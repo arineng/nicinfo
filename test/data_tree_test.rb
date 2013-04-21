@@ -14,7 +14,7 @@
 
 
 require 'test/unit'
-require 'arinr_logger'
+require 'nicinfo_logger'
 require 'stringio'
 require 'data_tree'
 

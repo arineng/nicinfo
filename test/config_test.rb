@@ -17,7 +17,7 @@ require 'tmpdir'
 require 'fileutils'
 require 'test/unit'
 require 'config'
-require 'arinr_logger'
+require 'nicinfo_logger'
 
 class ConfigTest < Test::Unit::TestCase
 

@@ -14,7 +14,7 @@
 
 
 require 'fileutils'
-require 'arinr_logger'
+require 'nicinfo_logger'
 require 'yaml'
 require 'ostruct'
 

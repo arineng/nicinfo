@@ -15,9 +15,10 @@
 
 require 'test/unit'
 require 'ostruct'
+require 'tmpdir'
 require 'base_opts'
 require 'config'
-require 'arinr_logger'
+require 'nicinfo_logger'
 
 class BaseOptsTest < Test::Unit::TestCase
 
