@@ -17,7 +17,7 @@ require 'tmpdir'
 require 'fileutils'
 require 'config'
 require 'test/unit'
-require 'whois_main'
+require 'nicinfo_main'
 require 'arinr_logger'
 
 class WhoisMainTest < Test::Unit::TestCase
