@@ -18,7 +18,7 @@ require 'arinr_logger'
 require 'yaml'
 require 'ostruct'
 
-module ARINcli
+module NicInfo
 
   # Handles configuration of the application
   class Config
@@ -27,12 +27,12 @@ module ARINcli
 
     # Intializes the configuration with a place to look for the config file
     # If the file doesn't exist, a default is used.
-    # Main routines will do something like ARINcli::Config.new( ARINcli::Config.formulate_app_data_dir() )
+    # Main routines will do something like NicInfo::Config.new( NicInfo::Config.formulate_app_data_dir() )
     def initialize app_data
 
       @options = OpenStruct.new
       @app_data = app_data
-      @logger = ARINcli::Logger.new
+      @logger = NicInfo::Logger.new
 
       config_file_name = Config.formulate_config_file_name( @app_data )
       if File.exist?( config_file_name )
@@ -141,13 +141,13 @@ module ARINcli
 
     def self.formulate_app_data_dir
       if RUBY_PLATFORM =~ /win32/
-        data_dir = File.join(ENV['APPDATA'], "ARINcli")
+        data_dir = File.join(ENV['APPDATA'], "NicInfo")
       elsif RUBY_PLATFORM =~ /linux/
-        data_dir = File.join(ENV['HOME'], ".ARINcli")
+        data_dir = File.join(ENV['HOME'], ".NicInfo")
       elsif RUBY_PLATFORM =~ /darwin/
-        data_dir = File.join(ENV['HOME'], ".ARINcli")
+        data_dir = File.join(ENV['HOME'], ".NicInfo")
       elsif RUBY_PLATFORM =~ /freebsd/
-        data_dir = File.join(ENV['HOME'], ".ARINcli")
+        data_dir = File.join(ENV['HOME'], ".NicInfo")
       else
         raise ScriptError, "system platform is not recognized."
       end
@@ -166,14 +166,14 @@ output:
 
   # If specified, messages goes to this file
   # otherwise, leave it commented out to go to stderr
-  #messages_file: /tmp/ARINcli.messages
+  #messages_file: /tmp/NicInfo.messages
 
   # possible values are TERSE, NORMAL, EXTRA
   data: NORMAL
 
   # If specified, data goest to this file
   # otherwise, leave it commented out to go to stdout
-  #data_file: /tmp/ARINcli.data
+  #data_file: /tmp/NicInfo.data
 
   # Page output with system pager when appropriate.
   pager: true

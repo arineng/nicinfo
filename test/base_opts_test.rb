@@ -35,7 +35,7 @@ class BaseOptsTest < Test::Unit::TestCase
 
   end
 
-  class ExtendBaseOpts < ARINcli::BaseOpts
+  class ExtendBaseOpts < NicInfo::BaseOpts
 
     def eval_opts( config, args )
 
@@ -65,7 +65,7 @@ class BaseOptsTest < Test::Unit::TestCase
   def test_base_opts
 
     dir = File.join( @work_dir, "test_base_opts" )
-    c = ARINcli::Config.new( dir )
+    c = NicInfo::Config.new( dir )
 
     e = ExtendBaseOpts.new
     args = [ "--messages", "ALL", "-r", "FOO", "BAR" ]
@@ -80,7 +80,7 @@ class BaseOptsTest < Test::Unit::TestCase
   def test_help_option
 
     dir = File.join( @work_dir, "test_help_option" )
-    c = ARINcli::Config.new( dir )
+    c = NicInfo::Config.new( dir )
 
     e = ExtendBaseOpts.new
     args = [ "-h" ]

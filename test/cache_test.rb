@@ -58,26 +58,26 @@ NET_XML
 
   def test_make_safe
 
-    assert_equal( ARINcli::make_safe( "http://" ), "http%3A%2F%2F" )
-    assert_equal( ARINcli::make_safe(
+    assert_equal( NicInfo::make_safe( "http://" ), "http%3A%2F%2F" )
+    assert_equal( NicInfo::make_safe(
                           "http://whois.arin.net/rest/nets;q=192.136.136.1?showDetails=true&showARIN=false" ),
                   "http%3A%2F%2Fwhois.arin.net%2Frest%2Fnets%3Bq%3D192.136.136.1%3FshowDetails%3Dtrue%26showARIN%3Dfalse")
-    assert_equal( ARINcli::make_safe( "marry had a little lamb!" ), "marry%20had%20a%20little%20lamb%21" )
+    assert_equal( NicInfo::make_safe( "marry had a little lamb!" ), "marry%20had%20a%20little%20lamb%21" )
 
   end
 
   def test_create_or_update
 
     dir = File.join( @work_dir, "test_create_or_update" )
-    c = ARINcli::Config.new( dir )
+    c = NicInfo::Config.new( dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
 
-    cache = ARINcli::Whois::Cache.new c
+    cache = NicInfo::Whois::Cache.new c
     url = "http://whois.arin.net/rest/net/NET-192-136-136-0-1"
     cache.create_or_update( url, @net_xml )
 
-    safe = ARINcli::make_safe( url )
+    safe = NicInfo::make_safe( url )
     file_name = File.join( c.whois_cache_dir, safe )
     assert( File.exist?( file_name ) )
     f = File.open( file_name, "r" )
@@ -104,16 +104,16 @@ NET_XML
   def test_create
 
     dir = File.join( @work_dir, "test_create" )
-    c = ARINcli::Config.new( dir )
+    c = NicInfo::Config.new( dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
     c.config[ "whois" ][ "cache_expiry" ] = 9000 # really any number above 1 should be good
 
-    cache = ARINcli::Whois::Cache.new c
+    cache = NicInfo::Whois::Cache.new c
     url = "http://whois.arin.net/rest/net/NET-192-136-136-0-1"
     cache.create_or_update( url, @net_xml )
 
-    safe = ARINcli::make_safe( url )
+    safe = NicInfo::make_safe( url )
     file_name = File.join( c.whois_cache_dir, safe )
     assert( File.exist?( file_name ) )
     f = File.open( file_name, "r" )
@@ -140,13 +140,13 @@ NET_XML
   def test_get_hit
 
     dir = File.join( @work_dir, "test_get_hit" )
-    c = ARINcli::Config.new( dir )
+    c = NicInfo::Config.new( dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
 
     c.config[ "whois" ][ "use_cache" ] = true
     c.config[ "whois" ][ "cache_expiry" ] = 9000 # really any number above 1 should be good
-    cache = ARINcli::Whois::Cache.new c
+    cache = NicInfo::Whois::Cache.new c
     url = "http://whois.arin.net/rest/net/NET-192-136-136-0-1"
     cache.create_or_update( url, @net_xml )
 
@@ -158,13 +158,13 @@ NET_XML
   def test_get_no_hit
 
     dir = File.join( @work_dir, "test_get_no_hit" )
-    c = ARINcli::Config.new( dir )
+    c = NicInfo::Config.new( dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
 
     c.config[ "whois" ][ "use_cache" ] = true
     c.config[ "whois" ][ "cache_expiry" ] = 9000 # really any number above 1 should be good
-    cache = ARINcli::Whois::Cache.new c
+    cache = NicInfo::Whois::Cache.new c
     url = "http://whois.arin.net/rest/net/NET-192-136-136-0-1"
     cache.create_or_update( url, @net_xml )
 
@@ -176,13 +176,13 @@ NET_XML
   def test_get_expired_hit
 
     dir = File.join( @work_dir, "test_get_expired_hit" )
-    c = ARINcli::Config.new( dir )
+    c = NicInfo::Config.new( dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
 
     c.config[ "whois" ][ "use_cache" ] = true
     c.config[ "whois" ][ "cache_expiry" ] = -19000 # really any number less than -1 should be good
-    cache = ARINcli::Whois::Cache.new c
+    cache = NicInfo::Whois::Cache.new c
     url = "http://whois.arin.net/rest/net/NET-192-136-136-0-1"
     cache.create_or_update( url, @net_xml )
 
@@ -194,13 +194,13 @@ NET_XML
   def test_no_use_cache
 
     dir = File.join( @work_dir, "test_no_use_cache" )
-    c = ARINcli::Config.new( dir )
+    c = NicInfo::Config.new( dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
 
     c.config[ "whois" ][ "use_cache" ] = false
     c.config[ "whois" ][ "cache_expiry" ] = 9000 # really any number above 1 should be good
-    cache = ARINcli::Whois::Cache.new c
+    cache = NicInfo::Whois::Cache.new c
     url = "http://whois.arin.net/rest/net/NET-192-136-136-0-1"
     cache.create_or_update( url, @net_xml )
 
@@ -212,13 +212,13 @@ NET_XML
   def test_clean
 
     dir = File.join( @work_dir, "test_clean" )
-    c = ARINcli::Config.new( dir )
+    c = NicInfo::Config.new( dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
 
     c.config[ "whois" ][ "use_cache" ] = true
     c.config[ "whois" ][ "cache_eviction" ] = -19000 # really any number less than -1 should be good
-    cache = ARINcli::Whois::Cache.new c
+    cache = NicInfo::Whois::Cache.new c
     url = "http://whois.arin.net/rest/net/NET-192-136-136-0-"
     cache.create_or_update( url + "1", @net_xml )
     cache.create_or_update( url + "2", @net_xml )

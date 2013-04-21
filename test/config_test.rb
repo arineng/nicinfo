@@ -39,7 +39,7 @@ class ConfigTest < Test::Unit::TestCase
 
     dir = File.join( @work_dir, "test_init_no_config_file" )
 
-    c = ARINcli::Config.new( dir )
+    c = NicInfo::Config.new( dir )
     assert_equal( "SOME", c.config[ "output" ][ "messages" ] )
     assert_equal( "NORMAL", c.config[ "output" ][ "data" ] )
     assert_nil( c.config[ "output" ][ "messages_file" ] )
@@ -58,9 +58,9 @@ class ConfigTest < Test::Unit::TestCase
     not_default_config = <<NOT_DEFAULT_CONFIG
 output:
   messages: NONE
-  #messages_file: /tmp/ARINcli.messages
+  #messages_file: /tmp/NicInfo.messages
   data: TERSE
-  #data_file: /tmp/ARINcli.data
+  #data_file: /tmp/NicInfo.data
 whois:
   url: http://whois.test.arin.net
 NOT_DEFAULT_CONFIG
@@ -68,7 +68,7 @@ NOT_DEFAULT_CONFIG
     f.puts( not_default_config )
     f.close
 
-    c = ARINcli::Config.new( dir )
+    c = NicInfo::Config.new( dir )
     assert_equal( "NONE", c.config[ "output" ][ "messages" ] )
     assert_equal( "TERSE", c.config[ "output" ][ "data" ] )
     assert_nil( c.config[ "output" ][ "messages_file" ] )
@@ -84,7 +84,7 @@ NOT_DEFAULT_CONFIG
 
     dir = File.join( @work_dir, "test_setup_workspace" )
 
-    c = ARINcli::Config.new( dir )
+    c = NicInfo::Config.new( dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
 

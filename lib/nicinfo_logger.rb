@@ -17,10 +17,10 @@
 
 require 'enum'
 
-module ARINcli
+module NicInfo
 
   # Controls the type of informational messages that are about the function of the application.
-  class MessageLevel < ARINcli::Enum
+  class MessageLevel < NicInfo::Enum
 
     # no messages
     MessageLevel.add_item(:NO_MESSAGES, "NONE")
@@ -34,7 +34,7 @@ module ARINcli
   end
 
   # Controls the amount of data
-  class DataAmount < ARINcli::Enum
+  class DataAmount < NicInfo::Enum
 
     # a terse amount of data
     DataAmount.add_item(:TERSE_DATA, "TERSE")

@@ -13,21 +13,21 @@
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 
-module ARINcli
+module NicInfo
 
-  def ARINcli::is_last_name name
+  def NicInfo::is_last_name name
     is_name "last-names.txt", name
   end
 
-  def ARINcli::is_male_name name
+  def NicInfo::is_male_name name
     is_name "male-first-names.txt", name
   end
 
-  def ARINcli::is_female_name name
+  def NicInfo::is_female_name name
     is_name "female-first-names.txt", name
   end
 
-  def ARINcli::is_name file_name, name
+  def NicInfo::is_name file_name, name
     retval = false
 
     file = File.new( File.join( File.dirname( __FILE__ ) , file_name ), "r" )

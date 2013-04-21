@@ -14,9 +14,9 @@
 
 
 require 'yaml'
-require 'arinr_logger'
+require 'nicinfo_logger'
 
-module ARINcli
+module NicInfo
 
   class DataNode
 
@@ -98,7 +98,7 @@ module ARINcli
     end
 
     def find_node data_address
-      node = ARINcli::DataNode.new( "fakeroot" )
+      node = NicInfo::DataNode.new( "fakeroot" )
       node.children=roots
       data_address.split( /\D/ ).each do |index_str|
         index = index_str.to_i - 1

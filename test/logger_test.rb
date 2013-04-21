@@ -21,190 +21,190 @@ require 'stringio'
 class LoggerTest < Test::Unit::TestCase
 
   def test_unknown_data_amount
-    logger = ARINcli::Logger.new
+    logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
-    logger.data_amount = ARINcli::DataAmount::FOO
+    logger.data_amount = NicInfo::DataAmount::FOO
     assert_raise( ArgumentError ) { logger.terse( "Network Handle", "NET-192-136-136-0-1" ) }
   end
 
   def test_fake_data_amount
-    logger = ARINcli::Logger.new
+    logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
     logger.data_amount = "FAKE"
     assert_raise( ArgumentError ) { logger.terse( "Network Handle", "NET-192-136-136-0-1" ) }
   end
 
   def test_log_extra_at_default
-    logger = ARINcli::Logger.new
+    logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
     logger.extra( "Network Handle", "NET-192-136-136-0-1" )
     assert_equal( "", logger.data_out.string )
   end
 
   def test_log_extra_at_normal
-    logger = ARINcli::Logger.new
+    logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
-    logger.data_amount = ARINcli::DataAmount::NORMAL_DATA
+    logger.data_amount = NicInfo::DataAmount::NORMAL_DATA
     logger.extra( "Network Handle", "NET-192-136-136-0-1" )
     assert_equal( "", logger.data_out.string )
   end
 
   def test_log_extra_at_terse
-    logger = ARINcli::Logger.new
+    logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
-    logger.data_amount = ARINcli::DataAmount::TERSE_DATA
+    logger.data_amount = NicInfo::DataAmount::TERSE_DATA
     logger.extra( "Network Handle", "NET-192-136-136-0-1" )
     assert_equal( "", logger.data_out.string )
   end
 
   def test_log_extra_at_extra
-    logger = ARINcli::Logger.new
+    logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
-    logger.data_amount = ARINcli::DataAmount::EXTRA_DATA
+    logger.data_amount = NicInfo::DataAmount::EXTRA_DATA
     logger.extra( "Network Handle", "NET-192-136-136-0-1" )
     assert_equal( "           Network Handle:  NET-192-136-136-0-1\n", logger.data_out.string )
   end
 
   def test_log_terse_at_default
-    logger = ARINcli::Logger.new
+    logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
     logger.terse( "Network Handle", "NET-192-136-136-0-1" )
     assert_equal( "           Network Handle:  NET-192-136-136-0-1\n", logger.data_out.string )
   end
 
   def test_log_terse_at_normal
-    logger = ARINcli::Logger.new
+    logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
-    logger.data_amount = ARINcli::DataAmount::NORMAL_DATA
+    logger.data_amount = NicInfo::DataAmount::NORMAL_DATA
     logger.terse( "Network Handle", "NET-192-136-136-0-1" )
     assert_equal( "           Network Handle:  NET-192-136-136-0-1\n", logger.data_out.string )
   end
 
   def test_log_terse_at_terse
-    logger = ARINcli::Logger.new
+    logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
-    logger.data_amount = ARINcli::DataAmount::TERSE_DATA
+    logger.data_amount = NicInfo::DataAmount::TERSE_DATA
     logger.terse( "Network Handle", "NET-192-136-136-0-1" )
     assert_equal( "           Network Handle:  NET-192-136-136-0-1\n", logger.data_out.string )
   end
 
   def test_log_terse_at_extra
-    logger = ARINcli::Logger.new
+    logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
-    logger.data_amount = ARINcli::DataAmount::EXTRA_DATA
+    logger.data_amount = NicInfo::DataAmount::EXTRA_DATA
     logger.terse( "Network Handle", "NET-192-136-136-0-1" )
     assert_equal( "           Network Handle:  NET-192-136-136-0-1\n", logger.data_out.string )
   end
 
   def test_log_normal_at_default
-    logger = ARINcli::Logger.new
+    logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
     logger.datum( "Network Handle", "NET-192-136-136-0-1" )
     assert_equal( "           Network Handle:  NET-192-136-136-0-1\n", logger.data_out.string )
   end
 
   def test_log_normal_at_normal
-    logger = ARINcli::Logger.new
+    logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
-    logger.data_amount = ARINcli::DataAmount::NORMAL_DATA
+    logger.data_amount = NicInfo::DataAmount::NORMAL_DATA
     logger.datum( "Network Handle", "NET-192-136-136-0-1" )
     assert_equal( "           Network Handle:  NET-192-136-136-0-1\n", logger.data_out.string )
   end
 
   def test_log_normal_at_terse
-    logger = ARINcli::Logger.new
+    logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
-    logger.data_amount = ARINcli::DataAmount::TERSE_DATA
+    logger.data_amount = NicInfo::DataAmount::TERSE_DATA
     logger.datum( "Network Handle", "NET-192-136-136-0-1" )
     assert_equal( "", logger.data_out.string )
   end
 
   def test_log_normal_at_extra
-    logger = ARINcli::Logger.new
+    logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
-    logger.data_amount = ARINcli::DataAmount::EXTRA_DATA
+    logger.data_amount = NicInfo::DataAmount::EXTRA_DATA
     logger.datum( "Network Handle", "NET-192-136-136-0-1" )
     assert_equal( "           Network Handle:  NET-192-136-136-0-1\n", logger.data_out.string )
   end
 
   def test_unknown_message_level
-    logger = ARINcli::Logger.new
+    logger = NicInfo::Logger.new
     logger.message_out = StringIO.new
-    logger.message_level = ARINcli::MessageLevel::NO_SUCH_LEVEL
+    logger.message_level = NicInfo::MessageLevel::NO_SUCH_LEVEL
     assert_raise( ArgumentError ) { logger.mesg( "Network Handle" ) }
   end
 
   def test_fake_message_level
-    logger = ARINcli::Logger.new
+    logger = NicInfo::Logger.new
     logger.message_out = StringIO.new
     logger.message_level = "FAKE"
     assert_raise( ArgumentError ) { logger.mesg( "Network Handle" ) }
   end
 
   def test_log_some_at_default
-    logger = ARINcli::Logger.new
+    logger = NicInfo::Logger.new
     logger.message_out = StringIO.new
     logger.mesg( "blah" )
     assert_equal( "# blah\n", logger.message_out.string )
   end
 
   def test_log_some_at_some
-    logger = ARINcli::Logger.new
+    logger = NicInfo::Logger.new
     logger.message_out = StringIO.new
-    logger.message_level = ARINcli::MessageLevel::SOME_MESSAGES
+    logger.message_level = NicInfo::MessageLevel::SOME_MESSAGES
     logger.mesg( "blah" )
     assert_equal( "# blah\n", logger.message_out.string )
   end
 
   def test_log_some_at_trace
-    logger = ARINcli::Logger.new
+    logger = NicInfo::Logger.new
     logger.message_out = StringIO.new
-    logger.message_level = ARINcli::MessageLevel::ALL_MESSAGES
+    logger.message_level = NicInfo::MessageLevel::ALL_MESSAGES
     logger.mesg( "blah" )
     assert_equal( "# blah\n", logger.message_out.string )
   end
 
   def test_log_some_at_none
-    logger = ARINcli::Logger.new
+    logger = NicInfo::Logger.new
     logger.message_out = StringIO.new
-    logger.message_level = ARINcli::MessageLevel::NO_MESSAGES
+    logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
     logger.mesg( "blah" )
     assert_equal( "", logger.message_out.string )
   end
 
   def test_log_trace_at_default
-    logger = ARINcli::Logger.new
+    logger = NicInfo::Logger.new
     logger.message_out = StringIO.new
     logger.trace( "blah" )
     assert_equal( "", logger.message_out.string )
   end
 
   def test_log_trace_at_some
-    logger = ARINcli::Logger.new
+    logger = NicInfo::Logger.new
     logger.message_out = StringIO.new
-    logger.message_level = ARINcli::MessageLevel::SOME_MESSAGES
+    logger.message_level = NicInfo::MessageLevel::SOME_MESSAGES
     logger.trace( "blah" )
     assert_equal( "", logger.message_out.string )
   end
 
   def test_log_trace_at_trace
-    logger = ARINcli::Logger.new
+    logger = NicInfo::Logger.new
     logger.message_out = StringIO.new
-    logger.message_level = ARINcli::MessageLevel::ALL_MESSAGES
+    logger.message_level = NicInfo::MessageLevel::ALL_MESSAGES
     logger.trace( "blah" )
     assert_equal( "## blah\n", logger.message_out.string )
   end
 
   def test_log_trace_at_none
-    logger = ARINcli::Logger.new
+    logger = NicInfo::Logger.new
     logger.message_out = StringIO.new
-    logger.message_level = ARINcli::MessageLevel::NO_MESSAGES
+    logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
     logger.trace( "blah" )
     assert_equal( "", logger.message_out.string )
   end
 
   def test_messages_and_data
-    logger = ARINcli::Logger.new
+    logger = NicInfo::Logger.new
     logger.message_out = StringIO.new
     logger.data_out = logger.message_out
     logger.mesg( "blah" )
@@ -214,7 +214,7 @@ class LoggerTest < Test::Unit::TestCase
   end
 
   def test_messages_vs_data
-    logger = ARINcli::Logger.new
+    logger = NicInfo::Logger.new
     messages = StringIO.new
     logger.message_out = messages
     data = StringIO.new
@@ -226,18 +226,18 @@ class LoggerTest < Test::Unit::TestCase
   end
 
   def test_log_ljust_item_name
-    logger = ARINcli::Logger.new
+    logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
-    logger.data_amount = ARINcli::DataAmount::NORMAL_DATA
+    logger.data_amount = NicInfo::DataAmount::NORMAL_DATA
     logger.item_name_rjust = false
     logger.datum( "Network Handle", "NET-192-136-136-0-1" )
     assert_equal( "Network Handle           :  NET-192-136-136-0-1\n", logger.data_out.string )
   end
 
   def test_log_empty_datum
-    logger = ARINcli::Logger.new
+    logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
-    logger.data_amount = ARINcli::DataAmount::NORMAL_DATA
+    logger.data_amount = NicInfo::DataAmount::NORMAL_DATA
     logger.datum( "Network Handle", "" )
     assert_equal( "", logger.data_out.string )
   end
