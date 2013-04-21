@@ -24,10 +24,6 @@ module NicInfo
   # regular expressions
   NET_HANDLE_REGEX = /^NET-.*/i
   NET6_HANDLE_REGEX = /^NET6-.*/i
-  POC_HANDLE_REGEX = /.*-ARIN$/i
-  ORGL_HANDLE_REGEX = /.*-Z$/i
-  ORGS_HANDLE_REGEX = /.*-O$/i
-  ORGN_HANDLE_REGEX = /\w+\-\d+/
   AS_REGEX = /^[0-9]{1,10}$/
   ASN_REGEX = /^AS[0-9]{1,20}$/i
   IP4_ARPA = /\.in-addr\.arpa[\.]?/i
@@ -41,26 +37,6 @@ module NicInfo
   IPV6_HEXCOMPRESS_REGEX = /\A((?:[0-9A-Fa-f]{1,4}(?::[0-9A-Fa-f]{1,4})*)?)::((?:[0-9A-Fa-f]{1,4}(?::[0-9A-Fa-f]{1,4})*)?)\z/
 
   #File Name Constants
-  ARININFO_LASTTREE_YAML = "arininfo-lasttree.yaml"
-  TICKET_LASTTREE_YAML   = "ticket-lasttree.yaml"
-  TICKET_TREE_YAML       = "ticket-tree.yaml"
-  TICKET_TX_PREFIX       = "ticket"
-  POC_TX_PREFIX          = "poc"
-  CREATE_POC_FILE        = "create_poc"
-  MODIFY_POC_FILE        = "modify_poc"
-  TICKET_MESSAGE_FILE    = "ticket_message"
-  EDIT_RDNS_FILE         = "edit_rdns"
-  MODIFY_RDNS_FILE       = "modify_rdns"
-  RDNS_TX_PREFIX         = "rdns"
-  REPORTS_TX_PREFIX      = "reports"
-
-  #Template constants
-  SUBJECT_HEADER         = "Subject:"
-  SUBJECT_DEFAULT        = "(Place Message Subject Here)"
-
-  #DNSSEC Record Algorithm Mapping
-  # in index order for the mapping:
-  #      DNSSEC_ALGORITHMS.index( "RSASHA1" ) + 1 = 5, 5 is the IETF value for RSASHA1
-  DNSSEC_ALGORITHMS = [ "RSAMD5", "DH", "DSA", "ECC", "RSASHA1" ]
+  LASTTREE_YAML          = "lasttree.yaml"
 
 end

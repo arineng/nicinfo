@@ -16,18 +16,11 @@
 require 'optparse'
 require 'net/http'
 require 'uri'
-require 'rexml/document'
 require 'base_opts'
 require 'config'
 require 'constants'
 require 'cache'
 require 'enum'
-require 'whois_net'
-require 'whois_poc'
-require 'whois_org'
-require 'whois_asn'
-require 'whois_rdns'
-require 'whois_trees'
 require 'common_names'
 
 module NicInfo

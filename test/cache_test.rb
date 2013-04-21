@@ -73,7 +73,7 @@ NET_XML
     c.logger.message_level = "NONE"
     c.setup_workspace
 
-    cache = NicInfo::Whois::Cache.new c
+    cache = NicInfo::Cache.new c
     url = "http://whois.arin.net/rest/net/NET-192-136-136-0-1"
     cache.create_or_update( url, @net_xml )
 
@@ -109,7 +109,7 @@ NET_XML
     c.setup_workspace
     c.config[ "whois" ][ "cache_expiry" ] = 9000 # really any number above 1 should be good
 
-    cache = NicInfo::Whois::Cache.new c
+    cache = NicInfo::Cache.new c
     url = "http://whois.arin.net/rest/net/NET-192-136-136-0-1"
     cache.create_or_update( url, @net_xml )
 
@@ -146,7 +146,7 @@ NET_XML
 
     c.config[ "whois" ][ "use_cache" ] = true
     c.config[ "whois" ][ "cache_expiry" ] = 9000 # really any number above 1 should be good
-    cache = NicInfo::Whois::Cache.new c
+    cache = NicInfo::Cache.new c
     url = "http://whois.arin.net/rest/net/NET-192-136-136-0-1"
     cache.create_or_update( url, @net_xml )
 
@@ -164,7 +164,7 @@ NET_XML
 
     c.config[ "whois" ][ "use_cache" ] = true
     c.config[ "whois" ][ "cache_expiry" ] = 9000 # really any number above 1 should be good
-    cache = NicInfo::Whois::Cache.new c
+    cache = NicInfo::Cache.new c
     url = "http://whois.arin.net/rest/net/NET-192-136-136-0-1"
     cache.create_or_update( url, @net_xml )
 
@@ -182,7 +182,7 @@ NET_XML
 
     c.config[ "whois" ][ "use_cache" ] = true
     c.config[ "whois" ][ "cache_expiry" ] = -19000 # really any number less than -1 should be good
-    cache = NicInfo::Whois::Cache.new c
+    cache = NicInfo::Cache.new c
     url = "http://whois.arin.net/rest/net/NET-192-136-136-0-1"
     cache.create_or_update( url, @net_xml )
 
@@ -200,7 +200,7 @@ NET_XML
 
     c.config[ "whois" ][ "use_cache" ] = false
     c.config[ "whois" ][ "cache_expiry" ] = 9000 # really any number above 1 should be good
-    cache = NicInfo::Whois::Cache.new c
+    cache = NicInfo::Cache.new c
     url = "http://whois.arin.net/rest/net/NET-192-136-136-0-1"
     cache.create_or_update( url, @net_xml )
 
@@ -218,7 +218,7 @@ NET_XML
 
     c.config[ "whois" ][ "use_cache" ] = true
     c.config[ "whois" ][ "cache_eviction" ] = -19000 # really any number less than -1 should be good
-    cache = NicInfo::Whois::Cache.new c
+    cache = NicInfo::Cache.new c
     url = "http://whois.arin.net/rest/net/NET-192-136-136-0-"
     cache.create_or_update( url + "1", @net_xml )
     cache.create_or_update( url + "2", @net_xml )
