@@ -18,6 +18,7 @@ require 'fileutils'
 require 'test/unit'
 require 'config'
 require 'nicinfo_logger'
+require 'constants'
 
 class ConfigTest < Test::Unit::TestCase
 
@@ -42,9 +43,9 @@ class ConfigTest < Test::Unit::TestCase
     c = NicInfo::Config.new( dir )
     assert_equal( "SOME", c.config[ "output" ][ "messages" ] )
     assert_equal( "NORMAL", c.config[ "output" ][ "data" ] )
-    assert_nil( c.config[ "output" ][ "messages_file" ] )
-    assert_nil( c.config[ "output" ][ "data_file" ] )
-    assert_equal( "http://whois.arin.net", c.config[ "whois" ][ "url" ] )
+    assert_nil( c.config[ NicInfo::OUTPUT ][ NicInfo::MESSAGES_FILE ] )
+    assert_nil( c.config[ NicInfo::OUTPUT ][ NicInfo::DATA_FILE ] )
+    assert_equal( "http://whois.arin.net", c.config[ NicInfo::BOOTSTRAP ][ NicInfo::IP_ROOT_URL ] )
 
     assert_equal( "NORMAL", c.logger.data_amount )
     assert_equal( "SOME", c.logger.message_level )
@@ -61,19 +62,19 @@ output:
   #messages_file: /tmp/NicInfo.messages
   data: TERSE
   #data_file: /tmp/NicInfo.data
-whois:
-  url: http://whois.test.arin.net
+bootstrap:
+  ip_root_url: http://whois.test.arin.net
 NOT_DEFAULT_CONFIG
     f = File.open( File.join( dir, "config.yaml" ), "w" )
     f.puts( not_default_config )
     f.close
 
     c = NicInfo::Config.new( dir )
-    assert_equal( "NONE", c.config[ "output" ][ "messages" ] )
-    assert_equal( "TERSE", c.config[ "output" ][ "data" ] )
-    assert_nil( c.config[ "output" ][ "messages_file" ] )
-    assert_nil( c.config[ "output" ][ "data_file" ] )
-    assert_equal( "http://whois.test.arin.net", c.config[ "whois" ][ "url" ] )
+    assert_equal( "NONE", c.config[ NicInfo::OUTPUT ][ NicInfo::MESSAGES ] )
+    assert_equal( "TERSE", c.config[ NicInfo::OUTPUT ][ NicInfo::DATA ] )
+    assert_nil( c.config[ NicInfo::OUTPUT ][ NicInfo::MESSAGES_FILE ] )
+    assert_nil( c.config[ NicInfo::OUTPUT ][ NicInfo::DATA_FILE ] )
+    assert_equal( "http://whois.test.arin.net", c.config[ NicInfo::BOOTSTRAP ][ NicInfo::IP_ROOT_URL ] )
 
     assert_equal( "TERSE", c.logger.data_amount )
     assert_equal( "NONE", c.logger.message_level )

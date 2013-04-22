@@ -27,7 +27,7 @@ module NicInfo
 
     # creates or updates an object in the cache
     def create_or_update url, data
-      return nil if @config.config["whois"]["use_cache"] == false
+      return nil if @config.config[ NicInfo::CACHE ][ NicInfo::USE_CACHE ] == false
       safe = NicInfo::make_safe(url)
       @config.logger.trace("Persisting " + url + " as " + safe)
       f = File.open(File.join(@config.whois_cache_dir, safe), "w")
@@ -40,16 +40,16 @@ module NicInfo
     def create url, data
       safe = NicInfo::make_safe(url)
       file_name = File.join(@config.whois_cache_dir, safe)
-      expiry = Time.now - @config.config["whois"]["cache_expiry"]
+      expiry = Time.now - @config.config[ NicInfo::CACHE ][ NicInfo::CACHE_EXPIRY ]
       return if (File.exist?(file_name) && File.mtime(file_name) > expiry)
       create_or_update(url, data)
     end
 
     def get url
-      return nil if @config.config["whois"]["use_cache"] == false
+      return nil if @config.config[ NicInfo::CACHE ][ NicInfo::USE_CACHE ] == false
       safe = NicInfo::make_safe(url)
       file_name = File.join(@config.whois_cache_dir, safe)
-      expiry = Time.now - @config.config["whois"]["cache_expiry"]
+      expiry = Time.now - @config.config[ NicInfo::CACHE ][ NicInfo::CACHE_EXPIRY ]
       if (File.exist?(file_name) && File.mtime(file_name) > expiry)
         @config.logger.trace("Getting " + url + " from cache.")
         f = File.open(file_name, "r")
@@ -66,7 +66,7 @@ module NicInfo
 
     def clean
       cache_files = Dir::entries(@config.whois_cache_dir)
-      eviction = Time.now - @config.config["whois"]["cache_eviction"]
+      eviction = Time.now - @config.config[ NicInfo::CACHE ][ NicInfo::CACHE_EVICTION ]
       eviction_count = 0
       cache_files.each do |file|
         full_file_name = File.join(@config.whois_cache_dir, file)

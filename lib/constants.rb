@@ -41,7 +41,7 @@ module NicInfo
 
   # Config constants
   OUTPUT = "output"
-  MESSAGE = "message"
+  MESSAGES = "messages"
   MESSAGES_FILE = "messages_file"
   DATA = "data"
   DATA_FILE = "data_file"

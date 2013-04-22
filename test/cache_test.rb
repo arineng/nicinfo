@@ -18,6 +18,7 @@ require 'fileutils'
 require 'test/unit'
 require 'config'
 require 'cache'
+require 'constants'
 
 
 class CacheTests < Test::Unit::TestCase
@@ -107,7 +108,7 @@ NET_XML
     c = NicInfo::Config.new( dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
-    c.config[ "whois" ][ "cache_expiry" ] = 9000 # really any number above 1 should be good
+    c.config[ NicInfo::CACHE ][ NicInfo::CACHE_EXPIRY ] = 9000 # really any number above 1 should be good
 
     cache = NicInfo::Cache.new c
     url = "http://whois.arin.net/rest/net/NET-192-136-136-0-1"
@@ -144,8 +145,8 @@ NET_XML
     c.logger.message_level = "NONE"
     c.setup_workspace
 
-    c.config[ "whois" ][ "use_cache" ] = true
-    c.config[ "whois" ][ "cache_expiry" ] = 9000 # really any number above 1 should be good
+    c.config[ NicInfo::CACHE ][ NicInfo::USE_CACHE ] = true
+    c.config[ NicInfo::CACHE ][ NicInfo::CACHE_EXPIRY ] = 9000 # really any number above 1 should be good
     cache = NicInfo::Cache.new c
     url = "http://whois.arin.net/rest/net/NET-192-136-136-0-1"
     cache.create_or_update( url, @net_xml )
@@ -162,8 +163,8 @@ NET_XML
     c.logger.message_level = "NONE"
     c.setup_workspace
 
-    c.config[ "whois" ][ "use_cache" ] = true
-    c.config[ "whois" ][ "cache_expiry" ] = 9000 # really any number above 1 should be good
+    c.config[ NicInfo::CACHE ][ NicInfo::USE_CACHE ] = true
+    c.config[ NicInfo::CACHE ][ NicInfo::CACHE_EXPIRY ] = 9000 # really any number above 1 should be good
     cache = NicInfo::Cache.new c
     url = "http://whois.arin.net/rest/net/NET-192-136-136-0-1"
     cache.create_or_update( url, @net_xml )
@@ -180,8 +181,8 @@ NET_XML
     c.logger.message_level = "NONE"
     c.setup_workspace
 
-    c.config[ "whois" ][ "use_cache" ] = true
-    c.config[ "whois" ][ "cache_expiry" ] = -19000 # really any number less than -1 should be good
+    c.config[ NicInfo::CACHE ][ NicInfo::USE_CACHE ] = true
+    c.config[ NicInfo::CACHE ][ NicInfo::CACHE_EXPIRY ] = -19000 # really any number less than -1 should be good
     cache = NicInfo::Cache.new c
     url = "http://whois.arin.net/rest/net/NET-192-136-136-0-1"
     cache.create_or_update( url, @net_xml )
@@ -198,8 +199,8 @@ NET_XML
     c.logger.message_level = "NONE"
     c.setup_workspace
 
-    c.config[ "whois" ][ "use_cache" ] = false
-    c.config[ "whois" ][ "cache_expiry" ] = 9000 # really any number above 1 should be good
+    c.config[ NicInfo::CACHE ][ NicInfo::USE_CACHE ] = false
+    c.config[ NicInfo::CACHE ][ NicInfo::CACHE_EXPIRY ] = 9000 # really any number above 1 should be good
     cache = NicInfo::Cache.new c
     url = "http://whois.arin.net/rest/net/NET-192-136-136-0-1"
     cache.create_or_update( url, @net_xml )
@@ -216,8 +217,8 @@ NET_XML
     c.logger.message_level = "NONE"
     c.setup_workspace
 
-    c.config[ "whois" ][ "use_cache" ] = true
-    c.config[ "whois" ][ "cache_eviction" ] = -19000 # really any number less than -1 should be good
+    c.config[ NicInfo::CACHE ][ NicInfo::USE_CACHE ] = true
+    c.config[ NicInfo::CACHE ][ NicInfo::CACHE_EVICTION ] = -19000 # really any number less than -1 should be good
     cache = NicInfo::Cache.new c
     url = "http://whois.arin.net/rest/net/NET-192-136-136-0-"
     cache.create_or_update( url + "1", @net_xml )
