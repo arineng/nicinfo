@@ -32,14 +32,14 @@ module NicInfo
     QueryType.add_item :BY_IP4_CIDR, "IP4CIDR"
     QueryType.add_item :BY_IP6_CIDR, "IP6CIDR"
     QueryType.add_item :BY_AS_NUMBER, "ASNUMBER"
-    QueryType.add_item :BY_DELEGATION, "DELEGATION"
+    QueryType.add_item :BY_DOMAIN, "DOMAIN"
     QueryType.add_item :BY_RESULT, "RESULT"
     QueryType.add_item :BY_ENTITY_NAME, "ENTITYNAME"
 
   end
 
   # The main class for the nicinfo command.
-  class Main < NicInfo::BaseOpts
+  class Main
 
     def initialize args, config = nil
 
@@ -98,9 +98,60 @@ module NicInfo
           raise OptionParser::InvalidArgument, cc.to_s unless cc =~ /yes|no|true|false/i
         end
 
-      end
+        opts.separator ""
+        opts.separator "Output Options:"
 
-      add_base_opts(@opts, @config)
+        opts.on( "--messages MESSAGE_LEVEL",
+                 "Specify the message level",
+                 "  none - no messages are to be output",
+                 "  some - some messages but not all",
+                 "  all  - all messages to be outupt" ) do |m|
+          config.logger.message_level = m.to_s.upcase
+          begin
+            config.logger.validate_message_level
+          rescue
+            raise OptionParser::InvalidArgument, m.to_s
+          end
+        end
+
+        opts.on( "--messages-out FILE",
+                 "FILE where messages will be written." ) do |f|
+          config.logger.messages_out = f
+        end
+
+        opts.on( "--data DATA_AMOUNT",
+                 "Specify the amount of data",
+                 "  terse  - enough data to identify the object",
+                 "  normal - normal view of data on objects",
+                 "  extra  - all data about the object" ) do |d|
+          config.logger.data_amount = d.to_s.upcase
+          begin
+            config.logger.validate_data_amount
+          rescue
+            raise OptionParser::InvalidArgument, d.to_s
+          end
+        end
+
+        opts.on( "--data-out FILE",
+                 "FILE where data will be written." ) do |f|
+          config.logger.data_out = f
+        end
+
+        opts.on( "-V",
+                 "Equivalent to --messages all and --data extra" ) do |v|
+          config.logger.data_amount = NicInfo::DataAmount::EXTRA_DATA
+          config.logger.message_level = NicInfo::MessageLevel::ALL_MESSAGES
+        end
+
+        opts.separator ""
+        opts.separator "General Options:"
+
+        opts.on( "-h", "--help",
+                 "Show this message" ) do
+          config.options.help = true
+        end
+
+      end
 
       begin
         @opts.parse!(args)
@@ -285,27 +336,6 @@ HELP_SUMMARY
       if (args.length() == 1)
 
         case args[0]
-          when NicInfo::NET_HANDLE_REGEX
-            args[0] = args[0].upcase
-            retval = QueryType::BY_NET_HANDLE
-          when NicInfo::NET6_HANDLE_REGEX
-            args[0] = args[0].upcase
-            retval = QueryType::BY_NET_HANDLE
-          when NicInfo::POC_HANDLE_REGEX
-            args[0] = args[0].upcase
-            retval = QueryType::BY_POC_HANDLE
-          when NicInfo::ORGL_HANDLE_REGEX
-            args[0] = args[0].upcase
-            retval = QueryType::BY_ORG_HANDLE
-          when NicInfo::ORGN_HANDLE_REGEX
-            args[0] = args[0].upcase
-            retval = QueryType::BY_ORG_HANDLE
-          when NicInfo::ORGS_HANDLE_REGEX
-            old = args[0]
-            args[0] = args[0].sub(/-O$/i, "")
-            args[0].upcase!
-            @config.logger.trace("Interpretting " + old + " as organization handle for " + args[0])
-            retval = QueryType::BY_ORG_HANDLE
           when NicInfo::IPV4_REGEX
             retval = QueryType::BY_IP4_ADDR
           when NicInfo::IPV6_REGEX
@@ -320,9 +350,9 @@ HELP_SUMMARY
             @config.logger.trace("Interpretting " + old + " as autonomous system number " + args[0])
             retval = QueryType::BY_AS_NUMBER
           when NicInfo::IP4_ARPA
-            retval = QueryType::BY_DELEGATION
+            retval = QueryType::BY_DOMAIN
           when NicInfo::IP6_ARPA
-            retval = QueryType::BY_DELEGATION
+            retval = QueryType::BY_DOMAIN
           when /(.*)\/\d/
             ip = $+
             if ip =~ NicInfo::IPV4_REGEX
@@ -343,21 +373,14 @@ HELP_SUMMARY
       elsif (args.length() == 2)
 
         if NicInfo::is_last_name(args[1].upcase) && (NicInfo::is_male_name(args[0].upcase) || NicInfo::is_female_name(args[0].upcase))
-          retval = QueryType::BY_POC_NAME
-        else
-          retval = QueryType::BY_ORG_NAME
+          retval = QueryType::BY_ENTITY_NAME
         end
 
       elsif (args.length() == 3)
 
         if NicInfo::is_last_name(args[2].upcase) && (NicInfo::is_male_name(args[0].upcase) || NicInfo::is_female_name(args[0].upcase))
-          retval = QueryType::BY_POC_NAME
-        else
-          retval = QueryType::BY_ORG_NAME
+          retval = QueryType::BY_ENTITY_NAME
         end
-
-      else
-        retval = QueryType::BY_ORG_NAME
 
       end
 
@@ -385,7 +408,7 @@ HELP_SUMMARY
           path << "rest/cidr/" << args[0]
         when QueryType::BY_AS_NUMBER
           path << "rest/asn/" << args[0]
-        when QueryType::BY_DELEGATION
+        when QueryType::BY_DOMAIN
           path << "rest/rdns/" << args[0]
         when QueryType::BY_RESULT
           tree = @config.load_as_yaml(NicInfo::ARININFO_LASTTREE_YAML)
