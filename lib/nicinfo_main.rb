@@ -16,7 +16,6 @@
 require 'optparse'
 require 'net/http'
 require 'uri'
-require 'base_opts'
 require 'config'
 require 'constants'
 require 'cache'
