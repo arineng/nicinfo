@@ -27,9 +27,6 @@ module NicInfo
 
   class QueryType < NicInfo::Enum
 
-    QueryType.add_item :BY_NET_HANDLE, "NETHANDLE"
-    QueryType.add_item :BY_POC_HANDLE, "POCHANDLE"
-    QueryType.add_item :BY_ORG_HANDLE, "ORGHANDLE"
     QueryType.add_item :BY_IP4_ADDR, "IP4ADDR"
     QueryType.add_item :BY_IP6_ADDR, "IP6ADDR"
     QueryType.add_item :BY_IP4_CIDR, "IP4CIDR"
@@ -37,30 +34,11 @@ module NicInfo
     QueryType.add_item :BY_AS_NUMBER, "ASNUMBER"
     QueryType.add_item :BY_DELEGATION, "DELEGATION"
     QueryType.add_item :BY_RESULT, "RESULT"
-    QueryType.add_item :BY_POC_NAME, "POCNAME"
-    QueryType.add_item :BY_ORG_NAME, "ORGNAME"
+    QueryType.add_item :BY_ENTITY_NAME, "ENTITYNAME"
 
   end
 
-  class RelatedType < NicInfo::Enum
-
-    RelatedType.add_item :NETS, "NETS"
-    RelatedType.add_item :DELS, "DELS"
-    RelatedType.add_item :ORGS, "ORGS"
-    RelatedType.add_item :POCS, "POCS"
-    RelatedType.add_item :ASNS, "ASNS"
-
-  end
-
-  class CidrMatching < NicInfo::Enum
-
-    CidrMatching.add_item :EXACT, "EXACT"
-    CidrMatching.add_item :LESS, "LESS"
-    CidrMatching.add_item :MORE, "MORE"
-
-  end
-
-  # The main class for the arininfo command.
+  # The main class for the nicinfo command.
   class Main < NicInfo::BaseOpts
 
     def initialize args, config = nil
@@ -73,54 +51,24 @@ module NicInfo
 
       @opts = OptionParser.new do |opts|
 
-        opts.banner = "Usage: arininfo [options] QUERY_VALUE"
+        opts.banner = "Usage: nicinfo [options] QUERY_VALUE"
 
         opts.separator ""
         opts.separator "Query Options:"
 
-        opts.on("-r", "--related TYPE",
-                "Query for the specified type related to the query value.",
-                "  nets - query for the related networks",
-                "  dels - query for the reverse DNS delegations",
-                "  orgs - query for the related organizations",
-                "  pocs - query for the related points of contact",
-                "  asns - query for the related autonomous system numbers") do |type|
-          uptype = type.upcase
-          raise OptionParser::InvalidArgument, type.to_s unless RelatedType.has_value?(uptype)
-          @config.options.related_type = uptype
-        end
-
         opts.on("-t", "--type TYPE",
                 "Specify type of the query value.",
-                "  nethandle  - network handle",
-                "  pochandle  - point of contact handle",
-                "  orghandle  - organization handle",
                 "  ip4addr    - IPv4 address",
                 "  ip6addr    - IPv6 address",
                 "  ip4cidr    - IPv4 cidr block",
                 "  ip6cidr    - IPv6 cidr block",
                 "  asnumber   - autonomous system number",
                 "  delegation - reverse DNS delegation",
-                "  pocname    - name of a point of contact",
-                "  orgname    - name of an organization",
+                "  entityname - name of a contact, organization, registrar or other entity",
                 "  result     - result from a previous query") do |type|
           uptype = type.upcase
           raise OptionParser::InvalidArgument, type.to_s unless QueryType.has_value?(uptype)
           @config.options.query_type = uptype
-        end
-
-        opts.on("--pft YES|NO|TRUE|FALSE",
-                "Use a PFT style query.") do |pft|
-          @config.config["whois"]["pft"] = false if pft =~ /no|false/i
-          @config.config["whois"]["pft"] = true if pft =~ /yes|true/i
-          raise OptionParser::InvalidArgument, pft.to_s unless pft =~ /yes|no|true|false/i
-        end
-
-        opts.on("--cidr LESS|EXACT|MORE",
-                "Type of matching to use for CIDR queries.") do |cidr|
-          upcidr = cidr.upcase
-          raise OptionParser::InvalidArgument, cidr.to_s unless CidrMatching.has_value?(upcidr)
-          @config.config["whois"]["cidr"] = upcidr
         end
 
         opts.on("--substring YES|NO|TRUE|FALSE",
@@ -128,13 +76,6 @@ module NicInfo
           @config.config["whois"]["substring"] = false if substring =~ /no|false/i
           @config.config["whois"]["substring"] = true if substring =~ /yes|true/i
           raise OptionParser::InvalidArgument, substring.to_s unless substring =~ /yes|no|true|false/i
-        end
-
-        opts.on("--details YES|NO|TRUE|FALSE",
-                "Query for extra details.") do |details|
-          @config.config["whois"]["details"] = false if details =~ /no|false/i
-          @config.config["whois"]["details"] = true if details =~ /yes|true/i
-          raise OptionParser::InvalidArgument, details.to_s unless details =~ /yes|no|true|false/i
         end
 
         opts.on("-U", "--url URL",

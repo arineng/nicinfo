@@ -182,10 +182,7 @@ output:
   # Comment out to disable auto-wrapping.
   auto_wrap: 80
 
-whois:
-
-  # the base URL for the Whois-RWS service
-  url: http://whois.arin.net
+cache:
 
   # The maximum age an item from the cache will be used.
   # This value is in seconds
@@ -203,30 +200,44 @@ whois:
   # Automatically clean the cache.
   clean_cache: true
 
-  # Use PFT style queries where appropriate
-  pft: true
+bootstrap:
 
-  # Query for extra details
-  details: false
+  entity_root_url: http://whois.arin.net
 
-  # CIDR query matching
-  # values are EXACT, LESS, and MORE
-  cidr: LESS
+  ip_root_url: http://whois.arin.net
+
+  as_root_url: http://whois.arin.net
+
+  domain_root_url: http://whois.arin.net
+
+  ns_root_url: http://whois.arin.net
+
+  arin_url: http://whois.arin.net
+
+  ripe_url: http://whois.ripe.net
+
+  lacnic_url: http://whois.lacnic.net
+
+  apnic_url: http://whois.apnic.net
+
+  afrinic_url: http://whois.afrinic.net
+
+  com_url: http://whois.verisign.net
+
+  net_url: http://whois.verisign.net
+
+  org_url: http://whois.pir.org
+
+  info_url: http://whois.affilias.info
+
+  biz_url: http://whois.neustar.biz
+
+search:
 
   # Substring matching
+  # NOT YET USED
   substring: true
 
-registration:
-
-  # The API-KEY to use for Reg-RWS requests
-  apikey: API-1234-5678-9012-3456
-
-  # the base URL for the Reg-RWS service
-  url: https://reg.arin.net
-
-  # The editor to use for editing values.
-  # If left blank, an attempt will be used to find a system default
-  # editor: vi
 YAML_CONFIG
 
   end
