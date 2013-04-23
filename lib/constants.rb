@@ -38,6 +38,8 @@ module NicInfo
 
   #File Name Constants
   LASTTREE_YAML          = "lasttree.yaml"
+  V6_ALLOCATIONS         = "v6_allocations.xml"
+  V4_ALLOCATIONS         = "v4_allocations.xml"
 
   # Config constants
   OUTPUT = "output"
