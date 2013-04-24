@@ -27,14 +27,19 @@ module NicInfo
         "IANA",                     NicInfo::IP_ROOT_URL,
         "ARIN",                     NicInfo::ARIN_URL,
         "Administered by ARIN",     NicInfo::ARIN_URL,
+        "Assigned by ARIN",         NicInfo::ARIN_URL,
         "APNIC",                    NicInfo::APNIC_URL,
         "Administered by APNIC",    NicInfo::APNIC_URL,
+        "Assigned by APNIC",        NicInfo::APNIC_URL,
         "AFRINIC",                  NicInfo::AFRINIC_URL,
         "Administered by AFRINIC",  NicInfo::AFRINIC_URL,
+        "Assigned by AFRINIC",      NicInfo::AFRINIC_URL,
         "RIPE NCC",                 NicInfo::RIPE_URL,
         "Administered by RIPE NCC", NicInfo::RIPE_URL,
+        "Assigned by RIPE NCC",     NicInfo::RIPE_URL,
         "LACNIC",                   NicInfo::LACNIC_URL,
-        "Administered by LACNIC",   NicInfo::LACNIC_URL
+        "Administered by LACNIC",   NicInfo::LACNIC_URL,
+        "Assigned by LACNIC",       NicInfo::LACNIC_URL
       }
     end
 
@@ -55,6 +60,7 @@ module NicInfo
         end
         retval = element.elements[ "description" ].text if prefix.include?( addr ) if addr.ipv6?
         retval = element.elements[ "designation" ].text if prefix.include?( addr ) if addr.ipv4?
+        break if retval
       end
       retval
     end
@@ -64,6 +70,22 @@ module NicInfo
       retval = @config.config[ NicInfo::BOOTSTRAP ][ @RIR_URLS[ rir ] ]
       retval = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::IP_ROOT_URL ] if retval == nil
       return retval
+    end
+
+    def find_rir_by_as as
+      retval = nil
+      file = File.new( File.join( File.dirname( __FILE__ ) , NicInfo::AS_ALLOCATIONS ), "r" )
+      doc = REXML::Document.new file
+      doc.elements.each( 'registry/registry/record' ) do |element|
+        numbers = element.elements[ "number" ].text.split( "-" )
+        min = numbers[ 0 ].to_i
+        max = numbers[ -1 ].to_i
+        if (as >= min ) && (as <= max)
+          retval = element.elements[ "description" ].text
+          break
+        end
+      end
+      retval
     end
 
   end

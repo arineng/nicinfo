@@ -86,4 +86,21 @@ class BootStrapTest < Test::Unit::TestCase
     assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::LACNIC_URL ], bootstrap.find_rir_url_by_ip( "191.0.0.1" ) )
     assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::AFRINIC_URL ], bootstrap.find_rir_url_by_ip( "196.0.0.1" ) )
   end
+
+  def test_find_rir_by_as
+    dir = File.join( @work_dir, "test_find_v4_url" )
+    c = NicInfo::Config.new( dir )
+    c.logger.message_level = "NONE"
+    c.setup_workspace
+    bootstrap = NicInfo::Bootstrap.new c
+    assert_equal( "Assigned by ARIN", bootstrap.find_rir_by_as( 26756 ) )
+    assert_equal( "Assigned by ARIN", bootstrap.find_rir_by_as( 26755 ) )
+    assert_equal( "Assigned by ARIN", bootstrap.find_rir_by_as( 27575 ) )
+    assert_equal( "Assigned by APNIC", bootstrap.find_rir_by_as( 23552 ) )
+    assert_equal( "Assigned by LACNIC", bootstrap.find_rir_by_as( 27648 ) )
+    assert_equal( "Assigned by RIPE NCC", bootstrap.find_rir_by_as( 24735 ) )
+    assert_equal( "Assigned by LACNIC", bootstrap.find_rir_by_as( 23541 ) )
+    assert_equal( "Assigned by AFRINIC", bootstrap.find_rir_by_as( 23549 ) )
+    assert_equal( "Assigned by ARIN", bootstrap.find_rir_by_as( 393216 ) )
+  end
 end
