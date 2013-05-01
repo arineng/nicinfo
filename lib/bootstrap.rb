@@ -73,6 +73,10 @@ module NicInfo
     end
 
     def find_rir_by_as as
+      if as.instance_of? String
+        as.sub!( /^AS/i, '')
+        as = as.to_i
+      end
       retval = nil
       file = File.new( File.join( File.dirname( __FILE__ ) , NicInfo::AS_ALLOCATIONS ), "r" )
       doc = REXML::Document.new file
@@ -88,8 +92,15 @@ module NicInfo
       retval
     end
 
+    def find_rir_url_by_as as
+      rir = find_rir_by_as as
+      retval = @config.config[ NicInfo::BOOTSTRAP ][ @RIR_URLS[ rir ] ]
+      retval = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::AS_ROOT_URL ] if retval == nil
+      return retval
+    end
+
     def get_ip4_by_inaddr inaddr
-      inaddr.sub!( /\.in\-addr\.arpa\.?/, "")
+      inaddr = inaddr.sub( /\.in\-addr\.arpa\.?/, "")
       a = inaddr.split( "." ).reverse
       ip = Array.new( 4 ).fill( 0 )
       for i in 0..a.length-1 do
@@ -99,7 +110,7 @@ module NicInfo
     end
 
     def get_ip6_by_inaddr inaddr
-      inaddr.sub!( /\.ip6\.arpa\.?/, "")
+      inaddr = inaddr.sub( /\.ip6\.arpa\.?/, "")
       a = inaddr.split( "." ).reverse.join
       ip = Array.new( 16 ).fill( 0 )
       i = 0

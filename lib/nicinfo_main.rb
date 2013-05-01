@@ -21,6 +21,7 @@ require 'constants'
 require 'cache'
 require 'enum'
 require 'common_names'
+require 'bootstrap'
 
 module NicInfo
 
@@ -62,7 +63,7 @@ module NicInfo
                 "  ip4cidr    - IPv4 cidr block",
                 "  ip6cidr    - IPv6 cidr block",
                 "  asnumber   - autonomous system number",
-                "  delegation - reverse DNS delegation",
+                "  domain     - domain name",
                 "  entityname - name of a contact, organization, registrar or other entity",
                 "  result     - result from a previous query") do |type|
           uptype = type.upcase
@@ -72,14 +73,14 @@ module NicInfo
 
         opts.on("--substring YES|NO|TRUE|FALSE",
                 "Use substring matching for name searchs.") do |substring|
-          @config.config["whois"]["substring"] = false if substring =~ /no|false/i
-          @config.config["whois"]["substring"] = true if substring =~ /yes|true/i
+          @config.config[ NicInfo::SEARCH ][ NicInfo::SUBSTRING ] = false if substring =~ /no|false/i
+          @config.config[ NicInfo::SEARCH ][ NicInfo::SUBSTRING ] = true if substring =~ /yes|true/i
           raise OptionParser::InvalidArgument, substring.to_s unless substring =~ /yes|no|true|false/i
         end
 
         opts.on("-U", "--url URL",
-                "The base URL of the Whois RESTful Web Service.") do |url|
-          @config.config["whois"]["url"] = url
+                "The base URL of the RDAP Service.") do |url|
+          @config.options.base_url = url
         end
 
         opts.separator ""
@@ -87,13 +88,13 @@ module NicInfo
 
         opts.on("--cache-expiry SECONDS",
                 "Age in seconds of items in the cache to be considered expired.") do |s|
-          @config.config["whois"]["cache_expiry"] = s
+          @config.config[ NicInfo::CACHE ][ NicInfo::CACHE_EXPIRY ] = s
         end
 
         opts.on("--cache YES|NO|TRUE|FALSE",
                 "Controls if the cache is used or not.") do |cc|
-          @config.config["whois"]["use_cache"] = false if cc =~ /no|false/i
-          @config.config["whois"]["use_cache"] = true if cc =~ /yes|true/i
+          @config.config[ NicInfo::CACHE ][ NicInfo::USE_CACHE ] = false if cc =~ /no|false/i
+          @config.config[ NicInfo::CACHE ][ NicInfo::USE_CACHE ] = true if cc =~ /yes|true/i
           raise OptionParser::InvalidArgument, cc.to_s unless cc =~ /yes|no|true|false/i
         end
 
@@ -213,8 +214,8 @@ module NicInfo
       @config.logger.run_pager
       @config.logger.mesg(NicInfo::VERSION)
       @config.setup_workspace
-      @cache = NicInfo::Whois::Cache.new(@config)
-      @cache.clean if @config.config["whois"]["clean_cache"]
+      @cache = Cache.new(@config)
+      @cache.clean if @config.config[ NicInfo::CACHE ][ NicInfo::CLEAN_CACHE ]
 
       if (@config.options.query_type == nil)
         @config.options.query_type = guess_query_value_type(@config.options.argv)
@@ -226,29 +227,48 @@ module NicInfo
         end
       end
 
-      begin
-        path = create_resource_url(@config.options.argv, @config.options.query_type)
-        path = mod_url(path, @config.options.related_type,
-                       @config.config["whois"]["pft"], @config.config["whois"]["details"])
-        data = get(path)
-        root = REXML::Document.new(data).root
-        has_results = evaluate_response(root)
-        if has_results
-          @config.logger.trace("Non-empty result set given.")
-          show_helpful_messages(path)
+      if @config.options.base_url == nil
+        bootstrap = Bootstrap.new( @config )
+        case @config.options.query_type
+          when QueryType::BY_IP4_ADDR
+            @config.options.base_url = bootstrap.find_rir_url_by_ip( @config.options.argv[ 0 ] )
+          when QueryType::BY_IP6_ADDR
+            @config.options.base_url = bootstrap.find_rir_url_by_ip( @config.options.argv[ 0 ] )
+          when QueryType::BY_IP4_CIDR
+            @config.options.base_url = bootstrap.find_rir_url_by_ip( @config.options.argv[ 0 ] )
+          when QueryType::BY_IP6_CIDR
+            @config.options.base_url = bootstrap.find_rir_url_by_ip( @config.options.argv[ 0 ] )
+          when QueryType::BY_AS_NUMBER
+            @config.options.base_url = bootstrap.find_rir_url_by_as( @config.options.argv[ 0 ] )
+          when QueryType::BY_DOMAIN
+            @config.options.base_url = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
+          when QueryType::BY_ENTITY_NAME
+            @config.options.base_url = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::ENTITY_ROOT_URL ]
         end
-        @config.logger.end_run
-      rescue ArgumentError => a
-        @config.logger.mesg(a.message)
-      rescue Net::HTTPServerException => e
-        case e.response.code
-          when "404"
-            @config.logger.mesg("Query yielded no results.")
-          when "503"
-            @config.logger.mesg("ARIN Whois-RWS is unavailable.")
-        end
-        @config.logger.trace("Server response code was " + e.response.code)
       end
+      @config.logger.mesg("RDAP URL is " + @config.options.base_url)
+
+      #begin
+      #  path = create_resource_url(@config.options.argv, @config.options.query_type)
+      #  data = get(path)
+      #  root = REXML::Document.new(data).root
+      #  has_results = evaluate_response(root)
+      #  if has_results
+      #    @config.logger.trace("Non-empty result set given.")
+      #    show_helpful_messages(path)
+      #  end
+      #  @config.logger.end_run
+      #rescue ArgumentError => a
+      #  @config.logger.mesg(a.message)
+      #rescue Net::HTTPServerException => e
+      #  case e.response.code
+      #    when "404"
+      #      @config.logger.mesg("Query yielded no results.")
+      #    when "503"
+      #      @config.logger.mesg("ARIN Whois-RWS is unavailable.")
+      #  end
+      #  @config.logger.trace("Server response code was " + e.response.code)
+      #end
 
     end
 
@@ -308,17 +328,15 @@ module NicInfo
       puts NicInfo::COPYRIGHT
       puts <<HELP_SUMMARY
 
-This program uses ARIN's Whois-RWS RESTful API to query ARIN's Whois database.
-The general usage is "arininfo QUERY_VALUE" where the type of QUERY_VALUE influences the
-type of query performed. This program will attempt to guess the type of QUERY_VALUE,
-but the QUERY_VALUE type maybe explicitly set using the -t option. Queries for data
-related to the QUERY_VALUE may be specified using the -r option (i.e. the reverse DNS
-delegations related to a network).
+NicInfo is a Registry Data Access Protocol (RDAP) client capable of querying RDAP
+servers containing IP address, Autonomous System, and Domain name information.
 
-In certain cases, Organization handles (orghandle), also knows as organization ids,
-can be properly determined. This occurs when the Organization handle ends with '-z'
-or with '-xxx' where xxx is a number. As a shortcut for Organization handles that do
-not match these cases, a '-o' can be appended to signify that it is an Organization handle.
+The general usage is "nicinfo QUERY_VALUE" where the type of QUERY_VALUE influences the
+type of query performed. This program will attempt to guess the type of QUERY_VALUE,
+but the QUERY_VALUE type maybe explicitly set using the -t option.
+
+Given the type of query to perform, this program will attempt to use the most appropriate
+RDAP server it can determine, and follow referrals from that server if necessary.
 
 HELP_SUMMARY
       puts @opts.help
@@ -363,9 +381,7 @@ HELP_SUMMARY
             retval = QueryType::BY_RESULT
           else
             if NicInfo::is_last_name(args[0].upcase)
-              retval = QueryType::BY_POC_NAME
-            else
-              retval = QueryType::BY_ORG_NAME
+              retval = QueryType::BY_ENTITY_NAME
             end
         end
 
@@ -431,94 +447,6 @@ HELP_SUMMARY
           path << "rest/orgs;q=" << URI.escape(args.join(" ")) << substring
         else
           raise ArgumentError.new("Unable to create a resource URL for " + queryType)
-      end
-
-      return path
-    end
-
-    def mod_url(path, relatedType, pft, details)
-
-      case path
-        when /rest\/ip\//
-          if relatedType != nil
-            raise ArgumentError.new("Unable to relate " + relatedType + " to " + path)
-          else
-            if pft
-              path << "/pft"
-            end
-            if details
-              path << "?showDetails=true"
-            end
-          end
-        when /rest\/cidr\//
-          if relatedType != nil
-            raise ArgumentError.new("Unable to relate " + relatedType + " to " + path)
-          else
-            cidr = @config.config["whois"]["cidr"]
-            if cidr == CidrMatching::LESS
-              path << "/less"
-            elsif cidr == CidrMatching::MORE
-              path << "/more"
-            end
-          end
-        when /rest\/net\//
-          if relatedType == RelatedType::DELS
-            path << "/rdns"
-          elsif relatedType != nil
-            raise ArgumentError.new("Unable to relate " + relatedType + " to " + path)
-          else
-            if pft
-              path << "/pft"
-            end
-            if details
-              path << "?showDetails=true"
-            end
-          end
-        when /rest\/rdns\//
-          if relatedType == RelatedType::NETS
-            path << "/nets"
-          elsif relatedType != nil
-            raise ArgumentError.new("Unable to relate " + relatedType + " to " + path)
-          end
-        when /rest\/asn\//
-          if relatedType != nil
-            raise ArgumentError.new("Unable to relate " + relatedType + " to " + path)
-          else
-            if details
-              path << "?showDetails=true"
-            end
-          end
-        when /rest\/org\//
-          case relatedType
-            when RelatedType::POCS
-              path << "/pocs"
-            when RelatedType::NETS
-              path << "/nets"
-            when RelatedType::ASNS
-              path << "/asns"
-            else
-              raise ArgumentError.new("Unable to relate " + relatedType + " to " + path) if relatedType
-          end
-          if !relatedType and pft
-            path << "/pft"
-          end
-          if details
-            path << "?showDetails=true"
-          end
-        when /rest\/poc\//
-          case relatedType
-            when RelatedType::ORGS
-              path << "/orgs"
-            when RelatedType::NETS
-              path << "/nets"
-            when RelatedType::ASNS
-              path << "/asns"
-            else
-              raise ArgumentError.new("Unable to relate " + relatedType + " to " + path) if relatedType
-          end
-          if details
-            path << "?showDetails=true"
-          end
       end
 
       return path
