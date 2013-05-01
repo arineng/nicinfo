@@ -100,26 +100,22 @@ module NicInfo
 
     def get_ip6_by_inaddr inaddr
       inaddr.sub!( /\.ip6\.arpa\.?/, "")
-      a = inaddr.split( "." ).reverse
+      a = inaddr.split( "." ).reverse.join
       ip = Array.new( 16 ).fill( 0 )
-      for i in 0..a.length-1 do
-        if i %2
-          ip[ i/2 ] ||= a[ i ].to_i
-        else
-          ip[ i/2 ] ||= ( a[ i ].to_i << 4 )
-        end
+      i = 0
+      while i <= a.length-1 do
+        ip[ i/2 ] = ( a[ i..i+1 ].to_i(16) )
+        i = i +2
       end
-      puts ip
       ipstr = ""
       i = 0
-      while i <= ip.length do
+      while i <= ip.length-1 do
         ipstr << ("%02X" % ip[i])
-        if i % 8
-          ipstr << ":"
+        if ((i+1) % 2) == 0
+          ipstr << ":" if i != ip.length-1
         end
         i = i +1
       end
-      puts ipstr
       return IPAddr.new( ipstr )
     end
 

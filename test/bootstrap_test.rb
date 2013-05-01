@@ -124,5 +124,6 @@ class BootStrapTest < Test::Unit::TestCase
     c.setup_workspace
     bootstrap = NicInfo::Bootstrap.new c
     assert_equal( IPAddr.new( "2001:db8::567:89ab" ), bootstrap.get_ip6_by_inaddr( "b.a.9.8.7.6.5.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6.arpa.") )
+    assert_equal( IPAddr.new( "2001:db8::0" ), bootstrap.get_ip6_by_inaddr( "8.b.d.0.1.0.0.2.ip6.arpa.") )
   end
 end
