@@ -88,6 +88,41 @@ module NicInfo
       retval
     end
 
+    def get_ip4_by_inaddr inaddr
+      inaddr.sub!( /\.in\-addr\.arpa\.?/, "")
+      a = inaddr.split( "." ).reverse
+      ip = Array.new( 4 ).fill( 0 )
+      for i in 0..a.length-1 do
+        ip[ i ] = a[ i ].to_i
+      end
+      return IPAddr.new( ip.join( "." ) )
+    end
+
+    def get_ip6_by_inaddr inaddr
+      inaddr.sub!( /\.ip6\.arpa\.?/, "")
+      a = inaddr.split( "." ).reverse
+      ip = Array.new( 16 ).fill( 0 )
+      for i in 0..a.length-1 do
+        if i %2
+          ip[ i/2 ] ||= a[ i ].to_i
+        else
+          ip[ i/2 ] ||= ( a[ i ].to_i << 4 )
+        end
+      end
+      puts ip
+      ipstr = ""
+      i = 0
+      while i <= ip.length do
+        ipstr << ("%02X" % ip[i])
+        if i % 8
+          ipstr << ":"
+        end
+        i = i +1
+      end
+      puts ipstr
+      return IPAddr.new( ipstr )
+    end
+
   end
 
 end

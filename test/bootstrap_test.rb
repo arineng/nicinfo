@@ -103,4 +103,26 @@ class BootStrapTest < Test::Unit::TestCase
     assert_equal( "Assigned by AFRINIC", bootstrap.find_rir_by_as( 23549 ) )
     assert_equal( "Assigned by ARIN", bootstrap.find_rir_by_as( 393216 ) )
   end
+
+  def test_get_ip4_from_inaddr
+    dir = File.join( @work_dir, "test_find_ip4_from_inaddr" )
+    c = NicInfo::Config.new( dir )
+    c.logger.message_level = "NONE"
+    c.setup_workspace
+    bootstrap = NicInfo::Bootstrap.new c
+    assert_equal( IPAddr.new( "192.0.0.1" ), bootstrap.get_ip4_by_inaddr( "1.0.0.192.in-addr.arpa.") )
+    assert_equal( IPAddr.new( "192.0.0.1" ), bootstrap.get_ip4_by_inaddr( "1.0.0.192.in-addr.arpa") )
+    assert_equal( IPAddr.new( "192.0.0.0" ), bootstrap.get_ip4_by_inaddr( "0.0.192.in-addr.arpa") )
+    assert_equal( IPAddr.new( "192.0.0.0" ), bootstrap.get_ip4_by_inaddr( "0.192.in-addr.arpa") )
+    assert_equal( IPAddr.new( "192.0.0.0" ), bootstrap.get_ip4_by_inaddr( "192.in-addr.arpa") )
+  end
+
+  def test_get_ip6_from_inaddr
+    dir = File.join( @work_dir, "test_find_ip6_from_inaddr" )
+    c = NicInfo::Config.new( dir )
+    c.logger.message_level = "NONE"
+    c.setup_workspace
+    bootstrap = NicInfo::Bootstrap.new c
+    assert_equal( IPAddr.new( "2001:db8::567:89ab" ), bootstrap.get_ip6_by_inaddr( "b.a.9.8.7.6.5.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6.arpa.") )
+  end
 end
