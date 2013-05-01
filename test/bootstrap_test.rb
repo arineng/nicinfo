@@ -126,4 +126,19 @@ class BootStrapTest < Test::Unit::TestCase
     assert_equal( IPAddr.new( "2001:db8::567:89ab" ), bootstrap.get_ip6_by_inaddr( "b.a.9.8.7.6.5.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6.arpa.") )
     assert_equal( IPAddr.new( "2001:db8::0" ), bootstrap.get_ip6_by_inaddr( "8.b.d.0.1.0.0.2.ip6.arpa.") )
   end
+
+  def test_find_url_by_domain
+    dir = File.join( @work_dir, "test_find_url_by_domain" )
+    c = NicInfo::Config.new( dir )
+    c.logger.message_level = "NONE"
+    c.setup_workspace
+    bootstrap = NicInfo::Bootstrap.new c
+    assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::ARIN_URL ], bootstrap.find_url_by_domain( "0.0.4.0.1.0.0.2.ip6.arpa.") )
+    assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::ARIN_URL ], bootstrap.find_url_by_domain( "192.in-addr.arpa") )
+    assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::COM_URL ], bootstrap.find_url_by_domain( "www.exmaple.com") )
+    assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::COM_URL ], bootstrap.find_url_by_domain( "exmaple.com") )
+    assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::BIZ_URL ], bootstrap.find_url_by_domain( "www.exmaple.biz") )
+    assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::DOMAIN_ROOT_URL ], bootstrap.find_url_by_domain( "www.exmaple.museuum") )
+  end
+
 end

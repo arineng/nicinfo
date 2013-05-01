@@ -119,6 +119,23 @@ module NicInfo
       return IPAddr.new( ipstr )
     end
 
+    def find_url_by_domain domain
+      retval = nil
+      domain.sub!( /\.$/, '' ) #remove trailing dot if there is one
+      if domain.end_with?( ".ip6.arpa" )
+        addr = get_ip6_by_inaddr domain
+        retval = find_rir_url_by_ip addr
+      elsif domain.end_with?( ".in-addr.arpa" )
+        addr = get_ip4_by_inaddr domain
+        retval = find_rir_url_by_ip addr
+      else
+        tld = domain.split( '.' ).last
+        retval = @config.config[ NicInfo::BOOTSTRAP ][ tld + "_url" ]
+        retval = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::DOMAIN_ROOT_URL ] if retval == nil
+      end
+      return retval
+    end
+
   end
 
 end
