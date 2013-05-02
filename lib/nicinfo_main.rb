@@ -164,19 +164,15 @@ module NicInfo
 
     end
 
-    # Do an HTTP GET with the path.
-    # The base URL is taken from the config
-    def get path
-
-      if path.start_with?("http://")
-        url = path
-      else
-        url = @config.config["whois"]["url"]
-        if (!url.end_with?("/"))
-          url << "/"
-        end
-        url << path
+    def make_rdap_url( base_url, resource_path )
+      if !(base_url.end_with?( "/" ))
+        base_url << "/"
       end
+      base_url << resource_path
+    end
+
+    # Do an HTTP GET with the path.
+    def get url
 
       data = @cache.get(url)
       if (data == nil)
@@ -246,29 +242,29 @@ module NicInfo
             @config.options.base_url = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::ENTITY_ROOT_URL ]
         end
       end
-      @config.logger.mesg("RDAP URL is " + @config.options.base_url)
 
-      #begin
-      #  path = create_resource_url(@config.options.argv, @config.options.query_type)
-      #  data = get(path)
-      #  root = REXML::Document.new(data).root
-      #  has_results = evaluate_response(root)
-      #  if has_results
-      #    @config.logger.trace("Non-empty result set given.")
-      #    show_helpful_messages(path)
-      #  end
-      #  @config.logger.end_run
-      #rescue ArgumentError => a
-      #  @config.logger.mesg(a.message)
-      #rescue Net::HTTPServerException => e
-      #  case e.response.code
-      #    when "404"
-      #      @config.logger.mesg("Query yielded no results.")
-      #    when "503"
-      #      @config.logger.mesg("ARIN Whois-RWS is unavailable.")
-      #  end
-      #  @config.logger.trace("Server response code was " + e.response.code)
-      #end
+      begin
+        path = create_resource_url(@config.options.argv, @config.options.query_type)
+        rdap_url = make_rdap_url( @config.options.base_url, path )
+        #data = get( rdap_url )
+        #root = REXML::Document.new(data).root
+        #has_results = evaluate_response(root)
+        #if has_results
+        #  @config.logger.trace("Non-empty result set given.")
+        #  show_helpful_messages(path)
+        #end
+        @config.logger.end_run
+      rescue ArgumentError => a
+        @config.logger.mesg(a.message)
+      rescue Net::HTTPServerException => e
+        case e.response.code
+          when "404"
+            @config.logger.mesg("Query yielded no results.")
+          when "503"
+            @config.logger.mesg("ARIN Whois-RWS is unavailable.")
+        end
+        @config.logger.trace("Server response code was " + e.response.code)
+      end
 
     end
 
@@ -409,44 +405,24 @@ HELP_SUMMARY
 
       path = ""
       case queryType
-        when QueryType::BY_NET_HANDLE
-          path << "rest/net/" << args[0]
-        when QueryType::BY_POC_HANDLE
-          path << "rest/poc/" << args[0]
-        when QueryType::BY_ORG_HANDLE
-          path << "rest/org/" << args[0]
         when QueryType::BY_IP4_ADDR
-          path << "rest/ip/" << args[0]
+          path << "ip/" << args[0]
         when QueryType::BY_IP6_ADDR
-          path << "rest/ip/" << args[0]
+          path << "ip/" << args[0]
         when QueryType::BY_IP4_CIDR
-          path << "rest/cidr/" << args[0]
+          path << "ip/" << args[0]
         when QueryType::BY_IP6_CIDR
-          path << "rest/cidr/" << args[0]
+          path << "ip/" << args[0]
         when QueryType::BY_AS_NUMBER
-          path << "rest/asn/" << args[0]
+          path << "autnum/" << args[0]
         when QueryType::BY_DOMAIN
-          path << "rest/rdns/" << args[0]
+          path << "domain/" << args[0]
         when QueryType::BY_RESULT
           tree = @config.load_as_yaml(NicInfo::ARININFO_LASTTREE_YAML)
           path = tree.find_rest_ref(args[0])
           raise ArgumentError.new("Unable to find result for " + args[0]) unless path
-        when QueryType::BY_POC_NAME
-          substring = @config.config["whois"]["substring"] ? "*" : ""
-          path << "rest/pocs"
-          case args.length
-            when 1
-              path << ";last=" << URI.escape(args[0]) << substring
-            when 2
-              path << ";last=" << URI.escape(args[1]) << substring << ";first=" << URI.escape(args[0]) << substring
-            when 3
-              path << ";last=" << URI.escape(args[2]) << substring << ";first=" << URI.escape(args[0]) << substring << ";middle=" << URI.escape(args[1]) << substring
-            else
-              path << ";q=" << URI.escape(args.join(" ")) << substring
-          end
-        when QueryType::BY_ORG_NAME
-          substring = @config.config["whois"]["substring"] ? "*" : ""
-          path << "rest/orgs;q=" << URI.escape(args.join(" ")) << substring
+        when QueryType::BY_ENTITY_NAME
+          path << "entity/" << URI.escape( args[ 0 ] )
         else
           raise ArgumentError.new("Unable to create a resource URL for " + queryType)
       end
