@@ -65,6 +65,9 @@ class NicInfoMainTest < Test::Unit::TestCase
     assert_equal( nicinfo.guess_query_value_type( [ "136.199.in-addr.arpa." ] ), "DOMAIN" )
     assert_equal( nicinfo.guess_query_value_type( [ "8.f.4.0.1.0.0.2.ip6.arpa" ] ), "DOMAIN" )
     assert_equal( nicinfo.guess_query_value_type( [ "8.f.4.0.1.0.0.2.ip6.arpa." ] ), "DOMAIN" )
+    assert_equal( nicinfo.guess_query_value_type( [ "example.com" ] ), "DOMAIN" )
+    assert_equal( nicinfo.guess_query_value_type( [ "example.com." ] ), "DOMAIN" )
+    assert_equal( nicinfo.guess_query_value_type( [ "foo" ] ), "ENTITYNAME" )
 
   end
 

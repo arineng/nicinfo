@@ -379,6 +379,8 @@ HELP_SUMMARY
             end
           when NicInfo::DATA_TREE_ADDR_REGEX
             retval = QueryType::BY_RESULT
+          when NicInfo::DOMAIN_REGEX
+            retval = QueryType::BY_DOMAIN
           else
             if NicInfo::is_last_name(args[0].upcase)
               retval = QueryType::BY_ENTITY_NAME
