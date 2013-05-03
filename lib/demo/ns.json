@@ -1,0 +1,37 @@
+{
+    "handle":"XXXX",
+    "ldhName":"ns1.xn--fo-5ja.example",
+    "unicodeName":"foo.example",
+    "status":[ "active" ],
+    "ipAddresses":{
+        "v4":[ "192.0.2.1", "192.0.2.2" ],
+        "v6":[ "2001:db8::123" ]
+    },
+    "remarks":[
+        {
+            "description":[
+                "She sells sea shells down by the sea shore.",
+                "Originally written by Terry Sullivan."
+            ]
+        }
+    ],
+    "links":[
+        {
+            "value":"http://example.net/nameserver/xxxx",
+            "rel":"self",
+            "href":"http://example.net/nameserver/xxxx"
+        }
+    ],
+    "port43":"whois.example.net",
+    "events":[
+        {
+            "eventAction":"registration",
+            "eventDate":"1990-12-31T23:59:60Z"
+        },
+        {
+            "eventAction":"last changed",
+            "eventDate":"1991-12-31T23:59:60Z",
+            "eventActor":"joe@bob.com"
+        }
+    ]
+}

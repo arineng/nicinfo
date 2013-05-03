@@ -1,0 +1,51 @@
+       {
+         "handle" : "XXXX",
+         "vCard" :
+         [
+            [ "version", {}, "text", "4.0" ],
+            [ "fn", {}, "text", "Joe Bob, Inc." ],
+            [ "fn", {}, "text", "Bobby Joe Shopping" ],
+            [ "label", {}, "text", "123 Maple Ave\n",
+                                   "Vancouver\n",
+                                   "BC\n",
+                                   "1239\n" ],
+            [ "email", {}, "text", "joe at bob.com" ],
+            [ "email", {}, "text", "bob at joe.com" ],
+            [ "tel", { "type": "work" }, "uri", "tel:+1-958-555-4321" ],
+            [ "tel", { "type": "work" }, "uri", "tel:+1-958-555-4322" ],
+            [ "tel", { "type": "fax" }, "uri", "tel:+1-958-555-4323" ],
+            [ "tel", { "type": "cell" }, "uri", "tel:+1-958-555-4324" ],
+         ],
+         "status" : [ "validated", "locked" ],
+         "remarks" :
+         [
+           {
+             "description" :
+             [
+               "She sells sea shells down by the sea shore.",
+               "Originally written by Terry Sullivan."
+             ]
+           }
+         ],
+         "links" :
+         [
+           {
+             "value" : "http://example.com/entity/XXXX",
+             "rel" : "self",
+             "href" : "http://example.com/entity/XXXX"
+           }
+         ],
+         "port43" : "whois.example.net",
+         "events" :
+         [
+           {
+             "eventAction" : "registration",
+             "eventDate" : "1990-12-31T23:59:60Z"
+           },
+           {
+             "eventAction" : "last changed",
+             "eventDate" : "1991-12-31T23:59:60Z",
+             "eventActor" : "joe@bob.com"
+           }
+         ]
+       }

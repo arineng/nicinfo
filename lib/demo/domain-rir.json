@@ -1,0 +1,102 @@
+{
+    "handle":"XXXX",
+    "ldhName":"192.in-addr.arpa",
+    "nameServers":[
+        {
+            "ldhName":"ns1.rir.example"
+        },
+        {
+            "ldhName":"ns2.rir.example"
+        }
+    ],
+    "delegationKeys":[
+        {
+            "algorithm":7,
+            "digest":"E68C017BD813B9AE2F4DD28E61AD014F859ED44C",
+            "digestType":1,
+            "keyTag":53814
+        }
+    ],
+    "remarks":[
+        {
+            "description":[
+                "She sells sea shells down by the sea shore.",
+                "Originally written by Terry Sullivan."
+            ]
+        }
+    ],
+    "links":[
+        {
+            "value":"http://example.net/domain/XXXX",
+            "rel":"self",
+            "href":"http://example.net/domain/XXXXX"
+        }
+    ],
+    "events":[
+        {
+            "eventAction":"registration",
+            "eventDate":"1990-12-31T23:59:60Z"
+        },
+        {
+            "eventAction":"last changed",
+            "eventDate":"1991-12-31T23:59:60Z",
+            "eventActor":"joe@bob.com"
+        }
+    ],
+    "entities":[
+        {
+            "handle":"XXXX",
+            "vCard":[
+                [ "version", {}, "text", "4.0" ],
+                [ "fn", {}, "text", "Joe Bob, Inc." ],
+                [ "fn", {}, "text", "Bobby Joe Shopping" ],
+                [ "label", {}, "text", "123 Maple Ave\n",
+                    "Suite 90001\n",
+                    "Vancouver\n",
+                    "BC\n",
+                    "1239\n" ],
+                [ "email", {}, "text", "joe at bob.com" ],
+                [ "email", {}, "text", "bob at joe.com" ],
+                [ "tel", {
+                    "type":"work"
+                }, "uri", "tel:+1-958-555-4321" ],
+                [ "tel", {
+                    "type":"work"
+                }, "uri", "tel:+1-958-555-4322" ],
+                [ "tel", {
+                    "type":"fax"
+                }, "uri", "tel:+1-958-555-4323" ],
+                [ "tel", {
+                    "type":"cell"
+                }, "uri", "tel:+1-958-555-4324" ],
+            ],
+            "roles":[ "registrant" ],
+            "remarks":[
+                {
+                    "description":[
+                        "She sells sea shells down by the sea shore.",
+                        "Originally written by Terry Sullivan."
+                    ]
+                }
+            ],
+            "links":[
+                {
+                    "value":"http://example.net/entity/xxxx",
+                    "rel":"self",
+                    "href":"http://example.net/entity/xxxx"
+                }
+            ],
+            "events":[
+                {
+                    "eventAction":"registration",
+                    "eventDate":"1990-12-31T23:59:60Z"
+                },
+                {
+                    "eventAction":"last changed",
+                    "eventDate":"1991-12-31T23:59:60Z",
+                    "eventActor":"joe@bob.com"
+                }
+            ]
+        }
+    ]
+}
