@@ -1,3 +1,5 @@
 {
+    "nicInfo_demoUrl" : "http://whois.arin.net/nameserver/ns1.example.com",
+    "nicInfo_demoHint" : "nicinfo ns1.example.com",
     "ldhName":"ns1.example.com"
 }

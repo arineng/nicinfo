@@ -1,4 +1,6 @@
 {
+    "nicInfo_demoUrl" : "http://whois.arin.net/ip/192.0.2.0/24",
+    "nicInfo_demoHint" : "nicinfo 192.0.2.0/24",
     "rdapConformance":[
         "rdap_level_0"
     ],

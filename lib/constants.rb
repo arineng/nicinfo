@@ -42,6 +42,7 @@ module NicInfo
   V6_ALLOCATIONS         = "v6_allocations.xml"
   V4_ALLOCATIONS         = "v4_allocations.xml"
   AS_ALLOCATIONS         = "as_allocations.xml"
+  DEMO_DIR               = "demo"
 
   # Config constants
   OUTPUT = "output"
@@ -74,5 +75,11 @@ module NicInfo
   BIZ_URL = "biz_url"
   SEARCH = "search"
   SUBSTRING = "substring"
+
+  #JSON Constants
+
+  # NicInfo values
+  NICINFO_DEMO_URL = "nicInfo_demoUrl"
+  NICINFO_DEMO_HINT = "nicInfo_demoHint"
 
 end

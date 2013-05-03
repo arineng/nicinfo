@@ -1,4 +1,6 @@
 {
+    "nicInfo_demoUrl" : "http://whois.arin.net/nameserver/ns1.xn--fo-5ja.example",
+    "nicInfo_demoHint" : "nicinfo ns1.xn--fo-5ja.example",
     "handle":"XXXX",
     "ldhName":"ns1.xn--fo-5ja.example",
     "unicodeName":"foo.example",

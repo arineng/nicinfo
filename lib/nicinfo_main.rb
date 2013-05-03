@@ -98,6 +98,11 @@ module NicInfo
           raise OptionParser::InvalidArgument, cc.to_s unless cc =~ /yes|no|true|false/i
         end
 
+        opts.on("--demo",
+                "Populates the cache with demonstration results.") do |cc|
+          @config.options.demo = true
+        end
+
         opts.separator ""
         opts.separator "Output Options:"
 
@@ -212,6 +217,13 @@ module NicInfo
       @config.setup_workspace
       @cache = Cache.new(@config)
       @cache.clean if @config.config[ NicInfo::CACHE ][ NicInfo::CLEAN_CACHE ]
+      if @config.options.demo
+        @config.logger.mesg( "Populating cache with demonstration results" )
+        demo_files = Dir::entries( File.join( File.dirname( __FILE__ ), NicInfo::DEMO_DIR ) )
+        demo_files.each do |file|
+
+        end
+      end
 
       if (@config.options.query_type == nil)
         @config.options.query_type = guess_query_value_type(@config.options.argv)

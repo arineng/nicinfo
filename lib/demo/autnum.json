@@ -1,5 +1,7 @@
 {
-    "handle":"XXXX-RIR",
+    "nicInfo_demoUrl":"http://whois.arin.net/autnum/10",
+    "nicInfo_demoHint":"nicinfo as10",
+    "handle":"AS10-RIR",
     "startAutnum":"10",
     "endAutnum":"15",
     "name":"AS-RTR-1",

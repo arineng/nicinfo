@@ -1,218 +1,203 @@
-   {
-     "handle" : "XXXX",
-     "ldhName" : "xn--fo-5ja.example",
-     "unicodeName" : "foo.example",
-     "variants" :
-     [
-       {
-         "relation" : [ "registered", "conjoined" ],
-         "variantNames" :
-         [
-           {
-             "ldhName" : "xn--fo-cka.example",
-             "unicodeName" : "foo.example"
-           },
-           {
-             "ldhName" : "xn--fo-fka.example",
-             "unicodeName" : "foeo.example"
-           }
-         ]
-       },
-       {
-         "relation" : [ "unregistered", "restricted registration" ],
-         "variantNames" :
-         [
-           {
-             "ldhName": "xn--fo-8ja.example",
-             "unicodeName" : "foo.example"
-           }
-         ]
-       }
-     ],
-     "status" : [ "locked", "transferProhibited" ],
-     "nameServers" :
-     [
-       {
-         "handle" : "XXXX",
-         "ldhName" : "ns1.example.com",
-         "status" : [ "active" ],
-         "ipAddresses" :
-         {
-           "v6": [ "2001:db8::123", "2001:db8::124" ],
-           "v4": [ "192.0.2.1", "192.0.2.2" ]
-         },
-         "remarks" :
-         [
-           {
-             "description" :
-             [
-               "She sells sea shells down by the sea shore.",
-               "Originally written by Terry Sullivan."
-             ]
-           }
-         ],
-         "links" :
-         [
-           {
-             "value" : "http://example.net/nameserver/XXXX",
-             "rel" : "self",
-             "href" : "http://example.net/nameserver/XXXX"
-           }
-         ],
-         "events" :
-         [
-           {
-             "eventAction" : "registration",
-             "eventDate" : "1990-12-31T23:59:60Z"
-           },
-           {
-             "eventAction" : "last changed",
-             "eventDate" : "1991-12-31T23:59:60Z"
-           }
-         ]
-       },
-       {
-         "handle" : "XXXX",
-         "ldhName" : "ns2.example.com",
-         "status" : [ "active" ],
-         "ipAddresses" :
-         {
-           "v6" : [ "2001:db8::125", "2001:db8::126" ],
-           "v4" : [ "192.0.2.3", "192.0.2.4" ]
-         },
-         "remarks" :
-         [
-           {
-             "description" :
-             [
-               "She sells sea shells down by the sea shore.",
-               "Originally written by Terry Sullivan."
-             ]
-           }
-         ],
-         "links" :
-         [
-           {
-             "value" : "http://example.net/nameserver/XXXX",
-             "rel" : "self",
-             "href" : "http://example.net/nameserver/XXXX"
-           }
-         ],
-         "events" :
-         [
-           {
-             "eventAction" : "registration",
-             "eventDate" : "1990-12-31T23:59:60Z"
-           },
-           {
-             "eventAction" : "last changed",
-             "eventDate" : "1991-12-31T23:59:60Z"
-           }
-         ]
-       }
-     ],
-     "delegationKeys" :
-     [
-       {
-         "algorithm": 7,
-         "digest" : "E68C017BD813B9AE2F4DD28E61AD014F859ED44C",
-         "digestType" : 1,
-         "keyTag" : 53814
-       }
-     ],
-     "remarks" :
-     [
-       {
-         "description" :
-         [
-           "She sells sea shells down by the sea shore.",
-           "Originally written by Terry Sullivan."
-         ]
-       }
-     ],
-     "links" :
-     [
-       {
-         "value": "http://example.net/domain/XXXX",
-         "rel" : "self",
-         "href" : "http://example.net/domain/XXXX"
-       }
-     ],
-     "port43" : "whois.example.net",
-     "events" :
-     [
-       {
-         "eventAction" : "registration",
-         "eventDate" : "1990-12-31T23:59:60Z"
-       },
-       {
-         "eventAction" : "last changed",
-         "eventDate" : "1991-12-31T23:59:60Z",
-         "eventActor" : "joe@bob.com"
-       },
-       {
-         "eventAction" : "transfer",
-         "eventDate" : "1991-12-31T23:59:60Z",
-         "eventActor" : "joe@bob.com"
-       },
-       {
-         "eventAction" : "expiration",
-         "eventDate" : "2016-12-31T23:59:60Z",
-         "eventActor" : "joe@bob.com"
-       }
-     ],
-     "entities" :
-     [
-       {
-         "handle" : "XXXX",
-         "vCard" :
-         [
-            [ "version", {}, "text", "4.0" ],
-            [ "fn", {}, "text", "Joe Bob, Inc." ],
-            [ "fn", {}, "text", "Bobby Joe Shopping" ],
-            [ "label", {}, "text", "123 Maple Ave\n",
-                                   "Suite 90001\n",
-                                   "Vancouver\n",
-                                   "BC\n",
-                                   "1239\n" ],
-            [ "email", {}, "text", "joe at bob.com" ],
-            [ "email", {}, "text", "bob at joe.com" ],
-            [ "tel", { "type": "work" }, "uri", "tel:+1-958-555-4321" ],
-            [ "tel", { "type": "work" }, "uri", "tel:+1-958-555-4322" ],
-            [ "tel", { "type": "fax" }, "uri", "tel:+1-958-555-4323" ],
-            [ "tel", { "type": "cell" }, "uri", "tel:+1-958-555-4324" ],
-         ],
-         "status" : [ "validated", "locked" ],
-         "roles" : [ "registrant" ],
-         "remarks" :
-         [
-           {
-             "description" :
-             [
-               "She sells sea shells down by the sea shore.",
-               "Originally written by Terry Sullivan."
-             ]
-           }
-         ],
-         "links" :
-         [
-           {
-             "value" : "http://example.net/entity/xxxx",
-             "rel" : "self",
-             "href" : "http://example.net/entity/xxxx"
-           }
-         ],
-         "events" :
-         [
-           {
-             "eventAction" : "registration",
-             "eventDate" : "1990-12-31T23:59:60Z"
-           },
-           {
-             "eventAction" : "last changed",
-             "eventDate" : "1991-12-31T23:59:60Z"
-           }
-         ]
-       }
-     ]
-   }
+{
+    "nicInfo_demoUrl":"http://whois.arin.net/domain/xn--fo-5ja.example",
+    "nicInfo_demoHint":"nicinfo xn--fo-5ja.example",
+    "handle":"xn--fo-5ja.example-001",
+    "ldhName":"xn--fo-5ja.example",
+    "unicodeName":"foo.example",
+    "variants":[
+        {
+            "relation":[ "registered", "conjoined" ],
+            "variantNames":[
+                {
+                    "ldhName":"xn--fo-cka.example",
+                    "unicodeName":"foo.example"
+                },
+                {
+                    "ldhName":"xn--fo-fka.example",
+                    "unicodeName":"foeo.example"
+                }
+            ]
+        },
+        {
+            "relation":[ "unregistered", "restricted registration" ],
+            "variantNames":[
+                {
+                    "ldhName":"xn--fo-8ja.example",
+                    "unicodeName":"foo.example"
+                }
+            ]
+        }
+    ],
+    "status":[ "locked", "transferProhibited" ],
+    "nameServers":[
+        {
+            "handle":"XXXX",
+            "ldhName":"ns1.example.com",
+            "status":[ "active" ],
+            "ipAddresses":{
+                "v6":[ "2001:db8::123", "2001:db8::124" ],
+                "v4":[ "192.0.2.1", "192.0.2.2" ]
+            },
+            "remarks":[
+                {
+                    "description":[
+                        "She sells sea shells down by the sea shore.",
+                        "Originally written by Terry Sullivan."
+                    ]
+                }
+            ],
+            "links":[
+                {
+                    "value":"http://example.net/nameserver/XXXX",
+                    "rel":"self",
+                    "href":"http://example.net/nameserver/XXXX"
+                }
+            ],
+            "events":[
+                {
+                    "eventAction":"registration",
+                    "eventDate":"1990-12-31T23:59:60Z"
+                },
+                {
+                    "eventAction":"last changed",
+                    "eventDate":"1991-12-31T23:59:60Z"
+                }
+            ]
+        },
+        {
+            "handle":"XXXX",
+            "ldhName":"ns2.example.com",
+            "status":[ "active" ],
+            "ipAddresses":{
+                "v6":[ "2001:db8::125", "2001:db8::126" ],
+                "v4":[ "192.0.2.3", "192.0.2.4" ]
+            },
+            "remarks":[
+                {
+                    "description":[
+                        "She sells sea shells down by the sea shore.",
+                        "Originally written by Terry Sullivan."
+                    ]
+                }
+            ],
+            "links":[
+                {
+                    "value":"http://example.net/nameserver/XXXX",
+                    "rel":"self",
+                    "href":"http://example.net/nameserver/XXXX"
+                }
+            ],
+            "events":[
+                {
+                    "eventAction":"registration",
+                    "eventDate":"1990-12-31T23:59:60Z"
+                },
+                {
+                    "eventAction":"last changed",
+                    "eventDate":"1991-12-31T23:59:60Z"
+                }
+            ]
+        }
+    ],
+    "delegationKeys":[
+        {
+            "algorithm":7,
+            "digest":"E68C017BD813B9AE2F4DD28E61AD014F859ED44C",
+            "digestType":1,
+            "keyTag":53814
+        }
+    ],
+    "remarks":[
+        {
+            "description":[
+                "She sells sea shells down by the sea shore.",
+                "Originally written by Terry Sullivan."
+            ]
+        }
+    ],
+    "links":[
+        {
+            "value":"http://example.net/domain/XXXX",
+            "rel":"self",
+            "href":"http://example.net/domain/XXXX"
+        }
+    ],
+    "port43":"whois.example.net",
+    "events":[
+        {
+            "eventAction":"registration",
+            "eventDate":"1990-12-31T23:59:60Z"
+        },
+        {
+            "eventAction":"last changed",
+            "eventDate":"1991-12-31T23:59:60Z",
+            "eventActor":"joe@bob.com"
+        },
+        {
+            "eventAction":"transfer",
+            "eventDate":"1991-12-31T23:59:60Z",
+            "eventActor":"joe@bob.com"
+        },
+        {
+            "eventAction":"expiration",
+            "eventDate":"2016-12-31T23:59:60Z",
+            "eventActor":"joe@bob.com"
+        }
+    ],
+    "entities":[
+        {
+            "handle":"XXXX",
+            "vCard":[
+                [ "version", {}, "text", "4.0" ],
+                [ "fn", {}, "text", "Joe Bob, Inc." ],
+                [ "fn", {}, "text", "Bobby Joe Shopping" ],
+                [ "label", {}, "text", "123 Maple Ave\n",
+                    "Suite 90001\n",
+                    "Vancouver\n",
+                    "BC\n",
+                    "1239\n" ],
+                [ "email", {}, "text", "joe at bob.com" ],
+                [ "email", {}, "text", "bob at joe.com" ],
+                [ "tel", {
+                    "type":"work"
+                }, "uri", "tel:+1-958-555-4321" ],
+                [ "tel", {
+                    "type":"work"
+                }, "uri", "tel:+1-958-555-4322" ],
+                [ "tel", {
+                    "type":"fax"
+                }, "uri", "tel:+1-958-555-4323" ],
+                [ "tel", {
+                    "type":"cell"
+                }, "uri", "tel:+1-958-555-4324" ],
+            ],
+            "status":[ "validated", "locked" ],
+            "roles":[ "registrant" ],
+            "remarks":[
+                {
+                    "description":[
+                        "She sells sea shells down by the sea shore.",
+                        "Originally written by Terry Sullivan."
+                    ]
+                }
+            ],
+            "links":[
+                {
+                    "value":"http://example.net/entity/xxxx",
+                    "rel":"self",
+                    "href":"http://example.net/entity/xxxx"
+                }
+            ],
+            "events":[
+                {
+                    "eventAction":"registration",
+                    "eventDate":"1990-12-31T23:59:60Z"
+                },
+                {
+                    "eventAction":"last changed",
+                    "eventDate":"1991-12-31T23:59:60Z"
+                }
+            ]
+        }
+    ]
+}

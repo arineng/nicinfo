@@ -1,5 +1,7 @@
 {
-    "ldhName":"ns1.example.com",
+    "nicInfo_demoUrl" : "http://whois.arin.net/nameserver/ns2.example.com",
+    "nicInfo_demoHint" : "nicinfo ns2.example.com",
+    "ldhName":"ns2.example.com",
     "ipAddresses":{
         "v6":[ "2001:db8::123", "2001:db8::124" ]
     }

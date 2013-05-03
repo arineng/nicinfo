@@ -1,4 +1,6 @@
 {
+    "nicInfo_demoUrl" : "http://whois.arin.net/ip/2001:db8::0",
+    "nicInfo_demoHint" : "nicinfo 2001:db8::0",
     "handle":"XXXX-RIR",
     "startAddress":"2001:db8::0",
     "endAddress":"2001:db8::0:FFFF:FFFF:FFFF:FFFF:FFFF",

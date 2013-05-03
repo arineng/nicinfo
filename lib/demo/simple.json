@@ -1,4 +1,6 @@
 {
+    "nicInfo_demoUrl" : "http://whois.arin.net/entity/ABC123",
+    "nicInfo_demoHint" : "nicinfo ABC123",
     "handle":"ABC123",
     "remarks":[
         {

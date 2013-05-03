@@ -1,5 +1,7 @@
 {
-    "handle":"XXXX",
+    "nicInfo_demoUrl" : "http://whois.arin.net/domain/192.in-addr.arpa",
+    "nicInfo_demoHint" : "nicinfo 192.in-addr.arpa",
+    "handle":"192.in-addr.arpa-001",
     "ldhName":"192.in-addr.arpa",
     "nameServers":[
         {
