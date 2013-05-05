@@ -24,7 +24,7 @@
         }, "uri", "tel:+1-958-555-4323" ],
         [ "tel", {
             "type":"cell"
-        }, "uri", "tel:+1-958-555-4324" ],
+        }, "uri", "tel:+1-958-555-4324" ]
     ],
     "roles":[ "registrant" ],
     "remarks":[

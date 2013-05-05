@@ -22,6 +22,12 @@ require 'cache'
 require 'enum'
 require 'common_names'
 require 'bootstrap'
+begin
+  require 'json'
+rescue LoadError
+  require 'rubygems'
+  require 'json'
+end
 
 module NicInfo
 
@@ -206,12 +212,6 @@ module NicInfo
 
     def run
 
-      if (@config.options.help)
-        help()
-      elsif (@config.options.argv == nil || @config.options.argv == [])
-        help()
-      end
-
       @config.logger.run_pager
       @config.logger.mesg(NicInfo::VERSION)
       @config.setup_workspace
@@ -219,11 +219,32 @@ module NicInfo
       @cache.clean if @config.config[ NicInfo::CACHE ][ NicInfo::CLEAN_CACHE ]
       if @config.options.demo
         @config.logger.mesg( "Populating cache with demonstration results" )
-        demo_files = Dir::entries( File.join( File.dirname( __FILE__ ), NicInfo::DEMO_DIR ) )
+        @config.logger.mesg( "Try the following demonstration queries:" )
+        demo_dir = File.join( File.dirname( __FILE__ ), NicInfo::DEMO_DIR )
+        demo_files = Dir::entries( demo_dir )
         demo_files.each do |file|
-
+          df = File.join( demo_dir, file )
+          if File.file?( df )
+            demo_data = File.read( df )
+            json_data = JSON.load demo_data
+            demo_url = json_data[ NicInfo::NICINFO_DEMO_URL ]
+            demo_hint = json_data[ NicInfo::NICINFO_DEMO_HINT ]
+            @cache.create( demo_url, demo_data )
+            @config.logger.mesg( "  " + demo_hint )
+          end
         end
       end
+
+      if(@config.options.help)
+        help()
+      elsif( @config.options.argv == nil || @config.options.argv == [] )
+        if !@config.options.demo
+          help()
+        else
+          exit
+        end
+      end
+
 
       if (@config.options.query_type == nil)
         @config.options.query_type = guess_query_value_type(@config.options.argv)
