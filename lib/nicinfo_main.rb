@@ -22,6 +22,7 @@ require 'cache'
 require 'enum'
 require 'common_names'
 require 'bootstrap'
+require 'ipaddr'
 begin
   require 'json'
 rescue LoadError
@@ -77,6 +78,11 @@ module NicInfo
           uptype = type.upcase
           raise OptionParser::InvalidArgument, type.to_s unless QueryType.has_value?(uptype)
           @config.options.query_type = uptype
+        end
+
+        opts.on("-r", "--reverse",
+                "Creates a reverse DNS name from an IP address. ") do |reverse|
+          @config.options.reverse_ip = true
         end
 
         opts.on("--substring YES|NO|TRUE|FALSE",
@@ -247,9 +253,15 @@ module NicInfo
         end
       end
 
-
       if (@config.options.query_type == nil)
         @config.options.query_type = guess_query_value_type(@config.options.argv)
+        if (@config.options.query_type == QueryType::BY_IP4_ADDR ||
+              @config.options.query_type == QueryType::BY_IP6_ADDR ) && @config.options.reverse_ip == true
+          ip = IPAddr.new( @config.options.argv[ 0 ] )
+          @config.options.argv[ 0 ] = ip.reverse
+          @config.logger.mesg( "Query value changed to " + @config.options.argv[ 0 ] )
+          @config.options.query_type = QueryType::BY_DOMAIN
+        end
         if (@config.options.query_type == nil)
           @config.logger.mesg("Unable to guess type of query. You must specify it.")
           exit
