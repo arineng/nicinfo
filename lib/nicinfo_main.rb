@@ -41,6 +41,7 @@ module NicInfo
     QueryType.add_item :BY_DOMAIN, "DOMAIN"
     QueryType.add_item :BY_RESULT, "RESULT"
     QueryType.add_item :BY_ENTITY_NAME, "ENTITYNAME"
+    QueryType.add_item :BY_NAMESERVER, "NAMESERVER"
 
   end
 
@@ -71,6 +72,7 @@ module NicInfo
                 "  asnumber   - autonomous system number",
                 "  domain     - domain name",
                 "  entityname - name of a contact, organization, registrar or other entity",
+                "  nameserver - fully qualified domain name of a nameserver",
                 "  result     - result from a previous query") do |type|
           uptype = type.upcase
           raise OptionParser::InvalidArgument, type.to_s unless QueryType.has_value?(uptype)
@@ -271,6 +273,8 @@ module NicInfo
             @config.options.base_url = bootstrap.find_rir_url_by_as( @config.options.argv[ 0 ] )
           when QueryType::BY_DOMAIN
             @config.options.base_url = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
+          when QueryType::BY_NAMESERVER
+            @config.options.base_url = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
           when QueryType::BY_ENTITY_NAME
             @config.options.base_url = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::ENTITY_ROOT_URL ]
         end
@@ -408,6 +412,8 @@ HELP_SUMMARY
             end
           when NicInfo::DATA_TREE_ADDR_REGEX
             retval = QueryType::BY_RESULT
+          when NicInfo::NS_REGEX
+            retval = QueryType::BY_NAMESERVER
           when NicInfo::DOMAIN_REGEX
             retval = QueryType::BY_DOMAIN
           else
@@ -448,6 +454,8 @@ HELP_SUMMARY
           path << "ip/" << args[0]
         when QueryType::BY_AS_NUMBER
           path << "autnum/" << args[0]
+        when QueryType::BY_NAMESERVER
+          path << "nameserver/" << args[0]
         when QueryType::BY_DOMAIN
           path << "domain/" << args[0]
         when QueryType::BY_RESULT

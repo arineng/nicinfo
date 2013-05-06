@@ -67,44 +67,10 @@ class NicInfoMainTest < Test::Unit::TestCase
     assert_equal( nicinfo.guess_query_value_type( [ "8.f.4.0.1.0.0.2.ip6.arpa." ] ), "DOMAIN" )
     assert_equal( nicinfo.guess_query_value_type( [ "example.com" ] ), "DOMAIN" )
     assert_equal( nicinfo.guess_query_value_type( [ "example.com." ] ), "DOMAIN" )
+    assert_equal( nicinfo.guess_query_value_type( [ "ns1.example.com." ] ), "NAMESERVER" )
     assert_equal( nicinfo.guess_query_value_type( [ "foo" ] ), "ENTITYNAME" )
 
   end
-
-  #def test_create_query
-  #
-  #  dir = File.join( @work_dir, "test_create_query" )
-  #
-  #  logger = NicInfo::Logger.new
-  #  logger.message_out = StringIO.new
-  #  logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
-  #  config = NicInfo::Config.new( dir )
-  #  config.logger=logger
-  #
-  #  arinw = NicInfo::Main.new( [], config )
-  #
-  #  assert_equal( "rest/net/NET-192-136-136-1",
-  #                arinw.create_resource_url(
-  #                    [ "NET-192-136-136-1" ], NicInfo::QueryType::BY_NET_HANDLE ) )
-  #  assert_equal( "rest/net/NET6-2001-500-13-1",
-  #                arinw.create_resource_url(
-  #                    [ "NET6-2001-500-13-1" ], NicInfo::QueryType::BY_NET_HANDLE ) )
-  #  assert_equal( "rest/poc/ALN-ARIN",
-  #                arinw.create_resource_url(
-  #                    [ "ALN-ARIN" ], NicInfo::QueryType::BY_POC_HANDLE ) )
-  #  assert_equal( "rest/ip/1.0.0.0",
-  #                arinw.create_resource_url(
-  #                    [ "1.0.0.0" ], NicInfo::QueryType::BY_IP4_ADDR ) )
-  #  assert_equal( "rest/ip/2001:500:13::",
-  #                arinw.create_resource_url(
-  #                    [ "2001:500:13::" ], NicInfo::QueryType::BY_IP6_ADDR ) )
-  #  assert_equal( "rest/rdns/8.f.4.0.1.0.0.2.ip6.arpa",
-  #                arinw.create_resource_url(
-  #                    [ "8.f.4.0.1.0.0.2.ip6.arpa" ], NicInfo::QueryType::BY_DELEGATION ) )
-  #  assert_equal( "rest/rdns/199.in-addr.arpa",
-  #                arinw.create_resource_url(
-  #                    [ "199.in-addr.arpa" ], NicInfo::QueryType::BY_DELEGATION ) )
-  #end
 
   def test_base_opts
 
