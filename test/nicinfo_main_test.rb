@@ -92,6 +92,61 @@ class NicInfoMainTest < Test::Unit::TestCase
 
   end
 
+  def test_eval_json_value
+
+    data = <<JSON_DATA
+{
+    "rdapConformance":[
+        "rdap_level_0"
+    ],
+    "notices":[
+        {
+            "title":"Content Redacted",
+            "description":[
+                "Without full authorization, content has been redacted.",
+                "Sorry, dude!"
+            ],
+            "links":[
+                {
+                    "value":"http://example.net/ip/192.0.2.0/24",
+                    "rel":"alternate",
+                    "type":"text/html",
+                    "href":"http://www.example.com/redaction_policy.html"
+                }
+            ]
+        }
+    ],
+    "lang":"en",
+    "startAddress":"192.0.2.0",
+    "endAddress":"192.0.2.255",
+    "remarks":[
+        {
+            "description":[
+                "She sells sea shells down by the sea shore.",
+                "Originally written by Terry Sullivan."
+            ]
+        }
+    ]
+}
+JSON_DATA
+
+    dir = File.join( @work_dir, "test_get_query_type_from_url" )
+
+    logger = NicInfo::Logger.new
+    logger.message_out = StringIO.new
+    logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
+    config = NicInfo::Config.new( dir )
+    config.logger=logger
+
+    nicinfo = NicInfo::Main.new( [], config )
+    json_data = JSON::load( data )
+
+    assert_equal( "192.0.2.0", nicinfo.eval_json_value( "startAddress", json_data ) )
+    assert_equal( "192.0.2.255", nicinfo.eval_json_value( "endAddress", json_data ) )
+    assert_equal( "rdap_level_0", nicinfo.eval_json_value( "rdapConformance.0", json_data ) )
+    assert_equal( "Sorry, dude!", nicinfo.eval_json_value( "notices.0.description.1", json_data ) )
+  end
+
   def test_base_opts
 
     dir = File.join( @work_dir, "test_base_opts" )

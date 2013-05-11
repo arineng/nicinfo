@@ -187,6 +187,14 @@ module NicInfo
           @config.options.output_json = true
         end
 
+        opts.on( "--value VALUE",
+                 "Outputs a specific JSON value." ) do |value|
+          if !@config.options.json_values
+            @config.options.json_values = Array.new
+          end
+          @config.options.json_values << value
+        end
+
         opts.separator ""
         opts.separator "General Options:"
 
@@ -332,6 +340,10 @@ module NicInfo
         inspect_rdap_compliance json_data
         if @config.options.output_json
           @config.logger.raw( DataAmount::TERSE_DATA, data )
+        elsif @config.options.json_values
+          @config.options.json_values.each do |value|
+            @config.logger.raw( DataAmount::TERSE_DATA, eval_json_value( value, json_data) )
+          end
         end
         @config.logger.end_run
       rescue ArgumentError => a
@@ -543,6 +555,21 @@ HELP_SUMMARY
           raise ArgumentError.new( "Unable to determine query type from url '#{url}'" )
       end
       return queryType
+    end
+
+    def eval_json_value json_value, json_data
+      appended_code = String.new
+      values = json_value.split( "." )
+      values.each do |value|
+        i = Integer( value ) rescue false
+        if i
+          appended_code << "[#{i}]"
+        else
+          appended_code << "[\"#{value}\"]"
+        end
+      end
+      code = "json_data#{appended_code}"
+      return eval( code )
     end
 
     def handle_pft_response root
