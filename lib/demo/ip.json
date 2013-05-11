@@ -1,5 +1,5 @@
 {
-    "nicInfo_demoUrl" : "http://whois.arin.net/ip/2001:db8::0",
+    "nicInfo_demoUrl" : "http://whois.apnic.net/ip/2001:db8::0",
     "nicInfo_demoHint" : "nicinfo 2001:db8::0",
     "handle":"XXXX-RIR",
     "startAddress":"2001:db8::0",

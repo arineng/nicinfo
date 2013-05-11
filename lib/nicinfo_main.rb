@@ -125,9 +125,9 @@ module NicInfo
                  "  none - no messages are to be output",
                  "  some - some messages but not all",
                  "  all  - all messages to be outupt" ) do |m|
-          config.logger.message_level = m.to_s.upcase
+          @config.logger.message_level = m.to_s.upcase
           begin
-            config.logger.validate_message_level
+            @config.logger.validate_message_level
           rescue
             raise OptionParser::InvalidArgument, m.to_s
           end
@@ -135,7 +135,7 @@ module NicInfo
 
         opts.on( "--messages-out FILE",
                  "FILE where messages will be written." ) do |f|
-          config.logger.messages_out = f
+          @config.logger.messages_out = f
         end
 
         opts.on( "--data DATA_AMOUNT",
@@ -143,9 +143,9 @@ module NicInfo
                  "  terse  - enough data to identify the object",
                  "  normal - normal view of data on objects",
                  "  extra  - all data about the object" ) do |d|
-          config.logger.data_amount = d.to_s.upcase
+          @config.logger.data_amount = d.to_s.upcase
           begin
-            config.logger.validate_data_amount
+            @config.logger.validate_data_amount
           rescue
             raise OptionParser::InvalidArgument, d.to_s
           end
@@ -153,13 +153,13 @@ module NicInfo
 
         opts.on( "--data-out FILE",
                  "FILE where data will be written." ) do |f|
-          config.logger.data_out = f
+          @config.logger.data_out = f
         end
 
         opts.on( "-V",
                  "Equivalent to --messages all and --data extra" ) do |v|
-          config.logger.data_amount = NicInfo::DataAmount::EXTRA_DATA
-          config.logger.message_level = NicInfo::MessageLevel::ALL_MESSAGES
+          @config.logger.data_amount = NicInfo::DataAmount::EXTRA_DATA
+          @config.logger.message_level = NicInfo::MessageLevel::ALL_MESSAGES
         end
 
         opts.separator ""
@@ -167,7 +167,7 @@ module NicInfo
 
         opts.on( "-h", "--help",
                  "Show this message" ) do
-          config.options.help = true
+          @config.options.help = true
         end
 
       end
@@ -295,13 +295,9 @@ module NicInfo
       begin
         path = create_resource_url(@config.options.argv, @config.options.query_type)
         rdap_url = make_rdap_url( @config.options.base_url, path )
-        #data = get( rdap_url )
-        #root = REXML::Document.new(data).root
-        #has_results = evaluate_response(root)
-        #if has_results
-        #  @config.logger.trace("Non-empty result set given.")
-        #  show_helpful_messages(path)
-        #end
+        data = get( rdap_url )
+        json_data = JSON.load data
+        inspect_rdap_compliance json_data
         @config.logger.end_run
       rescue ArgumentError => a
         @config.logger.mesg(a.message)
@@ -365,6 +361,17 @@ module NicInfo
         @config.logger.mesg "Response contained an answer this program does not understand."
       end
       return has_results
+    end
+
+    def inspect_rdap_compliance json
+      rdap_conformance = json[ "rdapConformance" ]
+      if rdap_conformance
+        rdap_conformance.each do |conformance|
+          @config.logger.trace( "Server conforms to #{conformance}" )
+        end
+      else
+        @config.logger.trace( "Response has no RDAP Conformance level specified." )
+      end
     end
 
     def help
