@@ -574,22 +574,40 @@ HELP_SUMMARY
     end
 
     def cache_self_references json_data
-      links = json_data[ "links" ]
+      links = get_links json_data
       links.each do |link|
-        href = link[ "href" ]
-        if href && link[ "rel" ] == "self"
+        href = get_self_href link
+        if href
           pretty = JSON::pretty_generate( json_data )
           @cache.create( href, pretty )
         end
       end if links
-      entities = json_data[ "entities" ]
+      entities = get_entitites json_data
       entities.each do |entity|
         cache_self_references( entity )
       end if entities
-      nameservers = json_data[ "nameservers" ]
+      nameservers = get_nameservers json_data
       nameservers.each do |ns|
         cache_self_references( ns )
       end if nameservers
+    end
+
+    def get_self_href link
+      href = link[ "href" ]
+      return href if href && link[ "rel" ] == "self"
+      return nil
+    end
+
+    def get_links json_data
+      return json_data[ "links" ]
+    end
+
+    def get_entitites json_data
+      return json_data[ "entities" ]
+    end
+
+    def get_nameservers json_data
+      return json_data[ "nameservers" ]
     end
 
     def handle_pft_response root
