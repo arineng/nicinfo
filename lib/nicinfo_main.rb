@@ -162,10 +162,29 @@ module NicInfo
           @config.logger.data_out = f
         end
 
+        opts.on( "--pager YES|NO|TRUE|FALSE",
+                 "Turns the pager on and off." ) do |pager|
+          @config.logger.pager = false if pager =~ /no|false/i
+          @config.logger.pager = true if pager =~ /yes|true/i
+          raise OptionParser::InvalidArgument, pager.to_s unless pager =~ /yes|no|true|false/i
+        end
+
         opts.on( "-V",
                  "Equivalent to --messages all and --data extra" ) do |v|
           @config.logger.data_amount = NicInfo::DataAmount::EXTRA_DATA
           @config.logger.message_level = NicInfo::MessageLevel::ALL_MESSAGES
+        end
+
+        opts.on( "-Q",
+                 "Equivalent to --messages none and --data extra and --pager false" ) do |q|
+          @config.logger.data_amount = NicInfo::DataAmount::EXTRA_DATA
+          @config.logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
+          @config.logger.pager = false
+        end
+
+        opts.on( "--json",
+                 "Output raw JSON response." ) do |json|
+          @config.options.output_json = true
         end
 
         opts.separator ""
@@ -311,6 +330,9 @@ module NicInfo
         data = get( rdap_url )
         json_data = JSON.load data
         inspect_rdap_compliance json_data
+        if @config.options.output_json
+          @config.logger.raw( DataAmount::TERSE_DATA, data )
+        end
         @config.logger.end_run
       rescue ArgumentError => a
         @config.logger.mesg(a.message)
@@ -319,7 +341,7 @@ module NicInfo
           when "404"
             @config.logger.mesg("Query yielded no results.")
           when "503"
-            @config.logger.mesg("ARIN Whois-RWS is unavailable.")
+            @config.logger.mesg("RDAP service is unavailable.")
         end
         @config.logger.trace("Server response code was " + e.response.code)
       end
