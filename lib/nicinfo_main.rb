@@ -338,6 +338,7 @@ module NicInfo
         data = get( rdap_url )
         json_data = JSON.load data
         inspect_rdap_compliance json_data
+        cache_self_references json_data
         if @config.options.output_json
           @config.logger.raw( DataAmount::TERSE_DATA, data )
         elsif @config.options.json_values
@@ -570,6 +571,25 @@ HELP_SUMMARY
       end
       code = "json_data#{appended_code}"
       return eval( code )
+    end
+
+    def cache_self_references json_data
+      links = json_data[ "links" ]
+      links.each do |link|
+        href = link[ "href" ]
+        if href && link[ "rel" ] == "self"
+          pretty = JSON::pretty_generate( json_data )
+          @cache.create( href, pretty )
+        end
+      end if links
+      entities = json_data[ "entities" ]
+      entities.each do |entity|
+        cache_self_references( entity )
+      end if entities
+      nameservers = json_data[ "nameservers" ]
+      nameservers.each do |ns|
+        cache_self_references( ns )
+      end if nameservers
     end
 
     def handle_pft_response root
