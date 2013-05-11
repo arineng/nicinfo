@@ -72,6 +72,26 @@ class NicInfoMainTest < Test::Unit::TestCase
 
   end
 
+  def test_get_query_type_from_url
+
+    dir = File.join( @work_dir, "test_get_query_type_from_url" )
+
+    logger = NicInfo::Logger.new
+    logger.message_out = StringIO.new
+    logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
+    config = NicInfo::Config.new( dir )
+    config.logger=logger
+
+    nicinfo = NicInfo::Main.new( [], config )
+
+    assert_equal( "IP", nicinfo.get_query_type_from_url( "http://example.com/rdap/ip/2001:db8:00" ) )
+    assert_equal( "IP", nicinfo.get_query_type_from_url( "http://example.com/rdap/ip/192.0.2.0/24" ) )
+    assert_equal( "ASNUMBER", nicinfo.get_query_type_from_url( "http://example.com/rdap/autnum/21" ) )
+    assert_equal( "DOMAIN", nicinfo.get_query_type_from_url( "http://example.com/rdap/domain/example.com" ) )
+    assert_equal( "ENTITYNAME", nicinfo.get_query_type_from_url( "http://example.com/rdap/entity/CE12" ) )
+
+  end
+
   def test_base_opts
 
     dir = File.join( @work_dir, "test_base_opts" )

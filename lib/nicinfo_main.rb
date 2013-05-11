@@ -38,6 +38,7 @@ module NicInfo
     QueryType.add_item :BY_IP6_ADDR, "IP6ADDR"
     QueryType.add_item :BY_IP4_CIDR, "IP4CIDR"
     QueryType.add_item :BY_IP6_CIDR, "IP6CIDR"
+    QueryType.add_item :BY_IP, "IP"
     QueryType.add_item :BY_AS_NUMBER, "ASNUMBER"
     QueryType.add_item :BY_DOMAIN, "DOMAIN"
     QueryType.add_item :BY_RESULT, "RESULT"
@@ -92,9 +93,14 @@ module NicInfo
           raise OptionParser::InvalidArgument, substring.to_s unless substring =~ /yes|no|true|false/i
         end
 
-        opts.on("-U", "--url URL",
+        opts.on("-b", "--base URL",
                 "The base URL of the RDAP Service.") do |url|
           @config.options.base_url = url
+        end
+
+        opts.on("-u", "--url URL",
+                "Fetch a specific RDAP URL.") do |url|
+          @config.options.url = url
         end
 
         opts.separator ""
@@ -245,6 +251,8 @@ module NicInfo
 
       if(@config.options.help)
         help()
+      elsif @config.options.url
+        @config.options.query_type = get_query_type_from_url( @config.options.url )
       elsif( @config.options.argv == nil || @config.options.argv == [] )
         if !@config.options.demo
           help()
@@ -293,8 +301,13 @@ module NicInfo
       end
 
       begin
-        path = create_resource_url(@config.options.argv, @config.options.query_type)
-        rdap_url = make_rdap_url( @config.options.base_url, path )
+        rdap_url = nil
+        if !@config.options.url
+          path = create_resource_url(@config.options.argv, @config.options.query_type)
+          rdap_url = make_rdap_url( @config.options.base_url, path )
+        else
+          rdap_url = @config.options.url
+        end
         data = get( rdap_url )
         json_data = JSON.load data
         inspect_rdap_compliance json_data
@@ -488,6 +501,26 @@ HELP_SUMMARY
       end
 
       return path
+    end
+
+    def get_query_type_from_url url
+      queryType = nil
+      case url
+        when /.*\/ip\/.*/
+          # covers all IP cases
+          queryType = QueryType::BY_IP
+        when /.*\/autnum\/.*/
+          queryType = QueryType::BY_AS_NUMBER
+        when /.*\/nameserver\/.*/
+          queryType = QueryType::BY_NAMESERVER
+        when /.*\/domain\/.*/
+          queryType = QueryType::BY_DOMAIN
+        when /.*\/entity\/.*/
+          queryType = QueryType::BY_ENTITY_NAME
+        else
+          raise ArgumentError.new( "Unable to determine query type from url '#{url}'" )
+      end
+      return queryType
     end
 
     def handle_pft_response root
