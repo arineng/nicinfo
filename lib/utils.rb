@@ -24,7 +24,7 @@ module NicInfo
     return safe
   end
 
-  def get_descriptions description
+  def NicInfo.get_descriptions description
     return description[ "description" ]
   end
 
