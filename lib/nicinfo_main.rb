@@ -345,6 +345,8 @@ module NicInfo
           @config.options.json_values.each do |value|
             @config.logger.raw( DataAmount::TERSE_DATA, eval_json_value( value, json_data) )
           end
+        else
+          show_helpful_messages rdap_url
         end
         @config.logger.end_run
       rescue ArgumentError => a
@@ -359,56 +361,6 @@ module NicInfo
         @config.logger.trace("Server response code was " + e.response.code)
       end
 
-    end
-
-    def evaluate_response element
-      has_results = false
-      if (element.namespace == "http://www.arin.net/whoisrws/core/v1")
-        case element.name
-          when "net"
-            net = NicInfo::Whois::WhoisNet.new(element)
-            net.to_log(@config.logger)
-            has_results = true
-          when "poc"
-            poc = NicInfo::Whois::WhoisPoc.new(element)
-            poc.to_log(@config.logger)
-            has_results = true
-          when "org"
-            org = NicInfo::Whois::WhoisOrg.new(element)
-            org.to_log(@config.logger)
-            has_results = true
-          when "asn"
-            asn = NicInfo::Whois::WhoisAsn.new(element)
-            asn.to_log(@config.logger)
-            has_results = true
-          when "nets"
-            has_results = handle_list_response(element)
-          when "orgs"
-            has_results = handle_list_response(element)
-          when "pocs"
-            has_results = handle_list_response(element)
-          when "asns"
-            has_results = handle_list_response(element)
-          else
-            @config.logger.mesg "Response contained an answer this program does not implement."
-        end
-      elsif (element.namespace == "http://www.arin.net/whoisrws/rdns/v1")
-        case element.name
-          when "delegation"
-            del = NicInfo::Whois::WhoisRdns.new(element)
-            del.to_log(@config.logger)
-            has_results = true
-          when "delegations"
-            has_results = handle_list_response(element)
-          else
-            @config.logger.mesg "Response contained an answer this program does not implement."
-        end
-      elsif (element.namespace == "http://www.arin.net/whoisrws/pft/v1" && element.name == "pft")
-        has_results = handle_pft_response element
-      else
-        @config.logger.mesg "Response contained an answer this program does not understand."
-      end
-      return has_results
     end
 
     def inspect_rdap_compliance json
@@ -610,153 +562,18 @@ HELP_SUMMARY
       return json_data[ "nameservers" ]
     end
 
-    def handle_pft_response root
-      objs = []
-      root.elements.each("*/ref") do |ref|
-        obj = nil
-        case ref.parent.name
-          when "net"
-            obj = NicInfo::Whois::WhoisNet.new(ref.parent)
-          when "poc"
-            obj = NicInfo::Whois::WhoisPoc.new(ref.parent)
-          when "org"
-            obj = NicInfo::Whois::WhoisOrg.new(ref.parent)
-          when "asn"
-            obj = NicInfo::Whois::WhoisAsn.new(ref.parent)
-          when "delegation"
-            obj = NicInfo::Whois::WhoisRdns.new(ref.parent)
-        end
-        if (obj)
-          copy_namespace_attributes(root, obj.element)
-          @cache.create(obj.ref.to_s, obj.element)
-          objs << obj
-        end
+    def show_helpful_messages rdap_url
+      arg = @config.options.argv[0]
+      case @config.options.query_type
+        when QueryType::BY_IP4_ADDR
+          @config.logger.mesg("Use \"nicinfo -r #{arg}\" to see reverse DNS information.");
+        when QueryType::BY_IP6_ADDR
+          @config.logger.mesg("Use \"nicinfo -r #{arg}\" to see reverse DNS information.");
+        when QueryType::BY_AS_NUMBER
+          @config.logger.mesg("Use \"nicinfo #{arg}\" or \"nicinfo as#{arg}\" for autnums.");
       end
-      tree = NicInfo::DataTree.new
-      if (!objs.empty?)
-        first = objs.first()
-        tree_root = NicInfo::DataNode.new(first.to_s, first.ref.to_s)
-        tree_root.add_child(NicInfo::Whois.make_orgs_tree(first.element))
-        tree_root.add_child(NicInfo::Whois.make_pocs_tree(first.element))
-        tree_root.add_child(NicInfo::Whois.make_asns_tree(first.element))
-        tree_root.add_child(NicInfo::Whois.make_nets_tree(first.element))
-        tree_root.add_child(NicInfo::Whois.make_delegations_tree(first.element))
-        tree.add_root(tree_root)
-      end
-      if !tree_root.empty?
-        tree.to_normal_log(@config.logger, true)
-        @config.save_as_yaml(NicInfo::ARININFO_LASTTREE_YAML, tree)
-      end
-      objs.each do |obj|
-        obj.to_log(@config.logger)
-      end
-      return true if !objs.empty? && !tree.empty?
-      #else
-      return false
-    end
-
-    def handle_list_response root
-      objs = []
-      root.elements.each("*/ref") do |ref|
-        obj = nil
-        case ref.parent.name
-          when "net"
-            obj = NicInfo::Whois::WhoisNet.new(ref.parent)
-          when "poc"
-            obj = NicInfo::Whois::WhoisPoc.new(ref.parent)
-          when "org"
-            obj = NicInfo::Whois::WhoisOrg.new(ref.parent)
-          when "asn"
-            obj = NicInfo::Whois::WhoisAsn.new(ref.parent)
-          when "delegation"
-            obj = NicInfo::Whois::WhoisRdns.new(ref.parent)
-        end
-        if (obj)
-          copy_namespace_attributes(root, obj.element)
-          @cache.create(obj.ref.to_s, obj.element)
-          objs << obj
-        end
-      end
-
-      tree = NicInfo::DataTree.new
-      objs.each do |obj|
-        tree_root = NicInfo::DataNode.new(obj.to_s, obj.ref.to_s)
-        tree_root.add_child(NicInfo::Whois.make_orgs_tree(obj.element))
-        tree_root.add_child(NicInfo::Whois.make_pocs_tree(obj.element))
-        tree_root.add_child(NicInfo::Whois.make_asns_tree(obj.element))
-        tree_root.add_child(NicInfo::Whois.make_nets_tree(obj.element))
-        tree_root.add_child(NicInfo::Whois.make_delegations_tree(obj.element))
-        tree.add_root(tree_root)
-      end
-
-      tree.add_children_as_root(NicInfo::Whois.make_orgs_tree(root))
-      tree.add_children_as_root(NicInfo::Whois.make_pocs_tree(root))
-      tree.add_children_as_root(NicInfo::Whois.make_asns_tree(root))
-      tree.add_children_as_root(NicInfo::Whois.make_nets_tree(root))
-      tree.add_children_as_root(NicInfo::Whois.make_delegations_tree(root))
-
-      if !tree.empty?
-        tree.to_terse_log(@config.logger, true)
-        @config.save_as_yaml(NicInfo::ARININFO_LASTTREE_YAML, tree)
-      end
-      objs.each do |obj|
-        obj.to_log(@config.logger)
-      end if tree.empty?
-      if tree.empty? && objs.empty?
-        @config.logger.mesg("No results found.")
-        has_results = false
-      else
-        has_results = true
-        limit_element = REXML::XPath.first(root, "limitExceeded")
-        if limit_element and limit_element.text() == "true"
-          limit = limit_element.attribute("limit")
-          @config.logger.mesg("Results limited to " + limit.to_s)
-        end
-      end
-      return has_results
-    end
-
-    def copy_namespace_attributes(source, dest)
-      source.attributes.each() do |name, value|
-        if name.start_with?("xmlns")
-          if !dest.attributes.get_attribute(name)
-            dest.add_attribute(name, value)
-          end
-        end
-      end
-    end
-
-    def show_helpful_messages path
-      show_default_help = true
-      case path
-        when /rest\/net\/(.*)/
-          net = $+
-          if (!net.include?("/rdns"))
-            new_net = net.sub("/pft", "")
-            @config.logger.mesg('Use "arininfo -r dels ' + new_net + '" to see reverse DNS information.');
-            show_default_help = false
-          end
-          if (!net.include?("/pft"))
-            new_net = net.sub("/rdns", "")
-            @config.logger.mesg('Use "arininfo --pft true ' + new_net + '" to see reverse DNS information.');
-            show_default_help = false
-          end
-        when /rest\/org\/(.*)/
-          org = $+
-          if (!org.include?("/"))
-            @config.logger.mesg('Use "arininfo --pft true ' + org + '-o" to see other relevant information.');
-            show_default_help = false
-          end
-        when /rest\/ip\/(.*)/
-          ip = $+
-          if (ip.match(/\/pft/) == nil)
-            @config.logger.mesg('Use "arininfo --pft true ' + ip + '" to see other relevant information.');
-            show_default_help = false
-          end
-      end
-      if show_default_help
-        @config.logger.mesg('Use "arininfo -h" for help.')
-      end
+      @config.logger.mesg("Use \"nicinfo -u #{rdap_url}\" to directly query this resource in the future.")
+      @config.logger.mesg('Use "nicinfo -h" for help.')
     end
 
   end
