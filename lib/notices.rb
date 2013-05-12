@@ -12,20 +12,32 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-
-require 'stringio'
-require 'uri'
+require 'utils'
 
 module NicInfo
 
-  def NicInfo.make_safe( url )
-    safe = URI.escape( url )
-    safe = URI.escape( safe, "!*'();:@&=+$,/?#[]" )
-    return safe
-  end
+  # deals with RDAP notices structures
+  class Notices
 
-  def get_descriptions description
-    return description[ "description" ]
+    def is_excessive_notice notices
+      return false if !notices
+      return false if notices.length == 0
+      return true if notices.length > 2
+      word_count = 0
+      line_count = 0
+      notices.each do |notice|
+        descriptions = NicInfo::get_descriptions notice
+        descriptions.each do |line|
+          line_count = line_count + 1
+          word_count = word_count + line.length
+        end if descriptions
+      end
+      return true if line_count > 10
+      return true if word_count > 700
+      #otherwise
+      return false
+    end
+
   end
 
 end
