@@ -30,7 +30,7 @@ module NicInfo
       return nil if @config.config[ NicInfo::CACHE ][ NicInfo::USE_CACHE ] == false
       safe = NicInfo::make_safe(url)
       @config.logger.trace("Persisting " + url + " as " + safe)
-      f = File.open(File.join(@config.whois_cache_dir, safe), "w")
+      f = File.open(File.join(@config.rdap_cache_dir, safe), "w")
       f.puts data
       f.close
     end
@@ -39,7 +39,7 @@ module NicInfo
     # if the object already exists in the cache, this does nothing.
     def create url, data
       safe = NicInfo::make_safe(url)
-      file_name = File.join(@config.whois_cache_dir, safe)
+      file_name = File.join(@config.rdap_cache_dir, safe)
       expiry = Time.now - @config.config[ NicInfo::CACHE ][ NicInfo::CACHE_EXPIRY ]
       return if (File.exist?(file_name) && File.mtime(file_name) > expiry)
       create_or_update(url, data)
@@ -48,7 +48,7 @@ module NicInfo
     def get url
       return nil if @config.config[ NicInfo::CACHE ][ NicInfo::USE_CACHE ] == false
       safe = NicInfo::make_safe(url)
-      file_name = File.join(@config.whois_cache_dir, safe)
+      file_name = File.join(@config.rdap_cache_dir, safe)
       expiry = Time.now - @config.config[ NicInfo::CACHE ][ NicInfo::CACHE_EXPIRY ]
       if (File.exist?(file_name) && File.mtime(file_name) > expiry)
         @config.logger.trace("Getting " + url + " from cache.")
@@ -65,11 +65,11 @@ module NicInfo
     end
 
     def clean
-      cache_files = Dir::entries(@config.whois_cache_dir)
+      cache_files = Dir::entries(@config.rdap_cache_dir)
       eviction = Time.now - @config.config[ NicInfo::CACHE ][ NicInfo::CACHE_EVICTION ]
       eviction_count = 0
       cache_files.each do |file|
-        full_file_name = File.join(@config.whois_cache_dir, file)
+        full_file_name = File.join(@config.rdap_cache_dir, file)
         if !file.start_with?(".") && (File.mtime(full_file_name) < eviction)
           @config.logger.trace("Evicting " + full_file_name)
           File::unlink(full_file_name)
@@ -82,7 +82,7 @@ module NicInfo
 
     def count
       count = 0
-      cache_files = Dir::entries(@config.whois_cache_dir)
+      cache_files = Dir::entries(@config.rdap_cache_dir)
       cache_files.each do |file|
         if !file.start_with?(".")
           count += 1
@@ -92,11 +92,11 @@ module NicInfo
     end
 
     def get_last
-      cache_files = Dir::entries(@config.whois_cache_dir)
+      cache_files = Dir::entries(@config.rdap_cache_dir)
       last_file = nil
       last_file_mtime = nil
       cache_files.each do |file|
-        full_file_name = File.join(@config.whois_cache_dir, file)
+        full_file_name = File.join(@config.rdap_cache_dir, file)
         if !file.start_with?(".")
           mtime = File.mtime(full_file_name)
           if last_file == nil

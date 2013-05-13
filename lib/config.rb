@@ -17,13 +17,14 @@ require 'fileutils'
 require 'nicinfo_logger'
 require 'yaml'
 require 'ostruct'
+require 'constants'
 
 module NicInfo
 
   # Handles configuration of the application
   class Config
 
-    attr_accessor :logger, :config, :whois_cache_dir, :options, :tickets_dir
+    attr_accessor :logger, :config, :rdap_cache_dir, :options
 
     # Intializes the configuration with a place to look for the config file
     # If the file doesn't exist, a default is used.
@@ -56,8 +57,8 @@ module NicInfo
         f.puts @@yaml_config
         f.close
 
-        @whois_cache_dir = File.join( @app_data, "whois_cache" )
-        Dir.mkdir( @whois_cache_dir )
+        @rdap_cache_dir = File.join( @app_data, "rdap_cache" )
+        Dir.mkdir( @rdap_cache_dir )
 
         @tickets_dir = File.join( @app_data, "tickets" )
         Dir.mkdir( @tickets_dir )
@@ -65,8 +66,7 @@ module NicInfo
       else
 
         @logger.trace "Using configuration found in " + @app_data
-        @whois_cache_dir = File.join( @app_data, "whois_cache" )
-        @tickets_dir = File.join( @app_data, "tickets" )
+        @rdap_cache_dir = File.join( @app_data, "rdap_cache" )
 
       end
 
@@ -111,26 +111,29 @@ module NicInfo
 
     # Configures the logger
     def configure_logger
-      output = @config[ "output" ]
+      output = @config[ NicInfo::OUTPUT ]
       return if output == nil
 
-      @logger.message_level = output[ "messages" ]
+      @logger.message_level = output[ NicInfo::MESSAGES ]
       @logger.validate_message_level
 
-      messages_file = output[ "messages_file" ]
+      messages_file = output[ NicInfo::MESSAGES_FILE ]
       if messages_file != nil
         @logger.message_out = File.open( messages_file, "w+" )
       end
 
-      @logger.data_amount = output[ "data" ]
+      @logger.data_amount = output[ NicInfo::DATA ]
       @logger.validate_data_amount
 
-      data_file = output[ "data_file" ]
+      data_file = output[ NicInfo::DATA_FILE ]
       if data_file != nil
         @logger.data_out= File.open( data_file, "w+" )
       end
 
-      @logger.pager=output[ "pager" ]
+      @logger.pager=output[ NicInfo::PAGER ]
+      @logger.auto_wrap=output[ NicInfo::AUTO_WRAP ]
+      @logger.default_width=output[ NicInfo::DEFAULT_WIDTH ]
+      @logger.detect_width=output[ NicInfo::DETECT_WIDTH ]
     end
 
     def self.clean
@@ -179,8 +182,15 @@ output:
   pager: true
 
   # Automatically wrap text when possible.
-  # Comment out to disable auto-wrapping.
-  auto_wrap: 80
+  auto_wrap: true
+
+  # When auto wrapping, automatically determine the terminal
+  # width if possible
+  detect_width: true
+
+  # The default terminal width if it is not to be detected
+  # or cannot be detected
+  default_width: 80
 
 cache:
 

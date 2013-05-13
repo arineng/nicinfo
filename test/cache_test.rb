@@ -79,7 +79,7 @@ NET_XML
     cache.create_or_update( url, @net_xml )
 
     safe = NicInfo::make_safe( url )
-    file_name = File.join( c.whois_cache_dir, safe )
+    file_name = File.join( c.rdap_cache_dir, safe )
     assert( File.exist?( file_name ) )
     f = File.open( file_name, "r" )
     data = ''
@@ -115,7 +115,7 @@ NET_XML
     cache.create_or_update( url, @net_xml )
 
     safe = NicInfo::make_safe( url )
-    file_name = File.join( c.whois_cache_dir, safe )
+    file_name = File.join( c.rdap_cache_dir, safe )
     assert( File.exist?( file_name ) )
     f = File.open( file_name, "r" )
     data = ''

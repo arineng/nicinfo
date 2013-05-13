@@ -53,6 +53,8 @@ module NicInfo
   DATA_FILE = "data_file"
   PAGER = "pager"
   AUTO_WRAP = "auto_wrap"
+  DETECT_WIDTH = "detect_width"
+  DEFAULT_WIDTH = "default_width"
   CACHE = "cache"
   CACHE_EXPIRY = "cache_expiry"
   CACHE_EVICTION = "cache_eviction"

@@ -283,5 +283,29 @@ TEXT2
     assert_equal( 110, logger.get_terminal_columns( text2, 80 ))
     assert_equal( 80, logger.get_terminal_columns( "blah", 80 ))
   end
+
+  def test_break_up_line
+    logger = NicInfo::Logger.new
+    logger.message_out = StringIO.new
+    logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
+
+    line = "this is a test of the emergency broadcast system"
+    lines = logger.break_up_line( line, 20 )
+    assert_equal( 3, lines.length )
+    line = "0123456789012345678 0123456789012345678 01234567 0123 0123"
+    lines = logger.break_up_line( line, 20 )
+    assert_equal( 3, lines.length )
+    line = "0123456789012345678012345678901234567801234567 0123 0123"
+    lines = logger.break_up_line( line, 20 )
+    assert_equal( 2, lines.length )
+    line = "012345678901234567801234567890123456780123456701230123"
+    lines = logger.break_up_line( line, 20 )
+    assert_equal( 1, lines.length )
+    line = "0123 012345678901234567801234567890123456780123456701230123"
+    lines = logger.break_up_line( line, 20 )
+    assert_equal( 2, lines.length )
+
+  end
+
 end
 

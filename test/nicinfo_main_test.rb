@@ -19,6 +19,7 @@ require 'config'
 require 'test/unit'
 require 'nicinfo_main'
 require 'nicinfo_logger'
+require 'pp'
 
 class NicInfoMainTest < Test::Unit::TestCase
 

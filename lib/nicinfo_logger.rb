@@ -51,6 +51,7 @@ module NicInfo
   class Logger
 
     attr_accessor :message_level, :data_amount, :message_out, :data_out, :item_name_length, :item_name_rjust, :pager
+    attr_accessor :auto_wrap, :detect_width, :default_width
 
     def initialize
 
@@ -64,9 +65,9 @@ module NicInfo
       @message_last_written_to = false
       @data_last_written_to = false
 
-      return if RUBY_PLATFORM =~ /win32/
+      return if RUBY_PLATFORM =~ /win32/ || !@detect_width
       #else
-      @columns = get_terminal_columns( `stty -a`, 80 )
+      @columns = get_terminal_columns( `stty -a`, @default_width )
     end
 
     def validate_message_level
@@ -224,6 +225,30 @@ module NicInfo
       return default_columns
     end
 
+    def break_up_line line, width
+      retval = Array.new
+      i = line.rindex( /\s/, width )
+      if i == nil
+        i = line.rindex( /\s/ )
+      end
+      while i != nil do
+        retval << line[ 0, i ]
+        line = line[ i+1..-1 ]
+        i = line.rindex( /\s/, width )
+        if i == nil
+          i = line.rindex( /\s/ )
+        end
+      end
+      if line != nil
+        if retval.length > 0 && retval.last.length + line.length + 1 <= width
+          retval.last << " " + line
+        else
+          retval << line
+        end
+      end
+      return retval
+    end
+
     private
 
     def log_info message
@@ -241,14 +266,34 @@ module NicInfo
         if (!@item_name_rjust)
           format_string = "%-" + @item_name_length.to_s + "s:  %s"
         end
-        @data_out.puts(format(format_string, item_name, item_value))
+        if @auto_wrap
+          lines = break_up_line item_value, @columns - ( @item_name_length + 3 )
+          i = 0
+          lines.each do |line|
+            if i == 0
+              @data_out.puts(format(format_string, item_name, line))
+            else
+              @data_out.puts(format(format_string, " ", line))
+            end
+            i = i + 1
+          end
+        else
+          @data_out.puts(format(format_string, item_name, item_value))
+        end
         @data_last_written_to = true
         @message_last_written_to = false
       end
     end
 
     def log_raw item_value
-      @data_out.puts(item_value)
+      if @auto_wrap
+        lines = break_up_line item_value, @columns
+        lines.each do |line|
+          @data_out.puts(line)
+        end
+      else
+        @data_out.puts(item_value)
+      end
       @data_last_written_to = true
       @message_last_written_to = false
     end

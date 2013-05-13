@@ -90,8 +90,8 @@ NOT_DEFAULT_CONFIG
     c.setup_workspace
 
     assert( File.exist?( File.join( dir, "config.yaml" ) ) )
-    assert( File.exist?( File.join( dir, "whois_cache" ) ) )
-    assert_equal( File.join( dir, "whois_cache" ), c.whois_cache_dir )
+    assert( File.exist?( File.join( dir, "rdap_cache" ) ) )
+    assert_equal( File.join( dir, "rdap_cache" ), c.rdap_cache_dir )
 
   end
 
