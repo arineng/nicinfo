@@ -242,5 +242,46 @@ class LoggerTest < Test::Unit::TestCase
     assert_equal( "", logger.data_out.string )
   end
 
+  def test_get_terminal_columns
+
+    text1 = <<TEXT1
+speed 38400 baud;
+rows = 60; columns = 157; ypixels = 0; xpixels = 0;
+csdata ?
+eucw 1:0:0:0, scrw 1:0:0:0
+intr = ^c; quit = ^\; erase = ^?; kill = ^u;
+eof = ^d; eol = ; eol2 = ; swtch = ;
+start = ^q; stop = ^s; susp = ^z; dsusp = ^y;
+rprnt = ^r; flush = ^o; werase = ^w; lnext = ^v;
+-parenb -parodd cs8 -cstopb -hupcl cread -clocal -loblk -crtscts -crtsxoff -parext
+-ignbrk brkint -ignpar -parmrk -inpck -istrip -inlcr -igncr icrnl -iuclc
+ixon -ixany -ixoff imaxbel
+isig icanon -xcase echo echoe echok -echonl -noflsh
+-tostop echoctl -echoprt echoke -defecho -flusho -pendin iexten
+opost -olcuc onlcr -ocrnl -onocr -onlret -ofill -ofdel tab3
+TEXT1
+
+    text2 = <<TEXT2
+speed 9600 baud; 40 rows; 110 columns;
+lflags: icanon isig iexten echo echoe -echok echoke -echonl echoctl
+-echoprt -altwerase -noflsh -tostop -flusho pendin -nokerninfo
+-extproc
+iflags: -istrip icrnl -inlcr -igncr ixon -ixoff ixany imaxbel iutf8
+-ignbrk brkint -inpck -ignpar -parmrk
+oflags: opost onlcr -oxtabs -onocr -onlret
+cflags: cread cs8 -parenb -parodd hupcl -clocal -cstopb -crtscts -dsrflow
+-dtrflow -mdmbuf
+cchars: discard = ^O; dsusp = ^Y; eof = ^D; eol = <undef>;
+eol2 = <undef>; erase = ^?; intr = ^C; kill = ^U; lnext = ^V;
+min = 1; quit = ^\; reprint = ^R; start = ^Q; status = ^T;
+stop = ^S; susp = ^Z; time = 0; werase = ^W;
+TEXT2
+
+    logger = NicInfo::Logger.new
+
+    assert_equal( 157, logger.get_terminal_columns( text1, 80 ))
+    assert_equal( 110, logger.get_terminal_columns( text2, 80 ))
+    assert_equal( 80, logger.get_terminal_columns( "blah", 80 ))
+  end
 end
 

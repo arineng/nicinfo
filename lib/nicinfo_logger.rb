@@ -64,6 +64,9 @@ module NicInfo
       @message_last_written_to = false
       @data_last_written_to = false
 
+      return if RUBY_PLATFORM =~ /win32/
+      #else
+      @columns = get_terminal_columns( `stty -a`, 80 )
     end
 
     def validate_message_level
@@ -208,6 +211,17 @@ module NicInfo
       Kernel.select [STDIN] # Wait until we have input before we start the pager
       pager = ENV['PAGER'] || 'less'
       exec pager rescue exec "/bin/sh", "-c", pager
+    end
+
+    def get_terminal_columns stty_output, default_columns
+      rx1 = /\s*columns\s*=\s*(\d*);/
+      m = rx1.match( stty_output )
+      return m[ 1 ].to_i if m
+      #else
+      rx2 = /\s*(\d*)\s*columns;/
+      m = rx2.match( stty_output )
+      return m[ 1 ].to_i if m
+      return default_columns
     end
 
     private
