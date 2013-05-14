@@ -28,6 +28,18 @@ module NicInfo
     return description[ "description" ]
   end
 
+  def NicInfo.get_entitites json_data
+    return json_data[ "entities" ]
+  end
+
+  def NicInfo.get_nameservers json_data
+    return json_data[ "nameservers" ]
+  end
+
+  def NicInfo.get_links json_data
+    return json_data[ "links" ]
+  end
+
   def NicInfo.get_alternate_link links
     get_link "alternate", links
   end
@@ -46,6 +58,10 @@ module NicInfo
 
   def NicInfo.get_about_link links
     get_link "about", links
+  end
+
+  def NicInfo.get_self_link links
+    get_link "self", links
   end
 
   def NicInfo.get_link rel, links

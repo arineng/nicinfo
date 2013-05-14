@@ -546,40 +546,22 @@ HELP_SUMMARY
     end
 
     def cache_self_references json_data
-      links = get_links json_data
-      links.each do |link|
-        href = get_self_href link
-        if href
+      links = NicInfo::get_links json_data
+      if links
+        self_link = NicInfo.get_self_link links
+        if self_link
           pretty = JSON::pretty_generate( json_data )
-          @cache.create( href, pretty )
+          @cache.create( self_link, pretty )
         end
-      end if links
-      entities = get_entitites json_data
+      end
+      entities = NicInfo::get_entitites json_data
       entities.each do |entity|
         cache_self_references( entity )
       end if entities
-      nameservers = get_nameservers json_data
+      nameservers = NicInfo::get_nameservers json_data
       nameservers.each do |ns|
         cache_self_references( ns )
       end if nameservers
-    end
-
-    def get_self_href link
-      href = link[ "href" ]
-      return href if href && link[ "rel" ] == "self"
-      return nil
-    end
-
-    def get_links json_data
-      return json_data[ "links" ]
-    end
-
-    def get_entitites json_data
-      return json_data[ "entities" ]
-    end
-
-    def get_nameservers json_data
-      return json_data[ "nameservers" ]
     end
 
     def show_helpful_messages rdap_url
