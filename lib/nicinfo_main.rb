@@ -22,6 +22,7 @@ require 'cache'
 require 'enum'
 require 'common_names'
 require 'bootstrap'
+require 'notices'
 require 'ipaddr'
 begin
   require 'json'
@@ -346,6 +347,7 @@ module NicInfo
             @config.logger.raw( DataAmount::TERSE_DATA, eval_json_value( value, json_data) )
           end
         else
+          Notices.new.display_notices json_data, @config
           show_helpful_messages rdap_url
         end
         @config.logger.end_run

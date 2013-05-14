@@ -1,6 +1,29 @@
 {
     "nicInfo_demoUrl" : "http://whois.arin.net/nameserver/ns1.xn--fo-5ja.example",
     "nicInfo_demoHint" : "nicinfo ns1.xn--fo-5ja.example",
+    "rdapConformance":[
+        "rdap_level_0"
+    ],
+    "notices":[
+        {
+            "title":"Rhetorical License",
+            "description":[
+                "Lorem ipsum dolor sit amet, has reque blandit recusabo ex, id cibo epicuri erroribus pri. Qui epicurei facilisis deseruisse at. Posse fierent persecuti mei te, ut vix lucilius expetenda. Quo ei inani minimum. In cum delenit definiebas, et dico case delicata vim, mei unum feugiat suscipiantur et. Sale soluta democritum ea eum.",
+                "Quo at diam fabulas. Cum dicant electram eu, his at graeco maiorum omittantur, numquam abhorreant instructior ad est. Legendos similique sea ei, fabellas voluptaria sed eu, pro et oblique utroque. Mea ornatus sapientem ex. Etiam gubergren eam id, eum id possit deleniti electram, dicat philosophia sed eu.",
+                "Ut vis dicunt laboramus, vis dolorem nostrum at. Vix suas nihil nostrud an, te his tation placerat luptatum, no minim nobis sea. Cum cu congue platonem hendrerit. Ex sint dolor constituam per, per an novum qualisque, rebum prompta ius ex. Nec in fabellas referrentur, quot dicit veniam has at, mea fuisset denique ut. Ut justo munere sed, facilisis efficiendi ei has.",
+                "Eros alterum oporteat nec ut, iriure malorum hendrerit ne est. Ius aliquam mandamus id, sea in vide soleat reprehendunt, has officiis maluisset prodesset cu. No qui dolore putent, ea veniam appetere persecuti mei, an eam tamquam delicata. Laoreet appetere scripserit mei eu, usu elit indoctum ex, error homero erroribus pro at. Cum an epicuri omittam conceptam. Ad tota utamur vix, illum eleifend efficiendi per ne.",
+                "Meliore vivendo concludaturque in pro, congue dictas usu at, ei viris assueverit mea. Veri rebum dicant no mea, ea facer altera mentitum sit. Eros sale reprimique id duo, graeco invenire ex eos, has affert munere bonorum te. Fuisset corpora eu pri. Aliquid sensibus duo id, mea assum maiestatis ad, integre accommodare eum no."
+            ],
+            "links":[
+                {
+                    "value":"http://example.net/ip/192.0.2.0/24",
+                    "rel":"license",
+                    "type":"text/html",
+                    "href":"http://www.example.com/license.html"
+                }
+            ]
+        }
+    ],
     "handle":"XXXX",
     "ldhName":"ns1.xn--fo-5ja.example",
     "unicodeName":"foo.example",

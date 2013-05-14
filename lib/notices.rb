@@ -12,6 +12,8 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+require 'config'
+require 'nicinfo_logger'
 require 'utils'
 
 module NicInfo
@@ -36,6 +38,51 @@ module NicInfo
       return true if word_count > 700
       #otherwise
       return false
+    end
+
+    def display_notices json_response, config
+
+      notices = json_response[ "notices" ]
+      return if notices == nil
+      if (is_excessive_notice notices) && (config.logger.data_amount != NicInfo::DataAmount::EXTRA_DATA)
+        config.logger.start_data_item
+        config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "Excessive Notices"
+        config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "-----------------"
+        config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "Response contains excessive notices."
+        config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "Use the \"-V\" or \"--data extra\" options to see them."
+        config.logger.end_data_item
+      else
+        notices.each do |notice|
+          display_single_notice notice, config
+        end
+      end
+
+    end
+
+    def display_single_notice notice, config
+      config.logger.start_data_item
+      title = notice[ "title" ]
+      if title == nil
+        title = "Notice"
+      end
+      config.logger.raw NicInfo::DataAmount::NORMAL_DATA, title
+      config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "-" * title.length
+      description = notice[ "description" ]
+      description.each do |line|
+        config.logger.raw NicInfo::DataAmount::NORMAL_DATA, line
+      end
+      links = notice[ "links" ]
+      alternate = NicInfo.get_alternate_link links
+      config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "More -> #{alternate}" if alternate
+      about = NicInfo.get_about_link links
+      config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "About -> #{about}" if about
+      tos = NicInfo.get_tos_link links
+      config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "Terms of Service -> #{tos}" if tos
+      copyright = NicInfo.get_copyright_link links
+      config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "Copyright -> #{copyright}" if copyright
+      license = NicInfo.get_license_link links
+      config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "License -> #{license}" if license
+      config.logger.end_data_item
     end
 
   end

@@ -28,4 +28,34 @@ module NicInfo
     return description[ "description" ]
   end
 
+  def NicInfo.get_alternate_link links
+    get_link "alternate", links
+  end
+
+  def NicInfo.get_tos_link links
+    get_link "terms-of-service", links
+  end
+
+  def NicInfo.get_license_link links
+    get_link "license", links
+  end
+
+  def NicInfo.get_copyright_link links
+    get_link "copyright", links
+  end
+
+  def NicInfo.get_about_link links
+    get_link "about", links
+  end
+
+  def NicInfo.get_link rel, links
+    return nil if !links
+    links.each do |link|
+      if link[ "rel" ] == rel
+        return link[ "href" ]
+      end
+    end
+    return nil
+  end
+
 end

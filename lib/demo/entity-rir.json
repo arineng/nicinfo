@@ -1,6 +1,41 @@
 {
     "nicInfo_demoUrl" : "http://whois.arin.net/entity/foo1",
     "nicInfo_demoHint" : "nicinfo foo1",
+    "rdapConformance":[
+        "rdap_level_0"
+    ],
+    "notices":[
+        {
+            "title":"Content Redacted",
+            "description":[
+                "Without full authorization, content has been redacted.",
+                "Sorry, dude!"
+            ],
+            "links":[
+                {
+                    "value":"http://example.net/ip/192.0.2.0/24",
+                    "rel":"alternate",
+                    "type":"text/html",
+                    "href":"http://www.example.com/redaction_policy.html"
+                }
+            ]
+        },
+        {
+            "title":"Terms of Use",
+            "description":[
+                "THESE are the times that try men's souls. The summer soldier and the sunshine patriot will, in this crisis, shrink from the service of their country; but he that stands by it now, deserves the love and thanks of man and woman. Tyranny, like hell, is not easily conquered; yet we have this consolation with us, that the harder the conflict, the more glorious the triumph.",
+                "So sayeth Thomas Paine"
+            ],
+            "links":[
+                {
+                    "value":"http://example.net/ip/192.0.2.0/24",
+                    "rel":"terms-of-service",
+                    "type":"text/html",
+                    "href":"http://www.example.com/tos.html"
+                }
+            ]
+        }
+    ],
     "handle":"foo1",
     "vCard":[
         [ "version", {}, "text", "4.0" ],

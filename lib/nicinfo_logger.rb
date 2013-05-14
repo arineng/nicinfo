@@ -65,9 +65,15 @@ module NicInfo
       @message_last_written_to = false
       @data_last_written_to = false
 
-      return if RUBY_PLATFORM =~ /win32/ || !@detect_width
+      return if RUBY_PLATFORM =~ /win32/
       #else
       @columns = get_terminal_columns( `stty -a`, @default_width )
+    end
+
+    def get_width
+      return @default_width if !@detect_width
+      return @columns if @columns != nil
+      return @default_width
     end
 
     def validate_message_level
@@ -267,7 +273,7 @@ module NicInfo
           format_string = "%-" + @item_name_length.to_s + "s:  %s"
         end
         if @auto_wrap
-          lines = break_up_line item_value, @columns - ( @item_name_length + 3 )
+          lines = break_up_line item_value, get_width - ( @item_name_length + 3 )
           i = 0
           lines.each do |line|
             if i == 0
@@ -287,7 +293,7 @@ module NicInfo
 
     def log_raw item_value
       if @auto_wrap
-        lines = break_up_line item_value, @columns
+        lines = break_up_line item_value, get_width
         lines.each do |line|
           @data_out.puts(line)
         end
