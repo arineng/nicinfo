@@ -59,6 +59,8 @@ module NicInfo
         @config = NicInfo::Config.new(NicInfo::Config::formulate_app_data_dir())
       end
 
+      @config.options.require_query = true
+
       @opts = OptionParser.new do |opts|
 
         opts.banner = "Usage: nicinfo [options] QUERY_VALUE"
@@ -87,12 +89,12 @@ module NicInfo
           @config.options.reverse_ip = true
         end
 
-        opts.on("--substring YES|NO|TRUE|FALSE",
-                "Use substring matching for name searchs.") do |substring|
-          @config.config[ NicInfo::SEARCH ][ NicInfo::SUBSTRING ] = false if substring =~ /no|false/i
-          @config.config[ NicInfo::SEARCH ][ NicInfo::SUBSTRING ] = true if substring =~ /yes|true/i
-          raise OptionParser::InvalidArgument, substring.to_s unless substring =~ /yes|no|true|false/i
-        end
+        #opts.on("--substring YES|NO|TRUE|FALSE",
+        #        "Use substring matching for name searchs.") do |substring|
+        #  @config.config[ NicInfo::SEARCH ][ NicInfo::SUBSTRING ] = false if substring =~ /no|false/i
+        #  @config.config[ NicInfo::SEARCH ][ NicInfo::SUBSTRING ] = true if substring =~ /yes|true/i
+        #  raise OptionParser::InvalidArgument, substring.to_s unless substring =~ /yes|no|true|false/i
+        #end
 
         opts.on("-b", "--base URL",
                 "The base URL of the RDAP Service.") do |url|
@@ -119,9 +121,16 @@ module NicInfo
           raise OptionParser::InvalidArgument, cc.to_s unless cc =~ /yes|no|true|false/i
         end
 
+        opts.on("--empty-cache",
+                "Empties the cache of all files regardless of eviction policy.") do |cc|
+          @config.options.empty_cache = true
+          @config.options.require_query = false
+        end
+
         opts.on("--demo",
                 "Populates the cache with demonstration results.") do |cc|
           @config.options.demo = true
+          @config.options.require_query = false
         end
 
         opts.separator ""
@@ -202,6 +211,7 @@ module NicInfo
         opts.on( "-h", "--help",
                  "Show this message" ) do
           @config.options.help = true
+          @config.options.require_query = false
         end
 
       end
@@ -277,15 +287,23 @@ module NicInfo
         end
       end
 
+      if @config.options.empty_cache
+        @cache.empty
+      end
+
       if(@config.options.help)
         help()
-      elsif @config.options.url
+      end
+
+      if @config.options.url
         @config.options.query_type = get_query_type_from_url( @config.options.url )
-      elsif( @config.options.argv == nil || @config.options.argv == [] )
-        if !@config.options.demo
-          help()
-        else
+      end
+
+      if @config.options.argv == nil || @config.options.argv == []
+        if @config.options.require_query == false
           exit
+        else
+          help
         end
       end
 

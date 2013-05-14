@@ -80,6 +80,21 @@ module NicInfo
       return eviction_count
     end
 
+    def empty
+      cache_files = Dir::entries(@config.rdap_cache_dir)
+      eviction_count = 0
+      cache_files.each do |file|
+        full_file_name = File.join(@config.rdap_cache_dir, file)
+        if !file.start_with?(".")
+          @config.logger.trace("Evicting " + full_file_name)
+          File::unlink(full_file_name)
+          eviction_count += 1
+        end
+      end
+      @config.logger.trace("Evicted " + eviction_count.to_s + " files from the cache")
+      return eviction_count
+    end
+
     def count
       count = 0
       cache_files = Dir::entries(@config.rdap_cache_dir)
