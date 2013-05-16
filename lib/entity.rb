@@ -39,19 +39,17 @@ module NicInfo
       common = CommonJson.new @config
       @config.logger.start_data_item
       @config.logger.datum "Handle", entity[ "handle" ]
-      roles = entity[ "roles" ]
-      if roles
-        new_roles = Array.new
-        roles.each do |role|
-          new_roles << NicInfo::capitalize( role )
-        end
-        @config.logger.datum "Roles", new_roles.join( ", " )
-      end
+      common.display_string_array "roles", "Roles", entity
+      common.display_status entity
       common.display_remarks entity
+      common.display_port43 entity
+      common.display_links( get_cn( entity ), entity )
       @config.logger.end_data_item
     end
 
-
+    def get_cn entity
+      return entity[ "handle" ]
+    end
   end
 
 end

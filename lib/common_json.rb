@@ -55,6 +55,38 @@ module NicInfo
       end
     end
 
+    def display_string_array json_name, display_name, json_data
+      arr = json_data[ json_name ]
+      if arr
+        new_arr = Array.new
+        arr.each do |str|
+          new_arr << NicInfo::capitalize( str )
+        end
+        @config.logger.datum display_name, new_arr.join( ", " )
+      end
+    end
+
+    def display_status objectclass
+      display_string_array "status", "Status", objectclass
+    end
+
+    def display_port43 objectclass
+      @config.logger.extra "Port 43 Whois", objectclass[ "port43" ]
+    end
+
+    def display_links cn, objectclass
+      links = NicInfo::get_links objectclass
+      if links
+        @config.logger.extra "Links", "for #{cn}"
+        @config.logger.extra "Reference", NicInfo::get_self_link( links )
+        @config.logger.extra "More", NicInfo::get_alternate_link( links )
+        @config.logger.extra "About", NicInfo::get_about_link( links )
+        @config.logger.extra "TOS", NicInfo::get_tos_link( links )
+        @config.logger.extra "(C)", NicInfo::get_copyright_link( links )
+        @config.logger.extra "License", NicInfo::get_license_link( links )
+      end
+    end
+
   end
 
 end
