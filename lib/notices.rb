@@ -73,16 +73,18 @@ module NicInfo
         i = i + 1
       end
       links = notice[ "links" ]
-      alternate = NicInfo.get_alternate_link links
-      config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "More", alternate if alternate
-      about = NicInfo.get_about_link links
-      config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "About", about if about
-      tos = NicInfo.get_tos_link links
-      config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "TOS", tos if tos
-      copyright = NicInfo.get_copyright_link links
-      config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "(C)", copyright if copyright
-      license = NicInfo.get_license_link links
-      config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "License", license if license
+      if links
+        alternate = NicInfo.get_alternate_link links
+        config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "More", alternate if alternate
+        about = NicInfo.get_about_link links
+        config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "About", about if about
+        tos = NicInfo.get_tos_link links
+        config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "TOS", tos if tos
+        copyright = NicInfo.get_copyright_link links
+        config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "(C)", copyright if copyright
+        license = NicInfo.get_license_link links
+        config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "License", license if license
+      end
       config.logger.end_data_item
     end
 

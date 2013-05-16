@@ -43,6 +43,14 @@ module NicInfo
             end
             i = i + 1
           end
+          links = NicInfo::get_links remark
+          if links
+            @config.logger.datum "More", NicInfo::get_alternate_link( links )
+            @config.logger.datum "About", NicInfo::get_about_link( links )
+            @config.logger.datum "TOS", NicInfo::get_tos_link( links )
+            @config.logger.datum "(C)", NicInfo::get_copyright_link( links )
+            @config.logger.datum "License", NicInfo::get_license_link( links )
+          end
         end if remarks
       end
     end

@@ -67,6 +67,14 @@
             "description":[
                 "She sells sea shells down by the sea shore.",
                 "Originally written by Terry Sullivan."
+            ],
+            "links":[
+                {
+                    "value":"http://example.net/ip/192.0.2.0/24",
+                    "rel":"alternate",
+                    "type":"text/html",
+                    "href":"http://www.example.com/redaction_policy.html"
+                }
             ]
         }
     ],
