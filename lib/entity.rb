@@ -1,0 +1,57 @@
+# Copyright (C) 2011,2012,2013 American Registry for Internet Numbers
+#
+# Permission to use, copy, modify, and/or distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
+# IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+require 'config'
+require 'nicinfo_logger'
+require 'utils'
+require 'common_json'
+
+module NicInfo
+
+  # deals with RDAP entity structures
+  class Entity
+
+    def initialize config
+      @config = config
+    end
+
+    def display_entities json_data
+
+      entities = NicInfo::get_entitites json_data
+      entities.each do |entity|
+        display_single_entity entity
+      end if entities
+
+    end
+
+    def display_single_entity entity
+      common = CommonJson.new @config
+      @config.logger.start_data_item
+      @config.logger.datum "Handle", entity[ "handle" ]
+      roles = entity[ "roles" ]
+      if roles
+        new_roles = Array.new
+        roles.each do |role|
+          new_roles << NicInfo::capitalize( role )
+        end
+        @config.logger.datum "Roles", new_roles.join( ", " )
+      end
+      common.display_remarks entity
+      @config.logger.end_data_item
+    end
+
+
+  end
+
+end

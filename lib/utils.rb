@@ -15,6 +15,7 @@
 
 require 'stringio'
 require 'uri'
+require 'config'
 
 module NicInfo
 
@@ -72,6 +73,14 @@ module NicInfo
       end
     end
     return nil
+  end
+
+  def NicInfo.capitalize str
+    words = str.split( /\s/ )
+    words.each do |word|
+      word.capitalize!
+    end
+    return words.join( " " )
   end
 
 end

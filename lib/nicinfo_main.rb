@@ -23,6 +23,7 @@ require 'enum'
 require 'common_names'
 require 'bootstrap'
 require 'notices'
+require 'entity'
 require 'ipaddr'
 begin
   require 'json'
@@ -366,6 +367,19 @@ module NicInfo
           end
         else
           Notices.new.display_notices json_data, @config
+          case @config.options.query_type
+            when QueryType::BY_IP4_ADDR
+            when QueryType::BY_IP6_ADDR
+            when QueryType::BY_IP4_CIDR
+            when QueryType::BY_IP6_CIDR
+            when QueryType::BY_IP
+            when QueryType::BY_AS_NUMBER
+            when QueryType::BY_DOMAIN
+            when QueryType::BY_NAMESERVER
+            when QueryType::BY_ENTITY_NAME
+              entity = Entity.new @config
+              entity.display_single_entity json_data
+          end
           show_helpful_messages rdap_url
         end
         @config.logger.end_run

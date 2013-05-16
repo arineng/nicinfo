@@ -21,7 +21,7 @@ module NicInfo
   # deals with RDAP notices structures
   class Notices
 
-    def is_excessive_notice notices
+    def Notices.is_excessive_notice notices
       return false if !notices
       return false if notices.length == 0
       return true if notices.length > 2
@@ -44,7 +44,7 @@ module NicInfo
 
       notices = json_response[ "notices" ]
       return if notices == nil
-      if (is_excessive_notice notices) && (config.logger.data_amount != NicInfo::DataAmount::EXTRA_DATA)
+      if (Notices::is_excessive_notice notices) && (config.logger.data_amount != NicInfo::DataAmount::EXTRA_DATA)
         config.logger.start_data_item
         config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "Excessive Notices"
         config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "-----------------"
@@ -70,6 +70,7 @@ module NicInfo
       description = notice[ "description" ]
       description.each do |line|
         config.logger.raw NicInfo::DataAmount::NORMAL_DATA, line
+        config.logger.raw NicInfo::DataAmount::NORMAL_DATA, " "
       end
       links = notice[ "links" ]
       alternate = NicInfo.get_alternate_link links
