@@ -77,7 +77,7 @@ module NicInfo
     def display_links cn, objectclass
       links = NicInfo::get_links objectclass
       if links
-        @config.logger.extra "Links", "for #{cn}"
+        @config.logger.extra "Links", "-- for #{cn} --"
         @config.logger.extra "Reference", NicInfo::get_self_link( links )
         @config.logger.extra "More", NicInfo::get_alternate_link( links )
         @config.logger.extra "About", NicInfo::get_about_link( links )
