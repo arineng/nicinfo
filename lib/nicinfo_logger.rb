@@ -51,7 +51,7 @@ module NicInfo
   class Logger
 
     attr_accessor :message_level, :data_amount, :message_out, :data_out, :item_name_length, :item_name_rjust, :pager
-    attr_accessor :auto_wrap, :detect_width, :default_width
+    attr_accessor :auto_wrap, :detect_width, :default_width, :prose_name_rjust, :prose_name_length
 
     def initialize
 
@@ -61,6 +61,8 @@ module NicInfo
       @data_out = $stdout
       @item_name_length = 25
       @item_name_rjust = true
+      @prose_name_length = 8
+      @prose_name_rjust = true
 
       @message_last_written_to = false
       @data_last_written_to = false
@@ -171,6 +173,27 @@ module NicInfo
       return retval
     end
 
+    def prose data_amount, prose_name, prose_value
+      retval = false
+      validate_data_amount()
+      case data_amount
+        when DataAmount::TERSE_DATA
+          log_prose prose_name, prose_value
+          retval = true
+        when DataAmount::NORMAL_DATA
+          if (@data_amount != DataAmount::TERSE_DATA)
+            log_prose prose_name, prose_value
+            retval = true
+          end
+        when DataAmount::EXTRA_DATA
+          if (@data_amount != DataAmount::TERSE_DATA && @data_amount != DataAmount::NORMAL_DATA)
+            log_prose prose_name, prose_value
+            retval = true
+          end
+      end
+      return retval
+    end
+
     def log_tree_item data_amount, tree_item
       retval = false
       validate_data_amount()
@@ -267,24 +290,32 @@ module NicInfo
     end
 
     def log_data item_name, item_value
+      log_just item_name, item_value, @item_name_length, @item_name_rjust, ":  "
+    end
+
+    def log_prose item_name, item_value
+      log_just item_name, item_value, @prose_name_length, @prose_name_rjust, " "
+    end
+
+    def log_just item_name, item_value, name_length, name_rjust, separator
       if (item_value != nil && !item_value.to_s.empty?)
-        format_string = "%" + @item_name_length.to_s + "s:  %s"
-        if (!@item_name_rjust)
-          format_string = "%-" + @item_name_length.to_s + "s:  %s"
+        format_string = "%" + name_length.to_s + "s%s%s"
+        if (!name_rjust)
+          format_string = "%-" + name_length.to_s + "s%s%s"
         end
         if @auto_wrap
-          lines = break_up_line item_value, get_width - ( @item_name_length + 3 )
+          lines = break_up_line item_value, get_width - ( name_length + separator.length )
           i = 0
           lines.each do |line|
             if i == 0
-              @data_out.puts(format(format_string, item_name, line))
+              @data_out.puts(format(format_string, item_name, separator, line))
             else
-              @data_out.puts(format(format_string, " ", line))
+              @data_out.puts(format(format_string, " ", separator, line))
             end
             i = i + 1
           end
         else
-          @data_out.puts(format(format_string, item_name, item_value))
+          @data_out.puts(format(format_string, item_name, separator, item_value))
         end
         @data_last_written_to = true
         @message_last_written_to = false

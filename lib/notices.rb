@@ -63,26 +63,26 @@ module NicInfo
       config.logger.start_data_item
       title = notice[ "title" ]
       if title == nil
-        title = "Notice"
+        title = ""
       end
-      config.logger.raw NicInfo::DataAmount::NORMAL_DATA, title
-      config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "-" * title.length
+      config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "Notice", title
       description = notice[ "description" ]
+      i = 1
       description.each do |line|
-        config.logger.raw NicInfo::DataAmount::NORMAL_DATA, line
-        config.logger.raw NicInfo::DataAmount::NORMAL_DATA, " "
+        config.logger.prose NicInfo::DataAmount::NORMAL_DATA, i.to_s, line
+        i = i + 1
       end
       links = notice[ "links" ]
       alternate = NicInfo.get_alternate_link links
-      config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "More -> #{alternate}" if alternate
+      config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "More", alternate if alternate
       about = NicInfo.get_about_link links
-      config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "About -> #{about}" if about
+      config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "About", about if about
       tos = NicInfo.get_tos_link links
-      config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "Terms of Service -> #{tos}" if tos
+      config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "TOS", tos if tos
       copyright = NicInfo.get_copyright_link links
-      config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "Copyright -> #{copyright}" if copyright
+      config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "(C)", copyright if copyright
       license = NicInfo.get_license_link links
-      config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "License -> #{license}" if license
+      config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "License", license if license
       config.logger.end_data_item
     end
 
