@@ -152,6 +152,27 @@ module NicInfo
       return false
     end
 
+    def info data_amount, item_name, item_value
+      retval = false
+      validate_data_amount()
+      case data_amount
+        when DataAmount::TERSE_DATA
+          log_data(item_name, item_value)
+          retval = true
+        when DataAmount::NORMAL_DATA
+          if (@data_amount != DataAmount::TERSE_DATA)
+            log_data( item_name, item_value)
+            retval = true
+          end
+        when DataAmount::EXTRA_DATA
+          if (@data_amount != DataAmount::TERSE_DATA && @data_amount != DataAmount::NORMAL_DATA)
+            log_data( item_name, item_value )
+            retval = true
+          end
+      end
+      return retval
+    end
+
     def raw data_amount, raw_data
       retval = false
       validate_data_amount()

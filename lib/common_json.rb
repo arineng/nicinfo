@@ -15,6 +15,7 @@
 require 'config'
 require 'nicinfo_logger'
 require 'utils'
+require 'time'
 
 module NicInfo
 
@@ -55,19 +56,19 @@ module NicInfo
       end
     end
 
-    def display_string_array json_name, display_name, json_data
+    def display_string_array json_name, display_name, json_data, data_amount
       arr = json_data[ json_name ]
       if arr
         new_arr = Array.new
         arr.each do |str|
           new_arr << NicInfo::capitalize( str )
         end
-        @config.logger.datum display_name, new_arr.join( ", " )
+        @config.logger.info data_amount, display_name, new_arr.join( ", " )
       end
     end
 
     def display_status objectclass
-      display_string_array "status", "Status", objectclass
+      display_string_array DataAmount::NORMAL_DATA, "status", "Status", objectclass
     end
 
     def display_port43 objectclass
@@ -84,6 +85,21 @@ module NicInfo
         @config.logger.extra "TOS", NicInfo::get_tos_link( links )
         @config.logger.extra "(C)", NicInfo::get_copyright_link( links )
         @config.logger.extra "License", NicInfo::get_license_link( links )
+      end
+    end
+
+    def display_events objectclass
+      events = objectclass[ "events" ]
+      if events
+        events.each do |event|
+          item_name = NicInfo::capitalize( event[ "eventAction" ] )
+          item_value = Time.parse( event[ "eventDate" ] ).rfc2822
+          actor = event[ "eventActor" ]
+          if actor
+            item_value << " by #{actor}"
+          end
+          @config.logger.datum item_name, item_value
+        end
       end
     end
 

@@ -38,12 +38,13 @@ module NicInfo
     def display_single_entity entity
       common = CommonJson.new @config
       @config.logger.start_data_item
-      @config.logger.datum "Handle", entity[ "handle" ]
-      common.display_string_array "roles", "Roles", entity
+      @config.logger.terse "Handle", entity[ "handle" ]
+      common.display_string_array DataAmount::TERSE_DATA, "roles", "Roles", entity
       common.display_status entity
       common.display_remarks entity
       common.display_port43 entity
       common.display_links( get_cn( entity ), entity )
+      common.display_events entity
       @config.logger.end_data_item
     end
 
