@@ -68,7 +68,7 @@ module NicInfo
     end
 
     def display_status objectclass
-      display_string_array DataAmount::NORMAL_DATA, "status", "Status", objectclass
+      display_string_array "status", "Status", objectclass, DataAmount::NORMAL_DATA
     end
 
     def display_port43 objectclass

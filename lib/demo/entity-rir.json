@@ -70,6 +70,20 @@
            "Canada"
           ]
        ],
+       ["adr",
+             { "type": "home",
+               "label": "123 Maple Ave\nSuite 90001\nVancouver\nBC\n1239\n"},
+             "text",
+             [
+                 "",
+                 "",
+                 "",
+                 "",
+                 "",
+                 "",
+                 ""
+             ]
+       ],
        ["tel",
          { "type": ["work", "voice"], "pref": "1" },
          "uri",
@@ -94,30 +108,6 @@
        ["tz", {}, "utc-offset", "-05:00"],
        ["url", { "type": "home" }, "uri", "http://nomis80.org"]
      ]
-    ],
-    "vCard":[
-        [ "version", {}, "text", "4.0" ],
-        [ "fn", {}, "text", "Joe Bob, Inc." ],
-        [ "fn", {}, "text", "Bobby Joe Shopping" ],
-        [ "label", {}, "text", "123 Maple Ave\n",
-            "Suite 90001\n",
-            "Vancouver\n",
-            "BC\n",
-            "1239\n" ],
-        [ "email", {}, "text", "joe at bob.com" ],
-        [ "email", {}, "text", "bob at joe.com" ],
-        [ "tel", {
-            "type":"work"
-        }, "uri", "tel:+1-958-555-4321" ],
-        [ "tel", {
-            "type":"work"
-        }, "uri", "tel:+1-958-555-4322" ],
-        [ "tel", {
-            "type":"fax"
-        }, "uri", "tel:+1-958-555-4323" ],
-        [ "tel", {
-            "type":"cell"
-        }, "uri", "tel:+1-958-555-4324" ]
     ],
     "roles":[ "registrant" ],
     "remarks":[

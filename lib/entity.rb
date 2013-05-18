@@ -30,6 +30,16 @@ module NicInfo
     end if entities
   end
 
+  class Adr
+    attr_accessor :structured, :label, :type
+    attr_accessor :pobox, :extended, :street, :locality, :region, :postal, :country
+    def initialize
+      @structured = false
+      @label = Array.new
+      @type = Array.new
+    end
+  end
+
   class Email
     attr_accessor :type, :addr
     def initialize
@@ -46,12 +56,13 @@ module NicInfo
 
   class JCard
 
-    attr_accessor :fns, :phones, :emails
+    attr_accessor :fns, :phones, :emails, :adrs
 
     def initialize
       @fns = Array.new
       @phones = Array.new
       @emails = Array.new
+      @adrs = Array.new
     end
 
     def get_vcard entity
@@ -87,6 +98,26 @@ module NicInfo
             end
             email.addr=element[ 3 ]
             @emails << email
+          end
+          if element[ 0 ] == "adr"
+            adr = Adr.new
+            if (type = element[ 1 ][ "type" ]) != nil
+              adr.type << type if type.instance_of? String
+              adr.type = type if type.instance_of? Array
+            end
+            if (label = element[ 1 ][ "label" ]) != nil
+              adr.label = label.split( "\n" )
+            else
+              adr.pobox=element[ 3 ][ 0 ]
+              adr.extended=element[ 3 ][ 1 ]
+              adr.street=element[ 3 ][ 2 ]
+              adr.locality=element[ 3 ][ 3 ]
+              adr.region=element[ 3 ][ 4 ]
+              adr.postal=element[ 3 ][ 5 ]
+              adr.country=element[ 3 ][ 6 ]
+              adr.structured=true
+            end
+            @adrs << adr
           end
         end
       end
@@ -134,12 +165,34 @@ module NicInfo
         end
         @config.logger.terse "Phone", item_value
       end
-      @common.display_string_array DataAmount::TERSE_DATA, "roles", "Roles", @objectclass
+      @common.display_string_array "roles", "Roles", @objectclass, DataAmount::TERSE_DATA
       @common.display_status @objectclass
       @common.display_remarks @objectclass
       @common.display_port43 @objectclass
       @common.display_links( get_cn, @objectclass )
       @common.display_events @objectclass
+      @jcard.adrs.each do |adr|
+        if adr.type.empty?
+          @config.logger.extra "Address", "-- for #{get_cn} --"
+        else
+          @config.logger.extra "Address", "( #{adr.type.join( ", " )} )"
+        end
+        if adr.structured
+          @config.logger.extra "P.O. Box", adr.pobox
+          @config.logger.extra "Apt/Suite", adr.extended
+          @config.logger.extra "Street", adr.street
+          @config.logger.extra "City", adr.locality
+          @config.logger.extra "Region", adr.region
+          @config.logger.extra "Postal Code", adr.postal
+          @config.logger.extra "Country", adr.country
+        else
+          i = 1
+          adr.label.each do |line|
+            @config.logger.extra i.to_s, line
+            i = i + 1
+          end
+        end
+      end
       @config.logger.end_data_item
     end
 
