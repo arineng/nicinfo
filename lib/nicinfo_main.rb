@@ -377,8 +377,7 @@ module NicInfo
             when QueryType::BY_DOMAIN
             when QueryType::BY_NAMESERVER
             when QueryType::BY_ENTITY_NAME
-              entity = Entity.new @config
-              entity.display_single_entity json_data
+              NicInfo::display_entity( json_data, @config )
           end
           show_helpful_messages rdap_url
         end

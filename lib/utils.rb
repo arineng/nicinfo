@@ -25,6 +25,10 @@ module NicInfo
     return safe
   end
 
+  def NicInfo.get_handle json_data
+    return json_data[ "handle" ]
+  end
+
   def NicInfo.get_descriptions description
     return description[ "description" ]
   end
