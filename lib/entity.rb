@@ -30,6 +30,14 @@ module NicInfo
     end if entities
   end
 
+  class Org
+    attr_accessor :type, :names
+    def initialize
+      @type = Array.new
+      @names = Array.new
+    end
+  end
+
   class Adr
     attr_accessor :structured, :label, :type
     attr_accessor :pobox, :extended, :street, :locality, :region, :postal, :country
@@ -56,13 +64,16 @@ module NicInfo
 
   class JCard
 
-    attr_accessor :fns, :phones, :emails, :adrs
+    attr_accessor :fns, :phones, :emails, :adrs, :kind, :titles, :roles, :orgs
 
     def initialize
       @fns = Array.new
       @phones = Array.new
       @emails = Array.new
       @adrs = Array.new
+      @titles = Array.new
+      @roles = Array.new
+      @orgs = Array.new
     end
 
     def get_vcard entity
@@ -119,6 +130,26 @@ module NicInfo
             end
             @adrs << adr
           end
+          if element[ 0 ] == "kind"
+            @kind = element[ 3 ]
+          end
+          if element[ 0 ] == "title"
+            @titles << element[ 3 ]
+          end
+          if element[ 0 ] == "role"
+            @roles << element[ 3 ]
+          end
+          if element[ 0 ] == "org"
+            org = Org.new
+            if (type = element[ 1 ][ "type" ]) != nil
+              org.type << type if type.instance_of? String
+              org.type = type if type.instance_of? Array
+            end
+            names = element[ 3 ]
+            org.names << names if names.instance_of? String
+            org.names = org.names + names if names.instance_of? Array
+            @orgs << org
+          end
         end
       end
       return self
@@ -147,6 +178,19 @@ module NicInfo
       @config.logger.terse "Handle", NicInfo::get_handle( @objectclass )
       @jcard.fns.each do |fn|
         @config.logger.terse "Name", fn
+      end
+      @jcard.orgs.each do |org|
+        item_value = org.names.join( ", " )
+        if !org.type.empty?
+          item_value << " ( #{org.type.join( ", " )} )"
+        end
+        @config.logger.terse "Organization", item_value
+      end
+      @jcard.titles.each do |title|
+        @config.logger.extra "Title", title
+      end
+      @jcard.roles.each do |role|
+        @config.logger.extra "Organizational Role", role
       end
       @jcard.emails.each do |email|
         item_value = email.addr
@@ -193,6 +237,7 @@ module NicInfo
           end
         end
       end
+      @config.logger.extra "Kind", @jcard.kind
       @config.logger.end_data_item
     end
 

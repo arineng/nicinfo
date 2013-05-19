@@ -54,9 +54,12 @@
          "2009-08-08T14:30:00-05:00"
        ],
        ["gender", {}, "text", "M"],
+       ["kind", {}, "text", "individual"],
        ["lang", { "pref": "1" }, "language-tag", "fr"],
        ["lang", { "pref": "2" }, "language-tag", "en"],
        ["org", { "type": "work" }, "text", "Viagenie"],
+       ["title", {}, "text", "Research Scientist"],
+       ["role", {}, "text", "Project Lead"],
        ["adr",
           { "type": "work" },
           "text",
