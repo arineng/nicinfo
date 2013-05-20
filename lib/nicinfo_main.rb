@@ -24,6 +24,7 @@ require 'common_names'
 require 'bootstrap'
 require 'notices'
 require 'entity'
+require 'ip'
 require 'ipaddr'
 begin
   require 'json'
@@ -369,10 +370,15 @@ module NicInfo
           Notices.new.display_notices json_data, @config
           case @config.options.query_type
             when QueryType::BY_IP4_ADDR
+              NicInfo::display_ip( json_data, @config )
             when QueryType::BY_IP6_ADDR
+              NicInfo::display_ip( json_data, @config )
             when QueryType::BY_IP4_CIDR
+              NicInfo::display_ip( json_data, @config )
             when QueryType::BY_IP6_CIDR
+              NicInfo::display_ip( json_data, @config )
             when QueryType::BY_IP
+              NicInfo::display_ip( json_data, @config )
             when QueryType::BY_AS_NUMBER
             when QueryType::BY_DOMAIN
             when QueryType::BY_NAMESERVER
