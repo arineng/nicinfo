@@ -40,7 +40,13 @@ module NicInfo
     def display
       @config.logger.start_data_item
       @config.logger.terse "Handle", NicInfo::get_handle( @objectclass )
-      @common.display_string_array "roles", "Roles", @objectclass, DataAmount::TERSE_DATA
+      @config.logger.terse "Start Address", @objectclass[ "startAddress" ]
+      @config.logger.terse "End Address", @objectclass[ "endAddress" ]
+      @config.logger.datum "IP Version", @objectclass[ "ipVersion" ]
+      @config.logger.extra "Name", @objectclass[ "name" ]
+      @config.logger.terse "Country", @objectclass[ "country" ]
+      @config.logger.datum "Type", @objectclass[ "type" ]
+      @config.logger.extra "Parent Handle", @objectclass[ "parentHandle" ]
       @common.display_status @objectclass
       @common.display_remarks @objectclass
       @common.display_links( get_cn, @objectclass )
