@@ -16,24 +16,32 @@ require 'config'
 require 'nicinfo_logger'
 require 'utils'
 require 'common_json'
+require 'entity'
 
 module NicInfo
 
   def NicInfo.display_ip json_data, config
-    Ip.new( config ).process( json_data ).display
+    ip = Ip.new( config ).process( json_data )
+    ip.display
+    ip.entities.each do |entity|
+      entity.display
+    end
   end
 
   # deals with RDAP IP network structures
   class Ip
 
+    attr_accessor :entities
+
     def initialize config
       @config = config
       @common = CommonJson.new config
-      @ip = nil
+      @entities = Array.new
     end
 
     def process json_data
       @objectclass = json_data
+      @entities = @common.process_entities @objectclass
       return self
     end
 
@@ -51,6 +59,7 @@ module NicInfo
       @common.display_remarks @objectclass
       @common.display_links( get_cn, @objectclass )
       @common.display_events @objectclass
+      @common.display_entities_as_events @entities
       @config.logger.end_data_item
     end
 

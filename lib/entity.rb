@@ -157,19 +157,35 @@ module NicInfo
 
   end
 
+  class EventActor
+    attr_accessor :eventAction, :eventDate
+  end
+
   # deals with RDAP entity structures
   class Entity
+
+    attr_accessor :asEvents, :selfhref
 
     def initialize config
       @config = config
       @jcard = JCard.new
       @common = CommonJson.new config
       @entity = nil
+      @asEvents = Array.new
+      @selfhref = nil
     end
 
     def process json_data
       @objectclass = json_data
       @jcard.process json_data
+      events = @objectclass[ "asEventActor" ]
+      events.each do |event|
+        eventActor = EventActor.new
+        eventActor.eventAction=event[ "eventAction" ]
+        eventActor.eventDate=event[ "eventDate" ]
+        @asEvents << eventActor
+      end if events
+      @selfhref = NicInfo::get_self_link( NicInfo::get_links( @objectclass ) )
       return self
     end
 

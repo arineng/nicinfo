@@ -16,6 +16,7 @@ require 'config'
 require 'nicinfo_logger'
 require 'utils'
 require 'time'
+require 'entity'
 
 module NicInfo
 
@@ -24,6 +25,17 @@ module NicInfo
 
     def initialize config
       @config = config
+    end
+
+    def process_entities objectclass
+      entities = Array.new
+      json_entities = NicInfo::get_entitites( objectclass )
+      json_entities.each do |json_entity|
+        entity = Entity.new( @config )
+        entity.process( json_entity )
+        entities << entity
+      end if json_entities
+      return entities
     end
 
     def display_remarks objectclass
@@ -101,6 +113,17 @@ module NicInfo
           @config.logger.datum item_name, item_value
         end
       end
+    end
+
+    def display_entities_as_events entities
+      entities.each do |entity|
+        entity.asEvents.each do |asEvent|
+          item_name = NicInfo::capitalize( asEvent.eventAction )
+          item_value = Time.parse( asEvent.eventDate ).rfc2822
+          item_value << " by #{entity.get_cn}"
+          @config.logger.datum item_name, item_value
+        end if entity.asEvents
+      end if entities
     end
 
   end
