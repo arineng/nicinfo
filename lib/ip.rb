@@ -17,11 +17,21 @@ require 'nicinfo_logger'
 require 'utils'
 require 'common_json'
 require 'entity'
+require 'data_tree'
 
 module NicInfo
 
   def NicInfo.display_ip json_data, config
     ip = Ip.new( config ).process( json_data )
+    if !ip.entities.empty?
+      data_tree = DataTree.new
+      root = ip.to_node
+      data_tree.add_root( root )
+      ip.entities.each do |entity|
+        root.add_child( entity.to_node )
+      end
+      data_tree.to_normal_log( config.logger, true )
+    end
     ip.display
     ip.entities.each do |entity|
       entity.display
@@ -67,6 +77,10 @@ module NicInfo
       handle = NicInfo::get_handle @objectclass
       return handle if handle
       return "(unidentifiable network)"
+    end
+
+    def to_node
+      DataNode.new( get_cn, NicInfo::get_self_link( NicInfo::get_links( @objectclass ) ) )
     end
 
   end

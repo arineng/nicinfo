@@ -16,6 +16,7 @@ require 'config'
 require 'nicinfo_logger'
 require 'utils'
 require 'common_json'
+require 'data_tree'
 
 module NicInfo
 
@@ -264,6 +265,10 @@ module NicInfo
       end
       return handle if handle
       return "(unidentifiable entity)"
+    end
+
+    def to_node
+      DataNode.new( get_cn, @selfhref )
     end
 
   end
