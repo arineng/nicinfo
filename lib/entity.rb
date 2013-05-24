@@ -260,7 +260,7 @@ module NicInfo
 
     def get_cn
       handle = NicInfo::get_handle @objectclass
-      handle = "(unidentifiable entity)" if handle
+      handle = "(unidentifiable entity)" if !handle
       if !@jcard.fns.empty?
         return "#{@jcard.fns[ 0 ] } ( #{handle} )"
       end

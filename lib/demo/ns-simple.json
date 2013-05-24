@@ -1,8 +1,207 @@
 {
-    "nicInfo_demoUrl" : "http://whois.arin.net/nameserver/ns2.example.com",
+    "nicInfo_demoUrl" : "http://whois.verisign.net/nameserver/ns2.example.com",
     "nicInfo_demoHint" : "nicinfo ns2.example.com",
+    "rdapConformance":[
+        "rdap_level_0"
+    ],
+    "notices":[
+        {
+            "title":"Content Redacted",
+            "description":[
+                "Without full authorization, content has been redacted.",
+                "Sorry, dude!"
+            ],
+            "links":[
+                {
+                    "value":"http://example.net/ip/192.0.2.0/24",
+                    "rel":"alternate",
+                    "type":"text/html",
+                    "href":"http://www.example.com/redaction_policy.html"
+                }
+            ]
+        },
+        {
+            "title":"Terms of Use",
+            "description":[
+                "THESE are the times that try men's souls. The summer soldier and the sunshine patriot will, in this crisis, shrink from the service of their country; but he that stands by it now, deserves the love and thanks of man and woman. Tyranny, like hell, is not easily conquered; yet we have this consolation with us, that the harder the conflict, the more glorious the triumph.",
+                "So sayeth Thomas Paine"
+            ],
+            "links":[
+                {
+                    "value":"http://example.net/ip/192.0.2.0/24",
+                    "rel":"terms-of-service",
+                    "type":"text/html",
+                    "href":"http://www.example.com/tos.html"
+                }
+            ]
+        }
+    ],
+    "handle" : "NS2.EXAMPLE.COM-01",
     "ldhName":"ns2.example.com",
     "ipAddresses":{
         "v6":[ "2001:db8::123", "2001:db8::124" ]
-    }
+    },
+    "entities":[
+        {
+            "handle":"PERIB-ARIN",
+            "vcardArray":[
+                "vcard",
+                [
+                    ["version", {}, "text", "4.0"],
+                    ["fn", {}, "text", "Peri Baykan"],
+                    ["kind", {}, "text", "individual"],
+                    ["org", {
+                        "type":"work"
+                    }, "text", "American Registry for Internet Numbers"],
+                    ["title", {}, "text", "Project Manager"],
+                    ["role", {}, "text", "Project Lead"],
+                    ["adr",
+                        {
+                            "type":"work"
+                        },
+                        "text",
+                        [
+                            "",
+                            "Suite 200",
+                            "3635 Concorde Parkway",
+                            "Chantilly",
+                            "VA",
+                            "20151",
+                            "United States"
+                        ]
+                    ],
+                    ["tel",
+                        {
+                            "type":["work", "voice"],
+                            "pref":"1"
+                        },
+                        "uri",
+                        "tel:+1-703-227-9840"
+                    ],
+                    ["email",
+                        {
+                            "type":"work"
+                        },
+                        "text",
+                        "info@arin.net"
+                    ]
+                ]
+            ],
+            "roles":[ "administrative" ],
+            "remarks":[
+                {
+                    "title": "No Solicitations",
+                    "description":[
+                        "Absolutely no solicitations are accepted at by this contact. If you wish to offer services or products to the American Registry for Internet Numbers, contact Pete Toscano at +1-703-227-9840."
+                    ]
+                }
+            ],
+            "links":[
+                {
+                    "value":"http://example.net/entity/PERIB-ARIN",
+                    "rel":"self",
+                    "href":"http://example.net/entity/PERIB-ARIN"
+                }
+            ],
+            "events":[
+                {
+                    "eventAction":"registration",
+                    "eventDate":"2012-12-31T23:59:60Z",
+                    "eventActor": "perib@arin.net"
+                },
+                {
+                    "eventAction":"last changed",
+                    "eventDate":"2013-12-31T23:59:60Z",
+                    "eventActor": "perib@arin.net"
+                }
+            ],
+            "asEventActor":[
+                {
+                    "eventAction":"last changed",
+                    "eventDate":"2013-12-31T23:59:60Z"
+                }
+            ]
+        },
+        {
+            "handle":"MAK21-ARIN",
+            "vcardArray":[
+                "vcard",
+                [
+                    ["version", {}, "text", "4.0"],
+                    ["fn", {}, "text", "Mark Kosters"],
+                    ["kind", {}, "text", "individual"],
+                    ["org", {
+                        "type":"work"
+                    }, "text", "American Registry for Internet Numbers"],
+                    ["title", {}, "text", "Chief Technical Officer"],
+                    ["role", {}, "text", "Pointy Haired Boss"],
+                    ["adr",
+                        {
+                            "type":"work",
+                            "label" : "3635 Concorde Parkway\nSuite200\nChantilly\nVA\n20151"
+                        },
+                        "text",
+                        [
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                            ""
+                        ]
+                    ],
+                    ["tel",
+                        {
+                            "type":["work", "voice"],
+                            "pref":"1"
+                        },
+                        "uri",
+                        "tel:+1-703-227-9840"
+                    ],
+                    ["email",
+                        {
+                            "type":"work"
+                        },
+                        "text",
+                        "info@arin.net"
+                    ]
+                ]
+            ],
+            "roles":[ "technical" ],
+            "remarks":[
+                {
+                    "title": "No Solicitations",
+                    "description":[
+                        "Absolutely no solicitations are accepted at by this contact. If you wish to offer services or products to the American Registry for Internet Numbers, contact Pete Toscano at +1-703-227-9840."
+                    ]
+                }
+            ],
+            "links":[
+                {
+                    "value":"http://example.net/entity/MAK21-ARIN",
+                    "rel":"self",
+                    "href":"http://example.net/entity/MAK21-ARIN"
+                }
+            ],
+            "events":[
+                {
+                    "eventAction":"registration",
+                    "eventDate":"2012-12-31T23:59:60Z",
+                    "eventActor": "markk@arin.net"
+                },
+                {
+                    "eventAction":"last changed",
+                    "eventDate":"2013-12-31T23:59:60Z",
+                    "eventActor": "markkb@arin.net"
+                }
+            ],
+            "asEventActor":[
+                {
+                    "eventAction":"reregistration",
+                    "eventDate":"2012-12-31T23:59:60Z"
+                }
+            ]
+        }
+    ]
 }

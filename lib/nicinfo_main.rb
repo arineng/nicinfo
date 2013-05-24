@@ -273,6 +273,11 @@ module NicInfo
       @config.setup_workspace
       @cache = Cache.new(@config)
       @cache.clean if @config.config[ NicInfo::CACHE ][ NicInfo::CLEAN_CACHE ]
+
+      if @config.options.empty_cache
+        @cache.empty
+      end
+
       if @config.options.demo
         @config.logger.mesg( "Populating cache with demonstration results" )
         @config.logger.mesg( "Try the following demonstration queries:" )
@@ -289,10 +294,6 @@ module NicInfo
             @config.logger.mesg( "  " + demo_hint )
           end
         end
-      end
-
-      if @config.options.empty_cache
-        @cache.empty
       end
 
       if(@config.options.help)
@@ -392,6 +393,8 @@ module NicInfo
           show_helpful_messages rdap_url
         end
         @config.logger.end_run
+      rescue SocketError => a
+        @config.logger.mesg(a.message)
       rescue ArgumentError => a
         @config.logger.mesg(a.message)
       rescue Net::HTTPServerException => e

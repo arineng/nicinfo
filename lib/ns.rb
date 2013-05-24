@@ -70,7 +70,8 @@ module NicInfo
 
     def get_cn
       handle = NicInfo::get_handle @objectclass
-      handle = "(unidentifiable nameserver)" if handle
+      handle = NicInfo::get_ldhName @objectclass if !handle
+      handle = "(unidentifiable nameserver)" if !handle
       if (name = NicInfo::get_ldhName( @objectclass ) ) != nil
         return "#{name} ( #{handle} )"
       end
