@@ -20,6 +20,21 @@ require 'entity'
 
 module NicInfo
 
+  def NicInfo.display_object_with_entities object, config, data_node
+    if !object.entities.empty?
+      root = object.to_node
+      data_node.add_root( root )
+      object.entities.each do |entity|
+        root.add_child( entity.to_node )
+      end
+      data_node.to_normal_log( config.logger, true )
+    end
+    object.display
+    object.entities.each do |entity|
+      entity.display
+    end
+  end
+
   # deals with common JSON RDAP structures
   class CommonJson
 

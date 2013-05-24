@@ -65,6 +65,10 @@ module NicInfo
       @roots << node if node
     end
 
+    def add_child node
+      add_root( node )
+    end
+
     def add_children_as_root node
       node.children.each do |child|
         add_root( child )

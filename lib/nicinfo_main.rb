@@ -25,7 +25,9 @@ require 'bootstrap'
 require 'notices'
 require 'entity'
 require 'ip'
+require 'ns'
 require 'ipaddr'
+require 'data_tree'
 begin
   require 'json'
 rescue LoadError
@@ -368,20 +370,22 @@ module NicInfo
           end
         else
           Notices.new.display_notices json_data, @config
+          data_tree = DataTree.new( )
           case @config.options.query_type
             when QueryType::BY_IP4_ADDR
-              NicInfo::display_ip( json_data, @config )
+              NicInfo::display_ip( json_data, @config, data_tree )
             when QueryType::BY_IP6_ADDR
-              NicInfo::display_ip( json_data, @config )
+              NicInfo::display_ip( json_data, @config, data_tree )
             when QueryType::BY_IP4_CIDR
-              NicInfo::display_ip( json_data, @config )
+              NicInfo::display_ip( json_data, @config, data_tree )
             when QueryType::BY_IP6_CIDR
-              NicInfo::display_ip( json_data, @config )
+              NicInfo::display_ip( json_data, @config, data_tree )
             when QueryType::BY_IP
-              NicInfo::display_ip( json_data, @config )
+              NicInfo::display_ip( json_data, @config, data_tree )
             when QueryType::BY_AS_NUMBER
             when QueryType::BY_DOMAIN
             when QueryType::BY_NAMESERVER
+              NicInfo::display_ns( json_data, @config, data_tree )
             when QueryType::BY_ENTITY_NAME
               NicInfo::display_entity( json_data, @config )
           end

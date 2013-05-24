@@ -29,6 +29,14 @@ module NicInfo
     return json_data[ "handle" ]
   end
 
+  def NicInfo.get_ldhName json_data
+    return json_data[ "ldhName" ]
+  end
+
+  def NicInfo.get_unicodeName json_data
+    return json_data[ "unicodeName" ]
+  end
+
   def NicInfo.get_descriptions description
     return description[ "description" ]
   end
