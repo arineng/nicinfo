@@ -21,15 +21,39 @@ require 'data_tree'
 
 module NicInfo
 
-  def NicInfo.display_ns json_data, config, data_node
-    ns = Ns.new( config ).process( json_data )
-    NicInfo::display_object_with_entities( ns, config, data_node )
+  def NicInfo.display_domain json_data, config, data_node
+    domain = Domain.new( config ).process( json_data )
+    if !domain.entities.empty? or !domain.nameservers.empty?
+      root = domain.to_node
+      data_node.add_root( root )
+      domain.entities.each do |entity|
+        root.add_child( entity.to_node )
+      end
+      domain.nameservers.each do |ns|
+        ns_node = ns.to_node
+        root.add_child( ns_node )
+        ns.entities.each do |entity|
+          ns_node.add_child( entity.to_node )
+        end
+      end
+      data_node.to_normal_log( config.logger, true )
+    end
+    domain.display
+    domain.entities.each do |entity|
+      entity.display
+    end
+    domain.nameservers.each do |ns|
+      ns.display
+      ns.entities.each do |entity|
+        entity.display
+      end
+    end
   end
 
   # deals with RDAP nameserver structures
   class Domain
 
-    attr_accessor :entities
+    attr_accessor :entities, :nameservers
 
     def initialize config
       @config = config
@@ -75,6 +99,15 @@ module NicInfo
         end if variant_names
         variant_no = variant_no + 1
       end if variants
+      delegationKeys = @objectclass[ "delegationKeys" ]
+      delegation_no = 1
+      delegationKeys.each do |dkey|
+        @config.logger.extra "DS #{delegation_no} Algorithm", dkey[ "algorithm" ]
+        @config.logger.extra "DS #{delegation_no} Digest", dkey[ "digest" ]
+        @config.logger.extra "DS #{delegation_no} Digest Type", dkey[ "digestType" ]
+        @config.logger.extra "DS #{delegation_no} Key Tag", dkey[ "keyTag" ]
+        delegation_no = delegation_no + 1
+      end if delegationKeys
       @common.display_status @objectclass
       @common.display_remarks @objectclass
       @common.display_links( get_cn, @objectclass )

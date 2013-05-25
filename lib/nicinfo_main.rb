@@ -26,6 +26,7 @@ require 'notices'
 require 'entity'
 require 'ip'
 require 'ns'
+require 'domain'
 require 'ipaddr'
 require 'data_tree'
 begin
@@ -385,6 +386,7 @@ module NicInfo
               NicInfo::display_ip( json_data, @config, data_tree )
             when QueryType::BY_AS_NUMBER
             when QueryType::BY_DOMAIN
+              NicInfo::display_domain( json_data, @config, data_tree )
             when QueryType::BY_NAMESERVER
               NicInfo::display_ns( json_data, @config, data_tree )
             when QueryType::BY_ENTITY_NAME

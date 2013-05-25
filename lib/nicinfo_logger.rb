@@ -325,7 +325,7 @@ module NicInfo
           format_string = "%-" + name_length.to_s + "s%s%s"
         end
         if @auto_wrap
-          lines = break_up_line item_value, get_width - ( name_length + separator.length )
+          lines = break_up_line item_value.to_s, get_width - ( name_length + separator.length )
           i = 0
           lines.each do |line|
             if i == 0
