@@ -46,7 +46,35 @@ module NicInfo
   end
 
   def NicInfo.get_nameservers json_data
-    return json_data[ "nameservers" ]
+    return json_data[ "nameServers" ]
+  end
+
+  def NicInfo.get_startAddress json_data
+    return json_data[ "startAddress" ]
+  end
+
+  def NicInfo.get_endAddress json_data
+    return json_data[ "endAddress" ]
+  end
+
+  def NicInfo.get_startAutnum json_data
+    return json_data[ "startAutnum" ]
+  end
+
+  def NicInfo.get_endAutnum json_data
+    return json_data[ "endAutnum" ]
+  end
+
+  def NicInfo.get_name json_data
+    return json_data[ "name" ]
+  end
+
+  def NicInfo.get_type json_data
+    return json_data[ "type" ]
+  end
+
+  def NicInfo.get_country json_data
+    return json_data[ "country" ]
   end
 
   def NicInfo.get_links json_data
