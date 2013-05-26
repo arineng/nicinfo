@@ -54,10 +54,10 @@ module NicInfo
       @config.logger.datum "Type", NicInfo.get_type( @objectclass )
       @config.logger.extra "Parent Handle", @objectclass[ "parentHandle" ]
       @common.display_status @objectclass
-      @common.display_remarks @objectclass
-      @common.display_links( get_cn, @objectclass )
       @common.display_events @objectclass
       @common.display_entities_as_events @entities
+      @common.display_remarks @objectclass
+      @common.display_links( get_cn, @objectclass )
       @config.logger.end_data_item
     end
 

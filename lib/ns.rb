@@ -60,11 +60,11 @@ module NicInfo
         end if v4Addrs
       end
       @common.display_status @objectclass
-      @common.display_remarks @objectclass
-      @common.display_links( get_cn, @objectclass )
       @common.display_events @objectclass
       @common.display_entities_as_events @entities
       @common.display_port43 @objectclass
+      @common.display_remarks @objectclass
+      @common.display_links( get_cn, @objectclass )
       @config.logger.end_data_item
     end
 

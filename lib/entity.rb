@@ -228,9 +228,7 @@ module NicInfo
       end
       @common.display_string_array "roles", "Roles", @objectclass, DataAmount::TERSE_DATA
       @common.display_status @objectclass
-      @common.display_remarks @objectclass
       @common.display_port43 @objectclass
-      @common.display_links( get_cn, @objectclass )
       @common.display_events @objectclass
       @jcard.adrs.each do |adr|
         if adr.type.empty?
@@ -255,6 +253,8 @@ module NicInfo
         end
       end
       @config.logger.extra "Kind", @jcard.kind
+      @common.display_remarks @objectclass
+      @common.display_links( get_cn, @objectclass )
       @config.logger.end_data_item
     end
 
