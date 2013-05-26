@@ -269,7 +269,7 @@ module NicInfo
     end
 
     def to_node
-      DataNode.new( get_cn, @selfhref )
+      DataNode.new( get_cn, nil, @selfhref )
     end
 
   end

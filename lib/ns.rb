@@ -80,7 +80,7 @@ module NicInfo
     end
 
     def to_node
-      DataNode.new( get_cn, NicInfo::get_self_link( NicInfo::get_links( @objectclass ) ) )
+      DataNode.new( get_cn, nil, NicInfo::get_self_link( NicInfo::get_links( @objectclass ) ) )
     end
 
   end

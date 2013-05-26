@@ -322,6 +322,10 @@ module NicInfo
           @config.options.argv[ 0 ] = ip.reverse
           @config.logger.mesg( "Query value changed to " + @config.options.argv[ 0 ] )
           @config.options.query_type = QueryType::BY_DOMAIN
+        elsif @config.options.query_type == QueryType::BY_RESULT
+          data_tree = @config.load_as_yaml( NicInfo::LASTTREE_YAML )
+          @config.options.url = data_tree.find_rest_ref( @config.options.argv[ 0 ] )
+          @config.options.query_type = get_query_type_from_url( @config.options.url )
         end
         if (@config.options.query_type == nil)
           @config.logger.mesg("Unable to guess type of query. You must specify it.")
@@ -394,7 +398,8 @@ module NicInfo
             when QueryType::BY_ENTITY_NAME
               NicInfo::display_entity( json_data, @config )
           end
-          show_helpful_messages rdap_url
+          @config.save_as_yaml( NicInfo::LASTTREE_YAML, data_tree ) if !data_tree.empty?
+          show_helpful_messages rdap_url, data_tree
         end
         @config.logger.end_run
       rescue SocketError => a
@@ -594,7 +599,7 @@ HELP_SUMMARY
       end if nameservers
     end
 
-    def show_helpful_messages rdap_url
+    def show_helpful_messages rdap_url, data_tree
       arg = @config.options.argv[0]
       case @config.options.query_type
         when QueryType::BY_IP4_ADDR
@@ -603,6 +608,9 @@ HELP_SUMMARY
           @config.logger.mesg("Use \"nicinfo -r #{arg}\" to see reverse DNS information.");
         when QueryType::BY_AS_NUMBER
           @config.logger.mesg("Use \"nicinfo #{arg}\" or \"nicinfo as#{arg}\" for autnums.");
+      end
+      if !data_tree.empty?
+        @config.logger.mesg("Use \"nicinfo 1=\" to show #{data_tree.roots.first}")
       end
       @config.logger.mesg("Use \"nicinfo -u #{rdap_url}\" to directly query this resource in the future.")
       @config.logger.mesg('Use "nicinfo -h" for help.')
