@@ -611,6 +611,14 @@ HELP_SUMMARY
       end
       if !data_tree.empty?
         @config.logger.mesg("Use \"nicinfo 1=\" to show #{data_tree.roots.first}")
+        if !data_tree.roots.first.empty?
+          children = data_tree.roots.first.children
+          @config.logger.mesg("Use \"nicinfo 1.1=\" to show #{children.first}")
+          if children.first != children.last
+            len = children.length + 1
+            @config.logger.mesg("Use \"nicinfo 1.#{len}=\" to show #{children.last}")
+          end
+        end
       end
       @config.logger.mesg("Use \"nicinfo -u #{rdap_url}\" to directly query this resource in the future.")
       @config.logger.mesg('Use "nicinfo -h" for help.')

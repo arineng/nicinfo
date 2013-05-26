@@ -1,6 +1,25 @@
 {
     "nicInfo_demoUrl":"http://whois.arin.net/domain/xn--fo-5ja.example",
     "nicInfo_demoHint":"nicinfo xn--fo-5ja.example",
+    "rdapConformance":[
+        "rdap_level_0"
+    ],
+    "notices":[
+        {
+            "title":"Terms of Use",
+            "description":[
+                "ARIN WHOIS data and services are subject to the Terms of Use available at: https://www.arin.net/whois_tou.html"
+            ],
+            "links":[
+                {
+                    "value":"http://whois.apnic.net/ip/2001:db8::0",
+                    "rel":"terms-of-service",
+                    "type":"text/html",
+                    "href":"https://www.arin.net/whois_tou.html"
+                }
+            ]
+        }
+    ],
     "handle":"xn--fo-5ja.example-001",
     "ldhName":"xn--fo-5ja.example",
     "unicodeName":"foo.example",
@@ -31,7 +50,7 @@
     "status":[ "locked", "transfer prohibited" ],
     "nameServers":[
         {
-            "handle":"XXXX",
+            "handle":"ns1.example.com-001",
             "ldhName":"ns1.example.com",
             "status":[ "active" ],
             "ipAddresses":{
@@ -57,10 +76,6 @@
                 {
                     "eventAction":"registration",
                     "eventDate":"1990-12-31T23:59:60Z"
-                },
-                {
-                    "eventAction":"last changed",
-                    "eventDate":"1991-12-31T23:59:60Z"
                 }
             ],
             "entities":[
@@ -228,7 +243,7 @@
             ]
         },
         {
-            "handle":"XXXX",
+            "handle":"ns2.example.com-001",
             "ldhName":"ns2.example.com",
             "status":[ "active" ],
             "ipAddresses":{
@@ -417,10 +432,6 @@
                 {
                     "eventAction":"registration",
                     "eventDate":"1990-12-31T23:59:60Z"
-                },
-                {
-                    "eventAction":"last changed",
-                    "eventDate":"1991-12-31T23:59:60Z"
                 }
             ]
         }
@@ -455,19 +466,13 @@
             "eventDate":"1990-12-31T23:59:60Z"
         },
         {
-            "eventAction":"last changed",
-            "eventDate":"1991-12-31T23:59:60Z",
-            "eventActor":"joe@bob.com"
-        },
-        {
             "eventAction":"transfer",
             "eventDate":"1991-12-31T23:59:60Z",
             "eventActor":"joe@bob.com"
         },
         {
             "eventAction":"expiration",
-            "eventDate":"2016-12-31T23:59:60Z",
-            "eventActor":"joe@bob.com"
+            "eventDate":"2016-12-31T23:59:60Z"
         }
     ],
     "entities":[

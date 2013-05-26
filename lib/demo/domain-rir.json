@@ -1,6 +1,25 @@
 {
     "nicInfo_demoUrl" : "http://whois.arin.net/domain/192.in-addr.arpa",
     "nicInfo_demoHint" : "nicinfo 192.in-addr.arpa",
+    "rdapConformance":[
+        "rdap_level_0"
+    ],
+    "notices":[
+        {
+            "title":"Terms of Use",
+            "description":[
+                "ARIN WHOIS data and services are subject to the Terms of Use available at: https://www.arin.net/whois_tou.html"
+            ],
+            "links":[
+                {
+                    "value":"http://whois.apnic.net/ip/2001:db8::0",
+                    "rel":"terms-of-service",
+                    "type":"text/html",
+                    "href":"https://www.arin.net/whois_tou.html"
+                }
+            ]
+        }
+    ],
     "handle":"192.in-addr.arpa-001",
     "ldhName":"192.in-addr.arpa",
     "nameServers":[

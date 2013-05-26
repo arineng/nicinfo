@@ -1,29 +1,100 @@
 {
     "nicInfo_demoUrl" : "http://whois.arin.net/entity/entity-dnr",
-    "nicInfo_demoHint" : "nicinfo entity-dnr",
+    "nicInfo_demoHint" : "nicinfo --type entityname entity-dnr",
+    "rdapConformance":[
+        "rdap_level_0"
+    ],
+    "notices":[
+        {
+            "title":"Terms of Use",
+            "description":[
+                "ARIN WHOIS data and services are subject to the Terms of Use available at: https://www.arin.net/whois_tou.html"
+            ],
+            "links":[
+                {
+                    "value":"http://whois.apnic.net/ip/2001:db8::0",
+                    "rel":"terms-of-service",
+                    "type":"text/html",
+                    "href":"https://www.arin.net/whois_tou.html"
+                }
+            ]
+        }
+    ],
     "handle":"entity-dnr",
-    "vCard":[
-        [ "version", {}, "text", "4.0" ],
-        [ "fn", {}, "text", "Joe Bob, Inc." ],
-        [ "fn", {}, "text", "Bobby Joe Shopping" ],
-        [ "label", {}, "text", "123 Maple Ave\n",
-            "Vancouver\n",
-            "BC\n",
-            "1239\n" ],
-        [ "email", {}, "text", "joe at bob.com" ],
-        [ "email", {}, "text", "bob at joe.com" ],
-        [ "tel", {
-            "type":"work"
-        }, "uri", "tel:+1-958-555-4321" ],
-        [ "tel", {
-            "type":"work"
-        }, "uri", "tel:+1-958-555-4322" ],
-        [ "tel", {
-            "type":"fax"
-        }, "uri", "tel:+1-958-555-4323" ],
-        [ "tel", {
-            "type":"cell"
-        }, "uri", "tel:+1-958-555-4324" ]
+    "vcardArray" : [
+        "vcard",
+        [
+            ["version", {}, "text", "4.0"],
+            ["fn", {}, "text", "Simon Perreault"],
+            ["n",
+                {},
+                "text",
+                ["Perreault", "Simon", "", "", ["ing. jr", "M.Sc."]]
+            ],
+            ["bday", {}, "date-and-or-time", "--02-03"],
+            ["anniversary",
+                {},
+                "date-and-or-time",
+                "2009-08-08T14:30:00-05:00"
+            ],
+            ["gender", {}, "text", "M"],
+            ["kind", {}, "text", "individual"],
+            ["lang", { "pref": "1" }, "language-tag", "fr"],
+            ["lang", { "pref": "2" }, "language-tag", "en"],
+            ["org", { "type": "work" }, "text", "Viagenie"],
+            ["title", {}, "text", "Research Scientist"],
+            ["role", {}, "text", "Project Lead"],
+            ["adr",
+                { "type": "work" },
+                "text",
+                [
+                    "",
+                    "Suite D2-630",
+                    "2875 Laurier",
+                    "Quebec",
+                    "QC",
+                    "G1V 2M2",
+                    "Canada"
+                ]
+            ],
+            ["adr",
+                { "type": "home",
+                    "label": "123 Maple Ave\nSuite 90001\nVancouver\nBC\n1239\n"},
+                "text",
+                [
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                ]
+            ],
+            ["tel",
+                { "type": ["work", "voice"], "pref": "1" },
+                "uri",
+                "tel:+1-418-656-9254;ext=102"
+            ],
+            ["tel",
+                { "type": ["work", "cell", "voice", "video", "text"] },
+                "uri",
+                "tel:+1-418-262-6501"
+            ],
+            ["email",
+                { "type": "work" },
+                "text",
+                "simon.perreault@viagenie.ca"
+            ],
+            ["geo", { "type": "work" }, "uri", "geo:46.772673,-71.282945"],
+            ["key",
+                { "type": "work" },
+                "uri",
+                "http://www.viagenie.ca/simon.perreault/simon.asc"
+            ],
+            ["tz", {}, "utc-offset", "-05:00"],
+            ["url", { "type": "home" }, "uri", "http://nomis80.org"]
+        ]
     ],
     "status":[ "validated", "locked" ],
     "remarks":[
@@ -44,9 +115,9 @@
     ],
     "links":[
         {
-            "value":"http://example.com/entity/XXXX",
+            "value":"http://whois.arin.net/entity/entity-dnr",
             "rel":"self",
-            "href":"http://example.com/entity/XXXX"
+            "href":"http://whois.arin.net/entity/entity-dnr"
         }
     ],
     "port43":"whois.example.net",

@@ -1,6 +1,6 @@
 {
     "nicInfo_demoUrl" : "http://whois.arin.net/entity/restricted",
-    "nicInfo_demoHint" : "nicinfo restricted",
+    "nicInfo_demoHint" : "nicinfo --type entityname restricted",
     "errorCode":418,
     "title":"Your beverage choice is not available",
     "description":[

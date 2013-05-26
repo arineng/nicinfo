@@ -1,6 +1,6 @@
 {
     "nicInfo_demoUrl" : "http://whois.arin.net/entity/foo1",
-    "nicInfo_demoHint" : "nicinfo foo1",
+    "nicInfo_demoHint" : "nicinfo --type entityname foo1",
     "rdapConformance":[
         "rdap_level_0"
     ],
@@ -131,9 +131,9 @@
     ],
     "links":[
         {
-            "value":"http://example.com/entity/XXXX",
+            "value":"http://whois.arin.net/entity/foo1",
             "rel":"self",
-            "href":"http://example.com/entity/XXXX"
+            "href":"http://whois.arin.net/entity/foo1"
         }
     ],
     "events":[
