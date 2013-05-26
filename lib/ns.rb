@@ -45,6 +45,7 @@ module NicInfo
 
     def display
       @config.logger.start_data_item
+      @config.logger.data_title "[ NAME SERVER ]"
       @config.logger.terse "Handle", NicInfo::get_handle( @objectclass )
       @config.logger.terse "Host Name", NicInfo::get_ldhName( @objectclass )
       @config.logger.terse "IDN Host Name", NicInfo::get_unicodeName( @objectclass )

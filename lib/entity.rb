@@ -192,6 +192,7 @@ module NicInfo
 
     def display
       @config.logger.start_data_item
+      @config.logger.data_title "[ ENTITY ]"
       @config.logger.terse "Handle", NicInfo::get_handle( @objectclass )
       @jcard.fns.each do |fn|
         @config.logger.terse "Name", fn

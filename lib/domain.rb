@@ -74,6 +74,7 @@ module NicInfo
 
     def display
       @config.logger.start_data_item
+      @config.logger.data_title "[ DOMAIN ]"
       @config.logger.terse "Handle", NicInfo::get_handle( @objectclass )
       @config.logger.terse "Domain Name", NicInfo::get_ldhName( @objectclass )
       @config.logger.datum "I18N Domain Name", NicInfo::get_unicodeName( @objectclass )

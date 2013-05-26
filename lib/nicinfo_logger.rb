@@ -61,7 +61,7 @@ module NicInfo
       @data_out = $stdout
       @item_name_length = 25
       @item_name_rjust = true
-      @prose_name_length = 8
+      @prose_name_length = 10
       @prose_name_rjust = true
 
       @message_last_written_to = false
@@ -150,6 +150,12 @@ module NicInfo
         return true
       end
       return false
+    end
+
+    def data_title title
+      validate_data_amount()
+      log_just title, " ", @item_name_length, @item_name_rjust, ""
+      return true
     end
 
     def info data_amount, item_name, item_value

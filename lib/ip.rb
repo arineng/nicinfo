@@ -45,6 +45,7 @@ module NicInfo
 
     def display
       @config.logger.start_data_item
+      @config.logger.data_title "[ IP NETWORK ]"
       @config.logger.terse "Handle", NicInfo::get_handle( @objectclass )
       @config.logger.terse "Start Address", NicInfo.get_startAddress( @objectclass )
       @config.logger.terse "End Address", NicInfo.get_endAddress( @objectclass )

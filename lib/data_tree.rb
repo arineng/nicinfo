@@ -143,8 +143,10 @@ module NicInfo
       end
       num_count = 1
       @logger.start_data_item unless double_space_roots
+      @logger.prose( @data_amount, "[ RESPONSE DATA ]", " ") unless double_space_roots
       @roots.each do |root|
         @logger.start_data_item if double_space_roots
+        @logger.prose( @data_amount, "[ RESPONSE DATA ]", " ") if double_space_roots
         if annotate
           if root.alert
             s = format( "   # %s", root.to_s )

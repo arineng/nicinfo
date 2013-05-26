@@ -65,7 +65,7 @@ module NicInfo
       if title == nil
         title = ""
       end
-      config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "Notice", title
+      config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "[ NOTICE ]", title
       description = notice[ "description" ]
       i = 1
       description.each do |line|
