@@ -157,7 +157,7 @@ module NicInfo
 
         opts.on( "--messages-out FILE",
                  "FILE where messages will be written." ) do |f|
-          @config.logger.messages_out = f
+          @config.logger.messages_out = File.open( f, "w+" )
         end
 
         opts.on( "--data DATA_AMOUNT",
@@ -175,7 +175,7 @@ module NicInfo
 
         opts.on( "--data-out FILE",
                  "FILE where data will be written." ) do |f|
-          @config.logger.data_out = f
+          @config.logger.data_out = File.open( f, "w+" )
         end
 
         opts.on( "--pager YES|NO|TRUE|FALSE",

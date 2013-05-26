@@ -38,16 +38,14 @@ module NicInfo
       end
       data_node.to_normal_log( config.logger, true )
     end
-    domain.display
-    domain.entities.each do |entity|
-      entity.display
-    end
+    dispobjs = DisplayObjects.new
+    dispobjs.add domain
+    dispobjs.add domain.entities
     domain.nameservers.each do |ns|
-      ns.display
-      ns.entities.each do |entity|
-        entity.display
-      end
+      dispobjs.add ns
+      dispobjs.add ns.entities
     end
+    dispobjs.display
   end
 
   # deals with RDAP nameserver structures

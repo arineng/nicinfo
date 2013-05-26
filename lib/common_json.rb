@@ -29,10 +29,10 @@ module NicInfo
       end
       data_node.to_normal_log( config.logger, true )
     end
-    object.display
-    object.entities.each do |entity|
-      entity.display
-    end
+    dispobjs = DisplayObjects.new
+    dispobjs.add object
+    dispobjs.add( object.entities )
+    dispobjs.display
   end
 
   # deals with common JSON RDAP structures
@@ -139,6 +139,35 @@ module NicInfo
           @config.logger.datum item_name, item_value
         end if entity.asEvents
       end if entities
+    end
+
+  end
+
+  # for keeping track of objects to display
+  class DisplayObjects
+
+    def initialize
+      @arr = Array.new #for keeping track of insertion order
+      @set = Hash.new
+    end
+
+    def add displayObject
+      if displayObject.instance_of? Array
+        displayObject.each do |obj|
+          add obj
+        end
+      else
+        if !@set[ displayObject.get_cn ]
+          @set[ displayObject.get_cn ] = displayObject
+          @arr << displayObject
+        end
+      end
+    end
+
+    def display
+      @arr.each do |object|
+        object.display
+      end
     end
 
   end
