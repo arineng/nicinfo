@@ -1,6 +1,27 @@
 {
     "nicInfo_demoUrl" : "http://whois.arin.net/entity/restricted",
     "nicInfo_demoHint" : "nicinfo --type entityname restricted",
+    "nicInfo_demoError" : "401",
+    "rdapConformance":[
+        "rdap_level_0"
+    ],
+    "notices":[
+        {
+            "title":"Terms of Use",
+            "description":[
+                "THESE are the times that try men's souls. The summer soldier and the sunshine patriot will, in this crisis, shrink from the service of their country; but he that stands by it now, deserves the love and thanks of man and woman. Tyranny, like hell, is not easily conquered; yet we have this consolation with us, that the harder the conflict, the more glorious the triumph.",
+                "So sayeth Thomas Paine"
+            ],
+            "links":[
+                {
+                    "value":"http://whois.arin.net/entity/restricted",
+                    "rel":"terms-of-service",
+                    "type":"text/html",
+                    "href":"http://www.example.com/tos.html"
+                }
+            ]
+        }
+    ],
     "errorCode":418,
     "title":"Your beverage choice is not available",
     "description":[

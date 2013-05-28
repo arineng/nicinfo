@@ -28,6 +28,7 @@ require 'ip'
 require 'ns'
 require 'domain'
 require 'autnum'
+require 'error_code'
 require 'ipaddr'
 require 'data_tree'
 begin
@@ -241,7 +242,7 @@ module NicInfo
     end
 
     # Do an HTTP GET with the path.
-    def get url
+    def get url, try
 
       data = @cache.get(url)
       if (data == nil)
@@ -249,6 +250,7 @@ module NicInfo
         @config.logger.trace("Issuing GET for " + url)
         req = Net::HTTP::Get.new(url)
         req["User-Agent"] = NicInfo::VERSION
+        req["Content-Type"] = NicInfo::RDAP_CONTENT_TYPE
         uri = URI.parse(url)
         res = Net::HTTP.start(uri.host, uri.port) do |http|
           http.request(req)
@@ -256,9 +258,15 @@ module NicInfo
 
         case res
           when Net::HTTPSuccess
+            res.error! if res["content-type"] != NicInfo::RDAP_CONTENT_TYPE
             data = res.body
             @cache.create_or_update(url, data)
           else
+            if res.code == "301" or res.code == "302" or res.code == "303" or res.code == "307" or res.code == "308"
+              res.error! if try >= 5
+              location = res["location"]
+              return get( location, try + 1)
+            end
             res.error!
         end
 
@@ -365,8 +373,14 @@ module NicInfo
         else
           rdap_url = @config.options.url
         end
-        data = get( rdap_url )
+        data = get( rdap_url, 0 )
         json_data = JSON.load data
+        if (ec = json_data[ NicInfo::NICINFO_DEMO_ERROR ]) != nil
+          res = MyHTTPResponse.new( "1.1", ec, "Demo Exception" )
+          res["content-type"] = NicInfo::RDAP_CONTENT_TYPE
+          res.body=data
+          raise Net::HTTPServerException.new( "Demo Exception", res )
+        end
         inspect_rdap_compliance json_data
         cache_self_references json_data
         if @config.options.output_json
@@ -408,14 +422,31 @@ module NicInfo
         @config.logger.mesg(a.message)
       rescue Net::HTTPServerException => e
         case e.response.code
+          when "401"
+            @config.logger.mesg("Authorization is required.")
+            handle_error_response e.response
           when "404"
             @config.logger.mesg("Query yielded no results.")
+            handle_error_response e.response
           when "503"
             @config.logger.mesg("RDAP service is unavailable.")
+            handle_error_response e.response
+          else
+            @config.logger.mesg("Error #{e.response.code}.")
+            handle_error_response e.response
         end
         @config.logger.trace("Server response code was " + e.response.code)
       end
 
+    end
+
+    def handle_error_response res
+      if res["content-type"] == NicInfo::RDAP_CONTENT_TYPE
+        json_data = JSON.load( res.body )
+        inspect_rdap_compliance json_data
+        Notices.new.display_notices json_data, @config
+        ErrorCode.new.display_error_code json_data, @config
+      end
     end
 
     def inspect_rdap_compliance json
@@ -615,7 +646,7 @@ HELP_SUMMARY
           children = data_tree.roots.first.children
           @config.logger.mesg("Use \"nicinfo 1.1=\" to show #{children.first}")
           if children.first != children.last
-            len = children.length + 1
+            len = children.length
             @config.logger.mesg("Use \"nicinfo 1.#{len}=\" to show #{children.last}")
           end
         end
@@ -624,6 +655,10 @@ HELP_SUMMARY
       @config.logger.mesg('Use "nicinfo -h" for help.')
     end
 
+  end
+
+  class MyHTTPResponse < Net::HTTPResponse
+    attr_accessor :body
   end
 
 end

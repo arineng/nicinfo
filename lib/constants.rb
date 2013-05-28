@@ -79,10 +79,12 @@ module NicInfo
   SEARCH = "search"
   SUBSTRING = "substring"
 
-  #JSON Constants
-
   # NicInfo values
   NICINFO_DEMO_URL = "nicInfo_demoUrl"
   NICINFO_DEMO_HINT = "nicInfo_demoHint"
+  NICINFO_DEMO_ERROR = "nicInfo_demoError"
+
+  # Other constants
+  RDAP_CONTENT_TYPE = "application/rdap+json"
 
 end
