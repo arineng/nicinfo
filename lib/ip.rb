@@ -72,7 +72,7 @@ module NicInfo
         handle << endAddress if endAddress
       end
       return handle if handle
-      return "(unidentifiable network)"
+      return "(unidentifiable network #{object_id})"
     end
 
     def to_node

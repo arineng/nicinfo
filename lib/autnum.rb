@@ -76,7 +76,7 @@ module NicInfo
         handle << endNum if endNum
       end
       return handle if handle
-      return "(unidentifiable autonomous system number)"
+      return "(unidentifiable autonomous system number #{object_id})"
     end
 
     def to_node

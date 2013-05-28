@@ -108,9 +108,9 @@ module NicInfo
           @config.options.base_url = url
         end
 
-        opts.on("-u", "--url URL",
+        opts.on("-u", "--url",
                 "Fetch a specific RDAP URL.") do |url|
-          @config.options.url = url
+          @config.options.url = true
         end
 
         opts.separator ""
@@ -250,7 +250,7 @@ module NicInfo
         @config.logger.trace("Issuing GET for " + url)
         req = Net::HTTP::Get.new(url)
         req["User-Agent"] = NicInfo::VERSION
-        req["Content-Type"] = NicInfo::RDAP_CONTENT_TYPE
+        req["Accept"] = NicInfo::RDAP_CONTENT_TYPE
         uri = URI.parse(url)
         res = Net::HTTP.start(uri.host, uri.port) do |http|
           http.request(req)
@@ -258,7 +258,9 @@ module NicInfo
 
         case res
           when Net::HTTPSuccess
-            res.error! if res["content-type"] != NicInfo::RDAP_CONTENT_TYPE
+            if res["content-type"] != NicInfo::RDAP_CONTENT_TYPE
+              raise Net::HTTPServerException.new( "Bad Content Type", res )
+            end
             data = res.body
             @cache.create_or_update(url, data)
           else
@@ -311,7 +313,7 @@ module NicInfo
       end
 
       if @config.options.url
-        @config.options.query_type = get_query_type_from_url( @config.options.url )
+        @config.options.query_type = get_query_type_from_url( @config.options.argv[ 0 ] )
       end
 
       if @config.options.argv == nil || @config.options.argv == []
@@ -371,7 +373,7 @@ module NicInfo
           path = create_resource_url(@config.options.argv, @config.options.query_type)
           rdap_url = make_rdap_url( @config.options.base_url, path )
         else
-          rdap_url = @config.options.url
+          rdap_url = @config.options.argv[ 0 ]
         end
         data = get( rdap_url, 0 )
         json_data = JSON.load data
@@ -422,6 +424,8 @@ module NicInfo
         @config.logger.mesg(a.message)
       rescue Net::HTTPServerException => e
         case e.response.code
+          when "200"
+            @config.logger.mesg( e.message )
           when "401"
             @config.logger.mesg("Authorization is required.")
             handle_error_response e.response
