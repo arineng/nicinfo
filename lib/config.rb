@@ -226,7 +226,7 @@ bootstrap:
 
   ripe_url: http://whois.ripe.net
 
-  lacnic_url: http://whois.lacnic.net
+  lacnic_url: http://restfulwhoisv2.labs.lacnic.net/rdap
 
   apnic_url: http://whois.apnic.net
 
@@ -238,9 +238,11 @@ bootstrap:
 
   org_url: http://whois.pir.org
 
-  info_url: http://whois.affilias.info
+  info_url: http://rdg.afilias.info/rdap
 
   biz_url: http://whois.neustar.biz
+
+  cn_url: http://rdap.restfulwhois.org
 
 search:
 
