@@ -107,6 +107,7 @@ module NicInfo
         @config.logger.extra "DS #{delegation_no} Key Tag", dkey[ "keyTag" ]
         delegation_no = delegation_no + 1
       end if delegationKeys
+      @common.display_public_ids @objectclass
       @common.display_status @objectclass
       @common.display_events @objectclass
       @common.display_entities_as_events @entities

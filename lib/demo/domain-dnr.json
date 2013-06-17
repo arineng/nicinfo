@@ -48,6 +48,13 @@
         }
     ],
     "status":[ "locked", "transfer prohibited" ],
+    "publicIds" :
+    [
+      {
+        "type": "ENS_AUTH",
+        "identifier" : "1"
+      }
+    ],
     "nameServers":[
         {
             "handle":"ns1.example.com-001",

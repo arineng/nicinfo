@@ -97,6 +97,13 @@
         ]
     ],
     "status":[ "validated", "locked" ],
+    "publicIds" :
+    [
+      {
+        "type": "IANA Registration",
+        "identifier" : "1"
+      }
+    ],
     "remarks":[
         {
             "title": "A Poem",

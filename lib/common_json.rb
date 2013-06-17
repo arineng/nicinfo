@@ -141,6 +141,19 @@ module NicInfo
       end if entities
     end
 
+    def display_public_ids objectclass
+      public_ids = objectclass[ "publicIds" ]
+      if public_ids
+        public_ids.each do |public_id|
+          item_name = "Public ID"
+          item_value = public_id[ "identifier" ]
+          authority = public_id[ "type" ]
+          item_value << " (#{authority})" if authority
+          @config.logger.datum item_name, item_value
+        end
+      end
+    end
+
   end
 
   # for keeping track of objects to display

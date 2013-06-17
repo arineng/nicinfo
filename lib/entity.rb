@@ -228,6 +228,7 @@ module NicInfo
         @config.logger.terse "Phone", item_value
       end
       @common.display_string_array "roles", "Roles", @objectclass, DataAmount::TERSE_DATA
+      @common.display_public_ids @objectclass
       @common.display_status @objectclass
       @common.display_port43 @objectclass
       @common.display_events @objectclass
