@@ -69,10 +69,12 @@ class DataTreeTest < Test::Unit::TestCase
     tree.to_extra_log( logger )
 
     expected = <<EXPECTED_LOG
+[ RESPONSE DATA ]  
 first root
   |- first child of first root
   `- second child of first root
 
+[ RESPONSE DATA ]  
 second root
   |- first child of second root
   |  |- first child of first child of second root
@@ -90,6 +92,7 @@ second root
      |- second child of fourth child of second root
      `- third child of fourth child of second root
 
+[ RESPONSE DATA ]  
 third root
   |- first child of third root
   `- second child of third root
@@ -166,10 +169,12 @@ EXPECTED_LOG
     tree.to_extra_log( logger, true )
 
     expected = <<EXPECTED_LOG
+[ RESPONSE DATA ]  
   1= first root
      |--- 1= first child of first root
      `--- 2= second child of first root
 
+[ RESPONSE DATA ]  
   2. second root
      |--- 1. first child of second root
      |    |--- 1. first child of first child of second root
@@ -197,6 +202,7 @@ EXPECTED_LOG
           |--- 2= second child of fourth child of second root
           `--- 3= third child of fourth child of second root
 
+[ RESPONSE DATA ]  
   3. third root
      |--- 1. first child of third root
      `--- 2. second child of third root
