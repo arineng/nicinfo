@@ -24,22 +24,22 @@ module NicInfo
       @config = config
       @RIR_URLS =
       {
-        "IANA",                     NicInfo::IP_ROOT_URL,
-        "ARIN",                     NicInfo::ARIN_URL,
-        "Administered by ARIN",     NicInfo::ARIN_URL,
-        "Assigned by ARIN",         NicInfo::ARIN_URL,
-        "APNIC",                    NicInfo::APNIC_URL,
-        "Administered by APNIC",    NicInfo::APNIC_URL,
-        "Assigned by APNIC",        NicInfo::APNIC_URL,
-        "AFRINIC",                  NicInfo::AFRINIC_URL,
-        "Administered by AFRINIC",  NicInfo::AFRINIC_URL,
-        "Assigned by AFRINIC",      NicInfo::AFRINIC_URL,
-        "RIPE NCC",                 NicInfo::RIPE_URL,
-        "Administered by RIPE NCC", NicInfo::RIPE_URL,
-        "Assigned by RIPE NCC",     NicInfo::RIPE_URL,
-        "LACNIC",                   NicInfo::LACNIC_URL,
-        "Administered by LACNIC",   NicInfo::LACNIC_URL,
-        "Assigned by LACNIC",       NicInfo::LACNIC_URL
+        "IANA" =>                     NicInfo::IP_ROOT_URL,
+        "ARIN" =>                     NicInfo::ARIN_URL,
+        "Administered by ARIN" =>     NicInfo::ARIN_URL,
+        "Assigned by ARIN" =>         NicInfo::ARIN_URL,
+        "APNIC" =>                    NicInfo::APNIC_URL,
+        "Administered by APNIC" =>    NicInfo::APNIC_URL,
+        "Assigned by APNIC" =>        NicInfo::APNIC_URL,
+        "AFRINIC" =>                  NicInfo::AFRINIC_URL,
+        "Administered by AFRINIC" =>  NicInfo::AFRINIC_URL,
+        "Assigned by AFRINIC" =>      NicInfo::AFRINIC_URL,
+        "RIPE NCC" =>                 NicInfo::RIPE_URL,
+        "Administered by RIPE NCC" => NicInfo::RIPE_URL,
+        "Assigned by RIPE NCC" =>     NicInfo::RIPE_URL,
+        "LACNIC" =>                   NicInfo::LACNIC_URL,
+        "Administered by LACNIC" =>   NicInfo::LACNIC_URL,
+        "Assigned by LACNIC" =>       NicInfo::LACNIC_URL
       }
     end
 
@@ -55,7 +55,7 @@ module NicInfo
         if addr.ipv6?
           prefix = IPAddr.new element.elements[ "prefix" ].text if addr.ipv6?
         else
-          prefix = IPAddr.new( element.elements[ "prefix" ].text.split( "/" )[ 0 ] + ".0.0.0" )
+          prefix = IPAddr.new( (element.elements[ "prefix" ].text.split( "/" )[ 0 ]).to_i.to_s + ".0.0.0" )
           prefix = prefix.mask( 8 )
         end
         retval = element.elements[ "description" ].text if prefix.include?( addr ) if addr.ipv6?
