@@ -26,24 +26,20 @@ module NicInfo
     if !domain.entities.empty? or !domain.nameservers.empty?
       root = domain.to_node
       data_node.add_root( root )
-      domain.entities.each do |entity|
-        root.add_child( entity.to_node )
-      end
+      NicInfo::add_entity_nodes( domain.entities, root )
       domain.nameservers.each do |ns|
         ns_node = ns.to_node
         root.add_child( ns_node )
-        ns.entities.each do |entity|
-          ns_node.add_child( entity.to_node )
-        end
+        NicInfo::add_entity_nodes( ns.entities, ns_node )
       end
       data_node.to_normal_log( config.logger, true )
     end
     dispobjs = DisplayObjects.new
     dispobjs.add domain
-    dispobjs.add domain.entities
+    NicInfo::add_entity_dispobjs( domain.entities, dispobjs )
     domain.nameservers.each do |ns|
       dispobjs.add ns
-      dispobjs.add ns.entities
+      NicInfo::add_entity_dispobjs( ns.entities, dispobjs )
     end
     dispobjs.display
   end

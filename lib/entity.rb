@@ -20,15 +20,9 @@ require 'data_tree'
 
 module NicInfo
 
-  def NicInfo.display_entity json_data, config
-    Entity.new( config ).process( json_data ).display
-  end
-
-  def NicInfo.display_entities json_data, config
-    entities = NicInfo::get_entitites json_data
-    entities.each do |json_entity|
-      NicInfo::display_entity( json_entity, config )
-    end if entities
+  def NicInfo.display_entity json_data, config, data_tree
+    entity = Entity.new( config ).process( json_data )
+    NicInfo::display_object_with_entities( entity, config, data_tree )
   end
 
   class Org
@@ -166,6 +160,7 @@ module NicInfo
   class Entity
 
     attr_accessor :asEvents, :selfhref
+    attr_accessor :entities
 
     def initialize config
       @config = config
@@ -174,6 +169,7 @@ module NicInfo
       @entity = nil
       @asEvents = Array.new
       @selfhref = nil
+      @entities = Array.new
     end
 
     def process json_data
@@ -187,6 +183,7 @@ module NicInfo
         @asEvents << eventActor
       end if events
       @selfhref = NicInfo::get_self_link( NicInfo::get_links( @objectclass ) )
+      @entities = @common.process_entities @objectclass
       return self
     end
 

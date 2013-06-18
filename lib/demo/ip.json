@@ -65,18 +65,16 @@
     ],
     "entities":[
         {
-            "handle":"MATTR-ARIN",
+            "handle":"ARIN-OPS",
             "vcardArray":[
                 "vcard",
                 [
                     ["version", {}, "text", "4.0"],
-                    ["fn", {}, "text", "Matt Rowley"],
-                    ["kind", {}, "text", "individual"],
+                    ["fn", {}, "text", "ARIN Operations"],
+                    ["kind", {}, "text", "org"],
                     ["org", {
                         "type":"work"
                     }, "text", "American Registry for Internet Numbers"],
-                    ["title", {}, "text", "Operations Manager"],
-                    ["role", {}, "text", "Project Lead"],
                     ["adr",
                         {
                             "type":"work"
@@ -91,25 +89,10 @@
                             "20151",
                             "United States"
                         ]
-                    ],
-                    ["tel",
-                        {
-                            "type":["work", "voice"],
-                            "pref":"1"
-                        },
-                        "uri",
-                        "tel:+1-703-227-9840"
-                    ],
-                    ["email",
-                        {
-                            "type":"work"
-                        },
-                        "text",
-                        "info@arin.net"
                     ]
                 ]
             ],
-            "roles":[ "administrative" ],
+            "roles":[ "registrant" ],
             "remarks":[
                 {
                     "title": "No Solicitations",
@@ -120,9 +103,9 @@
             ],
             "links":[
                 {
-                    "value":"http://example.net/entity/MATTR-ARIN",
+                    "value":"http://example.net/entity/ARIN-OPS",
                     "rel":"self",
-                    "href":"http://example.net/entity/MATTR-ARIN"
+                    "href":"http://example.net/entity/ARIN-OPS"
                 }
             ],
             "events":[
@@ -137,91 +120,167 @@
                     "eventActor": "mattr@arin.net"
                 }
             ],
-            "asEventActor":[
+            "entities":[
                 {
-                    "eventAction":"last changed",
-                    "eventDate":"2013-12-31T23:59:60Z"
-                }
-            ]
-        },
-        {
-            "handle":"MAK21-ARIN",
-            "vcardArray":[
-                "vcard",
-                [
-                    ["version", {}, "text", "4.0"],
-                    ["fn", {}, "text", "Mark Kosters"],
-                    ["kind", {}, "text", "individual"],
-                    ["org", {
-                        "type":"work"
-                    }, "text", "American Registry for Internet Numbers"],
-                    ["title", {}, "text", "Chief Technical Officer"],
-                    ["role", {}, "text", "Pointy Haired Boss"],
-                    ["adr",
-                        {
-                            "type":"work",
-                            "label" : "3635 Concorde Parkway\nSuite200\nChantilly\nVA\n20151"
-                        },
-                        "text",
+                    "handle":"MATTR-ARIN",
+                    "vcardArray":[
+                        "vcard",
                         [
-                            "",
-                            "",
-                            "",
-                            "",
-                            "",
-                            "",
-                            ""
+                            ["version", {}, "text", "4.0"],
+                            ["fn", {}, "text", "Matt Rowley"],
+                            ["kind", {}, "text", "individual"],
+                            ["org", {
+                                "type":"work"
+                            }, "text", "American Registry for Internet Numbers"],
+                            ["title", {}, "text", "Operations Manager"],
+                            ["role", {}, "text", "Project Lead"],
+                            ["adr",
+                                {
+                                    "type":"work"
+                                },
+                                "text",
+                                [
+                                    "",
+                                    "Suite 200",
+                                    "3635 Concorde Parkway",
+                                    "Chantilly",
+                                    "VA",
+                                    "20151",
+                                    "United States"
+                                ]
+                            ],
+                            ["tel",
+                                {
+                                    "type":["work", "voice"],
+                                    "pref":"1"
+                                },
+                                "uri",
+                                "tel:+1-703-227-9840"
+                            ],
+                            ["email",
+                                {
+                                    "type":"work"
+                                },
+                                "text",
+                                "info@arin.net"
+                            ]
                         ]
                     ],
-                    ["tel",
+                    "roles":[ "administrative" ],
+                    "remarks":[
                         {
-                            "type":["work", "voice"],
-                            "pref":"1"
-                        },
-                        "uri",
-                        "tel:+1-703-227-9840"
+                            "title": "No Solicitations",
+                            "description":[
+                                "Absolutely no solicitations are accepted at by this contact. If you wish to offer services or products to the American Registry for Internet Numbers, contact Pete Toscano at +1-703-227-9840."
+                            ]
+                        }
                     ],
-                    ["email",
+                    "links":[
                         {
-                            "type":"work"
+                            "value":"http://example.net/entity/MATTR-ARIN",
+                            "rel":"self",
+                            "href":"http://example.net/entity/MATTR-ARIN"
+                        }
+                    ],
+                    "events":[
+                        {
+                            "eventAction":"registration",
+                            "eventDate":"2012-12-31T23:59:60Z",
+                            "eventActor": "mattr@arin.net"
                         },
-                        "text",
-                        "info@arin.net"
+                        {
+                            "eventAction":"last changed",
+                            "eventDate":"2013-12-31T23:59:60Z",
+                            "eventActor": "mattr@arin.net"
+                        }
+                    ],
+                    "asEventActor":[
+                        {
+                            "eventAction":"last changed",
+                            "eventDate":"2013-12-31T23:59:60Z"
+                        }
                     ]
-                ]
-            ],
-            "roles":[ "technical" ],
-            "remarks":[
-                {
-                    "title": "No Solicitations",
-                    "description":[
-                        "Absolutely no solicitations are accepted at by this contact. If you wish to offer services or products to the American Registry for Internet Numbers, contact Pete Toscano at +1-703-227-9840."
-                    ]
-                }
-            ],
-            "links":[
-                {
-                    "value":"http://example.net/entity/MAK21-ARIN",
-                    "rel":"self",
-                    "href":"http://example.net/entity/MAK21-ARIN"
-                }
-            ],
-            "events":[
-                {
-                    "eventAction":"registration",
-                    "eventDate":"2012-12-31T23:59:60Z",
-                    "eventActor": "markk@arin.net"
                 },
                 {
-                    "eventAction":"last changed",
-                    "eventDate":"2013-12-31T23:59:60Z",
-                    "eventActor": "markkb@arin.net"
-                }
-            ],
-            "asEventActor":[
-                {
-                    "eventAction":"reregistration",
-                    "eventDate":"2012-12-31T23:59:60Z"
+                    "handle":"MAK21-ARIN",
+                    "vcardArray":[
+                        "vcard",
+                        [
+                            ["version", {}, "text", "4.0"],
+                            ["fn", {}, "text", "Mark Kosters"],
+                            ["kind", {}, "text", "individual"],
+                            ["org", {
+                                "type":"work"
+                            }, "text", "American Registry for Internet Numbers"],
+                            ["title", {}, "text", "Chief Technical Officer"],
+                            ["role", {}, "text", "Pointy Haired Boss"],
+                            ["adr",
+                                {
+                                    "type":"work",
+                                    "label" : "3635 Concorde Parkway\nSuite200\nChantilly\nVA\n20151"
+                                },
+                                "text",
+                                [
+                                    "",
+                                    "",
+                                    "",
+                                    "",
+                                    "",
+                                    "",
+                                    ""
+                                ]
+                            ],
+                            ["tel",
+                                {
+                                    "type":["work", "voice"],
+                                    "pref":"1"
+                                },
+                                "uri",
+                                "tel:+1-703-227-9840"
+                            ],
+                            ["email",
+                                {
+                                    "type":"work"
+                                },
+                                "text",
+                                "info@arin.net"
+                            ]
+                        ]
+                    ],
+                    "roles":[ "technical" ],
+                    "remarks":[
+                        {
+                            "title": "No Solicitations",
+                            "description":[
+                                "Absolutely no solicitations are accepted at by this contact. If you wish to offer services or products to the American Registry for Internet Numbers, contact Pete Toscano at +1-703-227-9840."
+                            ]
+                        }
+                    ],
+                    "links":[
+                        {
+                            "value":"http://example.net/entity/MAK21-ARIN",
+                            "rel":"self",
+                            "href":"http://example.net/entity/MAK21-ARIN"
+                        }
+                    ],
+                    "events":[
+                        {
+                            "eventAction":"registration",
+                            "eventDate":"2012-12-31T23:59:60Z",
+                            "eventActor": "markk@arin.net"
+                        },
+                        {
+                            "eventAction":"last changed",
+                            "eventDate":"2013-12-31T23:59:60Z",
+                            "eventActor": "markkb@arin.net"
+                        }
+                    ],
+                    "asEventActor":[
+                        {
+                            "eventAction":"reregistration",
+                            "eventDate":"2012-12-31T23:59:60Z"
+                        }
+                    ]
                 }
             ]
         }

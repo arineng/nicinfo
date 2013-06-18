@@ -132,7 +132,7 @@ module NicInfo
 
     def find_url_by_domain domain
       retval = nil
-      domain.sub!( /\.$/, '' ) #remove trailing dot if there is one
+      domain = domain.sub( /\.$/, '' ) #remove trailing dot if there is one
       if domain.end_with?( ".ip6.arpa" )
         addr = get_ip6_by_inaddr domain
         retval = find_rir_url_by_ip addr

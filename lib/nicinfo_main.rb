@@ -334,8 +334,9 @@ module NicInfo
           @config.options.query_type = QueryType::BY_DOMAIN
         elsif @config.options.query_type == QueryType::BY_RESULT
           data_tree = @config.load_as_yaml( NicInfo::LASTTREE_YAML )
-          @config.options.url = data_tree.find_rest_ref( @config.options.argv[ 0 ] )
-          @config.options.query_type = get_query_type_from_url( @config.options.url )
+          @config.options.argv[ 0 ] = data_tree.find_rest_ref( @config.options.argv[ 0 ] )
+          @config.options.url = true
+          @config.options.query_type = get_query_type_from_url( @config.options.argv[ 0 ] )
         end
         if (@config.options.query_type == nil)
           @config.logger.mesg("Unable to guess type of query. You must specify it.")
@@ -412,7 +413,7 @@ module NicInfo
             when QueryType::BY_NAMESERVER
               NicInfo::display_ns( json_data, @config, data_tree )
             when QueryType::BY_ENTITY_NAME
-              NicInfo::display_entity( json_data, @config )
+              NicInfo::display_entity( json_data, @config, data_tree )
           end
           @config.save_as_yaml( NicInfo::LASTTREE_YAML, data_tree ) if !data_tree.empty?
           show_helpful_messages rdap_url, data_tree

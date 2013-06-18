@@ -69,6 +69,9 @@ class NicInfoMainTest < Test::Unit::TestCase
     assert_equal( nicinfo.guess_query_value_type( [ "example.com" ] ), "DOMAIN" )
     assert_equal( nicinfo.guess_query_value_type( [ "example.com." ] ), "DOMAIN" )
     assert_equal( nicinfo.guess_query_value_type( [ "ns1.example.com." ] ), "NAMESERVER" )
+    assert_equal( nicinfo.guess_query_value_type( [ "1=" ] ), "RESULT" )
+    assert_equal( nicinfo.guess_query_value_type( [ "1.1=" ] ), "RESULT" )
+    assert_equal( nicinfo.guess_query_value_type( [ "1.1.1=" ] ), "RESULT" )
     assert_equal( nicinfo.guess_query_value_type( [ "foo" ] ), "ENTITYNAME" )
 
   end

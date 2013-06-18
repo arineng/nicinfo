@@ -24,15 +24,28 @@ module NicInfo
     if !object.entities.empty?
       root = object.to_node
       data_node.add_root( root )
-      object.entities.each do |entity|
-        root.add_child( entity.to_node )
-      end
+      NicInfo::add_entity_nodes( object.entities, root )
       data_node.to_normal_log( config.logger, true )
     end
     dispobjs = DisplayObjects.new
     dispobjs.add object
-    dispobjs.add( object.entities )
+    NicInfo::add_entity_dispobjs( object.entities, dispobjs )
     dispobjs.display
+  end
+
+  def NicInfo.add_entity_nodes entities, node
+    entities.each do |entity|
+      entity_node = entity.to_node
+      node.add_child( entity_node )
+      NicInfo::add_entity_nodes( entity.entities, entity_node )
+    end if entities
+  end
+
+  def NicInfo.add_entity_dispobjs entities, dispobjs
+    entities.each do |entity|
+      dispobjs.add( entity )
+      NicInfo::add_entity_dispobjs( entity.entities, dispobjs )
+    end if entities
   end
 
   # deals with common JSON RDAP structures
