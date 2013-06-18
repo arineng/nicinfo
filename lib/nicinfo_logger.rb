@@ -278,6 +278,9 @@ module NicInfo
       rx2 = /\s*(\d*)\s*columns;/
       m = rx2.match( stty_output )
       return m[ 1 ].to_i if m
+      rx3 = /\s*columns\s*(\d*);/
+      m = rx3.match( stty_output )
+      return m[ 1 ].to_i if m
       return default_columns
     end
 

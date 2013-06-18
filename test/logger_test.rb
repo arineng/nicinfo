@@ -277,10 +277,21 @@ min = 1; quit = ^\; reprint = ^R; start = ^Q; status = ^T;
 stop = ^S; susp = ^Z; time = 0; werase = ^W;
 TEXT2
 
+    text3 = <<TEXT3
+speed 38400 baud; rows 48; columns 135; line = 0;
+intr = ^C; quit = ^\; erase = ^?; kill = ^U; eof = ^D; eol = M-^?; eol2 = M-^?; swtch = M-^?; start = ^Q; stop = ^S; susp = ^Z;
+rprnt = ^R; werase = ^W; lnext = ^V; flush = ^O; min = 1; time = 0;
+-parenb -parodd cs8 hupcl -cstopb cread -clocal -crtscts
+-ignbrk brkint -ignpar -parmrk -inpck -istrip -inlcr -igncr icrnl ixon -ixoff -iuclc ixany imaxbel iutf8
+opost -olcuc -ocrnl onlcr -onocr -onlret -ofill -ofdel nl0 cr0 tab0 bs0 vt0 ff0
+isig icanon iexten echo echoe echok -echonl -noflsh -xcase -tostop -echoprt echoctl echoke
+TEXT3
+
     logger = NicInfo::Logger.new
 
     assert_equal( 157, logger.get_terminal_columns( text1, 80 ))
     assert_equal( 110, logger.get_terminal_columns( text2, 80 ))
+    assert_equal( 135, logger.get_terminal_columns( text3, 80 ))
     assert_equal( 80, logger.get_terminal_columns( "blah", 80 ))
   end
 
