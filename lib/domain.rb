@@ -87,6 +87,7 @@ module NicInfo
           item_value = arr.join( ", " )
         end
         @config.logger.extra "Variant #{variant_no}", item_value
+        @config.logger.extra "IDN Table", variant[ "idnTable" ]
         variant_names = variant[ "variantNames" ]
         variant_names.each do |variant_name|
           @config.logger.extra "Variant Domain", NicInfo::get_ldhName( variant_name )

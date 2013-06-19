@@ -26,6 +26,7 @@
     "variants":[
         {
             "relation":[ "registered", "conjoined" ],
+            "idnTable" : ".EXAMPLE Swedish",
             "variantNames":[
                 {
                     "ldhName":"xn--fo-cka.example",
