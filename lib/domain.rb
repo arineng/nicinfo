@@ -95,15 +95,6 @@ module NicInfo
         end if variant_names
         variant_no = variant_no + 1
       end if variants
-      delegationKeys = @objectclass[ "delegationKeys" ]
-      delegation_no = 1
-      delegationKeys.each do |dkey|
-        @config.logger.extra "DS #{delegation_no} Algorithm", dkey[ "algorithm" ]
-        @config.logger.extra "DS #{delegation_no} Digest", dkey[ "digest" ]
-        @config.logger.extra "DS #{delegation_no} Digest Type", dkey[ "digestType" ]
-        @config.logger.extra "DS #{delegation_no} Key Tag", dkey[ "keyTag" ]
-        delegation_no = delegation_no + 1
-      end if delegationKeys
       @common.display_public_ids @objectclass
       @common.display_status @objectclass
       @common.display_events @objectclass
@@ -112,6 +103,42 @@ module NicInfo
       @common.display_remarks @objectclass
       @common.display_links( get_cn, @objectclass )
       @config.logger.end_data_item
+      secureDns = @objectclass[ "secureDNS" ]
+      if secureDns
+        zoneSigned = secureDns[ "zoneSigned" ]
+        delegationSigned = secureDns[ "delegationSigned" ]
+        maxSigLife = secureDns[ "maxSigLife" ]
+        if zoneSigned or delegationSigned or maxSigLife
+          @config.logger.start_data_item
+          @config.logger.data_title "[ SECURE DNS ]"
+          @config.logger.terse "Zone Signed", zoneSigned
+          @config.logger.terse "Delegation Signed", delegationSigned
+          @config.logger.terse "Max Signature Life", maxSigLife
+          @config.logger.end_data_item
+        end
+        dsData = secureDns[ "dsData" ]
+        dsData.each do |ds|
+          @config.logger.start_data_item
+          @config.logger.data_title "[ DELEGATION SIGNER ]"
+          @config.logger.terse "Algorithm", ds[ "algorithm" ]
+          @config.logger.terse "Digest", ds[ "digest" ]
+          @config.logger.terse "Digest Type", ds[ "digestType" ]
+          @config.logger.terse "Key Tag", ds[ "keyTag" ]
+          @common.display_events ds
+          @config.logger.end_data_item
+        end if dsData
+        keyData = secureDns[ "keyData" ]
+        keyData.each do |key|
+          @config.logger.start_data_item
+          @config.logger.data_title "[ KEY DATA ]"
+          @config.logger.terse "Algorithm", key[ "algorithm" ]
+          @config.logger.terse "Flags", key[ "flags" ]
+          @config.logger.terse "Protocol", key[ "protocol" ]
+          @config.logger.terse "Public Key", key[ "publicKey" ]
+          @common.display_events key
+          @config.logger.end_data_item
+        end if keyData
+      end
     end
 
     def get_cn
