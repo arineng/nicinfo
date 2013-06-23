@@ -27,9 +27,9 @@ module NicInfo
       NicInfo::add_entity_nodes( object.entities, root )
       data_node.to_normal_log( config.logger, true )
     end
-    dispobjs = DisplayObjects.new
+    dispobjs = ResponseObjSet.new
     dispobjs.add object
-    NicInfo::add_entity_dispobjs( object.entities, dispobjs )
+    NicInfo::add_entity_respobjs( object.entities, dispobjs )
     dispobjs.display
   end
 
@@ -41,10 +41,10 @@ module NicInfo
     end if entities
   end
 
-  def NicInfo.add_entity_dispobjs entities, dispobjs
+  def NicInfo.add_entity_respobjs entities, dispobjs
     entities.each do |entity|
       dispobjs.add( entity )
-      NicInfo::add_entity_dispobjs( entity.entities, dispobjs )
+      NicInfo::add_entity_respobjs( entity.entities, dispobjs )
     end if entities
   end
 
@@ -170,22 +170,22 @@ module NicInfo
   end
 
   # for keeping track of objects to display
-  class DisplayObjects
+  class ResponseObjSet
 
     def initialize
       @arr = Array.new #for keeping track of insertion order
       @set = Hash.new
     end
 
-    def add displayObject
-      if displayObject.instance_of? Array
-        displayObject.each do |obj|
+    def add respObj
+      if respObj.instance_of? Array
+        respObj.each do |obj|
           add obj
         end
       else
-        if !@set[ displayObject.get_cn ]
-          @set[ displayObject.get_cn ] = displayObject
-          @arr << displayObject
+        if !@set[ respObj.get_cn ]
+          @set[ respObj.get_cn ] = respObj
+          @arr << respObj
         end
       end
     end

@@ -34,14 +34,14 @@ module NicInfo
       end
       data_node.to_normal_log( config.logger, true )
     end
-    dispobjs = DisplayObjects.new
-    dispobjs.add domain
-    NicInfo::add_entity_dispobjs( domain.entities, dispobjs )
+    respObjs = ResponseObjSet.new
+    respObjs.add domain
+    NicInfo::add_entity_respobjs( domain.entities, respObjs )
     domain.nameservers.each do |ns|
-      dispobjs.add ns
-      NicInfo::add_entity_dispobjs( ns.entities, dispobjs )
+      respObjs.add ns
+      NicInfo::add_entity_respobjs( ns.entities, respObjs )
     end
-    dispobjs.display
+    respObjs.display
   end
 
   # deals with RDAP nameserver structures
