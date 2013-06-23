@@ -633,6 +633,14 @@ HELP_SUMMARY
       nameservers.each do |ns|
         cache_self_references( ns )
       end if nameservers
+      ds_data_objs = NicInfo::get_ds_data_objs json_data
+      ds_data_objs.each do |ds|
+        cache_self_references( ds )
+      end if ds_data_objs
+      key_data_objs = NicInfo::get_key_data_objs json_data
+      key_data_objs.each do |key|
+        cache_self_references( key )
+      end if key_data_objs
     end
 
     def show_helpful_messages rdap_url, data_tree

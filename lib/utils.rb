@@ -25,6 +25,26 @@ module NicInfo
     return safe
   end
 
+  def NicInfo.get_secure_dns json_data
+    return json_data[ "secureDNS" ]
+  end
+
+  def NicInfo.get_ds_data_objs json_data
+    secure_dns = NicInfo::get_secure_dns json_data
+    return secure_dns[ "dsData" ] if secure_dns
+    return nil
+  end
+
+  def NicInfo.get_key_data_objs json_data
+    secure_dns = NicInfo::get_secure_dns json_data
+    return secure_dns[ "keyData" ] if secure_dns
+    return nil
+  end
+
+  def NicInfo.get_algorithm json_data
+    return json_data[ "algorithm" ]
+  end
+
   def NicInfo.get_handle json_data
     return json_data[ "handle" ]
   end

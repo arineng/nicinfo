@@ -17,6 +17,9 @@ require 'nicinfo_logger'
 require 'utils'
 require 'common_json'
 require 'entity'
+require 'ns'
+require 'ds_data'
+require 'key_data'
 require 'data_tree'
 
 module NicInfo
@@ -32,6 +35,14 @@ module NicInfo
         root.add_child( ns_node )
         NicInfo::add_entity_nodes( ns.entities, ns_node )
       end
+      domain.ds_data_objs.each do |ds|
+        ds_node = ds.to_node
+        root.add_child( ds_node )
+      end
+      domain.key_data_objs.each do |key|
+        key_node = key.to_node
+        root.add_child( key_node )
+      end
       data_node.to_normal_log( config.logger, true )
     end
     respObjs = ResponseObjSet.new
@@ -41,19 +52,27 @@ module NicInfo
       respObjs.add ns
       NicInfo::add_entity_respobjs( ns.entities, respObjs )
     end
+    domain.ds_data_objs.each do |ds|
+      respObjs.add ds
+    end
+    domain.key_data_objs.each do |key|
+      respObjs.add key
+    end
     respObjs.display
   end
 
   # deals with RDAP nameserver structures
   class Domain
 
-    attr_accessor :entities, :nameservers
+    attr_accessor :entities, :nameservers, :ds_data_objs, :key_data_objs
 
     def initialize config
       @config = config
       @common = CommonJson.new config
       @entities = Array.new
       @nameservers = Array.new
+      @ds_data_objs = Array.new
+      @key_data_objs = Array.new
     end
 
     def process json_data
@@ -65,6 +84,18 @@ module NicInfo
         ns.process( json_ns )
         @nameservers << ns
       end if json_nses
+      json_ds_data_objs = NicInfo::get_ds_data_objs @objectclass
+      json_ds_data_objs.each do |json_ds|
+        dsData = DsData.new( @config )
+        dsData.process( json_ds )
+        @ds_data_objs << dsData
+      end if json_ds_data_objs
+      json_key_data_objs = NicInfo::get_key_data_objs @objectclass
+      json_key_data_objs.each do |json_key|
+        keyData = KeyData.new( @config )
+        keyData.process( json_key )
+        @key_data_objs << keyData
+      end if json_key_data_objs
       return self
     end
 
@@ -102,43 +133,13 @@ module NicInfo
       @common.display_port43 @objectclass
       @common.display_remarks @objectclass
       @common.display_links( get_cn, @objectclass )
-      @config.logger.end_data_item
-      secureDns = @objectclass[ "secureDNS" ]
-      if secureDns
-        zoneSigned = secureDns[ "zoneSigned" ]
-        delegationSigned = secureDns[ "delegationSigned" ]
-        maxSigLife = secureDns[ "maxSigLife" ]
-        if zoneSigned or delegationSigned or maxSigLife
-          @config.logger.start_data_item
-          @config.logger.data_title "[ SECURE DNS ]"
-          @config.logger.terse "Zone Signed", zoneSigned
-          @config.logger.terse "Delegation Signed", delegationSigned
-          @config.logger.terse "Max Signature Life", maxSigLife
-          @config.logger.end_data_item
-        end
-        dsData = secureDns[ "dsData" ]
-        dsData.each do |ds|
-          @config.logger.start_data_item
-          @config.logger.data_title "[ DELEGATION SIGNER ]"
-          @config.logger.terse "Algorithm", ds[ "algorithm" ]
-          @config.logger.terse "Digest", ds[ "digest" ]
-          @config.logger.terse "Digest Type", ds[ "digestType" ]
-          @config.logger.terse "Key Tag", ds[ "keyTag" ]
-          @common.display_events ds
-          @config.logger.end_data_item
-        end if dsData
-        keyData = secureDns[ "keyData" ]
-        keyData.each do |key|
-          @config.logger.start_data_item
-          @config.logger.data_title "[ KEY DATA ]"
-          @config.logger.terse "Algorithm", key[ "algorithm" ]
-          @config.logger.terse "Flags", key[ "flags" ]
-          @config.logger.terse "Protocol", key[ "protocol" ]
-          @config.logger.terse "Public Key", key[ "publicKey" ]
-          @common.display_events key
-          @config.logger.end_data_item
-        end if keyData
+      secure_dns = NicInfo::get_secure_dns( @objectclass )
+      if secure_dns
+        @config.logger.terse "Zone Signed", secure_dns[ "zoneSigned" ]
+        @config.logger.terse "Delegation Signed", secure_dns[ "delegationSigned" ]
+        @config.logger.terse "Max Signature Life", secure_dns[ "maxSigLife" ]
       end
+      @config.logger.end_data_item
     end
 
     def get_cn
