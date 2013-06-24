@@ -20,14 +20,15 @@ module NicInfo
 
   class DataNode
 
-    attr_accessor :alert, :handle, :rest_ref, :data, :children
+    attr_accessor :alert, :handle, :rest_ref, :data, :children, :data_type
 
-    def initialize name, handle = nil, rest_ref = nil, data = nil
+    def initialize name, handle = nil, rest_ref = nil, data = nil, data_type = nil
       @name = name
       @children = []
       @data = data
       @handle = handle
       @rest_ref = rest_ref
+      @data_type = data_type
     end
 
     def add_child node

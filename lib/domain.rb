@@ -29,12 +29,6 @@ module NicInfo
     if !domain.entities.empty? or !domain.nameservers.empty?
       root = domain.to_node
       data_node.add_root( root )
-      NicInfo::add_entity_nodes( domain.entities, root )
-      domain.nameservers.each do |ns|
-        ns_node = ns.to_node
-        root.add_child( ns_node )
-        NicInfo::add_entity_nodes( ns.entities, ns_node )
-      end
       domain.ds_data_objs.each do |ds|
         ds_node = ds.to_node
         root.add_child( ds_node )
@@ -43,20 +37,26 @@ module NicInfo
         key_node = key.to_node
         root.add_child( key_node )
       end
+      NicInfo::add_entity_nodes( domain.entities, root )
+      domain.nameservers.each do |ns|
+        ns_node = ns.to_node
+        root.add_child( ns_node )
+        NicInfo::add_entity_nodes( ns.entities, ns_node )
+      end
       data_node.to_normal_log( config.logger, true )
     end
     respObjs = ResponseObjSet.new
     respObjs.add domain
-    NicInfo::add_entity_respobjs( domain.entities, respObjs )
-    domain.nameservers.each do |ns|
-      respObjs.add ns
-      NicInfo::add_entity_respobjs( ns.entities, respObjs )
-    end
     domain.ds_data_objs.each do |ds|
       respObjs.add ds
     end
     domain.key_data_objs.each do |key|
       respObjs.add key
+    end
+    NicInfo::add_entity_respobjs( domain.entities, respObjs )
+    domain.nameservers.each do |ns|
+      respObjs.add ns
+      NicInfo::add_entity_respobjs( ns.entities, respObjs )
     end
     respObjs.display
   end
@@ -145,7 +145,7 @@ module NicInfo
     def get_cn
       handle = NicInfo::get_handle @objectclass
       handle = NicInfo::get_ldhName @objectclass if !handle
-      handle = "(unidentifiable nameserver #{object_id})" if !handle
+      handle = "(unidentifiable domain #{object_id})" if !handle
       if (name = NicInfo::get_ldhName( @objectclass ) ) != nil
         return "#{name} ( #{handle} )"
       end

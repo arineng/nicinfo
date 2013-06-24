@@ -87,4 +87,17 @@ module NicInfo
   # Other constants
   RDAP_CONTENT_TYPE = "application/rdap+json"
 
+  DNSSEC_ALGORITHMS = {
+       0 =>  "reserved",
+       1 =>  "RSA/MD5",
+       2 =>  "Diffie-Hellman",
+       3 =>  "DSA/SHA-1",
+       4 =>  "Elliptic Curve",
+       5 =>  "RSA/SHA-1",
+     252 =>  "Indirect",
+     253 =>  "Private DNS",
+     254 =>  "Private OID",
+     255 =>  "reserved"
+  }
+
 end

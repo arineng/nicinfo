@@ -49,13 +49,16 @@ module NicInfo
     end
 
     def get_cn
-      algorithm = NicInfo::get_algorithm @objectclass
+      algorithm = NicInfo::DNSSEC_ALGORITHMS[ NicInfo::get_algorithm( @objectclass ) ]
+      algorithm = algorithm + " Key Data" if algorithm
       algorithm = "(unidentifiable key data #{object_id})" if !algorithm
       return algorithm
     end
 
     def to_node
-      DataNode.new( get_cn, nil, NicInfo::get_self_link( NicInfo::get_links( @objectclass ) ) )
+      node = DataNode.new( get_cn, nil, NicInfo::get_self_link( NicInfo::get_links( @objectclass ) ) )
+      node.data_type=self.class.name
+      return node
     end
 
   end

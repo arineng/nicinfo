@@ -334,15 +334,25 @@ module NicInfo
           @config.options.query_type = QueryType::BY_DOMAIN
         elsif @config.options.query_type == QueryType::BY_RESULT
           data_tree = @config.load_as_yaml( NicInfo::LASTTREE_YAML )
-          @config.options.argv[ 0 ] = data_tree.find_rest_ref( @config.options.argv[ 0 ] )
-          @config.options.url = true
-          @config.options.query_type = get_query_type_from_url( @config.options.argv[ 0 ] )
+          node = data_tree.find_node( @config.options.argv[ 0 ] )
+          if node and node.rest_ref
+            @config.options.argv[ 0 ] = node.rest_ref
+            @config.options.url = true
+            if node.data_type
+              @config.options.query_type = node.data_type
+            elsif node.rest_ref
+              @config.options.query_type = get_query_type_from_url( node.rest_ref )
+            end
+          else
+            @config.logger.mesg( "#{@config.options.argv[0]} is not retrievable.")
+            exit
+          end
         end
         if (@config.options.query_type == nil)
           @config.logger.mesg("Unable to guess type of query. You must specify it.")
           exit
         else
-          @config.logger.mesg("Assuming query value is " + @config.options.query_type)
+          @config.logger.trace("Assuming query value is " + @config.options.query_type)
         end
       end
 
@@ -408,6 +418,10 @@ module NicInfo
               NicInfo::display_ip( json_data, @config, data_tree )
             when QueryType::BY_AS_NUMBER
               NicInfo::display_autnum( json_data, @config, data_tree )
+            when "NicInfo::DsData"
+              NicInfo::display_ds_data( json_data, @config, data_tree )
+            when "NicInfo::KeyData"
+              NicInfo::display_key_data( json_data, @config, data_tree )
             when QueryType::BY_DOMAIN
               NicInfo::display_domain( json_data, @config, data_tree )
             when QueryType::BY_NAMESERVER

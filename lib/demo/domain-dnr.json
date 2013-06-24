@@ -444,14 +444,51 @@
             ]
         }
     ],
-    "delegationKeys":[
-        {
-            "algorithm":7,
-            "digest":"E68C017BD813B9AE2F4DD28E61AD014F859ED44C",
-            "digestType":1,
-            "keyTag":53814
-        }
-    ],
+  "secureDNS":{
+    "zoneSigned":true,
+    "delegationSigned":true,
+    "maxSigLife":604800,
+    "keyData":[
+      {
+        "links":[
+          {
+            "value":"http://whois.arin.net/domain/xn--fo-5ja.example",
+            "rel":"self",
+            "href":"http://whois.arin.net/domain/xn--fo-5ja.example/keydata_1"
+          }
+        ],
+        "flags":257,
+        "protocol":3,
+        "algorithm":1,
+        "publicKey":"AQPJ////4Q==",
+        "events":[
+          {
+            "eventAction":"last changed",
+            "eventDate":"2012-07-23T05:15:47Z"
+          }
+        ]
+      },
+      {
+        "links":[
+          {
+            "value":"http://whois.arin.net/domain/xn--fo-5ja.example",
+            "rel":"self",
+            "href":"http://whois.arin.net/domain/xn--fo-5ja.example/keydata_2"
+          }
+        ],
+        "flags":257,
+        "protocol":3,
+        "algorithm":3,
+        "publicKey":"AQPJ////4Q==",
+        "events":[
+          {
+            "eventAction":"last changed",
+            "eventDate":"2012-07-23T05:15:47Z"
+          }
+        ]
+      }
+    ]
+  },
     "remarks":[
         {
             "description":[
@@ -462,9 +499,9 @@
     ],
     "links":[
         {
-            "value":"http://example.net/domain/XXXX",
+            "value":"http://whois.arin.net/domain/xn--fo-5ja.example",
             "rel":"self",
-            "href":"http://example.net/domain/XXXX"
+            "href":"http://whois.arin.net/domain/xn--fo-5ja.example"
         }
     ],
     "port43":"whois.example.net",
