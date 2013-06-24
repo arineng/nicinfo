@@ -27,10 +27,10 @@ module NicInfo
       NicInfo::add_entity_nodes( object.entities, root )
       data_node.to_normal_log( config.logger, true )
     end
-    dispobjs = ResponseObjSet.new
-    dispobjs.add object
-    NicInfo::add_entity_respobjs( object.entities, dispobjs )
-    dispobjs.display
+    respobjs = ResponseObjSet.new
+    respobjs.add object
+    NicInfo::add_entity_respobjs( object.entities, respobjs )
+    respobjs.display
   end
 
   def NicInfo.add_entity_nodes entities, node
@@ -41,10 +41,10 @@ module NicInfo
     end if entities
   end
 
-  def NicInfo.add_entity_respobjs entities, dispobjs
+  def NicInfo.add_entity_respobjs entities, respobjs
     entities.each do |entity|
-      dispobjs.add( entity )
-      NicInfo::add_entity_respobjs( entity.entities, dispobjs )
+      respobjs.add( entity )
+      NicInfo::add_entity_respobjs( entity.entities, respobjs )
     end if entities
   end
 
