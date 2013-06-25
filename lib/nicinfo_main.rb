@@ -312,7 +312,7 @@ module NicInfo
         help()
       end
 
-      if @config.options.url
+      if @config.options.url and !@config.options.query_type
         @config.options.query_type = get_query_type_from_url( @config.options.argv[ 0 ] )
       end
 

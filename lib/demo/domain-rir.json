@@ -53,9 +53,9 @@
     ],
     "links":[
         {
-            "value":"http://example.net/domain/XXXX",
+            "value":"http://whois.arin.net/domain/192.in-addr.arpa",
             "rel":"self",
-            "href":"http://example.net/domain/XXXXX"
+            "href":"http://whois.arin.net/domain/192.in-addr.arpa"
         }
     ],
     "events":[
