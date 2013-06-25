@@ -152,15 +152,11 @@ module NicInfo
 
   end
 
-  class EventActor
-    attr_accessor :eventAction, :eventDate
-  end
-
   # deals with RDAP entity structures
   class Entity
 
     attr_accessor :asEvents, :selfhref
-    attr_accessor :entities
+    attr_accessor :entities, :objectclass, :asEventActors
 
     def initialize config
       @config = config
@@ -168,6 +164,7 @@ module NicInfo
       @common = CommonJson.new config
       @entity = nil
       @asEvents = Array.new
+      @asEventActors = Array.new
       @selfhref = nil
       @entities = Array.new
     end
@@ -180,6 +177,7 @@ module NicInfo
         eventActor = EventActor.new
         eventActor.eventAction=event[ "eventAction" ]
         eventActor.eventDate=event[ "eventDate" ]
+        eventActor.related=NicInfo.get_related_link( NicInfo.get_links( event ) )
         @asEvents << eventActor
       end if events
       @selfhref = NicInfo::get_self_link( NicInfo::get_links( @objectclass ) )
@@ -252,6 +250,7 @@ module NicInfo
         end
       end
       @config.logger.extra "Kind", @jcard.kind
+      @common.display_as_events_actors @asEventActors
       @common.display_remarks @objectclass
       @common.display_links( get_cn, @objectclass )
       @config.logger.end_data_item

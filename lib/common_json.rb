@@ -30,6 +30,7 @@ module NicInfo
     respobjs = ResponseObjSet.new
     respobjs.add object
     NicInfo::add_entity_respobjs( object.entities, respobjs )
+    respobjs.associateEntities object.entities
     respobjs.display
   end
 
@@ -143,15 +144,13 @@ module NicInfo
       end
     end
 
-    def display_entities_as_events entities
-      entities.each do |entity|
-        entity.asEvents.each do |asEvent|
-          item_name = NicInfo::capitalize( asEvent.eventAction )
-          item_value = Time.parse( asEvent.eventDate ).rfc2822
-          item_value << " by #{entity.get_cn}"
-          @config.logger.datum item_name, item_value
-        end if entity.asEvents
-      end if entities
+    def display_as_events_actors asEventActors
+      asEventActors.each do |asEventActor|
+        item_name = NicInfo::capitalize( asEventActor.eventAction )
+        item_value = Time.parse( asEventActor.eventDate ).rfc2822
+        item_value << " by #{asEventActor.entity_cn}"
+        @config.logger.datum item_name, item_value
+      end
     end
 
     def display_public_ids objectclass
@@ -169,12 +168,17 @@ module NicInfo
 
   end
 
+  class EventActor
+    attr_accessor :eventAction, :eventDate, :related, :entity_cn
+  end
+
   # for keeping track of objects to display
   class ResponseObjSet
 
     def initialize
       @arr = Array.new #for keeping track of insertion order
       @set = Hash.new
+      @self_links = Hash.new
     end
 
     def add respObj
@@ -186,6 +190,8 @@ module NicInfo
         if !@set[ respObj.get_cn ]
           @set[ respObj.get_cn ] = respObj
           @arr << respObj
+          self_link = NicInfo.get_self_link( NicInfo.get_links( respObj.objectclass ) )
+          @self_links[ self_link ] = respObj if self_link
         end
       end
     end
@@ -194,6 +200,24 @@ module NicInfo
       @arr.each do |object|
         object.display
       end
+    end
+
+    def associateEventActor eventActor
+      return if !eventActor or !eventActor.related
+      associate = @self_links[ eventActor.related ]
+      if associate
+        associate.asEventActors << eventActor
+      end
+    end
+
+    def associateEntities entities
+      entities.each do |entity|
+        associateEntities entity.entities if !entity.entities.empty?
+        entity.asEvents.each do |asEvent|
+          asEvent.entity_cn = entity.get_cn
+          associateEventActor asEvent
+        end
+      end if entities
     end
 
   end

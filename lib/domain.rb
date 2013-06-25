@@ -54,9 +54,11 @@ module NicInfo
       respObjs.add key
     end
     NicInfo::add_entity_respobjs( domain.entities, respObjs )
+    respObjs.associateEntities domain.entities
     domain.nameservers.each do |ns|
       respObjs.add ns
       NicInfo::add_entity_respobjs( ns.entities, respObjs )
+      respObjs.associateEntities ns.entities
     end
     respObjs.display
   end
@@ -64,12 +66,13 @@ module NicInfo
   # deals with RDAP nameserver structures
   class Domain
 
-    attr_accessor :entities, :nameservers, :ds_data_objs, :key_data_objs
+    attr_accessor :entities, :nameservers, :ds_data_objs, :key_data_objs, :objectclass, :asEventActors
 
     def initialize config
       @config = config
       @common = CommonJson.new config
       @entities = Array.new
+      @asEventActors = Array.new
       @nameservers = Array.new
       @ds_data_objs = Array.new
       @key_data_objs = Array.new
@@ -129,7 +132,7 @@ module NicInfo
       @common.display_public_ids @objectclass
       @common.display_status @objectclass
       @common.display_events @objectclass
-      @common.display_entities_as_events @entities
+      @common.display_as_events_actors @asEventActors
       @common.display_port43 @objectclass
       @common.display_remarks @objectclass
       @common.display_links( get_cn, @objectclass )

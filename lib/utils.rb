@@ -101,6 +101,10 @@ module NicInfo
     return json_data[ "links" ]
   end
 
+  def NicInfo.get_related_link links
+    get_link "related", links
+  end
+
   def NicInfo.get_alternate_link links
     get_link "alternate", links
   end

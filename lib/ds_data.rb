@@ -27,9 +27,12 @@ module NicInfo
   # deals with RDAP ds_data structures
   class DsData
 
+    attr_accessor :objectclass, :asEventActors
+
     def initialize config
       @config = config
       @common = CommonJson.new config
+      @asEventActors = Array.new
     end
 
     def process json_data
@@ -45,6 +48,7 @@ module NicInfo
       @config.logger.terse "Digest Type", @objectclass[ "digestType" ]
       @config.logger.terse "Key Tag", @objectclass[ "keyTag" ]
       @common.display_events @objectclass
+      @common.display_as_events_actors @asEventActors
       @config.logger.end_data_item
     end
 

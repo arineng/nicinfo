@@ -29,12 +29,13 @@ module NicInfo
   # deals with RDAP nameserver structures
   class Ns
 
-    attr_accessor :entities
+    attr_accessor :entities, :objectclass, :asEventActors
 
     def initialize config
       @config = config
       @common = CommonJson.new config
       @entities = Array.new
+      @asEventActors = Array.new
     end
 
     def process json_data
@@ -62,7 +63,7 @@ module NicInfo
       end
       @common.display_status @objectclass
       @common.display_events @objectclass
-      @common.display_entities_as_events @entities
+      @common.display_as_events_actors @asEventActors
       @common.display_port43 @objectclass
       @common.display_remarks @objectclass
       @common.display_links( get_cn, @objectclass )
