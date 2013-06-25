@@ -52,6 +52,7 @@ module NicInfo
     QueryType.add_item :BY_RESULT, "RESULT"
     QueryType.add_item :BY_ENTITY_NAME, "ENTITYNAME"
     QueryType.add_item :BY_NAMESERVER, "NAMESERVER"
+    QueryType.add_item :BY_SERVER_HELP, "HELP"
 
   end
 
@@ -85,7 +86,8 @@ module NicInfo
                 "  domain     - domain name",
                 "  entityname - name of a contact, organization, registrar or other entity",
                 "  nameserver - fully qualified domain name of a nameserver",
-                "  result     - result from a previous query") do |type|
+                "  result     - result from a previous query",
+                "  help       - server help") do |type|
           uptype = type.upcase
           raise OptionParser::InvalidArgument, type.to_s unless QueryType.has_value?(uptype)
           @config.options.query_type = uptype
@@ -361,9 +363,13 @@ module NicInfo
         end
       end
 
-      if @config.options.base_url == nil
+      if @config.options.base_url == nil && !@config.options.url
         bootstrap = Bootstrap.new( @config )
-        case @config.options.query_type
+        qtype = @config.options.query_type
+        if qtype == QueryType::BY_SERVER_HELP
+          qtype = guess_query_value_type( @config.options.argv )
+        end
+        case qtype
           when QueryType::BY_IP4_ADDR
             @config.options.base_url = bootstrap.find_rir_url_by_ip( @config.options.argv[ 0 ] )
           when QueryType::BY_IP6_ADDR
@@ -408,34 +414,36 @@ module NicInfo
             @config.logger.raw( DataAmount::TERSE_DATA, eval_json_value( value, json_data) )
           end
         else
-          Notices.new.display_notices json_data, @config
-          data_tree = DataTree.new( )
-          case @config.options.query_type
-            when QueryType::BY_IP4_ADDR
-              NicInfo::display_ip( json_data, @config, data_tree )
-            when QueryType::BY_IP6_ADDR
-              NicInfo::display_ip( json_data, @config, data_tree )
-            when QueryType::BY_IP4_CIDR
-              NicInfo::display_ip( json_data, @config, data_tree )
-            when QueryType::BY_IP6_CIDR
-              NicInfo::display_ip( json_data, @config, data_tree )
-            when QueryType::BY_IP
-              NicInfo::display_ip( json_data, @config, data_tree )
-            when QueryType::BY_AS_NUMBER
-              NicInfo::display_autnum( json_data, @config, data_tree )
-            when "NicInfo::DsData"
-              NicInfo::display_ds_data( json_data, @config, data_tree )
-            when "NicInfo::KeyData"
-              NicInfo::display_key_data( json_data, @config, data_tree )
-            when QueryType::BY_DOMAIN
-              NicInfo::display_domain( json_data, @config, data_tree )
-            when QueryType::BY_NAMESERVER
-              NicInfo::display_ns( json_data, @config, data_tree )
-            when QueryType::BY_ENTITY_NAME
-              NicInfo::display_entity( json_data, @config, data_tree )
+          Notices.new.display_notices json_data, @config, @config.options.query_type == QueryType::BY_SERVER_HELP
+          if @config.options.query_type != QueryType::BY_SERVER_HELP
+            data_tree = DataTree.new( )
+            case @config.options.query_type
+              when QueryType::BY_IP4_ADDR
+                NicInfo::display_ip( json_data, @config, data_tree )
+              when QueryType::BY_IP6_ADDR
+                NicInfo::display_ip( json_data, @config, data_tree )
+              when QueryType::BY_IP4_CIDR
+                NicInfo::display_ip( json_data, @config, data_tree )
+              when QueryType::BY_IP6_CIDR
+                NicInfo::display_ip( json_data, @config, data_tree )
+              when QueryType::BY_IP
+                NicInfo::display_ip( json_data, @config, data_tree )
+              when QueryType::BY_AS_NUMBER
+                NicInfo::display_autnum( json_data, @config, data_tree )
+              when "NicInfo::DsData"
+                NicInfo::display_ds_data( json_data, @config, data_tree )
+              when "NicInfo::KeyData"
+                NicInfo::display_key_data( json_data, @config, data_tree )
+              when QueryType::BY_DOMAIN
+                NicInfo::display_domain( json_data, @config, data_tree )
+              when QueryType::BY_NAMESERVER
+                NicInfo::display_ns( json_data, @config, data_tree )
+              when QueryType::BY_ENTITY_NAME
+                NicInfo::display_entity( json_data, @config, data_tree )
+            end
+            @config.save_as_yaml( NicInfo::LASTTREE_YAML, data_tree ) if !data_tree.empty?
+            show_helpful_messages json_data, data_tree
           end
-          @config.save_as_yaml( NicInfo::LASTTREE_YAML, data_tree ) if !data_tree.empty?
-          show_helpful_messages json_data, data_tree
         end
         @config.logger.end_run
       rescue SocketError => a
@@ -464,11 +472,11 @@ module NicInfo
 
     end
 
-    def handle_error_response res
-      if res["content-type"] == NicInfo::RDAP_CONTENT_TYPE
+    def handle_error_response (res)
+    if res["content-type"] == NicInfo::RDAP_CONTENT_TYPE
         json_data = JSON.load( res.body )
         inspect_rdap_compliance json_data
-        Notices.new.display_notices json_data, @config
+        Notices.new.display_notices json_data, @config, true
         ErrorCode.new.display_error_code json_data, @config
       end
     end
@@ -593,6 +601,8 @@ HELP_SUMMARY
           raise ArgumentError.new("Unable to find result for " + args[0]) unless path
         when QueryType::BY_ENTITY_NAME
           path << "entity/" << URI.escape( args[ 0 ] )
+        when QueryType::BY_SERVER_HELP
+          path << "help"
         else
           raise ArgumentError.new("Unable to create a resource URL for " + queryType)
       end

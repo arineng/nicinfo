@@ -40,11 +40,11 @@ module NicInfo
       return false
     end
 
-    def display_notices json_response, config
+    def display_notices json_response, config, ignore_excessive
 
       notices = json_response[ "notices" ]
       return if notices == nil
-      if (Notices::is_excessive_notice notices) && (config.logger.data_amount != NicInfo::DataAmount::EXTRA_DATA)
+      if (Notices::is_excessive_notice notices) && (config.logger.data_amount != NicInfo::DataAmount::EXTRA_DATA) && !ignore_excessive
         config.logger.start_data_item
         config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "Excessive Notices"
         config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "-----------------"
