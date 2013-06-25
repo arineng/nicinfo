@@ -332,6 +332,7 @@ module NicInfo
           @config.options.argv[ 0 ] = ip.reverse
           @config.logger.mesg( "Query value changed to " + @config.options.argv[ 0 ] )
           @config.options.query_type = QueryType::BY_DOMAIN
+          @config.options.externally_queriable = true
         elsif @config.options.query_type == QueryType::BY_RESULT
           data_tree = @config.load_as_yaml( NicInfo::LASTTREE_YAML )
           node = data_tree.find_node( @config.options.argv[ 0 ] )
@@ -340,13 +341,17 @@ module NicInfo
             @config.options.url = true
             if node.data_type
               @config.options.query_type = node.data_type
+              @config.options.externally_queriable = false
             elsif node.rest_ref
               @config.options.query_type = get_query_type_from_url( node.rest_ref )
+              @config.options.externally_queriable = true
             end
           else
             @config.logger.mesg( "#{@config.options.argv[0]} is not retrievable.")
             exit
           end
+        else
+          @config.options.externally_queriable = true
         end
         if (@config.options.query_type == nil)
           @config.logger.mesg("Unable to guess type of query. You must specify it.")
@@ -430,7 +435,7 @@ module NicInfo
               NicInfo::display_entity( json_data, @config, data_tree )
           end
           @config.save_as_yaml( NicInfo::LASTTREE_YAML, data_tree ) if !data_tree.empty?
-          show_helpful_messages rdap_url, data_tree
+          show_helpful_messages json_data, data_tree
         end
         @config.logger.end_run
       rescue SocketError => a
@@ -657,7 +662,7 @@ HELP_SUMMARY
       end if key_data_objs
     end
 
-    def show_helpful_messages rdap_url, data_tree
+    def show_helpful_messages json_data, data_tree
       arg = @config.options.argv[0]
       case @config.options.query_type
         when QueryType::BY_IP4_ADDR
@@ -678,7 +683,8 @@ HELP_SUMMARY
           end
         end
       end
-      @config.logger.mesg("Use \"nicinfo -u #{rdap_url}\" to directly query this resource in the future.")
+      self_link = NicInfo.get_self_link( NicInfo.get_links( json_data ) )
+      @config.logger.mesg("Use \"nicinfo -u #{self_link}\" to directly query this resource in the future.") if self_link and @config.options.externally_queriable
       @config.logger.mesg('Use "nicinfo -h" for help.')
     end
 
