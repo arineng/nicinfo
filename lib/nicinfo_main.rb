@@ -686,10 +686,10 @@ HELP_SUMMARY
         @config.logger.mesg("Use \"nicinfo 1=\" to show #{data_tree.roots.first}")
         if !data_tree.roots.first.empty?
           children = data_tree.roots.first.children
-          @config.logger.mesg("Use \"nicinfo 1.1=\" to show #{children.first}")
+          @config.logger.mesg("Use \"nicinfo 1.1=\" to show #{children.first}") if children.first.rest_ref
           if children.first != children.last
             len = children.length
-            @config.logger.mesg("Use \"nicinfo 1.#{len}=\" to show #{children.last}")
+            @config.logger.mesg("Use \"nicinfo 1.#{len}=\" to show #{children.last}") if children.last.rest_ref
           end
         end
       end
