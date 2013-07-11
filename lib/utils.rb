@@ -31,12 +31,18 @@ module NicInfo
 
   def NicInfo.get_ds_data_objs json_data
     secure_dns = NicInfo::get_secure_dns json_data
+    if secure_dns.instance_of? Array
+      secure_dns = secure_dns[ 0 ]
+    end
     return secure_dns[ "dsData" ] if secure_dns
     return nil
   end
 
   def NicInfo.get_key_data_objs json_data
     secure_dns = NicInfo::get_secure_dns json_data
+    if secure_dns.instance_of? Array
+      secure_dns = secure_dns[ 0 ]
+    end
     return secure_dns[ "keyData" ] if secure_dns
     return nil
   end

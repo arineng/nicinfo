@@ -137,6 +137,9 @@ module NicInfo
       @common.display_remarks @objectclass
       @common.display_links( get_cn, @objectclass )
       secure_dns = NicInfo::get_secure_dns( @objectclass )
+      if secure_dns.instance_of? Array
+        secure_dns = secure_dns[ 0 ]
+      end
       if secure_dns
         @config.logger.terse "Zone Signed", secure_dns[ "zoneSigned" ]
         @config.logger.terse "Delegation Signed", secure_dns[ "delegationSigned" ]
