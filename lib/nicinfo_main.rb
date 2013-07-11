@@ -624,6 +624,8 @@ HELP_SUMMARY
           queryType = QueryType::BY_DOMAIN
         when /.*\/entity\/.*/
           queryType = QueryType::BY_ENTITY_NAME
+        when /.*\/help.*/
+          queryType = QueryType::BY_SERVER_HELP
         else
           raise ArgumentError.new( "Unable to determine query type from url '#{url}'" )
       end
