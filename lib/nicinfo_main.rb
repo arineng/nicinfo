@@ -468,6 +468,16 @@ module NicInfo
             handle_error_response e.response
         end
         @config.logger.trace("Server response code was " + e.response.code)
+      rescue Net::HTTPFatalError => e
+        case e.response.code
+          when "500"
+            @config.logger.mesg("RDAP server is reporting an internal error.")
+            handle_error_response e.response
+          else
+            @config.logger.mesg("Error #{e.response.code}.")
+            handle_error_response e.response
+        end
+        @config.logger.trace("Server response code was " + e.response.code)
       end
 
     end
