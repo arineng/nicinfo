@@ -64,6 +64,7 @@ module NicInfo
   end
 
   def NicInfo.get_descriptions description
+    return if !description
     return description[ "description" ]
   end
 
