@@ -105,9 +105,10 @@ module NicInfo
         #  raise OptionParser::InvalidArgument, substring.to_s unless substring =~ /yes|no|true|false/i
         #end
 
-        opts.on("-b", "--base URL",
-                "The base URL of the RDAP Service.") do |url|
-          @config.options.base_url = url
+        opts.on("-b", "--base (or bootstrap) URL",
+                "The base URL of the RDAP Service.",
+                "When set, the internal bootstrap is bypassed.") do |url|
+          @config.config[ NicInfo::BOOTSTRAP][ NicInfo::BOOTSTRAP_URL ] = url
         end
 
         opts.on("-u", "--url",
@@ -364,7 +365,7 @@ module NicInfo
         end
       end
 
-      if @config.options.base_url == nil && !@config.options.url
+      if @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] == nil && !@config.options.url
         bootstrap = Bootstrap.new( @config )
         qtype = @config.options.query_type
         if qtype == QueryType::BY_SERVER_HELP
@@ -372,21 +373,21 @@ module NicInfo
         end
         case qtype
           when QueryType::BY_IP4_ADDR
-            @config.options.base_url = bootstrap.find_rir_url_by_ip( @config.options.argv[ 0 ] )
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_rir_url_by_ip( @config.options.argv[ 0 ] )
           when QueryType::BY_IP6_ADDR
-            @config.options.base_url = bootstrap.find_rir_url_by_ip( @config.options.argv[ 0 ] )
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_rir_url_by_ip( @config.options.argv[ 0 ] )
           when QueryType::BY_IP4_CIDR
-            @config.options.base_url = bootstrap.find_rir_url_by_ip( @config.options.argv[ 0 ] )
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_rir_url_by_ip( @config.options.argv[ 0 ] )
           when QueryType::BY_IP6_CIDR
-            @config.options.base_url = bootstrap.find_rir_url_by_ip( @config.options.argv[ 0 ] )
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_rir_url_by_ip( @config.options.argv[ 0 ] )
           when QueryType::BY_AS_NUMBER
-            @config.options.base_url = bootstrap.find_rir_url_by_as( @config.options.argv[ 0 ] )
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_rir_url_by_as( @config.options.argv[ 0 ] )
           when QueryType::BY_DOMAIN
-            @config.options.base_url = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
           when QueryType::BY_NAMESERVER
-            @config.options.base_url = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
           when QueryType::BY_ENTITY_NAME
-            @config.options.base_url = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::ENTITY_ROOT_URL ]
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::ENTITY_ROOT_URL ]
         end
       end
 
@@ -394,7 +395,7 @@ module NicInfo
         rdap_url = nil
         if !@config.options.url
           path = create_resource_url(@config.options.argv, @config.options.query_type)
-          rdap_url = make_rdap_url( @config.options.base_url, path )
+          rdap_url = make_rdap_url( @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ], path )
         else
           rdap_url = @config.options.argv[ 0 ]
         end

@@ -61,6 +61,7 @@ module NicInfo
   USE_CACHE = "use_cache"
   CLEAN_CACHE = "clean_cache"
   BOOTSTRAP = "bootstrap"
+  BOOTSTRAP_URL = "bootstrap_url"
   ENTITY_ROOT_URL = "entity_root_url"
   IP_ROOT_URL = "ip_root_url"
   AS_ROOT_URL = "as_root_url"

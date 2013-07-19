@@ -212,6 +212,8 @@ cache:
 
 bootstrap:
 
+  #base_url: http://projects.arin.net/rdapbootstrap
+
   entity_root_url: http://whois.arin.net
 
   ip_root_url: http://whois.arin.net
