@@ -331,7 +331,8 @@ module NicInfo
         if (@config.options.query_type == QueryType::BY_IP4_ADDR ||
               @config.options.query_type == QueryType::BY_IP6_ADDR ) && @config.options.reverse_ip == true
           ip = IPAddr.new( @config.options.argv[ 0 ] )
-          @config.options.argv[ 0 ] = ip.reverse
+          @config.options.argv[ 0 ] = ip.reverse.split( "\." )[ 1..-1 ].join( "." ) if ip.ipv4?
+          @config.options.argv[ 0 ] = ip.reverse.split( "\." )[ 24..-1 ].join( "." ) if ip.ipv6?
           @config.logger.mesg( "Query value changed to " + @config.options.argv[ 0 ] )
           @config.options.query_type = QueryType::BY_DOMAIN
           @config.options.externally_queriable = true
