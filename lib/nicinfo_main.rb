@@ -251,10 +251,10 @@ module NicInfo
       if (data == nil)
 
         @config.logger.trace("Issuing GET for " + url)
-        req = Net::HTTP::Get.new(url)
+        uri = URI.parse(url)
+        req = Net::HTTP::Get.new(uri.request_uri)
         req["User-Agent"] = NicInfo::VERSION
         req["Accept"] = NicInfo::RDAP_CONTENT_TYPE
-        uri = URI.parse(url)
         res = Net::HTTP.start(uri.host, uri.port) do |http|
           http.request(req)
         end
