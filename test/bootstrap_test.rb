@@ -80,7 +80,7 @@ class BootStrapTest < Test::Unit::TestCase
     assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::RIPE_URL ], bootstrap.find_rir_url_by_ip( "212.0.0.1" ) )
     assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::LACNIC_URL ], bootstrap.find_rir_url_by_ip( "200.0.0.1" ) )
     assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::AFRINIC_URL ], bootstrap.find_rir_url_by_ip( "102.0.0.1" ) )
-    assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::IP_ROOT_URL ], bootstrap.find_rir_url_by_ip( "128.0.0.1" ) )
+    assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::ARIN_URL ], bootstrap.find_rir_url_by_ip( "128.0.0.1" ) )
     assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::APNIC_URL ], bootstrap.find_rir_url_by_ip( "133.0.0.1" ) )
     assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::RIPE_URL ], bootstrap.find_rir_url_by_ip( "151.0.0.1" ) )
     assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::LACNIC_URL ], bootstrap.find_rir_url_by_ip( "191.0.0.1" ) )

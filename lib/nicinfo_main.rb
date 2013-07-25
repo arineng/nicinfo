@@ -225,6 +225,12 @@ module NicInfo
           @config.options.require_query = false
         end
 
+        opts.on( "--reset",
+                 "Reset configuration to defaults" ) do
+          @config.options.reset_config = true
+          @config.options.require_query = false
+        end
+
       end
 
       begin

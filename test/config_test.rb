@@ -45,7 +45,7 @@ class ConfigTest < Test::Unit::TestCase
     assert_equal( "NORMAL", c.config[ "output" ][ "data" ] )
     assert_nil( c.config[ NicInfo::OUTPUT ][ NicInfo::MESSAGES_FILE ] )
     assert_nil( c.config[ NicInfo::OUTPUT ][ NicInfo::DATA_FILE ] )
-    assert_equal( "http://whois.arin.net", c.config[ NicInfo::BOOTSTRAP ][ NicInfo::IP_ROOT_URL ] )
+    assert_equal( "http://rdappilot.arin.net/rdapbootstrap", c.config[ NicInfo::BOOTSTRAP ][ NicInfo::IP_ROOT_URL ] )
 
     assert_equal( "NORMAL", c.logger.data_amount )
     assert_equal( "SOME", c.logger.message_level )
@@ -63,7 +63,7 @@ output:
   data: TERSE
   #data_file: /tmp/NicInfo.data
 bootstrap:
-  ip_root_url: http://whois.test.arin.net
+  ip_root_url: http://rdappilot.arin.net/rdapbootstrap
 NOT_DEFAULT_CONFIG
     f = File.open( File.join( dir, "config.yaml" ), "w" )
     f.puts( not_default_config )
@@ -74,7 +74,7 @@ NOT_DEFAULT_CONFIG
     assert_equal( "TERSE", c.config[ NicInfo::OUTPUT ][ NicInfo::DATA ] )
     assert_nil( c.config[ NicInfo::OUTPUT ][ NicInfo::MESSAGES_FILE ] )
     assert_nil( c.config[ NicInfo::OUTPUT ][ NicInfo::DATA_FILE ] )
-    assert_equal( "http://whois.test.arin.net", c.config[ NicInfo::BOOTSTRAP ][ NicInfo::IP_ROOT_URL ] )
+    assert_equal( "http://rdappilot.arin.net/rdapbootstrap", c.config[ NicInfo::BOOTSTRAP ][ NicInfo::IP_ROOT_URL ] )
 
     assert_equal( "TERSE", c.logger.data_amount )
     assert_equal( "NONE", c.logger.message_level )

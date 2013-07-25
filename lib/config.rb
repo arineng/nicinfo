@@ -60,11 +60,16 @@ module NicInfo
         @rdap_cache_dir = File.join( @app_data, "rdap_cache" )
         Dir.mkdir( @rdap_cache_dir )
 
-        @tickets_dir = File.join( @app_data, "tickets" )
-        Dir.mkdir( @tickets_dir )
-
       else
 
+        if @options.reset_config
+          config_file_name = Config.formulate_config_file_name( @app_data )
+          @logger.trace "Resetting configuration in " + config_file_name
+          f = File.open( config_file_name, "w" )
+          f.puts @@yaml_config
+          f.close
+          @config = YAML.load( File.open( config_file_name ) )
+        end
         @logger.trace "Using configuration found in " + @app_data
         @rdap_cache_dir = File.join( @app_data, "rdap_cache" )
 
@@ -212,25 +217,25 @@ cache:
 
 bootstrap:
 
-  #base_url: http://projects.arin.net/rdapbootstrap
+  #base_url: http://rdappilot.arin.net/rdapbootstrap
 
-  entity_root_url: http://whois.arin.net
+  entity_root_url: http://rdappilot.arin.net/rdapbootstrap
 
-  ip_root_url: http://whois.arin.net
+  ip_root_url: http://rdappilot.arin.net/rdapbootstrap
 
-  as_root_url: http://whois.arin.net
+  as_root_url: http://rdappilot.arin.net/rdapbootstrap
 
-  domain_root_url: http://whois.arin.net
+  domain_root_url: http://rdappilot.arin.net/rdapbootstrap
 
-  ns_root_url: http://whois.arin.net
+  ns_root_url: http://rdappilot.arin.net/rdapbootstrap
 
-  arin_url: http://whois.arin.net
+  arin_url: http://rdappilot.arin.net/restfulwhois/rdap
 
   ripe_url: http://whois.ripe.net
 
   lacnic_url: http://restfulwhoisv2.labs.lacnic.net/rdap
 
-  apnic_url: http://whois.apnic.net
+  apnic_url: http://testwhois.apnic.net
 
   afrinic_url: http://whois.afrinic.net
 
