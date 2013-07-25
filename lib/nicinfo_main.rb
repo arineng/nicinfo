@@ -72,6 +72,7 @@ module NicInfo
       @opts = OptionParser.new do |opts|
 
         opts.banner = "Usage: nicinfo [options] QUERY_VALUE"
+        opts.version = NicInfo::VERSION
 
         opts.separator ""
         opts.separator "Query Options:"
@@ -207,7 +208,7 @@ module NicInfo
           @config.options.output_json = true
         end
 
-        opts.on( "--value VALUE",
+        opts.on( "--jv VALUE",
                  "Outputs a specific JSON value." ) do |value|
           if !@config.options.json_values
             @config.options.json_values = Array.new
