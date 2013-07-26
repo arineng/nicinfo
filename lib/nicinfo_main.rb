@@ -92,6 +92,7 @@ module NicInfo
           uptype = type.upcase
           raise OptionParser::InvalidArgument, type.to_s unless QueryType.has_value?(uptype)
           @config.options.query_type = uptype
+          @config.options.require_query = false if uptype == "HELP"
         end
 
         opts.on("-r", "--reverse",
@@ -326,7 +327,7 @@ module NicInfo
         @config.options.query_type = get_query_type_from_url( @config.options.argv[ 0 ] )
       end
 
-      if @config.options.argv == nil || @config.options.argv == []
+      if @config.options.argv == nil || @config.options.argv == [] && !@config.options.query_type
         if @config.options.require_query == false
           exit
         else
