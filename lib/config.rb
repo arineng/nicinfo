@@ -231,7 +231,7 @@ bootstrap:
 
   arin_url: http://rdappilot.arin.net/restfulwhois/rdap
 
-  ripe_url: http://whois.ripe.net
+  ripe_url: http://rdap.db.ripe.net/rdap/
 
   lacnic_url: http://restfulwhoisv2.labs.lacnic.net/rdap
 
