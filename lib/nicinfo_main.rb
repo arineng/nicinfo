@@ -377,6 +377,9 @@ module NicInfo
       if @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] == nil && !@config.options.url
         bootstrap = Bootstrap.new( @config )
         qtype = @config.options.query_type
+        if qtype == QueryType::BY_SERVER_HELP
+          qtype = guess_query_value_type( @config.options.argv )
+        end
         case qtype
           when QueryType::BY_IP4_ADDR
             @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_rir_url_by_ip( @config.options.argv[ 0 ] )
@@ -394,7 +397,7 @@ module NicInfo
             @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
           when QueryType::BY_ENTITY_NAME
             @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::ENTITY_ROOT_URL ]
-          when QueryType::BY_SERVER_HELP
+          else
             @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::HELP_ROOT_URL ]
         end
       end
