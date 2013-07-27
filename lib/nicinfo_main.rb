@@ -262,7 +262,7 @@ module NicInfo
         uri = URI.parse(url)
         req = Net::HTTP::Get.new(uri.request_uri)
         req["User-Agent"] = NicInfo::VERSION
-        req["Accept"] = NicInfo::JSON_CONTENT_TYPE + ", " + NicInfo::RDAP_CONTENT_TYPE
+        req["Accept"] = NicInfo::RDAP_CONTENT_TYPE + ", " + NicInfo::JSON_CONTENT_TYPE
         res = Net::HTTP.start(uri.host, uri.port) do |http|
           http.request(req)
         end
