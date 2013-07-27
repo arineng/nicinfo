@@ -410,7 +410,7 @@ module NicInfo
         else
           rdap_url = @config.options.argv[ 0 ]
         end
-        data = get( rdap_url, 0 )
+        data = get( URI::encode( rdap_url ), 0 )
         json_data = JSON.load data
         if (ec = json_data[ NicInfo::NICINFO_DEMO_ERROR ]) != nil
           res = MyHTTPResponse.new( "1.1", ec, "Demo Exception" )
