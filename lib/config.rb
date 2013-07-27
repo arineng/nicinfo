@@ -217,7 +217,10 @@ cache:
 
 bootstrap:
 
+  # The base or bootstrap URL. Specifying this will bypass all built-in bootstrapping.
   #base_url: http://rdappilot.arin.net/rdapbootstrap
+
+  help_root_url: http://rdappilot.arin.net/rdapbootstrap
 
   entity_root_url: http://rdappilot.arin.net/rdapbootstrap
 
