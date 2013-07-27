@@ -239,7 +239,7 @@ bootstrap:
 
   afrinic_url: http://whois.afrinic.net
 
-  com_url: http://whois.verisign.net
+  com_url: http://tlab.verisign.com/COM
 
   net_url: http://whois.verisign.net
 
