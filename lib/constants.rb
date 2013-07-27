@@ -88,6 +88,7 @@ module NicInfo
 
   # Other constants
   RDAP_CONTENT_TYPE = "application/rdap+json"
+  JSON_CONTENT_TYPE = "application/json"
 
   DNSSEC_ALGORITHMS = {
        0 =>  "reserved",

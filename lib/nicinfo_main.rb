@@ -262,14 +262,14 @@ module NicInfo
         uri = URI.parse(url)
         req = Net::HTTP::Get.new(uri.request_uri)
         req["User-Agent"] = NicInfo::VERSION
-        req["Accept"] = NicInfo::RDAP_CONTENT_TYPE
+        req["Accept"] = NicInfo::JSON_CONTENT_TYPE + ", " + NicInfo::RDAP_CONTENT_TYPE
         res = Net::HTTP.start(uri.host, uri.port) do |http|
           http.request(req)
         end
 
         case res
           when Net::HTTPSuccess
-            if res["content-type"] != NicInfo::RDAP_CONTENT_TYPE
+            if !(res["content-type"].include?(NicInfo::RDAP_CONTENT_TYPE) or res["content-type"].include?(NicInfo::JSON_CONTENT_TYPE))
               raise Net::HTTPServerException.new( "Bad Content Type", res )
             end
             data = res.body
