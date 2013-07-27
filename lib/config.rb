@@ -236,7 +236,7 @@ bootstrap:
 
   ripe_url: http://rdap.db.ripe.net/rdap/
 
-  lacnic_url: http://restfulwhoisv2.labs.lacnic.net/rdap
+  lacnic_url: http://rdap.labs.lacnic.net/rdap
 
   apnic_url: http://testwhois.apnic.net
 
@@ -244,7 +244,7 @@ bootstrap:
 
   com_url: http://tlab.verisign.com/COM
 
-  net_url: http://whois.verisign.net
+  net_url: http://tlab.verisign.com/COM
 
   org_url: http://whois.pir.org
 
@@ -253,6 +253,8 @@ bootstrap:
   biz_url: http://whois.neustar.biz
 
   cn_url: http://rdap.restfulwhois.org
+
+  name_url: http://tlab.verisign.com/NAME
 
 search:
 
