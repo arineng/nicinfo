@@ -147,6 +147,29 @@ module NicInfo
       return retval
     end
 
+    def find_url_by_entity_suffix entity_name
+      retval = nil
+      case entity_name
+        when NicInfo::ARIN_REGEX
+          retval = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::ARIN_URL ]
+        when NicInfo::APNIC_REGEX
+          retval = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::APNIC_URL ]
+        when NicInfo::AFRINIC_REGEX
+          retval = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::AFRINIC_URL ]
+        when NicInfo::LACNIC_REGEX
+          retval = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::LACNIC_URL ]
+        when NicInfo::RIPE_REGEX
+          retval = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::RIPE_URL ]
+        else
+          tld = entity_name.downcase.split( '-' ).last
+          if tld
+            retval = @config.config[ NicInfo::BOOTSTRAP ][ tld + "_url" ]
+            retval = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::DOMAIN_ROOT_URL ] if retval == nil
+          end
+      end
+      return retval
+    end
+
   end
 
 end

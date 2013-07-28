@@ -576,6 +576,16 @@ HELP_SUMMARY
             retval = QueryType::BY_NAMESERVER
           when NicInfo::DOMAIN_REGEX
             retval = QueryType::BY_DOMAIN
+          when NicInfo::ARIN_REGEX
+            retval = QueryType::BY_ENTITY_NAME
+          when NicInfo::APNIC_REGEX
+            retval = QueryType::BY_ENTITY_NAME
+          when NicInfo::AFRINIC_REGEX
+            retval = QueryType::BY_ENTITY_NAME
+          when NicInfo::LACNIC_REGEX
+            retval = QueryType::BY_ENTITY_NAME
+          when NicInfo::RIPE_REGEX
+            retval = QueryType::BY_ENTITY_NAME
           else
             if NicInfo::is_last_name(args[0].upcase)
               retval = QueryType::BY_ENTITY_NAME

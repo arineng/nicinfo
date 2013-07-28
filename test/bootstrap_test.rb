@@ -141,4 +141,21 @@ class BootStrapTest < Test::Unit::TestCase
     assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::DOMAIN_ROOT_URL ], bootstrap.find_url_by_domain( "www.exmaple.museuum") )
   end
 
+  def test_find_url_by_entity_suffix
+    dir = File.join( @work_dir, "test_find_url_by_entity_suffix" )
+    c = NicInfo::Config.new( dir )
+    c.logger.message_level = "NONE"
+    c.setup_workspace
+    bootstrap = NicInfo::Bootstrap.new c
+    assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::ARIN_URL ], bootstrap.find_url_by_entity_suffix( "XXX-ARIN") )
+    assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::ARIN_URL ], bootstrap.find_url_by_entity_suffix( "xxx-arin") )
+    assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::AFRINIC_URL ], bootstrap.find_url_by_entity_suffix( "xxx-afrinic") )
+    assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::APNIC_URL ], bootstrap.find_url_by_entity_suffix( "xxx-ap") )
+    assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::LACNIC_URL ], bootstrap.find_url_by_entity_suffix( "xxx-lacnic") )
+    assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::RIPE_URL ], bootstrap.find_url_by_entity_suffix( "xxx-ripe") )
+    assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::RIPE_URL ], bootstrap.find_url_by_entity_suffix( "xxx-ripe") )
+    assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::COM_URL ], bootstrap.find_url_by_entity_suffix( "xxx-com") )
+    assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::BIZ_URL ], bootstrap.find_url_by_entity_suffix( "xxx-biz") )
+    assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::DOMAIN_ROOT_URL ], bootstrap.find_url_by_entity_suffix( "xxx-museum") )
+  end
 end

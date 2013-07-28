@@ -31,6 +31,11 @@ module NicInfo
   DATA_TREE_ADDR_REGEX = /\d=$/
   DOMAIN_REGEX = /^([\S\-]+\.?)+\.([a-z][a-z0\-]+)\.?$/i
   NS_REGEX = /^ns[0-9]\.([\S\-]+\.?)+\.([a-z][a-z0\-]+)\.?$/i
+  ARIN_REGEX = /\-ARIN$/i
+  APNIC_REGEX = /\-AP$/i
+  LACNIC_REGEX = /\-LACNIC/i
+  AFRINIC_REGEX = /\-AFRINIC/i
+  RIPE_REGEX = /\-RIPE/i
 
   # IPv4 and IPv6 regular expressions are credited to Mike Poulson and are found here:
   #   http://blogs.msdn.com/b/mpoulson/archive/2005/01/10/350037.aspx
