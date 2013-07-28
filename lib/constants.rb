@@ -29,8 +29,8 @@ module NicInfo
   IP4_ARPA = /\.in-addr\.arpa[\.]?/i
   IP6_ARPA = /\.ip6\.arpa[\.]?/i
   DATA_TREE_ADDR_REGEX = /\d=$/
-  DOMAIN_REGEX = /^([a-z0-9\-]+\.?)+\.([a-z][a-z0\-]+)\.?$/i
-  NS_REGEX = /^ns[0-9]\.([a-z0-9\-]+\.?)+\.([a-z][a-z0\-]+)\.?$/i
+  DOMAIN_REGEX = /^([\S\-]+\.?)+\.([a-z][a-z0\-]+)\.?$/i
+  NS_REGEX = /^ns[0-9]\.([\S\-]+\.?)+\.([a-z][a-z0\-]+)\.?$/i
 
   # IPv4 and IPv6 regular expressions are credited to Mike Poulson and are found here:
   #   http://blogs.msdn.com/b/mpoulson/archive/2005/01/10/350037.aspx

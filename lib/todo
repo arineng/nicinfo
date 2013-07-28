@@ -1,0 +1,2 @@
+1. fix bug with --type domain being required or unicode domains
+2. fix bug with 1.193.in-addr.arpa
