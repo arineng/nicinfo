@@ -521,18 +521,23 @@ module NicInfo
       puts NicInfo::COPYRIGHT
       puts <<HELP_SUMMARY
 
-NicInfo is a Registry Data Access Protocol (RDAP) client capable of querying RDAP
-servers containing IP address, Autonomous System, and Domain name information.
+SYNOPSIS
+  nicinfo [OPTIONS] QUERY_VALUE
 
-The general usage is "nicinfo QUERY_VALUE" where the type of QUERY_VALUE influences the
-type of query performed. This program will attempt to guess the type of QUERY_VALUE,
-but the QUERY_VALUE type maybe explicitly set using the -t option.
+SUMMARY
+  NicInfo is a Registry Data Access Protocol (RDAP) client capable of querying RDAP
+  servers containing IP address, Autonomous System, and Domain name information.
 
-Given the type of query to perform, this program will attempt to use the most appropriate
-RDAP server it can determine, and follow referrals from that server if necessary.
+  The general usage is "nicinfo QUERY_VALUE" where the type of QUERY_VALUE influences the
+  type of query performed. This program will attempt to guess the type of QUERY_VALUE,
+  but the QUERY_VALUE type maybe explicitly set using the -t option.
+
+  Given the type of query to perform, this program will attempt to use the most appropriate
+  RDAP server it can determine, and follow referrals from that server if necessary.
 
 HELP_SUMMARY
       puts @opts.help
+      puts EXTENDED_HELP
       exit
 
     end
@@ -739,5 +744,28 @@ HELP_SUMMARY
     attr_accessor :body
   end
 
+  EXTENDED_HELP = <<EXTENDED_HELP
+
+USAGE FOR SCRIPTING
+  For usage with shell scripting, there are a couple of useful command line switches.
+
+  The --json option suppresses the human-readable output and instead emits the JSON
+  returned by the server. When not writing to an output file, this options should be
+  used with the -Q option to suppress the pager and program runtime messages so that
+  the JSON maybe run through a JSON parser.
+
+  The --jv option instructs this program to parse the JSON and emit specific JSON
+  values.  This option is also useful in combination with the -Q option to feed the
+  JSON values into other programs.  The syntax for specifying a JSON value is a
+  list of JSON object member names or integers signifying JSON array indexes separated
+  by a period, such as name1.name2.3.name4.5. For example, "entities.0.handle" would
+  be useful for getting at the "handle" value from the following JSON:
+
+    { "entities" : [ { "handle": "foo" } ] }
+
+  Multiple --jv options may be specified.
+EXTENDED_HELP
+
 end
+
 
