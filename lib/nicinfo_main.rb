@@ -211,7 +211,7 @@ module NicInfo
 
         opts.on( "--jv VALUE",
                  "Outputs a specific JSON value." ) do |value|
-          if !@config.options.json_values
+          unless @config.options.json_values
             @config.options.json_values = Array.new
           end
           @config.options.json_values << value
@@ -246,7 +246,7 @@ module NicInfo
     end
 
     def make_rdap_url( base_url, resource_path )
-      if !(base_url.end_with?( "/" ))
+      unless base_url.end_with?("/")
         base_url << "/"
       end
       base_url << resource_path
@@ -256,7 +256,7 @@ module NicInfo
     def get url, try
 
       data = @cache.get(url)
-      if (data == nil)
+      if data == nil
 
         @config.logger.trace("Issuing GET for " + url)
         uri = URI.parse(url)
@@ -320,7 +320,7 @@ module NicInfo
         end
       end
 
-      if(@config.options.help)
+      if @config.options.help
         help()
       end
 
@@ -329,14 +329,14 @@ module NicInfo
       end
 
       if @config.options.argv == nil || @config.options.argv == [] && !@config.options.query_type
-        if @config.options.require_query == false
+        unless @config.options.require_query
           exit
         else
           help
         end
       end
 
-      if (@config.options.query_type == nil)
+      if @config.options.query_type == nil
         @config.options.query_type = guess_query_value_type(@config.options.argv)
         if (@config.options.query_type == QueryType::BY_IP4_ADDR ||
               @config.options.query_type == QueryType::BY_IP6_ADDR ) && @config.options.reverse_ip == true
@@ -366,7 +366,7 @@ module NicInfo
         else
           @config.options.externally_queriable = true
         end
-        if (@config.options.query_type == nil)
+        if @config.options.query_type == nil
           @config.logger.mesg("Unable to guess type of query. You must specify it.")
           exit
         else
@@ -404,11 +404,11 @@ module NicInfo
 
       begin
         rdap_url = nil
-        if !@config.options.url
+        unless @config.options.url
           path = create_resource_url(@config.options.argv, @config.options.query_type)
-          rdap_url = make_rdap_url( @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ], path )
+          rdap_url = make_rdap_url(@config.config[NicInfo::BOOTSTRAP][NicInfo::BOOTSTRAP_URL], path)
         else
-          rdap_url = @config.options.argv[ 0 ]
+          rdap_url = @config.options.argv[0]
         end
         data = get( URI::encode( rdap_url ), 0 )
         json_data = JSON.load data
@@ -548,7 +548,7 @@ HELP_SUMMARY
     def guess_query_value_type(args)
       retval = nil
 
-      if (args.length() == 1)
+      if args.length() == 1
 
         case args[0]
           when NicInfo::IPV4_REGEX
@@ -597,13 +597,13 @@ HELP_SUMMARY
             end
         end
 
-      elsif (args.length() == 2)
+      elsif args.length() == 2
 
         if NicInfo::is_last_name(args[1].upcase) && (NicInfo::is_male_name(args[0].upcase) || NicInfo::is_female_name(args[0].upcase))
           retval = QueryType::BY_ENTITY_NAME
         end
 
-      elsif (args.length() == 3)
+      elsif args.length() == 3
 
         if NicInfo::is_last_name(args[2].upcase) && (NicInfo::is_male_name(args[0].upcase) || NicInfo::is_female_name(args[0].upcase))
           retval = QueryType::BY_ENTITY_NAME
@@ -722,9 +722,9 @@ HELP_SUMMARY
         when QueryType::BY_AS_NUMBER
           @config.logger.mesg("Use \"nicinfo #{arg}\" or \"nicinfo as#{arg}\" for autnums.");
       end
-      if !data_tree.empty?
+      unless data_tree.empty?
         @config.logger.mesg("Use \"nicinfo 1=\" to show #{data_tree.roots.first}")
-        if !data_tree.roots.first.empty?
+        unless data_tree.roots.first.empty?
           children = data_tree.roots.first.children
           @config.logger.mesg("Use \"nicinfo 1.1=\" to show #{children.first}") if children.first.rest_ref
           if children.first != children.last
