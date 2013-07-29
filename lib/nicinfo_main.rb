@@ -745,6 +745,46 @@ HELP_SUMMARY
   end
 
   EXTENDED_HELP = <<EXTENDED_HELP
+CONFIGURATION
+  When this program is run for the first time, it creates a directory called .NicInfo
+  (on Unix style platforms) or NicInfo (on Windows) in the users home directory. The
+  home directory is determined by the $HOME environment variable on Unix style platforms
+  and $APPDATA on Windows.
+
+  A configuration file is created in this directory called config.yaml. This is a YAML
+  file and contains a means for specifying most of the features of this program (instead
+  of needing to specify them on the command line as options). To set the configuration
+  back to the installation defaults, use the --reset option. This maybe desirable when
+  updating versions of this program.
+
+  A directory called rdap_cache is also created inside this directory. It holds cached
+  values from previously executed queries.
+
+CACHING
+  This program will write query responses to a cache. By default, answers are pulled
+  from the cache if present. This can be turned on or off with the --cache option or
+  using the cache/use_cache value in the configuration file.
+
+  Expiration of items in the cache and eviction of items from the cache can also be
+  controlled. The cache can be manually emptied using the --empty-cache option.
+
+BOOTSTRAPPING
+  Bootstrapping is the process of finding an appropriate RDAP server in which to send
+  queries. This program has a three tier bootstrapping process.
+
+  The first tier looks up the most appropriate server using internal tables compiled
+  from IANA registries. If an appropriate server cannot be found, bootstrapping falls
+  to the second tier.
+
+  The second tier has a default server for each type of RDAP query (domain, ip, autnum,
+  nameserver, and entity). If this program cannot determine the type of query, bootstrapping
+  falls to the third tier.
+
+  The third tier is a default server for all queries.
+
+  All bootstrap URLs are specified in the configuration file. Bootstrapping maybe
+  bypassed using the -b or --base option (or by setting the bootstrap/base_url in the
+  configuration file).
 
 USAGE FOR SCRIPTING
   For usage with shell scripting, there are a couple of useful command line switches.
@@ -764,6 +804,15 @@ USAGE FOR SCRIPTING
     { "entities" : [ { "handle": "foo" } ] }
 
   Multiple --jv options may be specified.
+
+DEMONSTRATION QUERIES
+  There are several built-in demonstration queries that may be exercised to show the
+  utility of RDAP. To use these queries, the --demo option must be used to populate
+  the query answers into the cache. If the cache is already populated with items, it
+  may be necessary to clean the cache using the --empty-cache option.
+
+  When the --demo option is given, the list of demonstration queries will be printed
+  out.
 EXTENDED_HELP
 
 end
