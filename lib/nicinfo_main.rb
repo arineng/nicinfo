@@ -496,7 +496,7 @@ module NicInfo
     end
 
     def handle_error_response (res)
-    if res["content-type"] == NicInfo::RDAP_CONTENT_TYPE
+    if res["content-type"] == NicInfo::RDAP_CONTENT_TYPE && res.body && res.body.to_s.size > 0
         json_data = JSON.load( res.body )
         inspect_rdap_compliance json_data
         Notices.new.display_notices json_data, @config, true
