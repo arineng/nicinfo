@@ -15,6 +15,7 @@
 
 require 'optparse'
 require 'net/http'
+require 'net/https'
 require 'uri'
 require 'config'
 require 'constants'
@@ -259,12 +260,18 @@ module NicInfo
       if data == nil
 
         @config.logger.trace("Issuing GET for " + url)
-        uri = URI.parse(url)
+        uri = URI.parse( URI::encode( url ) )
         req = Net::HTTP::Get.new(uri.request_uri)
         req["User-Agent"] = NicInfo::VERSION
         req["Accept"] = NicInfo::RDAP_CONTENT_TYPE + ", " + NicInfo::JSON_CONTENT_TYPE
-        res = Net::HTTP.start(uri.host, uri.port) do |http|
-          http.request(req)
+        req["Connection"] = "close"
+        http = Net::HTTP.new( uri.host, uri.port )
+        if uri.scheme == "https"
+          http.use_ssl=true
+          http.verify_mode=OpenSSL::SSL::VERIFY_NONE
+        end
+        res = http.start do |http_req|
+          http_req.request(req)
         end
 
         case res
@@ -410,7 +417,7 @@ module NicInfo
         else
           rdap_url = @config.options.argv[0]
         end
-        data = get( URI::encode( rdap_url ), 0 )
+        data = get( rdap_url, 0 )
         json_data = JSON.load data
         if (ec = json_data[ NicInfo::NICINFO_DEMO_ERROR ]) != nil
           res = MyHTTPResponse.new( "1.1", ec, "Demo Exception" )
