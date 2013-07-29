@@ -1,5 +1,5 @@
 {
-    "nicInfo_demoUrl":"http://whois.arin.net/autnum/10",
+    "nicInfo_demoUrl":"http://rdappilot.arin.net/restfulwhois/rdap/autnum/10",
     "nicInfo_demoHint":"nicinfo as10",
     "rdapConformance":[
         "rdap_level_0"
@@ -44,9 +44,9 @@
     ],
     "links":[
         {
-            "value":"http://example.net/autnum/xxxx",
+            "value":"http://rdappilot.arin.net/restfulwhois/rdap/autnum/10",
             "rel":"self",
-            "href":"http://example.net/autnum/xxxx"
+            "href":"http://rdappilot.arin.net/restfulwhois/rdap/autnum/10"
         }
     ],
     "events":[

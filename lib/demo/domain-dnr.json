@@ -1,5 +1,5 @@
 {
-    "nicInfo_demoUrl":"http://whois.arin.net/domain/xn--fo-5ja.example",
+    "nicInfo_demoUrl":"http://rdappilot.arin.net/rdapbootstrap/domain/xn--fo-5ja.example",
     "nicInfo_demoHint":"nicinfo xn--fo-5ja.example",
     "rdapConformance":[
         "rdap_level_0"
@@ -499,9 +499,9 @@
     ],
     "links":[
         {
-            "value":"http://whois.arin.net/domain/xn--fo-5ja.example",
+            "value":"http://rdappilot.arin.net/rdapbootstrap/domain/xn--fo-5ja.example",
             "rel":"self",
-            "href":"http://whois.arin.net/domain/xn--fo-5ja.example"
+            "href":"http://rdappilot.arin.net/rdapbootstrap/domain/xn--fo-5ja.example"
         }
     ],
     "port43":"whois.example.net",

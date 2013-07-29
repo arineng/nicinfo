@@ -1,5 +1,5 @@
 {
-    "nicInfo_demoUrl":"http://whois.apnic.net/ip/2001:db8::0",
+    "nicInfo_demoUrl":"http://testwhois.apnic.net/ip/2001:db8::0",
     "nicInfo_demoHint":"nicinfo 2001:db8::0",
     "rdapConformance":[
         "rdap_level_0"
@@ -47,9 +47,9 @@
     ],
     "links":[
         {
-            "value":"http://example.ent/ip/2001:db8::/48",
+            "value":"http://testwhois.apnic.net/ip/2001:db8::0",
             "rel":"self",
-            "href":"http://example.net/ip/2001:db8::/48"
+            "href":"http://testwhois.apnic.net/ip/2001:db8::0"
         },
         {
             "value":"http://example.net/ip/2001:db8::/48",

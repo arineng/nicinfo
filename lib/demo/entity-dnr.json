@@ -1,5 +1,5 @@
 {
-    "nicInfo_demoUrl" : "http://whois.arin.net/entity/entity-dnr",
+    "nicInfo_demoUrl" : "http://rdappilot.arin.net/rdapbootstrap/entity/entity-dnr",
     "nicInfo_demoHint" : "nicinfo --type entityname entity-dnr",
     "rdapConformance":[
         "rdap_level_0"
@@ -122,9 +122,9 @@
     ],
     "links":[
         {
-            "value":"http://whois.arin.net/entity/entity-dnr",
+            "value":"http://rdappilot.arin.net/rdapbootstrap/entity/entity-dnr",
             "rel":"self",
-            "href":"http://whois.arin.net/entity/entity-dnr"
+            "href":"http://rdappilot.arin.net/rdapbootstrap/entity/entity-dnr"
         }
     ],
     "port43":"whois.example.net",

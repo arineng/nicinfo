@@ -1,5 +1,5 @@
 {
-    "nicInfo_demoUrl" : "http://whois.arin.net/nameserver/ns1.xn--fo-5ja.example",
+    "nicInfo_demoUrl" : "http://rdappilot.arin.net/rdapbootstrap/nameserver/ns1.xn--fo-5ja.example",
     "nicInfo_demoHint" : "nicinfo ns1.xn--fo-5ja.example",
     "rdapConformance":[
         "rdap_level_0"
@@ -42,9 +42,9 @@
     ],
     "links":[
         {
-            "value":"http://example.net/nameserver/xxxx",
+            "value":"http://rdappilot.arin.net/rdapbootstrap/nameserver/ns1.xn--fo-5ja.example",
             "rel":"self",
-            "href":"http://example.net/nameserver/xxxx"
+            "href":"http://rdappilot.arin.net/rdapbootstrap/nameserver/ns1.xn--fo-5ja.example"
         }
     ],
     "port43":"whois.example.net",
