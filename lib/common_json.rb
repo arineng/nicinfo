@@ -110,11 +110,19 @@ module NicInfo
     def display_string_array json_name, display_name, json_data, data_amount
       arr = json_data[ json_name ]
       if arr
-        new_arr = Array.new
-        arr.each do |str|
-          new_arr << NicInfo::capitalize( str )
+        if arr.instance_of?( Array )
+          new_arr = Array.new
+          arr.each do |str|
+            if str.instance_of?( String )
+              new_arr << NicInfo::capitalize( str )
+            else
+              @config.conf_msgs << "value in string array is not a string."
+            end
+          end
+          @config.logger.info data_amount, display_name, new_arr.join( ", " )
+        else
+          @config.conf_msgs << "'#{json_name}' is not an array."
         end
-        @config.logger.info data_amount, display_name, new_arr.join( ", " )
       end
     end
 
@@ -170,12 +178,20 @@ module NicInfo
     def display_public_ids objectclass
       public_ids = objectclass[ "publicIds" ]
       if public_ids
-        public_ids.each do |public_id|
-          item_name = "Public ID"
-          item_value = public_id[ "identifier" ]
-          authority = public_id[ "type" ]
-          item_value << " (#{authority})" if authority
-          @config.logger.datum item_name, item_value
+        if public_ids.instance_of?( Array )
+          public_ids.each do |public_id|
+            if public_id.instance_of?( Hash )
+              item_name = "Public ID"
+              item_value = public_id[ "identifier" ]
+              authority = public_id[ "type" ]
+              item_value << " (#{authority})" if authority
+              @config.logger.datum item_name, item_value
+            else
+              @config.conf_msgs << "public id in array 'publicIds' is not an object."
+            end
+          end
+        else
+          @config.conf_msgs << "'publicIds' is not an array."
         end
       end
     end
