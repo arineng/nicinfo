@@ -27,7 +27,7 @@ module NicInfo
       NicInfo::add_entity_nodes( object.entities, root )
       data_node.to_normal_log( config.logger, true )
     end
-    respobjs = ResponseObjSet.new
+    respobjs = ResponseObjSet.new config
     respobjs.add object
     NicInfo::add_entity_respobjs( object.entities, respobjs )
     respobjs.associateEntities object.entities
@@ -69,31 +69,41 @@ module NicInfo
 
     def display_remarks objectclass
       remarks = objectclass[ "remarks" ]
-      if (Notices::is_excessive_notice remarks) && (@config.logger.data_amount != NicInfo::DataAmount::EXTRA_DATA)
+      if (Notices::is_excessive_notice(remarks, @config)) && (@config.logger.data_amount != NicInfo::DataAmount::EXTRA_DATA)
         @config.logger.datum "Excessive Remarks", "Use \"-V\" or \"--data extra\" to see them."
       else
-        remarks.each do |remark|
-          title = remark[ "title" ]
-          @config.logger.datum "Remarks", "-- #{title} --" if title
-          descriptions = NicInfo::get_descriptions remark
-          i = 1
-          descriptions.each do |line|
-            if !title && i == 1
-              @config.logger.datum "Remarks", line
-            elsif i != 1 || title
-              @config.logger.datum i.to_s, line
+        if remarks
+          if remarks.instance_of?( Array )
+            remarks.each do |remark|
+              if remark.instance_of?( Hash )
+                title = remark[ "title" ]
+                @config.logger.datum "Remarks", "-- #{title} --" if title
+                descriptions = NicInfo::get_descriptions remark, @config
+                i = 1
+                descriptions.each do |line|
+                  if !title && i == 1
+                    @config.logger.datum "Remarks", line
+                  elsif i != 1 || title
+                    @config.logger.datum i.to_s, line
+                  end
+                  i = i + 1
+                end if descriptions
+                links = NicInfo::get_links remark, @config
+                if links
+                  @config.logger.datum "More", NicInfo::get_alternate_link( links )
+                  @config.logger.datum "About", NicInfo::get_about_link( links )
+                  @config.logger.datum "TOS", NicInfo::get_tos_link( links )
+                  @config.logger.datum "(C)", NicInfo::get_copyright_link( links )
+                  @config.logger.datum "License", NicInfo::get_license_link( links )
+                end
+              else
+                @config.conf_msgs << "remark is not an object."
+              end
             end
-            i = i + 1
+          else
+            @config.conf_msgs << "'remarks' is not an array."
           end
-          links = NicInfo::get_links remark
-          if links
-            @config.logger.datum "More", NicInfo::get_alternate_link( links )
-            @config.logger.datum "About", NicInfo::get_about_link( links )
-            @config.logger.datum "TOS", NicInfo::get_tos_link( links )
-            @config.logger.datum "(C)", NicInfo::get_copyright_link( links )
-            @config.logger.datum "License", NicInfo::get_license_link( links )
-          end
-        end if remarks
+        end
       end
     end
 
@@ -117,7 +127,7 @@ module NicInfo
     end
 
     def display_links cn, objectclass
-      links = NicInfo::get_links objectclass
+      links = NicInfo::get_links objectclass, @config
       if links
         @config.logger.extra "Links", "-- for #{cn} --"
         @config.logger.extra "Reference", NicInfo::get_self_link( links )
@@ -132,14 +142,18 @@ module NicInfo
     def display_events objectclass
       events = objectclass[ "events" ]
       if events
-        events.each do |event|
-          item_name = NicInfo::capitalize( event[ "eventAction" ] )
-          item_value = Time.parse( event[ "eventDate" ] ).rfc2822
-          actor = event[ "eventActor" ]
-          if actor
-            item_value << " by #{actor}"
+        if events.instance_of?( Array )
+          events.each do |event|
+            item_name = NicInfo::capitalize( event[ "eventAction" ] )
+            item_value = Time.parse( event[ "eventDate" ] ).rfc2822
+            actor = event[ "eventActor" ]
+            if actor
+              item_value << " by #{actor}"
+            end
+            @config.logger.datum item_name, item_value
           end
-          @config.logger.datum item_name, item_value
+        else
+          @config.conf_msgs << "'events' is not an array."
         end
       end
     end
@@ -175,7 +189,8 @@ module NicInfo
   # for keeping track of objects to display
   class ResponseObjSet
 
-    def initialize
+    def initialize config
+      @config = config
       @arr = Array.new #for keeping track of insertion order
       @set = Hash.new
       @self_links = Hash.new
@@ -190,7 +205,7 @@ module NicInfo
         if !@set[ respObj.get_cn ]
           @set[ respObj.get_cn ] = respObj
           @arr << respObj
-          self_link = NicInfo.get_self_link( NicInfo.get_links( respObj.objectclass ) )
+          self_link = NicInfo.get_self_link( NicInfo.get_links( respObj.objectclass, @config ) )
           @self_links[ self_link ] = respObj if self_link
         end
       end

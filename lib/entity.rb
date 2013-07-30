@@ -177,10 +177,10 @@ module NicInfo
         eventActor = EventActor.new
         eventActor.eventAction=event[ "eventAction" ]
         eventActor.eventDate=event[ "eventDate" ]
-        eventActor.related=NicInfo.get_related_link( NicInfo.get_links( event ) )
+        eventActor.related=NicInfo.get_related_link( NicInfo.get_links( event, @config ) )
         @asEvents << eventActor
       end if events
-      @selfhref = NicInfo::get_self_link( NicInfo::get_links( @objectclass ) )
+      @selfhref = NicInfo::get_self_link( NicInfo::get_links( @objectclass, @config ) )
       @entities = @common.process_entities @objectclass
       return self
     end

@@ -24,7 +24,7 @@ module NicInfo
   # Handles configuration of the application
   class Config
 
-    attr_accessor :logger, :config, :rdap_cache_dir, :options
+    attr_accessor :logger, :config, :rdap_cache_dir, :options, :conf_msgs
 
     # Intializes the configuration with a place to look for the config file
     # If the file doesn't exist, a default is used.
@@ -34,6 +34,7 @@ module NicInfo
       @options = OpenStruct.new
       @app_data = app_data
       @logger = NicInfo::Logger.new
+      @conf_msgs = Array.new
 
       config_file_name = Config.formulate_config_file_name( @app_data )
       if File.exist?( config_file_name )

@@ -60,7 +60,7 @@ module NicInfo
     end
 
     def to_node
-      node = DataNode.new( get_cn, nil, NicInfo::get_self_link( NicInfo::get_links( @objectclass ) ) )
+      node = DataNode.new( get_cn, nil, NicInfo::get_self_link( NicInfo::get_links( @objectclass, @config ) ) )
       node.data_type=self.class.name
       return node
     end

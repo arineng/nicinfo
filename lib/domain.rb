@@ -45,7 +45,7 @@ module NicInfo
       end
       data_node.to_normal_log( config.logger, true )
     end
-    respObjs = ResponseObjSet.new
+    respObjs = ResponseObjSet.new config
     respObjs.add domain
     domain.ds_data_objs.each do |ds|
       respObjs.add ds
@@ -159,7 +159,7 @@ module NicInfo
     end
 
     def to_node
-      DataNode.new( get_cn, nil, NicInfo::get_self_link( NicInfo::get_links( @objectclass ) ) )
+      DataNode.new( get_cn, nil, NicInfo::get_self_link( NicInfo::get_links( @objectclass, @config ) ) )
     end
 
   end

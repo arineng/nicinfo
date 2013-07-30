@@ -63,9 +63,19 @@ module NicInfo
     return json_data[ "unicodeName" ]
   end
 
-  def NicInfo.get_descriptions description
-    return if !description
-    return description[ "description" ]
+  def NicInfo.get_descriptions json_data, config
+    return if !json_data
+    if json_data.instance_of?( Hash )
+      retval = json_data[ "description" ]
+      unless retval.instance_of?( Array )
+        config.conf_msgs << "'description' is not an array."
+        retval = nil
+      end
+    else
+      config.conf_msgs << "expected object for 'remarks' or 'notices'."
+      retval = nil
+    end
+    return retval
   end
 
   def NicInfo.get_entitites json_data
@@ -104,8 +114,14 @@ module NicInfo
     return json_data[ "country" ]
   end
 
-  def NicInfo.get_links json_data
-    return json_data[ "links" ]
+  def NicInfo.get_links json_data, config
+    retval = json_data[ "links" ]
+    return nil unless retval
+    if !retval.instance_of?( Array )
+      config.conf_msgs << "'links' is not an array."
+      retval = nil
+    end
+    return retval
   end
 
   def NicInfo.get_related_link links

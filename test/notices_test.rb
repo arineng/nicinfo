@@ -193,9 +193,9 @@ EXCESSIVE2
   end
 
   def test_is_excessive_notices
-    assert( ! NicInfo::Notices::is_excessive_notice( JSON.load( @non_excessive )[ "notices" ] ) )
-    assert(   NicInfo::Notices::is_excessive_notice( JSON.load( @excessive1 )[ "notices" ] ) )
-    assert(   NicInfo::Notices::is_excessive_notice( JSON.load( @excessive2 )[ "notices" ] ) )
+    assert( ! NicInfo::Notices::is_excessive_notice( JSON.load( @non_excessive )[ "notices" ], nil ) )
+    assert(   NicInfo::Notices::is_excessive_notice( JSON.load( @excessive1 )[ "notices" ], nil ) )
+    assert(   NicInfo::Notices::is_excessive_notice( JSON.load( @excessive2 )[ "notices" ], nil ) )
   end
 
 end

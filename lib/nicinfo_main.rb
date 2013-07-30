@@ -279,6 +279,8 @@ module NicInfo
             content_type = res[ "content-type" ].downcase
             if !(content_type.include?(NicInfo::RDAP_CONTENT_TYPE) or content_type.include?(NicInfo::JSON_CONTENT_TYPE))
               raise Net::HTTPServerException.new( "Bad Content Type", res )
+            elsif content_type.include? NicInfo::JSON_CONTENT_TYPE
+              @config.conf_msgs << "Server responded with non-RDAP content type but it is JSON"
             end
             data = res.body
             @cache.create_or_update(url, data)
@@ -462,10 +464,13 @@ module NicInfo
                 NicInfo::display_entity( json_data, @config, data_tree )
             end
             @config.save_as_yaml( NicInfo::LASTTREE_YAML, data_tree ) if !data_tree.empty?
+            show_conformance_messages
             show_helpful_messages json_data, data_tree
           end
         end
         @config.logger.end_run
+      rescue JSON::ParserError => a
+        @config.logger.mesg( "Server returned invalid JSON!" )
       rescue SocketError => a
         @config.logger.mesg(a.message)
       rescue ArgumentError => a
@@ -518,7 +523,7 @@ module NicInfo
           @config.logger.trace( "Server conforms to #{conformance}" )
         end
       else
-        @config.logger.trace( "Response has no RDAP Conformance level specified." )
+        @config.conf_msgs << "Response has no RDAP Conformance level specified."
       end
     end
 
@@ -693,7 +698,7 @@ HELP_SUMMARY
     end
 
     def cache_self_references json_data
-      links = NicInfo::get_links json_data
+      links = NicInfo::get_links json_data, @config
       if links
         self_link = NicInfo.get_self_link links
         if self_link
@@ -719,6 +724,16 @@ HELP_SUMMARY
       end if key_data_objs
     end
 
+    def show_conformance_messages
+      return if @config.conf_msgs.size == 0
+      @config.logger.trace( "** WARNING: The following issues might cause some data to discarded. **" )
+      i = 1
+      @config.conf_msgs.each do |msg|
+        @config.logger.trace( "** #{i} : #{msg}" )
+        i = i + 1
+      end
+    end
+
     def show_helpful_messages json_data, data_tree
       arg = @config.options.argv[0]
       case @config.options.query_type
@@ -740,7 +755,7 @@ HELP_SUMMARY
           end
         end
       end
-      self_link = NicInfo.get_self_link( NicInfo.get_links( json_data ) )
+      self_link = NicInfo.get_self_link( NicInfo.get_links( json_data, @config ) )
       @config.logger.mesg("Use \"nicinfo -u #{self_link}\" to directly query this resource in the future.") if self_link and @config.options.externally_queriable
       @config.logger.mesg('Use "nicinfo -h" for help.')
     end
