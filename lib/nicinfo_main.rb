@@ -767,6 +767,7 @@ HELP_SUMMARY
   end
 
   EXTENDED_HELP = <<EXTENDED_HELP
+
 CONFIGURATION
   When this program is run for the first time, it creates a directory called .NicInfo
   (on Unix style platforms) or NicInfo (on Windows) in the users home directory. The
