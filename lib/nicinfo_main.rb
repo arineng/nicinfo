@@ -726,10 +726,10 @@ HELP_SUMMARY
 
     def show_conformance_messages
       return if @config.conf_msgs.size == 0
-      @config.logger.trace( "** WARNING: The following issues might cause some data to discarded. **" )
+      @config.logger.msg( "** WARNING: There are problems in the response that might cause some data to discarded. **" )
       i = 1
       @config.conf_msgs.each do |msg|
-        @config.logger.trace( "** #{i} : #{msg}" )
+        @config.logger.trace( "#{i} : #{msg}" )
         i = i + 1
       end
     end
