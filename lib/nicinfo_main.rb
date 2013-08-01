@@ -430,10 +430,10 @@ module NicInfo
         inspect_rdap_compliance json_data
         cache_self_references json_data
         if @config.options.output_json
-          @config.logger.raw( DataAmount::TERSE_DATA, data )
+          @config.logger.raw( DataAmount::TERSE_DATA, data, false )
         elsif @config.options.json_values
           @config.options.json_values.each do |value|
-            @config.logger.raw( DataAmount::TERSE_DATA, eval_json_value( value, json_data) )
+            @config.logger.raw( DataAmount::TERSE_DATA, eval_json_value( value, json_data), false )
           end
         else
           Notices.new.display_notices json_data, @config, @config.options.query_type == QueryType::BY_SERVER_HELP

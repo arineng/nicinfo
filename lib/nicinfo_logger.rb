@@ -179,21 +179,21 @@ module NicInfo
       return retval
     end
 
-    def raw data_amount, raw_data
+    def raw data_amount, raw_data, wrap = true
       retval = false
       validate_data_amount()
       case data_amount
         when DataAmount::TERSE_DATA
-          log_raw(raw_data)
+          log_raw(raw_data, wrap)
           retval = true
         when DataAmount::NORMAL_DATA
           if (@data_amount != DataAmount::TERSE_DATA)
-            log_raw(raw_data)
+            log_raw(raw_data, wrap)
             retval = true
           end
         when DataAmount::EXTRA_DATA
           if (@data_amount != DataAmount::TERSE_DATA && @data_amount != DataAmount::NORMAL_DATA)
-            log_raw(raw_data)
+            log_raw(raw_data, wrap)
             retval = true
           end
       end
@@ -226,16 +226,16 @@ module NicInfo
       validate_data_amount()
       case data_amount
         when DataAmount::TERSE_DATA
-          log_raw(tree_item)
+          log_raw(tree_item, true)
           retval = true
         when DataAmount::NORMAL_DATA
           if (@data_amount != DataAmount::TERSE_DATA)
-            log_raw(tree_item)
+            log_raw(tree_item, true)
             retval = true
           end
         when DataAmount::EXTRA_DATA
           if (@data_amount != DataAmount::TERSE_DATA && @data_amount != DataAmount::NORMAL_DATA)
-            log_raw(tree_item)
+            log_raw(tree_item, true)
             retval = true
           end
       end
@@ -352,8 +352,8 @@ module NicInfo
       end
     end
 
-    def log_raw item_value
-      if @auto_wrap
+    def log_raw item_value, wrap
+      if @auto_wrap and wrap
         lines = break_up_line item_value, get_width
         lines.each do |line|
           @data_out.puts(line)
