@@ -1,6 +1,6 @@
 {
     "nicInfo_demoUrl" : "http://rdappilot.arin.net/rdapbootstrap/entity/entity-dnr",
-    "nicInfo_demoHint" : "nicinfo --type entityname entity-dnr",
+    "nicInfo_demoHint" : "nicinfo --type entityhandle entity-dnr",
     "rdapConformance":[
         "rdap_level_0"
     ],

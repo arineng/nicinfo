@@ -25,6 +25,24 @@ module NicInfo
     NicInfo::display_object_with_entities( entity, config, data_tree )
   end
 
+  def NicInfo.display_entities json_data, config, data_tree
+    entity_array = json_data[ "entitySearchResults" ]
+    if entity_array != nil
+      if entity_array.instance_of? Array
+        display_array = Array.new
+        entity_array.each do |ea|
+          entity = Entity.new( config ).process( ea )
+          display_array << entity
+        end
+        NicInfo.display_object_with_entities( display_array, config, data_tree )
+      else
+        config.conf_msgs << "'entitySearchResults' is not an array"
+      end
+    else
+      config.conf_msgs << "'entitySearchResults' is not present"
+    end
+  end
+
   class Org
     attr_accessor :type, :names
     def initialize

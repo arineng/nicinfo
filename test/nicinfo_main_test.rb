@@ -72,7 +72,7 @@ class NicInfoMainTest < Test::Unit::TestCase
     assert_equal( nicinfo.guess_query_value_type( [ "1=" ] ), "RESULT" )
     assert_equal( nicinfo.guess_query_value_type( [ "1.1=" ] ), "RESULT" )
     assert_equal( nicinfo.guess_query_value_type( [ "1.1.1=" ] ), "RESULT" )
-    assert_equal( nicinfo.guess_query_value_type( [ "foo" ] ), "ENTITYNAME" )
+    assert_equal( nicinfo.guess_query_value_type( [ "foo" ] ), "ESBYNAME" )
 
   end
 
@@ -92,7 +92,7 @@ class NicInfoMainTest < Test::Unit::TestCase
     assert_equal( "IP", nicinfo.get_query_type_from_url( "http://example.com/rdap/ip/192.0.2.0/24" ) )
     assert_equal( "ASNUMBER", nicinfo.get_query_type_from_url( "http://example.com/rdap/autnum/21" ) )
     assert_equal( "DOMAIN", nicinfo.get_query_type_from_url( "http://example.com/rdap/domain/example.com" ) )
-    assert_equal( "ENTITYNAME", nicinfo.get_query_type_from_url( "http://example.com/rdap/entity/CE12" ) )
+    assert_equal( "ENTITYHANDLE", nicinfo.get_query_type_from_url( "http://example.com/rdap/entity/CE12" ) )
 
   end
 

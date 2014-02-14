@@ -1,6 +1,6 @@
 {
     "nicInfo_demoUrl" : "http://rdappilot.arin.net/rdapbootstrap/entity/foo1",
-    "nicInfo_demoHint" : "nicinfo --type entityname foo1",
+    "nicInfo_demoHint" : "nicinfo --type entityhandle foo1",
     "rdapConformance":[
         "rdap_level_0"
     ],

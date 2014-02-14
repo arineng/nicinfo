@@ -25,42 +25,62 @@ require 'data_tree'
 module NicInfo
 
   def NicInfo.display_domain json_data, config, data_node
-    domain = Domain.new( config ).process( json_data )
-    if !domain.entities.empty? or !domain.nameservers.empty?
-      root = domain.to_node
-      data_node.add_root( root )
-      domain.ds_data_objs.each do |ds|
-        ds_node = ds.to_node
-        root.add_child( ds_node )
-      end
-      domain.key_data_objs.each do |key|
-        key_node = key.to_node
-        root.add_child( key_node )
-      end
-      NicInfo::add_entity_nodes( domain.entities, root )
-      domain.nameservers.each do |ns|
-        ns_node = ns.to_node
-        root.add_child( ns_node )
-        NicInfo::add_entity_nodes( ns.entities, ns_node )
-      end
-      data_node.to_normal_log( config.logger, true )
+    obj_array = json_data
+    unless json_data.instance_of? Array
+      obj_array = Array.new
+      obj_array << json_data
     end
     respObjs = ResponseObjSet.new config
-    respObjs.add domain
-    domain.ds_data_objs.each do |ds|
-      respObjs.add ds
+    obj_array.each do |array_object|
+      domain = Domain.new( config ).process( array_object )
+      root = domain.to_node
+      data_node.add_root( root )
+      if !domain.entities.empty? or !domain.nameservers.empty?
+        domain.ds_data_objs.each do |ds|
+          ds_node = ds.to_node
+          root.add_child( ds_node )
+        end
+        domain.key_data_objs.each do |key|
+          key_node = key.to_node
+          root.add_child( key_node )
+        end
+        NicInfo::add_entity_nodes( domain.entities, root )
+        domain.nameservers.each do |ns|
+          ns_node = ns.to_node
+          root.add_child( ns_node )
+          NicInfo::add_entity_nodes( ns.entities, ns_node )
+        end
+      end
+      respObjs.add domain
+      domain.ds_data_objs.each do |ds|
+        respObjs.add ds
+      end
+      domain.key_data_objs.each do |key|
+        respObjs.add key
+      end
+      NicInfo::add_entity_respobjs( domain.entities, respObjs )
+      respObjs.associateEntities domain.entities
+      domain.nameservers.each do |ns|
+        respObjs.add ns
+        NicInfo::add_entity_respobjs( ns.entities, respObjs )
+        respObjs.associateEntities ns.entities
+      end
     end
-    domain.key_data_objs.each do |key|
-      respObjs.add key
-    end
-    NicInfo::add_entity_respobjs( domain.entities, respObjs )
-    respObjs.associateEntities domain.entities
-    domain.nameservers.each do |ns|
-      respObjs.add ns
-      NicInfo::add_entity_respobjs( ns.entities, respObjs )
-      respObjs.associateEntities ns.entities
-    end
+    data_node.to_normal_log( config.logger, true )
     respObjs.display
+  end
+
+  def NicInfo.display_domains json_data, config, data_tree
+    domain_array = json_data[ "domainSearchResults" ]
+    if domain_array != nil
+      if domain_array.instance_of? Array
+        NicInfo.display_domain( domain_array, config, data_tree )
+      else
+        config.conf_msgs << "'domainSearchResults' is not an array"
+      end
+    else
+      config.conf_msgs << "'domainSearchResults' is not present"
+    end
   end
 
   # deals with RDAP nameserver structures

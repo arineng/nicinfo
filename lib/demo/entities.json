@@ -1,0 +1,540 @@
+{
+  "nicInfo_demoUrl": "http://rdappilot.arin.net/rdapbootstrap/entities?fn=Simon",
+  "nicInfo_demoHint": "nicinfo --type esbyname Simon",
+  "rdapConformance": [
+    "rdap_level_0"
+  ],
+  "notices": [
+    {
+      "title": "Terms of Use",
+      "description": [
+        "ARIN WHOIS data and services are subject to the Terms of Use available at: https://www.arin.net/whois_tou.html"
+      ],
+      "links": [
+        {
+          "value": "http://whois.apnic.net/ip/2001:db8::0",
+          "rel": "terms-of-service",
+          "type": "text/html",
+          "href": "https://www.arin.net/whois_tou.html"
+        }
+      ]
+    }
+  ],
+  "entitySearchResults": [
+    {
+      "handle": "entity-dnr",
+      "vcardArray": [
+        "vcard",
+        [
+          ["version", {}, "text", "4.0"],
+          ["fn", {}, "text", "Simon Perreault"],
+          ["n",
+            {},
+            "text",
+            ["Perreault", "Simon", "", "", ["ing. jr", "M.Sc."]]
+          ],
+          ["bday", {}, "date-and-or-time", "--02-03"],
+          ["anniversary",
+            {},
+            "date-and-or-time",
+            "2009-08-08T14:30:00-05:00"
+          ],
+          ["gender", {}, "text", "M"],
+          ["kind", {}, "text", "individual"],
+          ["lang", {
+            "pref": "1"
+          }, "language-tag", "fr"],
+          ["lang", {
+            "pref": "2"
+          }, "language-tag", "en"],
+          ["org", {
+            "type": "work"
+          }, "text", "Viagenie"],
+          ["title", {}, "text", "Research Scientist"],
+          ["role", {}, "text", "Project Lead"],
+          ["adr",
+            {
+              "type": "work"
+            },
+            "text",
+            [
+              "",
+              "Suite D2-630",
+              "2875 Laurier",
+              "Quebec",
+              "QC",
+              "G1V 2M2",
+              "Canada"
+            ]
+          ],
+          ["adr",
+            {
+              "type": "home",
+              "label": "123 Maple Ave\nSuite 90001\nVancouver\nBC\n1239\n"
+            },
+            "text",
+            [
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          ],
+          ["tel",
+            {
+              "type": ["work", "voice"],
+              "pref": "1"
+            },
+            "uri",
+            "tel:+1-418-656-9254;ext=102"
+          ],
+          ["tel",
+            {
+              "type": ["work", "cell", "voice", "video", "text"]
+            },
+            "uri",
+            "tel:+1-418-262-6501"
+          ],
+          ["email",
+            {
+              "type": "work"
+            },
+            "text",
+            "simon.perreault@viagenie.ca"
+          ],
+          ["geo", {
+            "type": "work"
+          }, "uri", "geo:46.772673,-71.282945"],
+          ["key",
+            {
+              "type": "work"
+            },
+            "uri",
+            "http://www.viagenie.ca/simon.perreault/simon.asc"
+          ],
+          ["tz", {}, "utc-offset", "-05:00"],
+          ["url", {
+            "type": "home"
+          }, "uri", "http://nomis80.org"]
+        ]
+      ],
+      "status": [ "validated", "locked" ],
+      "publicIds": [
+        {
+          "type": "IANA Registration",
+          "identifier": "1"
+        }
+      ],
+      "remarks": [
+        {
+          "title": "A Poem",
+          "description": [
+            "She sells sea shells down by the sea shore.",
+            "Originally written by Terry Sullivan."
+          ]
+        },
+        {
+          "title": "A Story",
+          "description": [
+            "It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness, it was the epoch of belief, it was the epoch of incredulity, it was the season of Light, it was the season of Darkness, it was the spring of hope, it was the winter of despair, we had everything before us, we had nothing before us, we were all going direct to heaven, we were all going direct the other way - in short, the period was so far like the present period, that some of its noisiest authorities insisted on its being received, for good or for evil, in the superlative degree of comparison only.",
+            "By Charles Dickens"
+          ]
+        }
+      ],
+      "links": [
+        {
+          "value": "http://rdappilot.arin.net/rdapbootstrap/entity/entity-dnr",
+          "rel": "self",
+          "href": "http://rdappilot.arin.net/rdapbootstrap/entity/entity-dnr"
+        }
+      ],
+      "port43": "whois.example.net",
+      "events": [
+        {
+          "eventAction": "registration",
+          "eventDate": "1990-12-31T23:59:60Z"
+        },
+        {
+          "eventAction": "last changed",
+          "eventDate": "1991-12-31T23:59:60Z",
+          "eventActor": "joe@bob.com"
+        }
+      ]
+
+    },
+    {
+      "handle": "foo1",
+      "vcardArray": [
+        "vcard",
+        [
+          ["version", {}, "text", "4.0"],
+          ["fn", {}, "text", "Simon Perreault"],
+          ["n",
+            {},
+            "text",
+            ["Perreault", "Simon", "", "", ["ing. jr", "M.Sc."]]
+          ],
+          ["bday", {}, "date-and-or-time", "--02-03"],
+          ["anniversary",
+            {},
+            "date-and-or-time",
+            "2009-08-08T14:30:00-05:00"
+          ],
+          ["gender", {}, "text", "M"],
+          ["kind", {}, "text", "individual"],
+          ["lang", {
+            "pref": "1"
+          }, "language-tag", "fr"],
+          ["lang", {
+            "pref": "2"
+          }, "language-tag", "en"],
+          ["org", {
+            "type": "work"
+          }, "text", "Viagenie"],
+          ["title", {}, "text", "Research Scientist"],
+          ["role", {}, "text", "Project Lead"],
+          ["adr",
+            {
+              "type": "work"
+            },
+            "text",
+            [
+              "",
+              "Suite D2-630",
+              "2875 Laurier",
+              "Quebec",
+              "QC",
+              "G1V 2M2",
+              "Canada"
+            ]
+          ],
+          ["adr",
+            {
+              "type": "home",
+              "label": "123 Maple Ave\nSuite 90001\nVancouver\nBC\n1239\n"
+            },
+            "text",
+            [
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          ],
+          ["tel",
+            {
+              "type": ["work", "voice"],
+              "pref": "1"
+            },
+            "uri",
+            "tel:+1-418-656-9254;ext=102"
+          ],
+          ["tel",
+            {
+              "type": ["work", "cell", "voice", "video", "text"]
+            },
+            "uri",
+            "tel:+1-418-262-6501"
+          ],
+          ["email",
+            {
+              "type": "work"
+            },
+            "text",
+            "simon.perreault@viagenie.ca"
+          ],
+          ["geo", {
+            "type": "work"
+          }, "uri", "geo:46.772673,-71.282945"],
+          ["key",
+            {
+              "type": "work"
+            },
+            "uri",
+            "http://www.viagenie.ca/simon.perreault/simon.asc"
+          ],
+          ["tz", {}, "utc-offset", "-05:00"],
+          ["url", {
+            "type": "home"
+          }, "uri", "http://nomis80.org"]
+        ]
+      ],
+      "roles": [ "registrant" ],
+      "remarks": [
+        {
+          "description": [
+            "She sells sea shells down by the sea shore.",
+            "Originally written by Terry Sullivan."
+          ],
+          "links": [
+            {
+              "value": "http://example.net/ip/192.0.2.0/24",
+              "rel": "alternate",
+              "type": "text/html",
+              "href": "http://www.example.com/redaction_policy.html"
+            }
+          ]
+        }
+      ],
+      "links": [
+        {
+          "value": "http://rdappilot.arin.net/rdapbootstrap/entity/foo1",
+          "rel": "self",
+          "href": "http://rdappilot.arin.net/rdapbootstrap/entity/foo1"
+        }
+      ],
+      "events": [
+        {
+          "eventAction": "registration",
+          "eventDate": "1990-12-31T23:59:60Z"
+        }
+      ],
+      "asEventActor": [
+        {
+          "eventAction": "last changed",
+          "eventDate": "1991-12-31T23:59:60Z"
+        }
+      ]
+    },
+    {
+          "handle":"ARIN-OPS",
+          "vcardArray":[
+            "vcard",
+            [
+              ["version", {}, "text", "4.0"],
+              ["fn", {}, "text", "Simon Shuster Operations"],
+              ["kind", {}, "text", "org"],
+              ["org", {
+                "type":"work"
+              }, "text", "American Registry for Internet Numbers"],
+              ["adr",
+                {
+                  "type":"work"
+                },
+                "text",
+                [
+                  "",
+                  "Suite 200",
+                  "3635 Concorde Parkway",
+                  "Chantilly",
+                  "VA",
+                  "20151",
+                  "United States"
+                ]
+              ]
+            ]
+          ],
+          "roles":[ "registrant" ],
+          "remarks":[
+            {
+              "title": "No Solicitations",
+              "description":[
+                "Absolutely no solicitations are accepted at by this contact. If you wish to offer services or products to the American Registry for Internet Numbers, contact Pete Toscano at +1-703-227-9840."
+              ]
+            }
+          ],
+          "links":[
+            {
+              "value":"http://example.net/entity/ARIN-OPS",
+              "rel":"self",
+              "href":"http://example.net/entity/ARIN-OPS"
+            }
+          ],
+          "events":[
+            {
+              "eventAction":"registration",
+              "eventDate":"2012-12-31T23:59:60Z",
+              "eventActor": "mattr@arin.net"
+            },
+            {
+              "eventAction":"last changed",
+              "eventDate":"2013-12-31T23:59:60Z",
+              "eventActor": "mattr@arin.net"
+            }
+          ],
+          "entities":[
+            {
+              "handle":"MATTR-ARIN",
+              "vcardArray":[
+                "vcard",
+                [
+                  ["version", {}, "text", "4.0"],
+                  ["fn", {}, "text", "Matt Rowley"],
+                  ["kind", {}, "text", "individual"],
+                  ["org", {
+                    "type":"work"
+                  }, "text", "American Registry for Internet Numbers"],
+                  ["title", {}, "text", "Operations Manager"],
+                  ["role", {}, "text", "Project Lead"],
+                  ["adr",
+                    {
+                      "type":"work"
+                    },
+                    "text",
+                    [
+                      "",
+                      "Suite 200",
+                      "3635 Concorde Parkway",
+                      "Chantilly",
+                      "VA",
+                      "20151",
+                      "United States"
+                    ]
+                  ],
+                  ["tel",
+                    {
+                      "type":["work", "voice"],
+                      "pref":"1"
+                    },
+                    "uri",
+                    "tel:+1-703-227-9840"
+                  ],
+                  ["email",
+                    {
+                      "type":"work"
+                    },
+                    "text",
+                    "info@arin.net"
+                  ]
+                ]
+              ],
+              "roles":[ "administrative" ],
+              "remarks":[
+                {
+                  "title": "No Solicitations",
+                  "description":[
+                    "Absolutely no solicitations are accepted at by this contact. If you wish to offer services or products to the American Registry for Internet Numbers, contact Pete Toscano at +1-703-227-9840."
+                  ]
+                }
+              ],
+              "links":[
+                {
+                  "value":"http://example.net/entity/MATTR-ARIN",
+                  "rel":"self",
+                  "href":"http://example.net/entity/MATTR-ARIN"
+                }
+              ],
+              "events":[
+                {
+                  "eventAction":"registration",
+                  "eventDate":"2012-12-31T23:59:60Z",
+                  "eventActor": "mattr@arin.net"
+                },
+                {
+                  "eventAction":"last changed",
+                  "eventDate":"2013-12-31T23:59:60Z",
+                  "eventActor": "mattr@arin.net"
+                }
+              ],
+              "asEventActor":[
+                {
+                  "links":[
+                    {
+                      "value":"http://whois.arin.net/domain/192.in-addr.arpa",
+                      "rel":"related",
+                      "href":"http://whois.arin.net/domain/192.in-addr.arpa"
+                    }
+                  ],
+                  "eventAction":"last changed",
+                  "eventDate":"2013-12-31T23:59:60Z"
+                }
+              ]
+            },
+            {
+              "handle":"MAK21-ARIN",
+              "vcardArray":[
+                "vcard",
+                [
+                  ["version", {}, "text", "4.0"],
+                  ["fn", {}, "text", "Mark Kosters"],
+                  ["kind", {}, "text", "individual"],
+                  ["org", {
+                    "type":"work"
+                  }, "text", "American Registry for Internet Numbers"],
+                  ["title", {}, "text", "Chief Technical Officer"],
+                  ["role", {}, "text", "Pointy Haired Boss"],
+                  ["adr",
+                    {
+                      "type":"work",
+                      "label" : "3635 Concorde Parkway\nSuite200\nChantilly\nVA\n20151"
+                    },
+                    "text",
+                    [
+                      "",
+                      "",
+                      "",
+                      "",
+                      "",
+                      "",
+                      ""
+                    ]
+                  ],
+                  ["tel",
+                    {
+                      "type":["work", "voice"],
+                      "pref":"1"
+                    },
+                    "uri",
+                    "tel:+1-703-227-9840"
+                  ],
+                  ["email",
+                    {
+                      "type":"work"
+                    },
+                    "text",
+                    "info@arin.net"
+                  ]
+                ]
+              ],
+              "roles":[ "technical" ],
+              "remarks":[
+                {
+                  "title": "No Solicitations",
+                  "description":[
+                    "Absolutely no solicitations are accepted at by this contact. If you wish to offer services or products to the American Registry for Internet Numbers, contact Pete Toscano at +1-703-227-9840."
+                  ]
+                }
+              ],
+              "links":[
+                {
+                  "value":"http://example.net/entity/MAK21-ARIN",
+                  "rel":"self",
+                  "href":"http://example.net/entity/MAK21-ARIN"
+                }
+              ],
+              "events":[
+                {
+                  "eventAction":"registration",
+                  "eventDate":"2012-12-31T23:59:60Z",
+                  "eventActor": "markk@arin.net"
+                },
+                {
+                  "eventAction":"last changed",
+                  "eventDate":"2013-12-31T23:59:60Z",
+                  "eventActor": "markkb@arin.net"
+                }
+              ],
+              "asEventActor":[
+                {
+                  "links":[
+                    {
+                      "value":"http://whois.arin.net/domain/192.in-addr.arpa",
+                      "rel":"related",
+                      "href":"http://whois.arin.net/domain/192.in-addr.arpa"
+                    }
+                  ],
+                  "eventAction":"reregistration",
+                  "eventDate":"2012-12-31T23:59:60Z"
+                }
+              ]
+            }
+          ]
+    }
+  ]
+}

@@ -51,8 +51,16 @@ module NicInfo
     QueryType.add_item :BY_AS_NUMBER, "ASNUMBER"
     QueryType.add_item :BY_DOMAIN, "DOMAIN"
     QueryType.add_item :BY_RESULT, "RESULT"
-    QueryType.add_item :BY_ENTITY_NAME, "ENTITYNAME"
+    QueryType.add_item :BY_ENTITY_HANDLE, "ENTITYHANDLE"
     QueryType.add_item :BY_NAMESERVER, "NAMESERVER"
+    QueryType.add_item :SRCH_ENTITY_BY_NAME, "ESBYNAME"
+    QueryType.add_item :SRCH_DOMAINS, "DOMAINS"
+    QueryType.add_item :SRCH_DOMAIN_BY_NAME, "DSBYNAME"
+    QueryType.add_item :SRCH_DOMAIN_BY_NSNAME, "DSBYNSNAME"
+    QueryType.add_item :SRCH_DOMAIN_BY_NSIP, "DSBYNSIP"
+    QueryType.add_item :SRCH_NS, "NAMESERVERS"
+    QueryType.add_item :SRCH_NS_BY_NAME, "NSBYNAME"
+    QueryType.add_item :SRCH_NS_BY_IP, "NSBYIP"
     QueryType.add_item :BY_SERVER_HELP, "HELP"
 
   end
@@ -80,16 +88,22 @@ module NicInfo
 
         opts.on("-t", "--type TYPE",
                 "Specify type of the query value.",
-                "  ip4addr    - IPv4 address",
-                "  ip6addr    - IPv6 address",
-                "  ip4cidr    - IPv4 cidr block",
-                "  ip6cidr    - IPv6 cidr block",
-                "  asnumber   - autonomous system number",
-                "  domain     - domain name",
-                "  entityname - name of a contact, organization, registrar or other entity",
-                "  nameserver - fully qualified domain name of a nameserver",
-                "  result     - result from a previous query",
-                "  help       - server help") do |type|
+                "  ip4addr      - IPv4 address",
+                "  ip6addr      - IPv6 address",
+                "  ip4cidr      - IPv4 cidr block",
+                "  ip6cidr      - IPv6 cidr block",
+                "  asnumber     - autonomous system number",
+                "  domain       - domain name",
+                "  entityhandle - handle or id of a contact, organization, registrar or other entity",
+                "  nameserver   - fully qualified domain name of a nameserver",
+                "  result       - result from a previous query",
+                "  esbyname     - entity search by name",
+                "  dsbyname     - domain search by name",
+                "  dsbynsname   - domain search by nameserver name",
+                "  dsbynsip     - domain search by nameserver IP address",
+                "  nsbyname     - nameserver search by nameserver name",
+                "  nsbyip       - nameserver search by IP address",
+                "  help         - server help") do |type|
           uptype = type.upcase
           raise OptionParser::InvalidArgument, type.to_s unless QueryType.has_value?(uptype)
           @config.options.query_type = uptype
@@ -405,8 +419,20 @@ module NicInfo
             @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
           when QueryType::BY_NAMESERVER
             @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
-          when QueryType::BY_ENTITY_NAME
+          when QueryType::BY_ENTITY_HANDLE
             @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::ENTITY_ROOT_URL ]
+          when QueryType::SRCH_ENTITY_BY_NAME
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::ENTITY_ROOT_URL ]
+          when QueryType::SRCH_DOMAIN_BY_NAME
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
+          when QueryType::SRCH_DOMAIN_BY_NSNAME
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
+          when QueryType::SRCH_DOMAIN_BY_NSIP
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::DOMAIN_ROOT_URL ]
+          when QueryType::SRCH_NS_BY_NAME
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
+          when QueryType::SRCH_NS_BY_IP
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_rir_url_by_ip( @config.options.argv[ 0 ] )
           else
             @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::HELP_ROOT_URL ]
         end
@@ -461,10 +487,23 @@ module NicInfo
                 NicInfo::display_domain( json_data, @config, data_tree )
               when QueryType::BY_NAMESERVER
                 NicInfo::display_ns( json_data, @config, data_tree )
-              when QueryType::BY_ENTITY_NAME
+              when QueryType::BY_ENTITY_HANDLE
                 NicInfo::display_entity( json_data, @config, data_tree )
+              when QueryType::SRCH_DOMAIN_BY_NAME
+                NicInfo::display_domains( json_data, @config, data_tree )
+              when QueryType::SRCH_DOMAIN_BY_NSNAME
+                NicInfo::display_domains( json_data, @config, data_tree )
+              when QueryType::SRCH_DOMAIN_BY_NSIP
+                NicInfo::display_domains( json_data, @config, data_tree )
+              when QueryType::SRCH_ENTITY_BY_NAME
+                NicInfo::display_entities( json_data, @config, data_tree )
+              when QueryType::SRCH_NS_BY_NAME
+                NicInfo::display_nameservers( json_data, @config, data_tree )
+              when QueryType::SRCH_NS_BY_IP
+                NicInfo::display_nameservers( json_data, @config, data_tree )
             end
             @config.save_as_yaml( NicInfo::LASTTREE_YAML, data_tree ) if !data_tree.empty?
+            show_search_results_truncated json_data
             show_conformance_messages
             show_helpful_messages json_data, data_tree
           end
@@ -595,31 +634,36 @@ HELP_SUMMARY
           when NicInfo::DOMAIN_REGEX
             retval = QueryType::BY_DOMAIN
           when NicInfo::ARIN_REGEX
-            retval = QueryType::BY_ENTITY_NAME
+            retval = QueryType::BY_ENTITY_HANDLE
           when NicInfo::APNIC_REGEX
-            retval = QueryType::BY_ENTITY_NAME
+            retval = QueryType::BY_ENTITY_HANDLE
           when NicInfo::AFRINIC_REGEX
-            retval = QueryType::BY_ENTITY_NAME
+            retval = QueryType::BY_ENTITY_HANDLE
           when NicInfo::LACNIC_REGEX
-            retval = QueryType::BY_ENTITY_NAME
+            retval = QueryType::BY_ENTITY_HANDLE
           when NicInfo::RIPE_REGEX
-            retval = QueryType::BY_ENTITY_NAME
+            retval = QueryType::BY_ENTITY_HANDLE
           else
-            if NicInfo::is_last_name(args[0].upcase)
-              retval = QueryType::BY_ENTITY_NAME
+            last_name = args[ 0 ].sub( /\*/, '' ).upcase
+            if NicInfo::is_last_name( last_name )
+              retval = QueryType::SRCH_ENTITY_BY_NAME
             end
         end
 
       elsif args.length() == 2
 
-        if NicInfo::is_last_name(args[1].upcase) && (NicInfo::is_male_name(args[0].upcase) || NicInfo::is_female_name(args[0].upcase))
-          retval = QueryType::BY_ENTITY_NAME
+        last_name = args[ 1 ].sub( /\*/, '' ).upcase
+        first_name = args[ 0 ].sub( /\*/, '' ).upcase
+        if NicInfo::is_last_name(last_name) && (NicInfo::is_male_name(first_name) || NicInfo::is_female_name(first_name))
+          retval = QueryType::SRCH_ENTITY_BY_NAME
         end
 
       elsif args.length() == 3
 
-        if NicInfo::is_last_name(args[2].upcase) && (NicInfo::is_male_name(args[0].upcase) || NicInfo::is_female_name(args[0].upcase))
-          retval = QueryType::BY_ENTITY_NAME
+        last_name = args[ 2 ].sub( /\*/, '' ).upcase
+        first_name = args[ 0 ].sub( /\*/, '' ).upcase
+        if NicInfo::is_last_name(last_name) && (NicInfo::is_male_name(first_name) || NicInfo::is_female_name(first_name))
+          retval = QueryType::SRCH_ENTITY_BY_NAME
         end
 
       end
@@ -650,8 +694,20 @@ HELP_SUMMARY
           tree = @config.load_as_yaml(NicInfo::ARININFO_LASTTREE_YAML)
           path = tree.find_rest_ref(args[0])
           raise ArgumentError.new("Unable to find result for " + args[0]) unless path
-        when QueryType::BY_ENTITY_NAME
+        when QueryType::BY_ENTITY_HANDLE
           path << "entity/" << URI.escape( args[ 0 ] )
+        when QueryType::SRCH_ENTITY_BY_NAME
+          path << "entities?fn=" << URI.escape( args[ 0 ] )
+        when QueryType::SRCH_DOMAIN_BY_NAME
+          path << "domains?name=" << args[ 0 ]
+        when QueryType::SRCH_DOMAIN_BY_NSNAME
+          path << "domains?nsLdhName=" << args[ 0 ]
+        when QueryType::SRCH_DOMAIN_BY_NSIP
+          path << "domains?nsIp=" << args[ 0 ]
+        when QueryType::SRCH_NS_BY_NAME
+          path << "nameservers?name=" << args[ 0 ]
+        when QueryType::SRCH_NS_BY_IP
+          path << "nameservers?ip=" << args[ 0 ]
         when QueryType::BY_SERVER_HELP
           path << "help"
         else
@@ -674,7 +730,15 @@ HELP_SUMMARY
         when /.*\/domain\/.*/
           queryType = QueryType::BY_DOMAIN
         when /.*\/entity\/.*/
-          queryType = QueryType::BY_ENTITY_NAME
+          queryType = QueryType::BY_ENTITY_HANDLE
+        when /.*\/entities\/.*/
+          queryType = QueryType::SRCH_ENTITY_BY_NAME
+        when /.*\/domains\/.*/
+          # covers all domain searches
+          queryType = QueryType::SRCH_DOMAIN
+        when /.*\/nameservers\/.*/
+          # covers all nameserver searches
+          queryType = QueryType::SRCH_NS
         when /.*\/help.*/
           queryType = QueryType::BY_SERVER_HELP
         else
@@ -732,6 +796,17 @@ HELP_SUMMARY
       @config.conf_msgs.each do |msg|
         @config.logger.trace( "#{i} : #{msg}" )
         i = i + 1
+      end
+    end
+
+    def show_search_results_truncated json_data
+      truncated = json_data[ "searchResultsTruncated" ]
+      if truncated.instance_of?(TrueClass) || truncated.instance_of?(FalseClass)
+        if truncated
+          @config.logger.mesg( "Results have been truncated by the server." )
+        end
+      elsif truncated != nil
+        @config.conf_msgs << "'searchResultsTruncated' is not a boolean"
       end
     end
 

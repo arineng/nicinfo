@@ -1,6 +1,6 @@
 {
     "nicInfo_demoUrl" : "http://rdappilot.arin.net/rdapbootstrap/entity/ABC123",
-    "nicInfo_demoHint" : "nicinfo --type entityname ABC123",
+    "nicInfo_demoHint" : "nicinfo --type entityhandle ABC123",
     "handle":"ABC123",
     "remarks":[
         {

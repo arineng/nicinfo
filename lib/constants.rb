@@ -30,6 +30,7 @@ module NicInfo
   IP6_ARPA = /\.ip6\.arpa[\.]?/i
   DATA_TREE_ADDR_REGEX = /\d=$/
   DOMAIN_REGEX = /^([\S\-]+\.?)+\.([a-z][a-z0\-]+)\.?$/i
+  DOMAIN_SRCH_REGEX = /^([\S\-]+\.?)+\.([a-z][a-z0\-\*]+)\.?$/i
   NS_REGEX = /^ns[0-9]\.([\S\-]+\.?)+\.([a-z][a-z0\-]+)\.?$/i
   ARIN_REGEX = /\-ARIN$/i
   APNIC_REGEX = /\-AP$/i

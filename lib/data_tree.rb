@@ -138,16 +138,14 @@ module NicInfo
 
     def to_log annotate
       retval = false
-      double_space_roots = false
+      print_tree = false
       @roots.each do |root|
-        double_space_roots = true unless root.children.empty?
+        print_tree = true unless root.children.empty?
       end
       num_count = 1
-      @logger.start_data_item unless double_space_roots
-      @logger.prose( @data_amount, "[ RESPONSE DATA ]", " ") unless double_space_roots
       @roots.each do |root|
-        @logger.start_data_item if double_space_roots
-        @logger.prose( @data_amount, "[ RESPONSE DATA ]", " ") if double_space_roots
+        @logger.start_data_item if print_tree
+        @logger.prose( @data_amount, "[ RESPONSE DATA ]", " ")
         if annotate
           if root.alert
             s = format( "   # %s", root.to_s )
@@ -172,9 +170,8 @@ module NicInfo
           child_num += 1 if child_num > 0
         end if root.children() != nil
         num_count += 1
-        @logger.end_data_item if double_space_roots
-      end
-      @logger.end_data_item unless double_space_roots
+        @logger.end_data_item
+      end if print_tree
       return retval
     end
 

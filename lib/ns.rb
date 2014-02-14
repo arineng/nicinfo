@@ -26,6 +26,24 @@ module NicInfo
     NicInfo::display_object_with_entities( ns, config, data_node )
   end
 
+  def NicInfo.display_nameservers json_data, config, data_node
+    ns_array = json_data[ "nameserverSearchResults" ]
+    if ns_array != nil
+      if ns_array.instance_of? Array
+        display_array = Array.new
+        ns_array.each do |ea|
+          ns = Ns.new( config ).process( ea )
+          display_array << ns
+        end
+        NicInfo::display_object_with_entities( display_array, config, data_node )
+      else
+        config.conf_msgs << "'nameserverSearchResults' is not an array"
+      end
+    else
+      config.conf_msgs << "'nameserverSearchResults' is not present"
+    end
+  end
+
   # deals with RDAP nameserver structures
   class Ns
 

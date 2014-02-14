@@ -21,16 +21,23 @@ require 'entity'
 module NicInfo
 
   def NicInfo.display_object_with_entities object, config, data_node
-    if !object.entities.empty?
-      root = object.to_node
-      data_node.add_root( root )
-      NicInfo::add_entity_nodes( object.entities, root )
-      data_node.to_normal_log( config.logger, true )
+    obj_array = object
+    unless object.instance_of? Array
+      obj_array = Array.new
+      obj_array << object
     end
     respobjs = ResponseObjSet.new config
-    respobjs.add object
-    NicInfo::add_entity_respobjs( object.entities, respobjs )
-    respobjs.associateEntities object.entities
+    obj_array.each do |array_object|
+      root = array_object.to_node
+      data_node.add_root( root )
+      if !array_object.entities.empty?
+        NicInfo::add_entity_nodes( array_object.entities, root )
+      end
+      respobjs.add array_object
+      NicInfo::add_entity_respobjs( array_object.entities, respobjs )
+      respobjs.associateEntities array_object.entities
+    end
+    data_node.to_normal_log( config.logger, true )
     respobjs.display
   end
 
