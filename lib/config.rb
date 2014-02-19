@@ -239,7 +239,7 @@ bootstrap:
 
   lacnic_url: http://rdap.labs.lacnic.net/rdap
 
-  apnic_url: http://testwhois.apnic.net
+  apnic_url: http://rdap.apnic.net
 
   afrinic_url: http://whois.afrinic.net
 
