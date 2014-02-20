@@ -235,13 +235,13 @@ bootstrap:
 
   arin_url: http://rdappilot.arin.net/restfulwhois/rdap
 
-  ripe_url: http://rdap.db.ripe.net/rdap/
+  ripe_url: http://rdap.db.ripe.net
 
   lacnic_url: http://rdap.labs.lacnic.net/rdap
 
   apnic_url: http://rdap.apnic.net
 
-  afrinic_url: http://whois.afrinic.net
+  afrinic_url: http://rdap.rd.mu.afrinic.net/whois/AFRINIC
 
   com_url: http://tlab.verisign.com/COM
 
