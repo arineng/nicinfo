@@ -24,7 +24,7 @@ module NicInfo
   # Handles configuration of the application
   class Config
 
-    attr_accessor :logger, :config, :rdap_cache_dir, :options, :conf_msgs
+    attr_accessor :logger, :config, :rdap_cache_dir, :options, :conf_msgs, :rdap_bootstrap_dir
 
     # Intializes the configuration with a place to look for the config file
     # If the file doesn't exist, a default is used.
@@ -50,6 +50,7 @@ module NicInfo
     # If directory is nil, then it uses its own value
     def setup_workspace
 
+      @rdap_bootstrap_dir = File.join( @app_data, NicInfo::BOOTSTRAP_FILE_DIR )
       if ! File.exist?( @app_data )
 
         @logger.trace "Creating configuration in " + @app_data
@@ -61,12 +62,10 @@ module NicInfo
         @rdap_cache_dir = File.join( @app_data, "rdap_cache" )
         Dir.mkdir( @rdap_cache_dir )
 
-        @rdap_bootstrap_dir = File.join( @app_data, NicInfo::BOOTSTRAP_FILE_DIR )
         copy_bsfiles
 
       else
 
-        @rdap_bootstrap_dir = File.join( @app_data, NicInfo::BOOTSTRAP_FILE_DIR )
         if @options.reset_config
           config_file_name = Config.formulate_config_file_name( @app_data )
           @logger.trace "Resetting configuration in " + config_file_name

@@ -244,6 +244,12 @@ module NicInfo
           @config.options.require_query = false
         end
 
+        opts.on( "--iana",
+                 "Download RDAP bootstrap files from IANA" ) do
+          @config.options.get_iana_files = true
+          @config.options.require_query = false
+        end
+
       end
 
       begin
@@ -311,9 +317,39 @@ module NicInfo
 
       end
 
-      return data
-
     end
+
+    # Do an HTTP GET of a file
+    def get_file_via_http url, file_name, try
+
+      @config.logger.trace("Downloading " + url + " to " + file_name )
+      uri = URI.parse( URI::encode( url ) )
+      req = Net::HTTP::Get.new(uri.request_uri)
+      req["User-Agent"] = NicInfo::VERSION
+      req["Accept"] = NicInfo::JSON_CONTENT_TYPE
+      req["Connection"] = "close"
+      http = Net::HTTP.new( uri.host, uri.port )
+      if uri.scheme == "https"
+        http.use_ssl=true
+        http.verify_mode=OpenSSL::SSL::VERIFY_NONE
+      end
+      res = http.start do |http_req|
+        http_req.request(req)
+      end
+
+      case res
+        when Net::HTTPSuccess
+          File.write(file_name, res.body)
+        else
+          if res.code == "301" or res.code == "302" or res.code == "303" or res.code == "307" or res.code == "308"
+            res.error! if try >= 5
+            location = res["location"]
+            return get_file_via_http( location, file_name, try + 1)
+          end
+          res.error!
+      end
+    end
+
 
     def run
 
@@ -325,6 +361,13 @@ module NicInfo
 
       if @config.options.empty_cache
         @cache.empty
+      end
+
+      if @config.options.get_iana_files
+        get_file_via_http( "http://data.iana.org/rdap/asn.json", File.join( @config.rdap_bootstrap_dir, "asn.json" ), 0 )
+        get_file_via_http( "http://data.iana.org/rdap/ipv4.json", File.join( @config.rdap_bootstrap_dir, "ipv4.json" ), 0 )
+        get_file_via_http( "http://data.iana.org/rdap/ipv6.json", File.join( @config.rdap_bootstrap_dir, "ipv6.json" ), 0 )
+        get_file_via_http( "http://data.iana.org/rdap/dns.json", File.join( @config.rdap_bootstrap_dir, "dns.json" ), 0 )
       end
 
       if @config.options.demo
