@@ -61,8 +61,12 @@ module NicInfo
         @rdap_cache_dir = File.join( @app_data, "rdap_cache" )
         Dir.mkdir( @rdap_cache_dir )
 
+        @rdap_bootstrap_dir = File.join( @app_data, NicInfo::BOOTSTRAP_FILE_DIR )
+        copy_bsfiles
+
       else
 
+        @rdap_bootstrap_dir = File.join( @app_data, NicInfo::BOOTSTRAP_FILE_DIR )
         if @options.reset_config
           config_file_name = Config.formulate_config_file_name( @app_data )
           @logger.trace "Resetting configuration in " + config_file_name
@@ -70,6 +74,9 @@ module NicInfo
           f.puts @@yaml_config
           f.close
           @config = YAML.load( File.open( config_file_name ) )
+          @logger.trace "Resetting bootstrap files in " + @rdap_bootstrap_dir
+          FileUtils::rm_r( @rdap_bootstrap_dir )
+          copy_bsfiles
         end
         @logger.trace "Using configuration found in " + @app_data
         @rdap_cache_dir = File.join( @app_data, "rdap_cache" )
@@ -78,6 +85,10 @@ module NicInfo
 
     end
 
+    def copy_bsfiles
+      src_dir = File.join( File.dirname( __FILE__ ), NicInfo::BOOTSTRAP_FILE_DIR )
+      FileUtils::cp_r( src_dir, @rdap_bootstrap_dir )
+    end
 
     def save name, data
       data_file = File.open( File.join( @app_data, name ), "w" )

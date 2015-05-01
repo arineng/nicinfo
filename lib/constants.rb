@@ -51,6 +51,7 @@ module NicInfo
   V4_ALLOCATIONS         = "v4_allocations.xml"
   AS_ALLOCATIONS         = "as_allocations.xml"
   DEMO_DIR               = "demo"
+  BOOTSTRAP_FILE_DIR     = "bsfiles"
 
   # Config constants
   OUTPUT = "output"

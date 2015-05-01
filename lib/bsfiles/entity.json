@@ -1,0 +1,53 @@
+{
+  "rdap_bootstrap": {
+    "version": "1.0",
+    "publication": "2014-09-09T15:39:03-0400",
+    "services": [
+      [
+        [
+          "ARIN"
+        ],
+        [
+          "https://rdappilot.arin.net/restfulwhois/rdap",
+          "http://rdappilot.arin.net/restfulwhois/rdap"
+        ]
+      ],
+      [
+        [
+          "AP"
+        ],
+        [
+          "https://rdap.apnic.net",
+          "http://rdap.apnic.net"
+        ]
+      ],
+      [
+        [
+          "RIPE"
+        ],
+        [
+          "https://rdap.db.ripe.net",
+          "http://rdap.db.ripe.net"
+        ]
+      ],
+      [
+        [
+          "AFRINIC"
+        ],
+        [
+          "https://rdap.rd.me.afrinic.net/whois/AFRINIC",
+          "http://rdap.rd.me.afrinic.net/whois/AFRINIC"
+        ]
+      ],
+      [
+        [
+          "LACNIC"
+        ],
+        [
+          "https://rdap.lacnic.net/rdap",
+          "http://rdap.lacnic.net/rdap"
+        ]
+      ]
+    ]
+  }
+}

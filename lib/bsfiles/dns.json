@@ -1,0 +1,55 @@
+{
+  "rdap_bootstrap": {
+    "version": "1.0",
+    "publication": "2014-09-09T15:39:03-0400",
+    "services": [
+      [
+        [
+          "com",
+          "net",
+          "name"
+        ],
+        [
+          "https://tlab.verisign.com/COM",
+          "http://tlab.verisign.com/COM"
+        ]
+      ],
+      [
+        [
+          "org"
+        ],
+        [
+          "https://whois.pir.org",
+          "http://whois.pir.org"
+        ]
+      ],
+      [
+        [
+          "info"
+        ],
+        [
+          "https://rdg.afilias.info/rdap",
+          "http://rdg.afilias.info/rdap"
+        ]
+      ],
+      [
+        [
+          "biz"
+        ],
+        [
+          "https://whois.neustar.biz",
+          "http://whois.neustar.biz"
+        ]
+      ],
+      [
+        [
+          "cn"
+        ],
+        [
+          "https://rdap.restfulwhois.org",
+          "http://rdap.restfulwhois.org"
+        ]
+      ]
+    ]
+  }
+}
