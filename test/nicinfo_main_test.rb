@@ -73,6 +73,7 @@ class NicInfoMainTest < Test::Unit::TestCase
     assert_equal( nicinfo.guess_query_value_type( [ "1.1=" ] ), "RESULT" )
     assert_equal( nicinfo.guess_query_value_type( [ "1.1.1=" ] ), "RESULT" )
     assert_equal( nicinfo.guess_query_value_type( [ "foo" ] ), "ESBYNAME" )
+    assert_equal( nicinfo.guess_query_value_type( [ "http://rdap.arin.net/ip/1.1.1.1" ] ), "URL" )
 
   end
 
