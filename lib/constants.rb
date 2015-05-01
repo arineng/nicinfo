@@ -1,4 +1,4 @@
-# Copyright (C) 2011,2012,2013,2014 American Registry for Internet Numbers
+# Copyright (C) 2011,2012,2013,2014,2015 American Registry for Internet Numbers
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -18,8 +18,8 @@
 
 module NicInfo
 
-  VERSION = "NicInfo v.1000.0.0-SNAPSHOT"
-  COPYRIGHT = "Copyright (c) 2011,2012,2013 American Registry for Internet Numbers (ARIN)"
+  VERSION = "NicInfo v.0.1.0-snapshot"
+  COPYRIGHT = "Copyright (c) 2011,2012,2013,2014,2015 American Registry for Internet Numbers (ARIN)"
 
   # regular expressions
   NET_HANDLE_REGEX = /^NET-.*/i
