@@ -25,6 +25,7 @@
         }
     ],
     "handle":"XXXX",
+    "objectClassName":"entity",
     "ldhName":"ns1.xn--fo-5ja.example",
     "unicodeName":"foo.example",
     "status":[ "active" ],

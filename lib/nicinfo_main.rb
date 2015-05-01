@@ -465,6 +465,17 @@ module NicInfo
         else
           Notices.new.display_notices json_data, @config, @config.options.query_type == QueryType::BY_SERVER_HELP
           if @config.options.query_type != QueryType::BY_SERVER_HELP
+            result_type = get_query_type_from_result( json_data )
+            if result_type != nil
+              if result_type != @config.options.query_type
+                @config.logger.mesg( "Query type is " + @config.options.query_type + ". Result type is " + result_type + "." )
+              else
+                @config.logger.mesg( "Result type is " + result_type + "." )
+              end
+              @config.options.query_type = result_type
+            elsif json_data[ "errorCode" ] == nil
+              @config.conf_msgs << "Response has no result type."
+            end
             data_tree = DataTree.new( )
             case @config.options.query_type
               when QueryType::BY_IP4_ADDR
@@ -595,6 +606,35 @@ HELP_SUMMARY
       puts EXTENDED_HELP
       exit
 
+    end
+
+    # Looks at the returned JSON and attempts to match that
+    # to a query type.
+    def get_query_type_from_result( json_data )
+      retval = nil
+      object_class_name = json_data[ "objectClassName" ]
+      if object_class_name != nil
+        case object_class_name
+          when "domain"
+            retval = QueryType::BY_DOMAIN
+          when "ip network"
+            retval = QueryType::BY_IP
+          when "entity"
+            retval = QueryType::BY_ENTITY_HANDLE
+          when "autnum"
+            retval = QueryType::BY_AS_NUMBER
+          when "nameserver"
+            retval = QueryType::BY_NAMESERVER
+        end
+      end
+      if json_data[ "domainSearchResults" ]
+        retval = QueryType::SRCH_DOMAINS
+      elsif json_data[ "nameserverSearchResults" ]
+        retval = QueryType::SRCH_NS
+      elsif json_data[ "entitySearchResults" ]
+        retval = QueryType::SRCH_ENTITY_BY_NAME
+      end
+      return retval
     end
 
     # Evaluates the args and guesses at the type of query.

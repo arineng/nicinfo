@@ -64,6 +64,7 @@
         "entities":[
           {
             "handle":"MATTR-ARIN",
+            "objectClassName":"entity",
             "vcardArray":[
               "vcard",
               [
@@ -144,6 +145,7 @@
           },
           {
             "handle":"MAK21-ARIN",
+            "objectClassName":"entity",
             "vcardArray":[
               "vcard",
               [
@@ -227,6 +229,7 @@
       },
       {
         "handle":"XXXX2",
+        "objectClassName":"domain",
         "ldhName":"ns1.xn--fo-5ja.example",
         "unicodeName":"foo.example",
         "status":[ "active" ],
@@ -264,6 +267,7 @@
         "entities":[
           {
             "handle":"MATTR-ARIN",
+            "objectClassName":"entity",
             "vcardArray":[
               "vcard",
               [
@@ -344,6 +348,7 @@
           },
           {
             "handle":"MAK21-ARIN",
+            "objectClassName":"entity",
             "vcardArray":[
               "vcard",
               [

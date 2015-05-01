@@ -28,6 +28,7 @@
         }
     ],
     "handle":"NET6-2001-0DB8-0-1",
+    "objectClassName":"ip network",
     "startAddress":"2001:db8::0",
     "endAddress":"2001:db8::0:FFFF:FFFF:FFFF:FFFF:FFFF",
     "ipVersion":"v6",
@@ -66,6 +67,7 @@
     "entities":[
         {
             "handle":"ARIN-OPS",
+            "objectClassName":"entity",
             "vcardArray":[
                 "vcard",
                 [
@@ -123,6 +125,7 @@
             "entities":[
                 {
                     "handle":"MATTR-ARIN",
+                    "objectClassName":"entity",
                     "vcardArray":[
                         "vcard",
                         [
@@ -210,6 +213,7 @@
                 },
                 {
                     "handle":"MAK21-ARIN",
+                    "objectClassName":"entity",
                     "vcardArray":[
                         "vcard",
                         [

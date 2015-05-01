@@ -28,6 +28,7 @@
         }
     ],
     "handle":"AS10-RIR",
+    "objectClassName":"autnum",
     "startAutnum":10,
     "endAutnum":15,
     "name":"AS-RTR-1",
@@ -62,6 +63,7 @@
     "entities":[
         {
             "handle":"MATTR-ARIN",
+            "objectClassName":"entity",
             "vcardArray":[
                 "vcard",
                 [
@@ -142,6 +144,7 @@
         },
         {
             "handle":"MAK21-ARIN",
+            "objectClassName":"entity",
             "vcardArray":[
                 "vcard",
                 [

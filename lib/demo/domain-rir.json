@@ -21,6 +21,7 @@
         }
     ],
     "handle":"192.in-addr.arpa-001",
+    "objectClassName":"domain",
     "ldhName":"192.in-addr.arpa",
     "nameServers":[
         {
@@ -72,6 +73,7 @@
     "entities":[
         {
             "handle":"ARIN-OPS",
+            "objectClassName":"entity",
             "vcardArray":[
                 "vcard",
                 [
@@ -129,6 +131,7 @@
             "entities":[
                 {
                     "handle":"MATTR-ARIN",
+                    "objectClassName":"entity",
                     "vcardArray":[
                         "vcard",
                         [
@@ -216,6 +219,7 @@
                 },
                 {
                     "handle":"MAK21-ARIN",
+                    "objectClassName":"entity",
                     "vcardArray":[
                         "vcard",
                         [

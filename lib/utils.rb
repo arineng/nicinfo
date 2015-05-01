@@ -55,6 +55,10 @@ module NicInfo
     return json_data[ "handle" ]
   end
 
+  def NicInfo.get_object_class_name json_data
+    return json_data[ "objectClassName" ]
+  end
+
   def NicInfo.get_ldhName json_data
     return json_data[ "ldhName" ]
   end

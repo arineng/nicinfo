@@ -37,6 +37,7 @@
         }
     ],
     "handle" : "NS2.EXAMPLE.COM-01",
+    "objectClassName":"nameserver",
     "ldhName":"ns2.example.com",
     "ipAddresses":{
         "v6":[ "2001:db8::123", "2001:db8::124" ]
@@ -44,6 +45,7 @@
     "entities":[
         {
             "handle":"MATTR-ARIN",
+            "objectClassName":"entity",
             "vcardArray":[
                 "vcard",
                 [
@@ -124,6 +126,7 @@
         },
         {
             "handle":"MAK21-ARIN",
+            "objectClassName":"entity",
             "vcardArray":[
                 "vcard",
                 [

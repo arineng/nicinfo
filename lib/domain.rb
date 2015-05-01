@@ -126,6 +126,7 @@ module NicInfo
       @config.logger.start_data_item
       @config.logger.data_title "[ DOMAIN ]"
       @config.logger.terse "Handle", NicInfo::get_handle( @objectclass )
+      @config.logger.extra "Object Class Name", NicInfo::get_object_class_name( @objectclass )
       @config.logger.terse "Domain Name", NicInfo::get_ldhName( @objectclass )
       @config.logger.datum "I18N Domain Name", NicInfo::get_unicodeName( @objectclass )
       variants = @objectclass[ "variants" ]

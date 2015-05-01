@@ -36,5 +36,6 @@
             ]
         }
     ],
-    "ldhName":"ns1.example.com"
+    "ldhName":"ns1.example.com",
+    "objectClassName":"nameserver"
 }

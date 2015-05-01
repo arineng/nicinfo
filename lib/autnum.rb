@@ -48,6 +48,7 @@ module NicInfo
       @config.logger.start_data_item
       @config.logger.data_title "[ AS NUMBER ]"
       @config.logger.terse "Handle", NicInfo::get_handle( @objectclass )
+      @config.logger.extra "Object Class Name", NicInfo::get_object_class_name( @objectclass )
       endNum = NicInfo.get_endAutnum @objectclass
       startNum = NicInfo.get_startAutnum @objectclass
       if endNum

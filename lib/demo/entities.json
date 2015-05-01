@@ -23,6 +23,7 @@
   "entitySearchResults": [
     {
       "handle": "entity-dnr",
+      "objectClassName":"entity",
       "vcardArray": [
         "vcard",
         [
@@ -167,6 +168,7 @@
     },
     {
       "handle": "foo1",
+      "objectClassName":"entity",
       "vcardArray": [
         "vcard",
         [
@@ -304,6 +306,7 @@
     },
     {
           "handle":"ARIN-OPS",
+          "objectClassName":"entity",
           "vcardArray":[
             "vcard",
             [
@@ -361,6 +364,7 @@
           "entities":[
             {
               "handle":"MATTR-ARIN",
+              "objectClassName":"entity",
               "vcardArray":[
                 "vcard",
                 [
@@ -448,6 +452,7 @@
             },
             {
               "handle":"MAK21-ARIN",
+              "objectClassName":"entity",
               "vcardArray":[
                 "vcard",
                 [

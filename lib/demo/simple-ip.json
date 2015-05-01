@@ -25,6 +25,7 @@
     "startAddress":"192.0.2.0",
     "endAddress":"192.0.2.255",
     "handle":"XXXX-RIR",
+    "objectClassName":"ip network",
     "ipVersion":"v4",
     "name":"NET-RTR-1",
     "description":[ "A network used for example documentation" ],

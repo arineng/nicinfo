@@ -37,6 +37,7 @@
         }
     ],
     "handle":"foo1",
+    "objectClassName":"entity",
     "vcardArray" : [
       "vcard",
      [

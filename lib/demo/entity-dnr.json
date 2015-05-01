@@ -21,6 +21,7 @@
         }
     ],
     "handle":"entity-dnr",
+    "objectClassName":"entity",
     "vcardArray" : [
         "vcard",
         [
