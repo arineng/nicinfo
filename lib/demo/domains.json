@@ -18,7 +18,24 @@
                     "href":"https://www.arin.net/whois_tou.html"
                 }
             ]
-        }
+        },
+      {
+        "title" : "Search Policy",
+        "type" : "result set truncated due to authorization",
+        "description" :
+        [
+          "Search results are limited to 25 per day per querying IP."
+        ],
+        "links" :
+        [
+          {
+            "value" : "http://example.net/help",
+            "rel" : "alternate",
+            "type" : "text/html",
+            "href" : "http://www.example.com/search_policy.html"
+          }
+        ]
+      }
     ],
     "domainSearchResults":
     [

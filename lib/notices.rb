@@ -67,6 +67,10 @@ module NicInfo
       end
       config.conf_msgs << "'title' in 'notice' is not a string." unless title.instance_of?( String )
       config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "[ NOTICE ]", title
+      type = notice[ "type" ]
+      if type != nil
+        config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "Type", NicInfo.capitalize( type )
+      end
       description = notice[ "description" ]
       i = 1
       if description.instance_of?( Array )

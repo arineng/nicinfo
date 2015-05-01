@@ -538,6 +538,9 @@ module NicInfo
           when "500"
             @config.logger.mesg("RDAP server is reporting an internal error.")
             handle_error_response e.response
+          when "501"
+            @config.logger.mesg("RDAP server does not implement the query.")
+            handle_error_response e.response
           else
             @config.logger.mesg("Error #{e.response.code}.")
             handle_error_response e.response
@@ -807,8 +810,9 @@ HELP_SUMMARY
         if truncated
           @config.logger.mesg( "Results have been truncated by the server." )
         end
-      elsif truncated != nil
-        @config.conf_msgs << "'searchResultsTruncated' is not a boolean"
+      end
+      if truncated != nil
+        @config.conf_msgs << "'searchResultsTruncated' is not part of the RDAP specification and was removed before standardization."
       end
     end
 
