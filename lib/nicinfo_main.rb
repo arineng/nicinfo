@@ -536,9 +536,6 @@ module NicInfo
           when "404"
             @config.logger.mesg("Query yielded no results.")
             handle_error_response e.response
-          when "503"
-            @config.logger.mesg("RDAP service is unavailable.")
-            handle_error_response e.response
           else
             @config.logger.mesg("Error #{e.response.code}.")
             handle_error_response e.response
