@@ -552,6 +552,9 @@ module NicInfo
           when "501"
             @config.logger.mesg("RDAP server does not implement the query.")
             handle_error_response e.response
+          when "503"
+            @config.logger.mesg("RDAP server is reporting that it is unavailable.")
+            handle_error_response e.response
           else
             @config.logger.mesg("Error #{e.response.code}.")
             handle_error_response e.response
