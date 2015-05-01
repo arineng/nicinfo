@@ -62,6 +62,7 @@ module NicInfo
     QueryType.add_item :SRCH_NS_BY_NAME, "NSBYNAME"
     QueryType.add_item :SRCH_NS_BY_IP, "NSBYIP"
     QueryType.add_item :BY_SERVER_HELP, "HELP"
+    QueryType.add_item :BY_URL, "URL"
 
   end
 
@@ -103,6 +104,7 @@ module NicInfo
                 "  dsbynsip     - domain search by nameserver IP address",
                 "  nsbyname     - nameserver search by nameserver name",
                 "  nsbyip       - nameserver search by IP address",
+                "  url          - RDAP URL",
                 "  help         - server help") do |type|
           uptype = type.upcase
           raise OptionParser::InvalidArgument, type.to_s unless QueryType.has_value?(uptype)
@@ -126,11 +128,6 @@ module NicInfo
                 "The base URL of the RDAP Service.",
                 "When set, the internal bootstrap is bypassed.") do |url|
           @config.config[ NicInfo::BOOTSTRAP][ NicInfo::BOOTSTRAP_URL ] = url
-        end
-
-        opts.on("-u", "--url",
-                "Fetch a specific RDAP URL.") do |url|
-          @config.options.url = true
         end
 
         opts.separator ""
@@ -251,6 +248,10 @@ module NicInfo
 
       begin
         @opts.parse!(args)
+      rescue OptionParser::InvalidOption => e
+        puts e.message
+        puts "use -h for help"
+        exit
       rescue OptionParser::InvalidArgument => e
         puts e.message
         puts "use -h for help"
@@ -348,10 +349,6 @@ module NicInfo
         help()
       end
 
-      if @config.options.url and !@config.options.query_type
-        @config.options.query_type = get_query_type_from_url( @config.options.argv[ 0 ] )
-      end
-
       if @config.options.argv == nil || @config.options.argv == [] && !@config.options.query_type
         unless @config.options.require_query
           exit
@@ -387,6 +384,9 @@ module NicInfo
             @config.logger.mesg( "#{@config.options.argv[0]} is not retrievable.")
             exit
           end
+        elsif @config.options.query_type == QueryType::BY_URL
+          @config.options.url = @config.options.argv[0]
+          @config.options.query_type = get_query_type_from_url( @config.options.url )
         else
           @config.options.externally_queriable = true
         end
@@ -603,6 +603,8 @@ HELP_SUMMARY
       if args.length() == 1
 
         case args[0]
+          when NicInfo::URL_REGEX
+            retval = QueryType::BY_URL
           when NicInfo::IPV4_REGEX
             retval = QueryType::BY_IP4_ADDR
           when NicInfo::IPV6_REGEX

@@ -37,6 +37,7 @@ module NicInfo
   LACNIC_REGEX = /\-LACNIC/i
   AFRINIC_REGEX = /\-AFRINIC/i
   RIPE_REGEX = /\-RIPE/i
+  URL_REGEX = /^(http|https):\/\/.*/
 
   # IPv4 and IPv6 regular expressions are credited to Mike Poulson and are found here:
   #   http://blogs.msdn.com/b/mpoulson/archive/2005/01/10/350037.aspx
