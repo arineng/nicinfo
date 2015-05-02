@@ -30,6 +30,7 @@ class BootStrapTest < Test::Unit::TestCase
     @work_dir = Dir.mktmpdir
   end
 
+=begin
   def test_find_v6_addr
     dir = File.join( @work_dir, "test_find_v6_addr" )
     c = NicInfo::Config.new( dir )
@@ -43,7 +44,9 @@ class BootStrapTest < Test::Unit::TestCase
     assert_equal( "LACNIC", bootstrap.find_rir_by_ip( "2001:1200::/23" ) )
     assert_equal( "AFRINIC", bootstrap.find_rir_by_ip( "2001:4200::/23" ) )
   end
+=end
 
+=begin
   def test_find_v6_url
     dir = File.join( @work_dir, "test_find_v6_url" )
     c = NicInfo::Config.new( dir )
@@ -57,7 +60,9 @@ class BootStrapTest < Test::Unit::TestCase
     assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::LACNIC_URL ], bootstrap.find_rir_url_by_ip( "2001:1200::/23" ) )
     assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::AFRINIC_URL ], bootstrap.find_rir_url_by_ip( "2001:4200::/23" ) )
   end
+=end
 
+=begin
   def test_find_v4_addr
     dir = File.join( @work_dir, "test_find_v4_addr" )
     c = NicInfo::Config.new( dir )
@@ -75,6 +80,7 @@ class BootStrapTest < Test::Unit::TestCase
     assert_equal( "Administered by LACNIC", bootstrap.find_rir_by_ip( "191.0.0.1" ) )
     assert_equal( "Administered by AFRINIC", bootstrap.find_rir_by_ip( "196.0.0.1" ) )
   end
+=end
 
 =begin
   def test_find_v4_url
@@ -112,6 +118,20 @@ class BootStrapTest < Test::Unit::TestCase
     assert_equal( RIPE_URL, bootstrap.find_url_by_ip( "151.0.0.1" ) )
     assert_equal( LACNIC_URL, bootstrap.find_url_by_ip( "191.0.0.1" ) )
     assert_equal( AFRINIC_URL, bootstrap.find_url_by_ip( "196.0.0.1" ) )
+  end
+
+  def test_find_url_by_v6
+    dir = File.join( @work_dir, "test_find_url_by_v6" )
+    c = NicInfo::Config.new( dir )
+    c.logger.message_level = "NONE"
+    c.setup_workspace
+    bootstrap = NicInfo::Bootstrap.new c
+    assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::IP_ROOT_URL ], bootstrap.find_rir_url_by_ip( "2001:0000::1") )
+    assert_equal( ARIN_URL, bootstrap.find_url_by_ip( "2001:0400::/23" ) )
+    assert_equal( APNIC_URL, bootstrap.find_url_by_ip( "2001:0200::/23" ) )
+    assert_equal( RIPE_URL, bootstrap.find_url_by_ip( "2001:0600::/23" ) )
+    assert_equal( LACNIC_URL, bootstrap.find_url_by_ip( "2001:1200::/23" ) )
+    assert_equal( AFRINIC_URL, bootstrap.find_url_by_ip( "2001:4200::/23" ) )
   end
 
 =begin
