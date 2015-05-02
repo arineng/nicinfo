@@ -73,6 +73,33 @@ module NicInfo
       return retval
     end
 
+    def find_url_by_ip addr
+      retval = nil
+      if ! addr.instance_of? IPAddr
+        addr = IPAddr.new addr
+      end
+      file = File.join( @config.rdap_bootstrap_dir , NicInfo::IPV6_BOOTSTRAP ) if addr.ipv6?
+      file = File.join( @config.rdap_bootstrap_dir , NicInfo::IPV4_BOOTSTRAP ) if addr.ipv4?
+      data = JSON.parse( File.read( file ) )
+      data["rdap_bootstrap"][ "services" ].each do |service|
+        service[ 0 ].each do |service_entry|
+          if addr.ipv6?
+            prefix = IPAddr.new( service_entry )
+          else
+            entry = service_entry.split( "/" )[0].to_i.to_s + ".0.0.0"
+            prefix = IPAddr.new( entry )
+            prefix = prefix.mask( 8 )
+          end
+          if prefix.include?( addr )
+            retval = get_service_url( service[ 1 ] )
+            break
+          end
+        end
+      end
+      retval = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::IP_ROOT_URL ] if retval == nil
+      return retval
+    end
+
     def find_rir_by_as as
       if as.instance_of? String
         as.sub!( /^AS/i, '')

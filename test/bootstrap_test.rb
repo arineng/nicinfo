@@ -76,6 +76,7 @@ class BootStrapTest < Test::Unit::TestCase
     assert_equal( "Administered by AFRINIC", bootstrap.find_rir_by_ip( "196.0.0.1" ) )
   end
 
+=begin
   def test_find_v4_url
     dir = File.join( @work_dir, "test_find_v4_url" )
     c = NicInfo::Config.new( dir )
@@ -92,6 +93,25 @@ class BootStrapTest < Test::Unit::TestCase
     assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::RIPE_URL ], bootstrap.find_rir_url_by_ip( "151.0.0.1" ) )
     assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::LACNIC_URL ], bootstrap.find_rir_url_by_ip( "191.0.0.1" ) )
     assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::AFRINIC_URL ], bootstrap.find_rir_url_by_ip( "196.0.0.1" ) )
+  end
+=end
+
+  def test_find_url_by_v4
+    dir = File.join( @work_dir, "test_find_url_by_v4" )
+    c = NicInfo::Config.new( dir )
+    c.logger.message_level = "NONE"
+    c.setup_workspace
+    bootstrap = NicInfo::Bootstrap.new c
+    assert_equal( ARIN_URL, bootstrap.find_url_by_ip( "216.0.0.1" ) )
+    assert_equal( APNIC_URL, bootstrap.find_url_by_ip( "218.0.0.1" ) )
+    assert_equal( RIPE_URL, bootstrap.find_url_by_ip( "212.0.0.1" ) )
+    assert_equal( LACNIC_URL, bootstrap.find_url_by_ip( "200.0.0.1" ) )
+    assert_equal( AFRINIC_URL, bootstrap.find_url_by_ip( "102.0.0.1" ) )
+    assert_equal( ARIN_URL, bootstrap.find_url_by_ip( "128.0.0.1" ) )
+    assert_equal( APNIC_URL, bootstrap.find_url_by_ip( "133.0.0.1" ) )
+    assert_equal( RIPE_URL, bootstrap.find_url_by_ip( "151.0.0.1" ) )
+    assert_equal( LACNIC_URL, bootstrap.find_url_by_ip( "191.0.0.1" ) )
+    assert_equal( AFRINIC_URL, bootstrap.find_url_by_ip( "196.0.0.1" ) )
   end
 
 =begin
