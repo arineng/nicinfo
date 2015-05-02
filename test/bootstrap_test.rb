@@ -17,6 +17,13 @@ require 'bootstrap'
 require 'constants'
 
 class BootStrapTest < Test::Unit::TestCase
+
+  ARIN_URL = "https://rdappilot.arin.net/restfulwhois/rdap"
+  APNIC_URL = "https://rdap.apnic.net"
+  LACNIC_URL = "https://rdap.lacnic.net/rdap"
+  AFRINIC_URL = "https://rdap.rd.me.afrinic.net/whois/AFRINIC"
+  RIPE_URL = "https://rdap.db.ripe.net"
+
   @work_dir = nil
 
   def setup
@@ -87,6 +94,7 @@ class BootStrapTest < Test::Unit::TestCase
     assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::AFRINIC_URL ], bootstrap.find_rir_url_by_ip( "196.0.0.1" ) )
   end
 
+=begin
   def test_find_rir_by_as
     dir = File.join( @work_dir, "test_find_v4_url" )
     c = NicInfo::Config.new( dir )
@@ -102,6 +110,24 @@ class BootStrapTest < Test::Unit::TestCase
     assert_equal( "Assigned by LACNIC", bootstrap.find_rir_by_as( 23541 ) )
     assert_equal( "Assigned by AFRINIC", bootstrap.find_rir_by_as( 23549 ) )
     assert_equal( "Assigned by ARIN", bootstrap.find_rir_by_as( 393216 ) )
+  end
+=end
+
+  def test_find_url_by_as
+    dir = File.join( @work_dir, "test_find_url_by_as" )
+    c = NicInfo::Config.new( dir )
+    c.logger.message_level = "NONE"
+    c.setup_workspace
+    bootstrap = NicInfo::Bootstrap.new c
+    assert_equal( ARIN_URL, bootstrap.find_url_by_as( 26756 ) )
+    assert_equal( ARIN_URL, bootstrap.find_url_by_as( 26755 ) )
+    assert_equal( ARIN_URL, bootstrap.find_url_by_as( 27575 ) )
+    assert_equal( APNIC_URL, bootstrap.find_url_by_as( 23552 ) )
+    assert_equal( LACNIC_URL, bootstrap.find_url_by_as( 27648 ) )
+    assert_equal( RIPE_URL, bootstrap.find_url_by_as( 24735 ) )
+    assert_equal( LACNIC_URL, bootstrap.find_url_by_as( 23541 ) )
+    assert_equal( AFRINIC_URL, bootstrap.find_url_by_as( 23549 ) )
+    assert_equal( ARIN_URL, bootstrap.find_url_by_as( 393216 ) )
   end
 
   def test_get_ip4_from_inaddr

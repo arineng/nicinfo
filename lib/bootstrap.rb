@@ -15,6 +15,7 @@
 require 'rexml/document'
 require 'constants'
 require 'ipaddr'
+require 'json'
 
 module NicInfo
 
@@ -99,6 +100,28 @@ module NicInfo
       return retval
     end
 
+    def find_url_by_as as
+      if as.instance_of? String
+        as.sub!( /^AS/i, '')
+        as = as.to_i
+      end
+      retval = nil
+      file = File.join( @config.rdap_bootstrap_dir , NicInfo::ASN_BOOTSTRAP )
+      data = JSON.parse( File.read( file ) )
+      data["rdap_bootstrap"][ "services" ].each do |service|
+        service[ 0 ].each do |service_entry|
+          numbers = service_entry.split( "-" )
+          min = numbers[ 0 ].to_i
+          max = numbers[ -1 ].to_i
+          if (as >= min ) && (as <= max)
+            retval = get_service_url( service[ 1 ] )
+            break
+          end
+        end
+      end
+      return retval
+    end
+
     def get_ip4_by_inaddr inaddr
       inaddr = inaddr.sub( /\.in\-addr\.arpa\.?/, "")
       a = inaddr.split( "." ).reverse
@@ -168,6 +191,23 @@ module NicInfo
           end
       end
       return retval
+    end
+
+    def get_service_url service_url_array
+      http_url = nil
+      https_url = nil
+      service_url_array.each do |url|
+        if url.start_with?( "https" )
+          https_url = url
+        elsif url.start_with?( "http" )
+          http_url = url
+        end
+      end
+      if https_url != nil
+        return https_url
+      end
+      #else
+      return http_url
     end
 
   end
