@@ -128,6 +128,7 @@ class BootStrapTest < Test::Unit::TestCase
     assert_equal( LACNIC_URL, bootstrap.find_url_by_as( 23541 ) )
     assert_equal( AFRINIC_URL, bootstrap.find_url_by_as( 23549 ) )
     assert_equal( ARIN_URL, bootstrap.find_url_by_as( 393216 ) )
+    assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::AS_ROOT_URL ], bootstrap.find_url_by_as( 0 ) )
   end
 
   def test_get_ip4_from_inaddr

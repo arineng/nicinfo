@@ -119,6 +119,7 @@ module NicInfo
           end
         end
       end
+      retval = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::AS_ROOT_URL ] if retval == nil
       return retval
     end
 
