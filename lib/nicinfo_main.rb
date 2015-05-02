@@ -313,11 +313,13 @@ module NicInfo
               return get( location, try + 1)
             end
             res.error!
-        end
+        end #end case
 
-      end
+      end #end if
 
-    end
+      return data
+
+    end #end def
 
     # Do an HTTP GET of a file
     def get_file_via_http url, file_name, try

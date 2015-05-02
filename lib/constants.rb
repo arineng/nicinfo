@@ -52,6 +52,11 @@ module NicInfo
   AS_ALLOCATIONS         = "as_allocations.xml"
   DEMO_DIR               = "demo"
   BOOTSTRAP_FILE_DIR     = "bsfiles"
+  ASN_BOOTSTRAP          = "asn.json"
+  DNS_BOOTSTRAP          = "dns.json"
+  ENTITY_BOOTSTRAP       = "entity.json"
+  IPV4_BOOTSTRAP         = "ipv4.json"
+  IPV6_BOOTSTRAP         = "ipv6.json"
 
   # Config constants
   OUTPUT = "output"
