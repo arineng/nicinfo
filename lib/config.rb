@@ -74,7 +74,11 @@ module NicInfo
           f.close
           @config = YAML.load( File.open( config_file_name ) )
           @logger.trace "Resetting bootstrap files in " + @rdap_bootstrap_dir
-          FileUtils::rm_r( @rdap_bootstrap_dir )
+          begin
+            FileUtils::rm_r( @rdap_bootstrap_dir )
+          rescue Errno::ENOENT
+            # do nothing
+          end
           copy_bsfiles
         end
         @logger.trace "Using configuration found in " + @app_data
