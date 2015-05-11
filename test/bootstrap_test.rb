@@ -23,6 +23,8 @@ class BootStrapTest < Test::Unit::TestCase
   LACNIC_URL = "https://rdap.lacnic.net/rdap"
   AFRINIC_URL = "https://rdap.rd.me.afrinic.net/whois/AFRINIC"
   RIPE_URL = "https://rdap.db.ripe.net"
+  COM_URL = "https://tlab.verisign.com/COM"
+  BIZ_URL = "https://whois.neustar.biz"
 
   @work_dir = nil
 
@@ -206,6 +208,18 @@ class BootStrapTest < Test::Unit::TestCase
     assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::COM_URL ], bootstrap.find_url_by_domain( "exmaple.com") )
     assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::BIZ_URL ], bootstrap.find_url_by_domain( "www.exmaple.biz") )
     assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::DOMAIN_ROOT_URL ], bootstrap.find_url_by_domain( "www.exmaple.museuum") )
+  end
+
+  def test_find_url_by_forward_domain
+    dir = File.join( @work_dir, "test_find_url_by_forward_domain" )
+    c = NicInfo::Config.new( dir )
+    c.logger.message_level = "NONE"
+    c.setup_workspace
+    bootstrap = NicInfo::Bootstrap.new c
+    assert_equal( COM_URL, bootstrap.find_url_by_forward_domain( "www.exmaple.com") )
+    assert_equal( COM_URL, bootstrap.find_url_by_forward_domain( "exmaple.com") )
+    assert_equal( BIZ_URL, bootstrap.find_url_by_forward_domain( "www.exmaple.biz") )
+    assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::DOMAIN_ROOT_URL ], bootstrap.find_url_by_forward_domain( "www.exmaple.museuum") )
   end
 
   def test_find_url_by_entity_suffix

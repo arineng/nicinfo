@@ -198,6 +198,29 @@ module NicInfo
       return retval
     end
 
+    def find_url_by_forward_domain domain
+      retval = nil
+      file = File.join( @config.rdap_bootstrap_dir , NicInfo::DNS_BOOTSTRAP )
+      data = JSON.parse( File.read( file ) )
+      longest_domain = nil
+      longest_urls = nil
+      data["rdap_bootstrap"][ "services" ].each do |service|
+        service[ 0 ].each do |service_entry|
+          if domain.end_with?( service_entry )
+            if longest_domain == nil || longest_domain.length < service_entry.length
+              longest_domain = service_entry
+              longest_urls = service[ 1 ]
+            end
+          end
+        end
+      end
+      if longest_urls != nil
+        retval = get_service_url( longest_urls )
+      end
+      retval = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::DOMAIN_ROOT_URL ] if retval == nil
+      return retval
+    end
+
     def find_url_by_entity_suffix entity_name
       retval = nil
       case entity_name
