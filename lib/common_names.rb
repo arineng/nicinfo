@@ -31,7 +31,7 @@ module NicInfo
     retval = false
 
     file = File.new( File.join( File.dirname( __FILE__ ) , file_name ), "r" )
-    file.lines.each do |line|
+    file.each_line do |line|
       if line.start_with?( name )
         retval = true
         break
