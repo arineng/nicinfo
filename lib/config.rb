@@ -239,23 +239,23 @@ bootstrap:
 
   entity_root_url: https://rdappilot.arin.net/restfulwhois/rdap
 
-  ip_root_url: http://rdappilot.arin.net/rdapbootstrap
+  ip_root_url: https://rdappilot.arin.net/restfulwhois/rdap
 
-  as_root_url: http://rdappilot.arin.net/rdapbootstrap
+  as_root_url: https://rdappilot.arin.net/restfulwhois/rdap
 
-  domain_root_url: http://rdappilot.arin.net/rdapbootstrap
+  domain_root_url: https://rdappilot.arin.net/restfulwhois/rdap
 
-  ns_root_url: http://rdappilot.arin.net/rdapbootstrap
+  ns_root_url: https://rdappilot.arin.net/restfulwhois/rdap
 
-  arin_url: http://rdappilot.arin.net/restfulwhois/rdap
+  arin_url: https://rdappilot.arin.net/restfulwhois/rdap
 
-  ripe_url: http://rdap.db.ripe.net
+  ripe_url: https://rdap.db.ripe.net
 
-  lacnic_url: http://rdap.labs.lacnic.net/rdap
+  lacnic_url: https://rdap.labs.lacnic.net/rdap
 
-  apnic_url: http://rdap.apnic.net
+  apnic_url: https://rdap.apnic.net
 
-  afrinic_url: http://rdap.rd.mu.afrinic.net/whois/AFRINIC
+  afrinic_url: https://rdap.rd.mu.afrinic.net/whois/AFRINIC
 
   com_url: http://tlab.verisign.com/COM
 

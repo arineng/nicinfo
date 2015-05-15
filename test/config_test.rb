@@ -45,7 +45,7 @@ class ConfigTest < Test::Unit::TestCase
     assert_equal( "NORMAL", c.config[ "output" ][ "data" ] )
     assert_nil( c.config[ NicInfo::OUTPUT ][ NicInfo::MESSAGES_FILE ] )
     assert_nil( c.config[ NicInfo::OUTPUT ][ NicInfo::DATA_FILE ] )
-    assert_equal( "http://rdappilot.arin.net/rdapbootstrap", c.config[ NicInfo::BOOTSTRAP ][ NicInfo::IP_ROOT_URL ] )
+    assert_equal( "https://rdappilot.arin.net/restfulwhois/rdap", c.config[ NicInfo::BOOTSTRAP ][ NicInfo::IP_ROOT_URL ] )
 
     assert_equal( "NORMAL", c.logger.data_amount )
     assert_equal( "SOME", c.logger.message_level )
