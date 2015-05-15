@@ -32,12 +32,8 @@ module NicInfo
   DOMAIN_REGEX = /^([\S\-]+\.?)+\.([a-z][a-z0\-]+)\.?$/i
   DOMAIN_SRCH_REGEX = /^([\S\-]+\.?)+\.([a-z][a-z0\-\*]+)\.?$/i
   NS_REGEX = /^ns[0-9]\.([\S\-]+\.?)+\.([a-z][a-z0\-]+)\.?$/i
-  ARIN_REGEX = /\-ARIN$/i
-  APNIC_REGEX = /\-AP$/i
-  LACNIC_REGEX = /\-LACNIC/i
-  AFRINIC_REGEX = /\-AFRINIC/i
-  RIPE_REGEX = /\-RIPE/i
   URL_REGEX = /^(http|https):\/\/.*/
+  ENTITY_REGEX = /^.*\-.*/
 
   # IPv4 and IPv6 regular expressions are credited to Mike Poulson and are found here:
   #   http://blogs.msdn.com/b/mpoulson/archive/2005/01/10/350037.aspx
@@ -47,10 +43,7 @@ module NicInfo
 
   #File Name Constants
   LASTTREE_YAML          = "lasttree.yaml"
-  V6_ALLOCATIONS         = "v6_allocations.xml"
-  V4_ALLOCATIONS         = "v4_allocations.xml"
-  AS_ALLOCATIONS         = "as_allocations.xml"
-  DEMO_DIR               = "demo"
+ DEMO_DIR               = "demo"
   BOOTSTRAP_FILE_DIR     = "bsfiles"
   ASN_BOOTSTRAP          = "asn.json"
   DNS_BOOTSTRAP          = "dns.json"

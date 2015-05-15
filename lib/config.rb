@@ -247,30 +247,6 @@ bootstrap:
 
   ns_root_url: https://rdappilot.arin.net/restfulwhois/rdap
 
-  arin_url: https://rdappilot.arin.net/restfulwhois/rdap
-
-  ripe_url: https://rdap.db.ripe.net
-
-  lacnic_url: https://rdap.labs.lacnic.net/rdap
-
-  apnic_url: https://rdap.apnic.net
-
-  afrinic_url: https://rdap.rd.mu.afrinic.net/whois/AFRINIC
-
-  com_url: http://tlab.verisign.com/COM
-
-  net_url: http://tlab.verisign.com/COM
-
-  org_url: http://whois.pir.org
-
-  info_url: http://rdg.afilias.info/rdap
-
-  biz_url: http://whois.neustar.biz
-
-  cn_url: http://rdap.restfulwhois.org
-
-  name_url: http://tlab.verisign.com/NAME
-
 search:
 
   # Substring matching

@@ -451,21 +451,21 @@ module NicInfo
         end
         case qtype
           when QueryType::BY_IP4_ADDR
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_rir_url_by_ip( @config.options.argv[ 0 ] )
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @config.options.argv[ 0 ] )
           when QueryType::BY_IP6_ADDR
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_rir_url_by_ip( @config.options.argv[ 0 ] )
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @config.options.argv[ 0 ] )
           when QueryType::BY_IP4_CIDR
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_rir_url_by_ip( @config.options.argv[ 0 ] )
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @config.options.argv[ 0 ] )
           when QueryType::BY_IP6_CIDR
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_rir_url_by_ip( @config.options.argv[ 0 ] )
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @config.options.argv[ 0 ] )
           when QueryType::BY_AS_NUMBER
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_rir_url_by_as( @config.options.argv[ 0 ] )
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_as( @config.options.argv[ 0 ] )
           when QueryType::BY_DOMAIN
             @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
           when QueryType::BY_NAMESERVER
             @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
           when QueryType::BY_ENTITY_HANDLE
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::ENTITY_ROOT_URL ]
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_entity( @config.options.argv[ 0 ] )
           when QueryType::SRCH_ENTITY_BY_NAME
             @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::ENTITY_ROOT_URL ]
           when QueryType::SRCH_DOMAIN_BY_NAME
@@ -477,7 +477,7 @@ module NicInfo
           when QueryType::SRCH_NS_BY_NAME
             @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
           when QueryType::SRCH_NS_BY_IP
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_rir_url_by_ip( @config.options.argv[ 0 ] )
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @config.options.argv[ 0 ] )
           else
             @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::HELP_ROOT_URL ]
         end
@@ -723,15 +723,7 @@ HELP_SUMMARY
             retval = QueryType::BY_NAMESERVER
           when NicInfo::DOMAIN_REGEX
             retval = QueryType::BY_DOMAIN
-          when NicInfo::ARIN_REGEX
-            retval = QueryType::BY_ENTITY_HANDLE
-          when NicInfo::APNIC_REGEX
-            retval = QueryType::BY_ENTITY_HANDLE
-          when NicInfo::AFRINIC_REGEX
-            retval = QueryType::BY_ENTITY_HANDLE
-          when NicInfo::LACNIC_REGEX
-            retval = QueryType::BY_ENTITY_HANDLE
-          when NicInfo::RIPE_REGEX
+          when NicInfo::ENTITY_REGEX
             retval = QueryType::BY_ENTITY_HANDLE
           else
             last_name = args[ 0 ].sub( /\*/, '' ).upcase
