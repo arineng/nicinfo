@@ -221,6 +221,25 @@ module NicInfo
       return retval
     end
 
+    def find_url_by_entity entity_name
+      retval = nil
+      suffix = entity_name.downcase.split( '-' ).last
+      if suffix
+        file = File.join( @config.rdap_bootstrap_dir , NicInfo::ENTITY_BOOTSTRAP )
+        data = JSON.parse( File.read( file ) )
+        data["rdap_bootstrap"][ "services" ].each do |service|
+          service[ 0 ].each do |service_entry|
+            if service_entry.downcase == suffix
+              retval = get_service_url( service[ 1 ] )
+              break
+            end
+          end
+        end
+      end
+      retval = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::ENTITY_ROOT_URL ] if retval == nil
+      return retval
+    end
+
     def find_url_by_entity_suffix entity_name
       retval = nil
       case entity_name

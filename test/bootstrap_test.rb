@@ -239,4 +239,19 @@ class BootStrapTest < Test::Unit::TestCase
     assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::BIZ_URL ], bootstrap.find_url_by_entity_suffix( "xxx-biz") )
     assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::DOMAIN_ROOT_URL ], bootstrap.find_url_by_entity_suffix( "xxx-museum") )
   end
+
+  def test_find_url_by_entity
+    dir = File.join( @work_dir, "test_find_url_by_entity" )
+    c = NicInfo::Config.new( dir )
+    c.logger.message_level = "NONE"
+    c.setup_workspace
+    bootstrap = NicInfo::Bootstrap.new c
+    assert_equal( ARIN_URL, bootstrap.find_url_by_entity( "XXX-ARIN") )
+    assert_equal( ARIN_URL, bootstrap.find_url_by_entity( "xxx-arin") )
+    assert_equal( AFRINIC_URL, bootstrap.find_url_by_entity( "xxx-afrinic") )
+    assert_equal( APNIC_URL, bootstrap.find_url_by_entity( "xxx-ap") )
+    assert_equal( LACNIC_URL, bootstrap.find_url_by_entity( "xxx-lacnic") )
+    assert_equal( RIPE_URL, bootstrap.find_url_by_entity( "xxx-ripe") )
+    assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::ENTITY_ROOT_URL ], bootstrap.find_url_by_entity( "xxx-museum") )
+  end
 end
