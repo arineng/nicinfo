@@ -222,6 +222,7 @@ class BootStrapTest < Test::Unit::TestCase
     assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::DOMAIN_ROOT_URL ], bootstrap.find_url_by_forward_domain( "www.exmaple.museuum") )
   end
 
+=begin
   def test_find_url_by_entity_suffix
     dir = File.join( @work_dir, "test_find_url_by_entity_suffix" )
     c = NicInfo::Config.new( dir )
@@ -239,6 +240,7 @@ class BootStrapTest < Test::Unit::TestCase
     assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::BIZ_URL ], bootstrap.find_url_by_entity_suffix( "xxx-biz") )
     assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::DOMAIN_ROOT_URL ], bootstrap.find_url_by_entity_suffix( "xxx-museum") )
   end
+=end
 
   def test_find_url_by_entity
     dir = File.join( @work_dir, "test_find_url_by_entity" )
