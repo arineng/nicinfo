@@ -34,7 +34,8 @@ module NicInfo
       file = File.join( @config.rdap_bootstrap_dir , NicInfo::IPV6_BOOTSTRAP ) if addr.ipv6?
       file = File.join( @config.rdap_bootstrap_dir , NicInfo::IPV4_BOOTSTRAP ) if addr.ipv4?
       data = JSON.parse( File.read( file ) )
-      data["rdap_bootstrap"][ "services" ].each do |service|
+      services = get_services data
+      services.each do |service|
         service[ 0 ].each do |service_entry|
           if addr.ipv6?
             prefix = IPAddr.new( service_entry )
@@ -48,7 +49,7 @@ module NicInfo
             break
           end
         end
-      end
+      end if services
       retval = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::IP_ROOT_URL ] if retval == nil
       return retval
     end
@@ -61,7 +62,8 @@ module NicInfo
       retval = nil
       file = File.join( @config.rdap_bootstrap_dir , NicInfo::ASN_BOOTSTRAP )
       data = JSON.parse( File.read( file ) )
-      data["rdap_bootstrap"][ "services" ].each do |service|
+      services = get_services data
+      services.each do |service|
         service[ 0 ].each do |service_entry|
           numbers = service_entry.split( "-" )
           min = numbers[ 0 ].to_i
@@ -71,7 +73,7 @@ module NicInfo
             break
           end
         end
-      end
+      end if services
       retval = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::AS_ROOT_URL ] if retval == nil
       return retval
     end
@@ -128,7 +130,8 @@ module NicInfo
       data = JSON.parse( File.read( file ) )
       longest_domain = nil
       longest_urls = nil
-      data["rdap_bootstrap"][ "services" ].each do |service|
+      services = get_services data
+      services.each do |service|
         service[ 0 ].each do |service_entry|
           if domain.end_with?( service_entry )
             if longest_domain == nil || longest_domain.length < service_entry.length
@@ -137,7 +140,7 @@ module NicInfo
             end
           end
         end
-      end
+      end if services
       if longest_urls != nil
         retval = get_service_url( longest_urls )
       end
@@ -151,17 +154,25 @@ module NicInfo
       if suffix
         file = File.join( @config.rdap_bootstrap_dir , NicInfo::ENTITY_BOOTSTRAP )
         data = JSON.parse( File.read( file ) )
-        data["rdap_bootstrap"][ "services" ].each do |service|
+        services = get_services data
+        services.each do |service|
           service[ 0 ].each do |service_entry|
             if service_entry.downcase == suffix
               retval = get_service_url( service[ 1 ] )
               break
             end
           end
-        end
+        end if services
       end
       retval = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::ENTITY_ROOT_URL ] if retval == nil
       return retval
+    end
+
+    def get_services data
+      rdap_bootstrap = data["rdap_bootstrap"]
+      if rdap_bootstrap
+        rdap_bootstrap["services"]
+      end
     end
 
     def get_service_url service_url_array

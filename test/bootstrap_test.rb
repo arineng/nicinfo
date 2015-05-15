@@ -41,6 +41,7 @@ class BootStrapTest < Test::Unit::TestCase
     bootstrap = NicInfo::Bootstrap.new c
     assert_equal( ARIN_URL, bootstrap.find_url_by_ip( "216.0.0.1" ) )
     assert_equal( APNIC_URL, bootstrap.find_url_by_ip( "218.0.0.1" ) )
+    assert_equal( APNIC_URL, bootstrap.find_url_by_ip( "1.1.1.1" ) )
     assert_equal( RIPE_URL, bootstrap.find_url_by_ip( "212.0.0.1" ) )
     assert_equal( LACNIC_URL, bootstrap.find_url_by_ip( "200.0.0.1" ) )
     assert_equal( AFRINIC_URL, bootstrap.find_url_by_ip( "102.0.0.1" ) )
