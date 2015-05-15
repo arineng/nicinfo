@@ -1,5 +1,6 @@
 1. IANA bootstrap
 2. Support networks and autnums
 3. Support network in domain
-4. Ruby gem
-5. Use FPM to create RPM, deb and pkg files
+4. Entity name search support
+5. Ruby gem
+6. Use FPM to create RPM, deb and pkg files
