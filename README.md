@@ -26,7 +26,7 @@ bootstrap server.
 The following is an example of using NicInfo:
 
     $ bin/nicinfo --pager no 1.1.1.1
-    # NicInfo v.1000.0.0-SNAPSHOT
+    # NicInfo v.0.1.0-snapshot
     
     [ NOTICE ] Source
              1 Objects returned came from source
@@ -73,7 +73,7 @@ The following is an example of using NicInfo:
     # Use "nicinfo 1=" to show 1.1.1.0 - 1.1.1.255
     # Use "nicinfo 1.1=" to show APNIC RESEARCH ( AR302-AP )
     # Use "nicinfo 1.2=" to show IRT-APNICRANDNET-AU ( IRT-APNICRANDNET-AU )
-    # Use "nicinfo -u http://rdap.apnic.net/ip/1.1.1.0/24" to directly query this resource in the future.
+    # Use "nicinfo http://rdap.apnic.net/ip/1.1.1.0/24" to directly query this resource in the future.
     # Use "nicinfo -h" for help.
 
 # System Requirements
@@ -115,6 +115,6 @@ domain along with many live demonstration queries.
 
     nicinfo -V xn--114-vm7le44f.info
 
-    nicinfo -u http://rdg.afilias.info/rdap/domain/dnssec.test
+    nicinfo http://rdg.afilias.info/rdap/domain/dnssec.test
 
 

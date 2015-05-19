@@ -915,7 +915,7 @@ HELP_SUMMARY
         end
       end
       self_link = NicInfo.get_self_link( NicInfo.get_links( json_data, @config ) )
-      @config.logger.mesg("Use \"nicinfo -u #{self_link}\" to directly query this resource in the future.") if self_link and @config.options.externally_queriable
+      @config.logger.mesg("Use \"nicinfo #{self_link}\" to directly query this resource in the future.") if self_link and @config.options.externally_queriable
       @config.logger.mesg('Use "nicinfo -h" for help.')
     end
 
