@@ -1,5 +1,5 @@
-1. IANA bootstrap
-2. Support networks and autnums
+1. IANA bootstrap (done)
+2. Support networks and autnums in Entities
 3. Support network in domain
 4. Entity name search support
 5. Ruby gem

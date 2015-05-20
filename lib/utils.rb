@@ -86,6 +86,14 @@ module NicInfo
     return json_data[ "entities" ]
   end
 
+  def NicInfo.get_networks json_data
+    return json_data[ "networks" ]
+  end
+
+  def NicInfo.get_autnums json_data
+    return json_data[ "autnums" ]
+  end
+
   def NicInfo.get_nameservers json_data
     return json_data[ "nameServers" ]
   end

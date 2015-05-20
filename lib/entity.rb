@@ -23,6 +23,7 @@ module NicInfo
   def NicInfo.display_entity json_data, config, data_tree
     entity = Entity.new( config ).process( json_data )
     NicInfo::display_object_with_entities( entity, config, data_tree )
+
   end
 
   def NicInfo.display_entities json_data, config, data_tree
@@ -175,6 +176,7 @@ module NicInfo
 
     attr_accessor :asEvents, :selfhref
     attr_accessor :entities, :objectclass, :asEventActors
+    attr_accessor :networks, :autnums
 
     def initialize config
       @config = config
@@ -200,6 +202,28 @@ module NicInfo
       end if events
       @selfhref = NicInfo::get_self_link( NicInfo::get_links( @objectclass, @config ) )
       @entities = @common.process_entities @objectclass
+      @networks = Array.new
+      json_networks = NicInfo::get_networks( @objectclass )
+      json_networks.each do |json_network|
+        if json_network.is_a?( Hash )
+          network = Ip.new( @config )
+          network.process( json_network )
+          @networks << network
+        else
+          @config.conf_mesgs << "'networks' contains a string and not an object"
+        end
+      end if json_networks
+      @autnums = Array.new
+      json_autnums = NicInfo::get_autnums( @objectclass )
+      json_autnums.each do |json_autnum|
+        if json_autnum.is_a?( Hash )
+          autnum = Autnum.new( @config )
+          autnum.process( json_autnum )
+          @autnums << autnum
+        else
+          @config.conf_mesgs << "'autnums' contains a string and not an object"
+        end
+      end if json_autnums
       return self
     end
 
