@@ -96,6 +96,14 @@ with a path when running the program.
 
 Once installed, use the -h option to view the help: `nicinfo -h`
 
+## Getting Help
+
+If you have questions or need help with this software, you may use the issue tracker on
+[GitHub](https://github.com/arinlabs/nicinfo/issues) or you may use the
+[ARIN Technical Discussions ](http://lists.arin.net/mailman/listinfo/arin-tech-discuss)
+mailing list (it is a very low volume list).
+
+
 # Demonstration Queries
 
 Demonstration queries are available with the --demo option, which will seed the cache with 
