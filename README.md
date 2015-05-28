@@ -19,7 +19,7 @@ NicInfo has the following features:
 the ability to select specific JSON values.
 * Multiple output controls: the amount of text detail and process execution can be varied and sent to different files.
 * A Built-in cache: RDAP queries are cached.
-* Bootstrapping can be done with internal files (soon to use the IANA bootstraps) or by using a
+* Bootstrapping using the IANA bootstrap files or by using a
 bootstrap server.
 * Demonstration queries: a set of built-in queries and results are provided for demonstration purposes.
 
