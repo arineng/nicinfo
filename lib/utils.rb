@@ -90,6 +90,10 @@ module NicInfo
     return json_data[ "networks" ]
   end
 
+  def NicInfo.get_network json_data
+    return json_data[ "network" ]
+  end
+
   def NicInfo.get_autnums json_data
     return json_data[ "autnums" ]
   end

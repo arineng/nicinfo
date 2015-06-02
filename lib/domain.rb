@@ -51,6 +51,11 @@ module NicInfo
           NicInfo::add_entity_nodes( ns.entities, ns_node )
         end
       end
+      if domain.network
+        net_node = domain.network.to_node
+        root.add_child net_node
+        NicInfo::add_entity_nodes( domain.network.entities, net_node )
+      end
       respObjs.add domain
       domain.ds_data_objs.each do |ds|
         respObjs.add ds
@@ -64,6 +69,10 @@ module NicInfo
         respObjs.add ns
         NicInfo::add_entity_respobjs( ns.entities, respObjs )
         respObjs.associateEntities ns.entities
+      end
+      if domain.network
+        respObjs.add domain.network
+        NicInfo::add_entity_respobjs( domain.network.entities, respObjs )
       end
     end
     data_node.to_normal_log( config.logger, true )
@@ -86,7 +95,7 @@ module NicInfo
   # deals with RDAP nameserver structures
   class Domain
 
-    attr_accessor :entities, :nameservers, :ds_data_objs, :key_data_objs, :objectclass, :asEventActors
+    attr_accessor :entities, :nameservers, :ds_data_objs, :key_data_objs, :objectclass, :asEventActors, :network
 
     def initialize config
       @config = config
@@ -107,6 +116,12 @@ module NicInfo
         ns.process( json_ns )
         @nameservers << ns
       end if json_nses
+      json_net = NicInfo::get_network json_data
+      if json_net
+        ip = Ip.new @config
+        ip.process json_net
+        @network = ip
+      end
       json_ds_data_objs = NicInfo::get_ds_data_objs @objectclass
       json_ds_data_objs.each do |json_ds|
         dsData = DsData.new( @config )
