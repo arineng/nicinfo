@@ -117,13 +117,6 @@ module NicInfo
           @config.options.reverse_ip = true
         end
 
-        #opts.on("--substring YES|NO|TRUE|FALSE",
-        #        "Use substring matching for name searchs.") do |substring|
-        #  @config.config[ NicInfo::SEARCH ][ NicInfo::SUBSTRING ] = false if substring =~ /no|false/i
-        #  @config.config[ NicInfo::SEARCH ][ NicInfo::SUBSTRING ] = true if substring =~ /yes|true/i
-        #  raise OptionParser::InvalidArgument, substring.to_s unless substring =~ /yes|no|true|false/i
-        #end
-
         opts.on("-b", "--base (or bootstrap) URL",
                 "The base URL of the RDAP Service.",
                 "When set, the internal bootstrap is bypassed.") do |url|
@@ -779,7 +772,14 @@ HELP_SUMMARY
         when QueryType::BY_ENTITY_HANDLE
           path << "entity/" << URI.escape( args[ 0 ] )
         when QueryType::SRCH_ENTITY_BY_NAME
-          path << "entities?fn=" << URI.escape( args[ 0 ] )
+          case args.length
+            when 1
+              path << "entities?fn=" << URI.escape( args[ 0 ] )
+            when 2
+              path << "entities?fn=" << URI.escape( args[ 0 ] + " " + args[ 1 ] )
+            when 3
+              path << "entities?fn=" << URI.escape( args[ 0 ] + " " + args[ 1 ] + " " + args[ 2 ] )
+          end
         when QueryType::SRCH_DOMAIN_BY_NAME
           path << "domains?name=" << args[ 0 ]
         when QueryType::SRCH_DOMAIN_BY_NSNAME
@@ -813,12 +813,12 @@ HELP_SUMMARY
           queryType = QueryType::BY_DOMAIN
         when /.*\/entity\/.*/
           queryType = QueryType::BY_ENTITY_HANDLE
-        when /.*\/entities\/.*/
+        when /.*\/entities.*/
           queryType = QueryType::SRCH_ENTITY_BY_NAME
-        when /.*\/domains\/.*/
+        when /.*\/domains.*/
           # covers all domain searches
           queryType = QueryType::SRCH_DOMAIN
-        when /.*\/nameservers\/.*/
+        when /.*\/nameservers.*/
           # covers all nameserver searches
           queryType = QueryType::SRCH_NS
         when /.*\/help.*/

@@ -29,12 +29,16 @@ module NicInfo
 
   def NicInfo::is_name file_name, name
     retval = false
+    name.gsub! '*',''
+    names = name.split( ' ' )
 
     file = File.new( File.join( File.dirname( __FILE__ ) , file_name ), "r" )
     file.each_line do |line|
-      if line.start_with?( name )
-        retval = true
-        break
+      names.each do |n|
+        if line.start_with?( n )
+          retval = true
+          break
+        end
       end
     end
     file.close
