@@ -110,10 +110,11 @@ module NicInfo
 
   class JCard
 
-    attr_accessor :fns, :phones, :emails, :adrs, :kind, :titles, :roles, :orgs
+    attr_accessor :fns, :names, :phones, :emails, :adrs, :kind, :titles, :roles, :orgs
 
     def initialize
       @fns = Array.new
+      @names = Array.new
       @phones = Array.new
       @emails = Array.new
       @adrs = Array.new
@@ -132,6 +133,24 @@ module NicInfo
         vcardElements.each do |element|
           if element[ 0 ] == "fn"
             @fns << element[ 3 ]
+          end
+          if element[ 0 ] == "n"
+            name = ""
+            if element[ 3 ][ -1 ].instance_of? Array
+              name << element[ 3 ][ -1 ].join
+            end
+            name << element[ 3 ][ 1 ]
+            if element[ 3 ][ 2 ] && !element[ 3 ][ 2 ].empty?
+              name << " " << element[ 3 ][ 2 ]
+            end
+            if element[ 3 ][ 3 ] && !element[ 3 ][ 3 ].empty?
+              name << " " << element[ 3 ][ 3 ]
+            end
+            name << " " << element[ 3 ][ 0 ]
+            if element[ 3 ][ -2 ].instance_of? Array
+              name << element[ 3 ][ -2 ].join
+            end
+            @names << name
           end
           if element[ 0 ] == "tel"
             tel = Tel.new
@@ -266,6 +285,9 @@ module NicInfo
       @config.logger.extra "Object Class Name", NicInfo::get_object_class_name( @objectclass )
       @jcard.fns.each do |fn|
         @config.logger.terse "Name", fn
+      end
+      @jcard.names.each do |n|
+        @config.logger.extra "Name", n
       end
       @jcard.orgs.each do |org|
         item_value = org.names.join( ", " )
