@@ -1,5 +1,5 @@
 {
-    "nicInfo_demoUrl" : "https://rdappilot.arin.net/restfulwhois/rdap/entity/foo1",
+    "nicInfo_demoUrl" : "http://rdappilot.arin.net/restfulwhois/rdap/entity/foo1",
     "nicInfo_demoHint" : "nicinfo --type entityhandle foo1",
     "rdapConformance":[
         "rdap_level_0"

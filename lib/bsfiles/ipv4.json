@@ -204,7 +204,6 @@
           "216.000.000.000/8"
         ],
         [
-          "https://rdappilot.arin.net/restfulwhois/rdap",
           "http://rdappilot.arin.net/restfulwhois/rdap"
         ]
       ],

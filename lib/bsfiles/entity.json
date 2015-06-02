@@ -8,7 +8,6 @@
           "ARIN"
         ],
         [
-          "https://rdappilot.arin.net/restfulwhois/rdap",
           "http://rdappilot.arin.net/restfulwhois/rdap"
         ]
       ],

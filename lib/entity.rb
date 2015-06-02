@@ -22,8 +22,40 @@ module NicInfo
 
   def NicInfo.display_entity json_data, config, data_tree
     entity = Entity.new( config ).process( json_data )
-    NicInfo::display_object_with_entities( entity, config, data_tree )
 
+    respobjs = ResponseObjSet.new config
+    root = entity.to_node
+    data_tree.add_root( root )
+    if !entity.entities.empty?
+      NicInfo::add_entity_nodes( entity.entities, root )
+    end
+    entity.networks.each do |network|
+      net_node = network.to_node
+      root.add_child( net_node )
+      NicInfo::add_entity_nodes( network.entities, net_node )
+    end
+    entity.autnums.each do |autnum|
+      as_node = autnum.to_node
+      root.add_child( as_node )
+      NicInfo::add_entity_nodes( autnum.entities, as_node )
+    end
+
+    respobjs.add entity
+    NicInfo::add_entity_respobjs( entity.entities, respobjs )
+    respobjs.associateEntities entity.entities
+    entity.networks.each do |network|
+      respobjs.add network
+      NicInfo::add_entity_respobjs( network.entities, respobjs )
+      respobjs.associateEntities network.entities
+    end
+    entity.autnums.each do |autnum|
+      respobjs.add autnum
+      NicInfo::add_entity_respobjs( autnum.entities, respobjs )
+      respobjs.associateEntities autnum.entities
+    end
+
+    data_tree.to_normal_log( config.logger, true )
+    respobjs.display
   end
 
   def NicInfo.display_entities json_data, config, data_tree

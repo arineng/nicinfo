@@ -237,15 +237,15 @@ bootstrap:
 
   help_root_url: http://rdappilot.arin.net/rdapbootstrap
 
-  entity_root_url: https://rdappilot.arin.net/restfulwhois/rdap
+  entity_root_url: http://rdappilot.arin.net/restfulwhois/rdap
 
-  ip_root_url: https://rdappilot.arin.net/restfulwhois/rdap
+  ip_root_url: http://rdappilot.arin.net/restfulwhois/rdap
 
-  as_root_url: https://rdappilot.arin.net/restfulwhois/rdap
+  as_root_url: http://rdappilot.arin.net/restfulwhois/rdap
 
-  domain_root_url: https://rdappilot.arin.net/restfulwhois/rdap
+  domain_root_url: http://rdappilot.arin.net/restfulwhois/rdap
 
-  ns_root_url: https://rdappilot.arin.net/restfulwhois/rdap
+  ns_root_url: http://rdappilot.arin.net/restfulwhois/rdap
 
 search:
 
