@@ -1,5 +1,5 @@
 {
-  "nicInfo_demoUrl": "http://rdappilot.arin.net/rdapbootstrap/entities?fn=Simon",
+  "nicInfo_demoUrl": "http://rdappilot.arin.net/restfulwhois/rdap/entities?fn=Simon",
   "nicInfo_demoHint": "nicinfo --type esbyname Simon",
   "rdapConformance": [
     "rdap_level_0"

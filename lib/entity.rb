@@ -137,8 +137,9 @@ module NicInfo
           if element[ 0 ] == "n"
             name = ""
             if element[ 3 ][ -1 ].instance_of? Array
-              name << element[ 3 ][ -1 ].join
+              name << element[ 3 ][ -1 ].join( ' ' )
             end
+            name << ' ' if name[-1] != ' '
             name << element[ 3 ][ 1 ]
             if element[ 3 ][ 2 ] && !element[ 3 ][ 2 ].empty?
               name << " " << element[ 3 ][ 2 ]
@@ -148,7 +149,7 @@ module NicInfo
             end
             name << " " << element[ 3 ][ 0 ]
             if element[ 3 ][ -2 ].instance_of? Array
-              name << element[ 3 ][ -2 ].join
+              name << " " << element[ 3 ][ -2 ].join( ' ' )
             end
             @names << name
           end

@@ -1,5 +1,5 @@
 {
-    "nicInfo_demoUrl":"http://testwhois.apnic.net/ip/2001:db8::0",
+    "nicInfo_demoUrl":"https://rdap.apnic.net/ip/2001:db8::0",
     "nicInfo_demoHint":"nicinfo 2001:db8::0",
     "rdapConformance":[
         "rdap_level_0"

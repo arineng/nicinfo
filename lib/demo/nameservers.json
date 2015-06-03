@@ -1,5 +1,5 @@
 {
-    "nicInfo_demoUrl" : "http://rdappilot.arin.net/rdapbootstrap/nameservers?name=ns*.xn--fo-5ja.example",
+    "nicInfo_demoUrl" : "http://rdappilot.arin.net/restfulwhois/rdap/nameservers?name=ns*.xn--fo-5ja.example",
     "nicInfo_demoHint" : "nicinfo --type nsbyname ns*.xn--fo-5ja.example",
     "rdapConformance":[
         "rdap_level_0"
