@@ -56,7 +56,7 @@ module NicInfo
 
     def find_url_by_as as
       if as.instance_of? String
-        as.sub!( /^AS/i, '')
+        as = as.sub( /^AS/i, '')
         as = as.to_i
       end
       retval = nil
