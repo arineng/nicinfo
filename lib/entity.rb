@@ -262,7 +262,7 @@ module NicInfo
           network.process( json_network )
           @networks << network
         else
-          @config.conf_mesgs << "'networks' contains a string and not an object"
+          @config.conf_msgs << "'networks' contains a string and not an object"
         end
       end if json_networks
       @autnums = Array.new
@@ -273,7 +273,7 @@ module NicInfo
           autnum.process( json_autnum )
           @autnums << autnum
         else
-          @config.conf_mesgs << "'autnums' contains a string and not an object"
+          @config.conf_msgs << "'autnums' contains a string and not an object"
         end
       end if json_autnums
       return self
