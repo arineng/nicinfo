@@ -927,6 +927,13 @@ HELP_SUMMARY
 
   EXTENDED_HELP = <<EXTENDED_HELP
 
+QUERIES
+  For most query values, the query type is inferred. However, some types of queries
+  cannot be inferred and so the -t option must be used. The domain search by name
+  (dsbyname) and entity search by name (esbyname) queries can take wildcards ('*'),
+  but these must be quoted or escaped to avoid processing by the invoking OS shell
+  on Unix-like operating systems.
+
 CONFIGURATION
   When this program is run for the first time, it creates a directory called .NicInfo
   (on Unix style platforms) or NicInfo (on Windows) in the users home directory. The
