@@ -107,6 +107,12 @@ Issue the following command: `gem install nicinfo`
 
 Once it is installed, try `nicinfo -h`
 
+## As an OS Package
+
+OS-specific packages are also provided for RedHat/CentOS based systems, Debian based systems, and
+Mac OS X. See [GitHub](https://github.com/arinlabs/nicinfo/releases). These packages are based on
+the Ruby Gem using FPM.
+
 ## As Source from Git
 
 To get the source, issue the following git command.
