@@ -18,7 +18,8 @@
 
 module NicInfo
 
-  VERSION = "NicInfo v.0.1.0-snapshot"
+  VERSION = "0.2.0"
+  VERSION_LABEL = "NicInfo v." + VERSION
   COPYRIGHT = "Copyright (c) 2011,2012,2013,2014,2015 American Registry for Internet Numbers (ARIN)"
 
   # regular expressions
@@ -43,7 +44,7 @@ module NicInfo
 
   #File Name Constants
   LASTTREE_YAML          = "lasttree.yaml"
- DEMO_DIR               = "demo"
+  DEMO_DIR               = "demo"
   BOOTSTRAP_FILE_DIR     = "bsfiles"
   ASN_BOOTSTRAP          = "asn.json"
   DNS_BOOTSTRAP          = "dns.json"

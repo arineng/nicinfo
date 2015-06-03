@@ -76,19 +76,43 @@ The following is an example of using NicInfo:
     # Use "nicinfo http://rdap.apnic.net/ip/1.1.1.0/24" to directly query this resource in the future.
     # Use "nicinfo -h" for help.
 
+
+# Versions
+
+* 0.2.0 - A pre-release to the first stable version. Considered feature complete and compatible
+with the latest RDAP specifications.
+
 # System Requirements
 
 NicInfo requires Ruby 1.8.7 or higher and should run on any operating system that supports it. 
 Some features such as the pager support and auto-detection of terminal width will only work on 
 Unix style systems such as Linux and Mac OS X. 
 
+Information on specific platforms are noted below:
+
+* Ruby 1.8.7: This will require you install the Ruby JSON parser. Depending on your system, that
+may be as simple as `gem install json`. You should probably moving away from Ruby 1.8.7.
+* RedHat / CentOS 6: This will require Ruby's JSON parser, as noted above. This may require installing
+multiple RPMs: `yum install gcc rubygems ruby-devel` before running `gem install json`.
+You should probably be moving away from RedHat or CentOS 6.
+* Docker ruby:2.0,2.1,2.2: This is a docker image based on a very scaled down Ubuntu Linux distribution.
+The "less" pager is not installed, so you will need to install it or disable pager use in NicInfo.
+Installing "less" can be done with `apt-get update` followed by `apt-get install less`.
+
 # Getting and Installing
 
-At present, the software is only available from the NicInfo source code repository using Git. 
-To get the software, issue the following git command.
+## As a Ruby Gem
+
+Issue the following command: `gem install nicinfo`
+
+Once it is installed, try `nicinfo -h`
+
+## As Source from Git
+
+To get the source, issue the following git command.
 
 ```
-git clone http://stash-projects.arin.net:7990/scm/NIC/main.git
+git clone https://github.com/arinlabs/nicinfo.git
 ```
 
 Once cloned, place the bin directory in your shell's execution path or refer directly to "nicinfo" 

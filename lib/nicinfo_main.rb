@@ -82,7 +82,7 @@ module NicInfo
       @opts = OptionParser.new do |opts|
 
         opts.banner = "Usage: nicinfo [options] QUERY_VALUE"
-        opts.version = NicInfo::VERSION
+        opts.version = NicInfo::VERSION_LABEL
 
         opts.separator ""
         opts.separator "Query Options:"
@@ -276,7 +276,7 @@ module NicInfo
         @config.logger.trace("Issuing GET for " + url)
         uri = URI.parse( URI::encode( url ) )
         req = Net::HTTP::Get.new(uri.request_uri)
-        req["User-Agent"] = NicInfo::VERSION
+        req["User-Agent"] = NicInfo::VERSION_LABEL
         req["Accept"] = NicInfo::RDAP_CONTENT_TYPE + ", " + NicInfo::JSON_CONTENT_TYPE
         req["Connection"] = "close"
         http = Net::HTTP.new( uri.host, uri.port )
@@ -320,7 +320,7 @@ module NicInfo
       @config.logger.trace("Downloading " + url + " to " + file_name )
       uri = URI.parse( URI::encode( url ) )
       req = Net::HTTP::Get.new(uri.request_uri)
-      req["User-Agent"] = NicInfo::VERSION
+      req["User-Agent"] = NicInfo::VERSION_LABEL
       req["Accept"] = NicInfo::JSON_CONTENT_TYPE
       req["Connection"] = "close"
       http = Net::HTTP.new( uri.host, uri.port )
@@ -349,7 +349,7 @@ module NicInfo
     def run
 
       @config.logger.run_pager
-      @config.logger.mesg(NicInfo::VERSION)
+      @config.logger.mesg(NicInfo::VERSION_LABEL)
       @config.setup_workspace
       @cache = Cache.new(@config)
       @cache.clean if @config.config[ NicInfo::CACHE ][ NicInfo::CLEAN_CACHE ]
@@ -625,7 +625,7 @@ module NicInfo
 
     def help
 
-      puts NicInfo::VERSION
+      puts NicInfo::VERSION_LABEL
       puts NicInfo::COPYRIGHT
       puts <<HELP_SUMMARY
 
