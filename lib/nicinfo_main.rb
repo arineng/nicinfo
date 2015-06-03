@@ -538,6 +538,8 @@ module NicInfo
                 NicInfo::display_ns( json_data, @config, data_tree )
               when QueryType::BY_ENTITY_HANDLE
                 NicInfo::display_entity( json_data, @config, data_tree )
+              when QueryType::SRCH_DOMAINS
+                NicInfo::display_domains( json_data, @config, data_tree )
               when QueryType::SRCH_DOMAIN_BY_NAME
                 NicInfo::display_domains( json_data, @config, data_tree )
               when QueryType::SRCH_DOMAIN_BY_NSNAME

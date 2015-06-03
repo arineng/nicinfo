@@ -1,5 +1,5 @@
 {
-    "nicInfo_demoUrl" : "http://rdappilot.arin.net/rdapbootstrap/domains?nsLdhName=ns1.rir.example",
+    "nicInfo_demoUrl" : "http://rdappilot.arin.net/restfulwhois/rdap/domains?nsLdhName=ns1.rir.example",
     "nicInfo_demoHint" : "nicinfo --type dsbynsname ns1.rir.example",
     "rdapConformance":[
         "rdap_level_0"

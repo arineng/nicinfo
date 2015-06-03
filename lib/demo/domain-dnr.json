@@ -1,5 +1,5 @@
 {
-    "nicInfo_demoUrl":"http://rdappilot.arin.net/rdapbootstrap/domain/xn--fo-5ja.example",
+    "nicInfo_demoUrl":"http://rdappilot.arin.net/restfulwhois/rdap/domain/xn--fo-5ja.example",
     "nicInfo_demoHint":"nicinfo xn--fo-5ja.example",
     "rdapConformance":[
         "rdap_level_0"
