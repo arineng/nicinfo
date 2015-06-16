@@ -1,5 +1,5 @@
 {
-    "nicInfo_demoUrl" : "http://rdappilot.arin.net/restfulwhois/rdap/nameservers?name=ns*.xn--fo-5ja.example",
+    "nicInfo_demoUrl" : "https://rdap.arin.net/registry/nameservers?name=ns*.xn--fo-5ja.example",
     "nicInfo_demoHint" : "nicinfo --type nsbyname ns*.xn--fo-5ja.example",
     "rdapConformance":[
         "rdap_level_0"
@@ -44,9 +44,9 @@
         ],
         "links":[
           {
-            "value":"http://rdappilot.arin.net/rdapbootstrap/nameserver/ns1.xn--fo-5ja.example",
+            "value":"https://rdap.arin.net/bootstrap/nameserver/ns1.xn--fo-5ja.example",
             "rel":"self",
-            "href":"http://rdappilot.arin.net/rdapbootstrap/nameserver/ns1.xn--fo-5ja.example"
+            "href":"https://rdap.arin.net/bootstrap/nameserver/ns1.xn--fo-5ja.example"
           }
         ],
         "port43":"whois.example.net",
@@ -247,9 +247,9 @@
         ],
         "links":[
           {
-            "value":"http://rdappilot.arin.net/rdapbootstrap/nameserver/ns1.xn--fo-5ja.example",
+            "value":"https://rdap.arin.net/bootstrap/nameserver/ns1.xn--fo-5ja.example",
             "rel":"self",
-            "href":"http://rdappilot.arin.net/rdapbootstrap/nameserver/ns1.xn--fo-5ja.example"
+            "href":"https://rdap.arin.net/bootstrap/nameserver/ns1.xn--fo-5ja.example"
           }
         ],
         "port43":"whois.example.net",

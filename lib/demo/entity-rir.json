@@ -1,5 +1,5 @@
 {
-    "nicInfo_demoUrl" : "http://rdappilot.arin.net/restfulwhois/rdap/entity/foo1",
+    "nicInfo_demoUrl" : "https://rdap.arin.net/registry/entity/foo1",
     "nicInfo_demoHint" : "nicinfo --type entityhandle foo1",
     "rdapConformance":[
         "rdap_level_0"
@@ -132,9 +132,9 @@
     ],
     "links":[
         {
-            "value":"http://rdappilot.arin.net/rdapbootstrap/entity/foo1",
+            "value":"https://rdap.arin.net/bootstrap/entity/foo1",
             "rel":"self",
-            "href":"http://rdappilot.arin.net/rdapbootstrap/entity/foo1"
+            "href":"https://rdap.arin.net/bootstrap/entity/foo1"
         }
     ],
     "events":[
@@ -208,9 +208,9 @@
         ],
         "links":[
           {
-            "value":"http://rdappilot.arin.net/restfulwhois/rdap/autnum/10",
+            "value":"https://rdap.arin.net/registry/autnum/10",
             "rel":"self",
-            "href":"http://rdappilot.arin.net/restfulwhois/rdap/autnum/10"
+            "href":"https://rdap.arin.net/registry/autnum/10"
           }
         ],
         "events":[

@@ -1,5 +1,5 @@
 {
-    "nicInfo_demoUrl" : "http://rdappilot.arin.net/restfulwhois/rdap/help",
+    "nicInfo_demoUrl" : "https://rdap.arin.net/registry/help",
     "nicInfo_demoHint" : "nicinfo --type help ns1.xn--fo-5ja.example",
     "rdapConformance":[
         "rdap_level_0"

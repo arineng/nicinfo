@@ -1,5 +1,5 @@
 {
-    "nicInfo_demoUrl" : "http://rdappilot.arin.net/restfulwhois/rdap/domains?nsLdhName=ns1.rir.example",
+    "nicInfo_demoUrl" : "https://rdap.arin.net/registry/domains?nsLdhName=ns1.rir.example",
     "nicInfo_demoHint" : "nicinfo --type dsbynsname ns1.rir.example",
     "rdapConformance":[
         "rdap_level_0"
@@ -74,9 +74,9 @@
         ],
         "links":[
           {
-            "value":"http://rdappilot.arin.net/restfulwhois/rdap/domain/192.in-addr.arpa",
+            "value":"https://rdap.arin.net/registry/domain/192.in-addr.arpa",
             "rel":"self",
-            "href":"http://rdappilot.arin.net/restfulwhois/rdap/domain/192.in-addr.arpa"
+            "href":"https://rdap.arin.net/registry/domain/192.in-addr.arpa"
           }
         ],
         "events":[
@@ -365,9 +365,9 @@
         ],
         "links":[
           {
-            "value":"http://rdappilot.arin.net/restfulwhois/rdap/domain/199.in-addr.arpa",
+            "value":"https://rdap.arin.net/registry/domain/199.in-addr.arpa",
             "rel":"self",
-            "href":"http://rdappilot.arin.net/restfulwhois/rdap/domain/199.in-addr.arpa"
+            "href":"https://rdap.arin.net/registry/domain/199.in-addr.arpa"
           }
         ],
         "events":[

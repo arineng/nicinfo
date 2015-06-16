@@ -1,5 +1,5 @@
 {
-    "nicInfo_demoUrl" : "http://rdappilot.arin.net/restfulwhois/rdap/ip/192.0.2.0/24",
+    "nicInfo_demoUrl" : "https://rdap.arin.net/registry/ip/192.0.2.0/24",
     "nicInfo_demoHint" : "nicinfo 192.0.2.0/24",
     "rdapConformance":[
         "rdap_level_0"

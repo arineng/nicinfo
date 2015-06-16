@@ -44,7 +44,8 @@
           "2620:0000::/23"
         ],
         [
-          "http://rdappilot.arin.net/restfulwhois/rdap"
+          "https://rdap.arin.net/registry",
+          "http://rdap.arin.net/registry"
         ]
       ],
       [

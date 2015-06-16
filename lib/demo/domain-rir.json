@@ -1,5 +1,5 @@
 {
-    "nicInfo_demoUrl" : "http://rdappilot.arin.net/restfulwhois/rdap/domain/192.in-addr.arpa",
+    "nicInfo_demoUrl" : "https://rdap.arin.net/registry/domain/192.in-addr.arpa",
     "nicInfo_demoHint" : "nicinfo 192.in-addr.arpa",
     "rdapConformance":[
         "rdap_level_0"
@@ -54,9 +54,9 @@
     ],
     "links":[
         {
-            "value":"http://rdappilot.arin.net/restfulwhois/rdap/domain/192.in-addr.arpa",
+            "value":"https://rdap.arin.net/registry/domain/192.in-addr.arpa",
             "rel":"self",
-            "href":"http://rdappilot.arin.net/restfulwhois/rdap/domain/192.in-addr.arpa"
+            "href":"https://rdap.arin.net/registry/domain/192.in-addr.arpa"
         }
     ],
     "events":[

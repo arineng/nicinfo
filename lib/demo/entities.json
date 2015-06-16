@@ -1,5 +1,5 @@
 {
-  "nicInfo_demoUrl": "http://rdappilot.arin.net/restfulwhois/rdap/entities?fn=Simon",
+  "nicInfo_demoUrl": "https://rdap.arin.net/registry/entities?fn=Simon",
   "nicInfo_demoHint": "nicinfo --type esbyname Simon",
   "rdapConformance": [
     "rdap_level_0"
@@ -147,9 +147,9 @@
       ],
       "links": [
         {
-          "value": "http://rdappilot.arin.net/rdapbootstrap/entity/entity-dnr",
+          "value": "https://rdap.arin.net/bootstrap/entity/entity-dnr",
           "rel": "self",
-          "href": "http://rdappilot.arin.net/rdapbootstrap/entity/entity-dnr"
+          "href": "https://rdap.arin.net/bootstrap/entity/entity-dnr"
         }
       ],
       "port43": "whois.example.net",
@@ -286,9 +286,9 @@
       ],
       "links": [
         {
-          "value": "http://rdappilot.arin.net/rdapbootstrap/entity/foo1",
+          "value": "https://rdap.arin.net/bootstrap/entity/foo1",
           "rel": "self",
-          "href": "http://rdappilot.arin.net/rdapbootstrap/entity/foo1"
+          "href": "https://rdap.arin.net/bootstrap/entity/foo1"
         }
       ],
       "events": [

@@ -1,5 +1,5 @@
 {
-    "nicInfo_demoUrl" : "http://rdappilot.arin.net/restfulwhois/rdap/entity/ABC123",
+    "nicInfo_demoUrl" : "https://rdap.arin.net/registry/entity/ABC123",
     "nicInfo_demoHint" : "nicinfo --type entityhandle ABC123",
     "handle":"ABC123",
     "remarks":[

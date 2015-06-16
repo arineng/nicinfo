@@ -1,5 +1,5 @@
 {
-    "nicInfo_demoUrl" : "http://rdappilot.arin.net/restfulwhois/rdap/entity/restricted",
+    "nicInfo_demoUrl" : "https://rdap.arin.net/registry/entity/restricted",
     "nicInfo_demoHint" : "nicinfo --type entityhandle restricted",
     "nicInfo_demoError" : "401",
     "rdapConformance":[
@@ -14,7 +14,7 @@
             ],
             "links":[
                 {
-                    "value":"http://rdappilot.arin.net/rdapbootstrap/entity/restricted",
+                    "value":"https://rdap.arin.net/bootstrap/entity/restricted",
                     "rel":"terms-of-service",
                     "type":"text/html",
                     "href":"http://www.example.com/tos.html"

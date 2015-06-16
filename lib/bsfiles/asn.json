@@ -1047,7 +1047,8 @@
           "393216-394239"
         ],
         [
-          "http://rdappilot.arin.net/restfulwhois/rdap"
+          "https://rdap.arin.net/registry",
+          "http://rdap.arin.net/registry"
         ]
       ],
       [

@@ -1,5 +1,5 @@
 {
-    "nicInfo_demoUrl" : "http://rdappilot.arin.net/restfulwhois/rdap/nameserver/ns1.example.com",
+    "nicInfo_demoUrl" : "https://rdap.arin.net/registry/nameserver/ns1.example.com",
     "nicInfo_demoHint" : "nicinfo ns1.example.com",
     "rdapConformance":[
         "rdap_level_0"

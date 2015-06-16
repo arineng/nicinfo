@@ -81,6 +81,7 @@ The following is an example of using NicInfo:
 
 * 0.2.0 - A pre-release to the first stable version. Considered feature complete and compatible
 with the latest RDAP specifications.
+* 1.0.0 - First production release.
 
 # System Requirements
 

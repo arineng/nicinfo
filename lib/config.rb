@@ -233,19 +233,19 @@ cache:
 bootstrap:
 
   # The base or bootstrap URL. Specifying this will bypass all built-in bootstrapping.
-  #base_url: http://rdappilot.arin.net/rdapbootstrap
+  #base_url: https://rdap.arin.net/bootstrap
 
-  help_root_url: http://rdappilot.arin.net/rdapbootstrap
+  help_root_url: https://rdap.arin.net/bootstrap
 
-  entity_root_url: http://rdappilot.arin.net/restfulwhois/rdap
+  entity_root_url: https://rdap.arin.net/registry
 
-  ip_root_url: http://rdappilot.arin.net/restfulwhois/rdap
+  ip_root_url: https://rdap.arin.net/registry
 
-  as_root_url: http://rdappilot.arin.net/restfulwhois/rdap
+  as_root_url: https://rdap.arin.net/registry
 
-  domain_root_url: http://rdappilot.arin.net/restfulwhois/rdap
+  domain_root_url: https://rdap.arin.net/registry
 
-  ns_root_url: http://rdappilot.arin.net/restfulwhois/rdap
+  ns_root_url: https://rdap.arin.net/registry
 
 search:
 

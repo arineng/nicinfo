@@ -19,7 +19,7 @@ require 'constants'
 class BootStrapTest < Test::Unit::TestCase
 
   IANA_URL = "https://rdap.iana.org"
-  ARIN_URL = "http://rdappilot.arin.net/restfulwhois/rdap"
+  ARIN_URL = "https://rdap.arin.net/registry"
   APNIC_URL = "https://rdap.apnic.net"
   LACNIC_URL = "https://rdap.lacnic.net/rdap"
   AFRINIC_URL = "https://rdap.rd.me.afrinic.net/whois/AFRINIC"
