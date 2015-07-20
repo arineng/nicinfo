@@ -82,7 +82,7 @@ module NicInfo
       @opts = OptionParser.new do |opts|
 
         opts.banner = "Usage: nicinfo [options] QUERY_VALUE"
-        opts.version = NicInfo::VERSION_LABEL
+        opts.version = NicInfo::VERSION
 
         opts.separator ""
         opts.separator "Query Options:"
