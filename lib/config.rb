@@ -44,6 +44,8 @@ module NicInfo
       end
 
       configure_logger()
+
+
     end
 
     # Setups work space for the application and lays down default config
@@ -86,6 +88,20 @@ module NicInfo
 
       end
 
+    end
+
+    def check_config_version
+      # check to see if the configuration is old
+      config_section = @config[NicInfo::CONFIG]
+      if config_section != nil
+        config_version = config_section[NicInfo::VERSION_CONFIG]
+      end
+      if config_version == nil || config_version < NicInfo::CONFIG_VERSION
+        # if a reset hasn't been asked for
+        if !@options.reset_config
+          @logger.mesg( "Your configuration is old. Use --reset to create a new one.")
+        end
+      end
     end
 
     def copy_bsfiles
@@ -252,6 +268,10 @@ search:
   # Substring matching
   # NOT YET USED
   substring: true
+
+config:
+  # This should not be altered.
+  version: 3
 
 YAML_CONFIG
 

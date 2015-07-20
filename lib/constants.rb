@@ -18,9 +18,10 @@
 
 module NicInfo
 
-  VERSION = "1.0.1-alpha"
+  VERSION = "1.1.0-alpha"
   VERSION_LABEL = "NicInfo v." + VERSION
   COPYRIGHT = "Copyright (c) 2011,2012,2013,2014,2015 American Registry for Internet Numbers (ARIN)"
+  CONFIG_VERSION = 3
 
   # regular expressions
   NET_HANDLE_REGEX = /^NET-.*/i
@@ -87,6 +88,8 @@ module NicInfo
   BIZ_URL = "biz_url"
   SEARCH = "search"
   SUBSTRING = "substring"
+  CONFIG = "config"
+  VERSION_CONFIG = "version"
 
   # NicInfo values
   NICINFO_DEMO_URL = "nicInfo_demoUrl"

@@ -351,6 +351,7 @@ module NicInfo
       @config.logger.run_pager
       @config.logger.mesg(NicInfo::VERSION_LABEL)
       @config.setup_workspace
+      @config.check_config_version
       @cache = Cache.new(@config)
       @cache.clean if @config.config[ NicInfo::CACHE ][ NicInfo::CLEAN_CACHE ]
 
