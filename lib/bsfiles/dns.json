@@ -19,6 +19,15 @@
           "https://rdap.restfulwhois.org",
           "http://rdap.restfulwhois.org"
         ]
+      ],
+      [
+        [
+          "br"
+        ],
+        [
+          "https://rdap.beta.registro.br",
+          "http://rdap.beta.registro.br"
+        ]
       ]
     ]
   }
