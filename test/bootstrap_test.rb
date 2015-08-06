@@ -12,11 +12,11 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-require "test/unit"
+require "minitest/autorun"
 require 'bootstrap'
 require 'constants'
 
-class BootStrapTest < Test::Unit::TestCase
+class BootStrapTest < Minitest::Test
 
   IANA_URL = "https://rdap.iana.org"
   ARIN_URL = "https://rdap.arin.net/registry"

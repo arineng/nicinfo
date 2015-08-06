@@ -13,10 +13,10 @@
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 
-require 'test/unit'
+require 'minitest/autorun'
 require 'enum'
 
-class EnumTest < Test::Unit::TestCase
+class EnumTest < Minitest::Test
 
   class Color < NicInfo::Enum
 

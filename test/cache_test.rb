@@ -15,13 +15,13 @@
 
 require 'tmpdir'
 require 'fileutils'
-require 'test/unit'
+require 'minitest/autorun'
 require 'config'
 require 'cache'
 require 'constants'
 
 
-class CacheTests < Test::Unit::TestCase
+class CacheTests < Minitest::Test
 
   @work_dir = nil
 
