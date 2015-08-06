@@ -13,8 +13,8 @@
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 require "minitest/autorun"
-require 'bootstrap'
-require 'constants'
+require 'nicinfo/bootstrap'
+require 'nicinfo/constants'
 
 class BootStrapTest < Minitest::Test
 

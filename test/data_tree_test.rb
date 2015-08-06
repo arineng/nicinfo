@@ -14,9 +14,9 @@
 
 
 require 'minitest/autorun'
-require 'nicinfo_logger'
+require 'nicinfo/nicinfo_logger'
 require 'stringio'
-require 'data_tree'
+require 'nicinfo/data_tree'
 
 class DataTreeTest < Minitest::Test
 

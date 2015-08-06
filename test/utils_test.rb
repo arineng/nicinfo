@@ -13,7 +13,7 @@
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 require "minitest/autorun"
-require 'utils'
+require 'nicinfo/utils'
 
 class UtilsTest < Minitest::Test
 

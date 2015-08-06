@@ -14,7 +14,7 @@
 
 
 require 'yaml'
-require 'nicinfo_logger'
+require 'nicinfo/nicinfo_logger'
 
 module NicInfo
 

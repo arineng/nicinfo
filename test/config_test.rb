@@ -16,9 +16,9 @@
 require 'tmpdir'
 require 'fileutils'
 require 'minitest/autorun'
-require 'config'
-require 'nicinfo_logger'
-require 'constants'
+require 'nicinfo/config'
+require 'nicinfo/nicinfo_logger'
+require 'nicinfo/constants'
 
 class ConfigTest < Minitest::Test
 

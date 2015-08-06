@@ -14,7 +14,7 @@
 
 
 require 'minitest/autorun'
-require 'nicinfo_logger'
+require 'nicinfo/nicinfo_logger'
 require 'stringio'
 
 # Tests the logger

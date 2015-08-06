@@ -14,7 +14,7 @@
 
 
 require 'minitest/autorun'
-require 'common_names'
+require 'nicinfo/common_names'
 
 class CommonNamesTest < Minitest::Test
 

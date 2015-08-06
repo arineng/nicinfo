@@ -16,7 +16,7 @@
 require 'tmpdir'
 require 'fileutils'
 require 'minitest/autorun'
-require 'notices'
+require 'nicinfo/notices'
 begin
   require 'json'
 rescue LoadError

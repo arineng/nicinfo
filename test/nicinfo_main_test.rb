@@ -15,10 +15,10 @@
 
 require 'tmpdir'
 require 'fileutils'
-require 'config'
+require 'nicinfo/config'
 require 'minitest/autorun'
-require 'nicinfo_main'
-require 'nicinfo_logger'
+require 'nicinfo/nicinfo_main'
+require 'nicinfo/nicinfo_logger'
 require 'pp'
 
 class NicInfoMainTest < Minitest::Test

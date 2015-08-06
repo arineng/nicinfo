@@ -16,9 +16,9 @@
 require 'tmpdir'
 require 'fileutils'
 require 'minitest/autorun'
-require 'config'
-require 'cache'
-require 'constants'
+require 'nicinfo/config'
+require 'nicinfo/cache'
+require 'nicinfo/constants'
 
 
 class CacheTests < Minitest::Test

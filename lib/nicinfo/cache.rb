@@ -15,7 +15,7 @@
 
 require 'time'
 require 'uri'
-require 'utils'
+require 'nicinfo/utils'
 
 module NicInfo
 

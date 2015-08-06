@@ -14,7 +14,7 @@
 
 
 require 'minitest/autorun'
-require 'enum'
+require 'nicinfo/enum'
 
 class EnumTest < Minitest::Test
 
