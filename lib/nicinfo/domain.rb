@@ -12,15 +12,15 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-require 'config'
-require 'nicinfo_logger'
-require 'utils'
-require 'common_json'
-require 'entity'
-require 'ns'
-require 'ds_data'
-require 'key_data'
-require 'data_tree'
+require 'nicinfo/config'
+require 'nicinfo/nicinfo_logger'
+require 'nicinfo/utils'
+require 'nicinfo/common_json'
+require 'nicinfo/entity'
+require 'nicinfo/ns'
+require 'nicinfo/ds_data'
+require 'nicinfo/key_data'
+require 'nicinfo/data_tree'
 
 module NicInfo
 

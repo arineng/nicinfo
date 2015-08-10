@@ -1,6 +1,7 @@
-$LOAD_PATH << File.join( File.dirname( File.expand_path(__FILE__ ) ), 'lib' )
+lib = File.expand_path('../lib', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
-require 'constants'
+require 'nicinfo/constants'
 
 Gem::Specification.new do |s|
   s.name        = 'nicinfo'

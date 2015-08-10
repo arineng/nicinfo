@@ -13,10 +13,7 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR 
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-$LOAD_PATH << File.join( File.dirname( File.expand_path(File.dirname(__FILE__) ) ), 'lib' )
-
-require 'nicinfo_main'
+require 'rubygems'
+require 'nicinfo'
 app = NicInfo::Main.new( ARGV )
 app.run()
-
-

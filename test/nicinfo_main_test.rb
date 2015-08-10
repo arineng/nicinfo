@@ -15,13 +15,13 @@
 
 require 'tmpdir'
 require 'fileutils'
-require 'config'
-require 'test/unit'
-require 'nicinfo_main'
-require 'nicinfo_logger'
+require 'nicinfo/config'
+require 'minitest/autorun'
+require 'nicinfo/nicinfo_main'
+require 'nicinfo/nicinfo_logger'
 require 'pp'
 
-class NicInfoMainTest < Test::Unit::TestCase
+class NicInfoMainTest < Minitest::Test
 
   @work_dir = nil
 

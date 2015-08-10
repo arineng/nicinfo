@@ -13,7 +13,7 @@
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 require 'rexml/document'
-require 'constants'
+require 'nicinfo/constants'
 require 'ipaddr'
 require 'json'
 
