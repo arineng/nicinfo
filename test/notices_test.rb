@@ -15,8 +15,8 @@
 
 require 'tmpdir'
 require 'fileutils'
-require 'test/unit'
-require 'notices'
+require 'minitest/autorun'
+require 'nicinfo/notices'
 begin
   require 'json'
 rescue LoadError
@@ -24,7 +24,7 @@ rescue LoadError
   require 'json'
 end
 
-class NoticesTest < Test::Unit::TestCase
+class NoticesTest < Minitest::Test
 
   def setup
 

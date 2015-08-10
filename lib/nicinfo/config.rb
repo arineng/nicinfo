@@ -14,10 +14,10 @@
 
 
 require 'fileutils'
-require 'nicinfo_logger'
+require 'nicinfo/nicinfo_logger'
 require 'yaml'
 require 'ostruct'
-require 'constants'
+require 'nicinfo/constants'
 
 module NicInfo
 

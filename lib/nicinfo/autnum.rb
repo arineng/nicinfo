@@ -12,22 +12,22 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-require 'config'
-require 'nicinfo_logger'
-require 'utils'
-require 'common_json'
-require 'entity'
-require 'data_tree'
+require 'nicinfo/config'
+require 'nicinfo/nicinfo_logger'
+require 'nicinfo/utils'
+require 'nicinfo/common_json'
+require 'nicinfo/entity'
+require 'nicinfo/data_tree'
 
 module NicInfo
 
-  def NicInfo.display_ip json_data, config, data_tree
-    ip = Ip.new( config ).process( json_data )
-    NicInfo::display_object_with_entities( ip, config, data_tree )
+  def NicInfo.display_autnum json_data, config, data_tree
+    autnum = Autnum.new( config ).process( json_data )
+    NicInfo::display_object_with_entities( autnum, config, data_tree )
   end
 
-  # deals with RDAP IP network structures
-  class Ip
+  # deals with RDAP autonomous number structures
+  class Autnum
 
     attr_accessor :entities, :objectclass, :asEventActors
 
@@ -46,16 +46,20 @@ module NicInfo
 
     def display
       @config.logger.start_data_item
-      @config.logger.data_title "[ IP NETWORK ]"
+      @config.logger.data_title "[ AS NUMBER ]"
       @config.logger.terse "Handle", NicInfo::get_handle( @objectclass )
       @config.logger.extra "Object Class Name", NicInfo::get_object_class_name( @objectclass )
-      @config.logger.terse "Start Address", NicInfo.get_startAddress( @objectclass )
-      @config.logger.terse "End Address", NicInfo.get_endAddress( @objectclass )
-      @config.logger.datum "IP Version", @objectclass[ "ipVersion" ]
+      endNum = NicInfo.get_endAutnum @objectclass
+      startNum = NicInfo.get_startAutnum @objectclass
+      if endNum
+        @config.logger.terse "Start AS Number", startNum
+        @config.logger.terse "End AS Number", endNum
+      else
+        @config.logger.terse "AS Number", startNum
+      end
       @config.logger.extra "Name", NicInfo.get_name( @objectclass )
       @config.logger.terse "Country", NicInfo.get_country( @objectclass )
       @config.logger.datum "Type", NicInfo.get_type( @objectclass )
-      @config.logger.extra "Parent Handle", @objectclass[ "parentHandle" ]
       @common.display_status @objectclass
       @common.display_events @objectclass
       @common.display_as_events_actors @asEventActors
@@ -67,14 +71,14 @@ module NicInfo
     def get_cn
       handle = NicInfo::get_handle @objectclass
       if !handle
-        startAddress = NicInfo.get_startAddress @objectclass
-        handle << startAddress if startAddress
-        endAddress = NicInfo.get_endAddress @objectclass
-        handle << " - " if startAddress and endAddress
-        handle << endAddress if endAddress
+        startNum = NicInfo.get_startAutnum @objectclass
+        handle = startNum if startNum
+        endNum = NicInfo.get_endAutnum @objectclass
+        handle << " - " if startNum and endNum
+        handle << endNum if endNum
       end
       return handle if handle
-      return "(unidentifiable network #{object_id})"
+      return "(unidentifiable autonomous system number #{object_id})"
     end
 
     def to_node

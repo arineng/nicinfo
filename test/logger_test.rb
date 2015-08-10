@@ -13,25 +13,25 @@
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 
-require 'test/unit'
-require 'nicinfo_logger'
+require 'minitest/autorun'
+require 'nicinfo/nicinfo_logger'
 require 'stringio'
 
 # Tests the logger
-class LoggerTest < Test::Unit::TestCase
+class LoggerTest < Minitest::Test
 
   def test_unknown_data_amount
     logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
     logger.data_amount = NicInfo::DataAmount::FOO
-    assert_raise( ArgumentError ) { logger.terse( "Network Handle", "NET-192-136-136-0-1" ) }
+    assert_raises( ArgumentError ) { logger.terse( "Network Handle", "NET-192-136-136-0-1" ) }
   end
 
   def test_fake_data_amount
     logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
     logger.data_amount = "FAKE"
-    assert_raise( ArgumentError ) { logger.terse( "Network Handle", "NET-192-136-136-0-1" ) }
+    assert_raises( ArgumentError ) { logger.terse( "Network Handle", "NET-192-136-136-0-1" ) }
   end
 
   def test_log_extra_at_default
@@ -131,14 +131,14 @@ class LoggerTest < Test::Unit::TestCase
     logger = NicInfo::Logger.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_SUCH_LEVEL
-    assert_raise( ArgumentError ) { logger.mesg( "Network Handle" ) }
+    assert_raises( ArgumentError ) { logger.mesg( "Network Handle" ) }
   end
 
   def test_fake_message_level
     logger = NicInfo::Logger.new
     logger.message_out = StringIO.new
     logger.message_level = "FAKE"
-    assert_raise( ArgumentError ) { logger.mesg( "Network Handle" ) }
+    assert_raises( ArgumentError ) { logger.mesg( "Network Handle" ) }
   end
 
   def test_log_some_at_default

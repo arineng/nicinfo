@@ -12,10 +12,10 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-require "test/unit"
-require 'utils'
+require "minitest/autorun"
+require 'nicinfo/utils'
 
-class UtilsTest < Test::Unit::TestCase
+class UtilsTest < Minitest::Test
 
   # Called before every test method runs. Can be used
   # to set up fixture information.

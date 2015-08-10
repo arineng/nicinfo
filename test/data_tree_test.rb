@@ -13,12 +13,12 @@
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 
-require 'test/unit'
-require 'nicinfo_logger'
+require 'minitest/autorun'
+require 'nicinfo/nicinfo_logger'
 require 'stringio'
-require 'data_tree'
+require 'nicinfo/data_tree'
 
-class DataTreeTest < Test::Unit::TestCase
+class DataTreeTest < Minitest::Test
 
   def test_to_log
 

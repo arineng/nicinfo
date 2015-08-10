@@ -12,9 +12,9 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-require 'config'
-require 'nicinfo_logger'
-require 'utils'
+require 'nicinfo/config'
+require 'nicinfo/nicinfo_logger'
+require 'nicinfo/utils'
 
 module NicInfo
 

@@ -15,7 +15,7 @@
 # The run_pager code came from http://nex-3.com/posts/73-git-style-automatic-paging-in-ruby
 # and is credited to Nathan Weizenbaum
 
-require 'enum'
+require 'nicinfo/enum'
 
 module NicInfo
 

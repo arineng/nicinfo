@@ -13,10 +13,10 @@
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 
-require 'test/unit'
-require 'common_names'
+require 'minitest/autorun'
+require 'nicinfo/common_names'
 
-class CommonNamesTest < Test::Unit::TestCase
+class CommonNamesTest < Minitest::Test
 
   def test_last_names
 
