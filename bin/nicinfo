@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-# Copyright (c) 2011,2012,2013 American Registry for Internet Numbers
+# Copyright (c) 2011-2015 American Registry for Internet Numbers
 #
 # Permission to use, copy, modify, and/or distribute this software for any 
 # purpose with or without fee is hereby granted, provided that the above 
@@ -14,6 +14,12 @@
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 require 'rubygems'
-require 'nicinfo'
+begin
+  require 'nicinfo'
+rescue LoadError
+  lib = File.expand_path("../lib",File.dirname(__FILE__))
+  $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+  require 'nicinfo'
+end
 app = NicInfo::Main.new( ARGV )
 app.run()

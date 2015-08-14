@@ -99,7 +99,7 @@ module NicInfo
   end
 
   def NicInfo.get_nameservers json_data
-    return json_data[ "nameServers" ]
+    return json_data[ "nameservers" ]
   end
 
   def NicInfo.get_startAddress json_data

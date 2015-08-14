@@ -43,7 +43,7 @@
         "handle":"192.in-addr.arpa-001",
         "objectClassName":"domain",
         "ldhName":"192.in-addr.arpa",
-        "nameServers":[
+        "nameservers":[
           {
             "ldhName":"ns1.rir.example"
           },
@@ -334,7 +334,7 @@
         "handle":"199.in-addr.arpa-001",
         "objectClassName":"domain",
         "ldhName":"199.in-addr.arpa",
-        "nameServers":[
+        "nameservers":[
           {
             "ldhName":"ns1.rir.example"
           },

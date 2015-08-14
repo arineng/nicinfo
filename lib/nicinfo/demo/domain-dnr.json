@@ -57,7 +57,7 @@
         "identifier" : "1"
       }
     ],
-    "nameServers":[
+    "nameservers":[
         {
             "handle":"ns1.example.com-001",
             "objectClassName":"nameserver",
