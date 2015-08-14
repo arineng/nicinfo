@@ -223,6 +223,16 @@ module NicInfo
         end
 
         opts.separator ""
+        opts.separator "Security Options:"
+
+        opts.on( "--try-insecure YES|NO|TRUE|FALSE",
+                 "Try HTTP if HTTPS fails" ) do |try_insecure|
+          @config.config[ NicInfo::SECURITY ][ NicInfo::TRY_INSECURE ] = false if try_insecure =~ /no|false/i
+          @config.config[ NicInfo::SECURITY ][ NicInfo::TRY_INSECURE ] = true if try_insecure =~ /yes|true/i
+          raise OptionsParser::InvalidArgument, try_insecure.to_s unless try_insecure =~/yes|no|true|false/i
+        end
+
+        opts.separator ""
         opts.separator "General Options:"
 
         opts.on( "-h", "--help",
@@ -284,8 +294,18 @@ module NicInfo
           http.use_ssl=true
           http.verify_mode=OpenSSL::SSL::VERIFY_NONE
         end
-        res = http.start do |http_req|
-          http_req.request(req)
+
+        begin
+          res = http.start do |http_req|
+            http_req.request(req)
+          end
+        rescue OpenSSL::SSL::SSLError => e
+          if @config.config[ NicInfo::SECURITY ][ NicInfo::TRY_INSECURE ]
+            uri.scheme = "http"
+            return get( uri.to_s, try )
+          else
+            raise e
+          end
         end
 
         case res

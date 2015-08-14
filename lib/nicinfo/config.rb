@@ -269,6 +269,11 @@ search:
   # NOT YET USED
   substring: true
 
+security:
+
+  # if HTTPS cannot be established, try HTTP
+  try_insecure = yes
+
 config:
   # This should not be altered.
   version: 3
