@@ -1,4 +1,4 @@
-# Copyright (C) 2011,2012,2013,2014 American Registry for Internet Numbers
+# Copyright (C) 2011,2012,2013,2014,2015 American Registry for Internet Numbers
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -38,13 +38,12 @@ module NicInfo
 
       config_file_name = Config.formulate_config_file_name( @app_data )
       if File.exist?( config_file_name )
-        @config = YAML.load( File.open( config_file_name ) )
+        @config = load_config( config_file_name )
       else
         @config = YAML.load( @@yaml_config )
       end
 
       configure_logger()
-
 
     end
 
@@ -102,6 +101,17 @@ module NicInfo
           @logger.mesg( "Your configuration is old. Use --reset to create a new one.")
         end
       end
+    end
+
+    def load_config config_file_name
+      @config = YAML.load( @@yaml_config )
+      @config[NicInfo::CONFIG].delete(NicInfo::VERSION_CONFIG)
+      merger = proc do |key, v1, v2|
+        Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) :
+                Array === v1 && Array === v2 ? v1 | v2 :
+                        [:undefined, nil, :nil].include?(v2) ? v1 : v2
+      end
+      @config.merge!( YAML.load( File.open( config_file_name ) ), &merger )
     end
 
     def copy_bsfiles
@@ -272,7 +282,7 @@ search:
 security:
 
   # if HTTPS cannot be established, try HTTP
-  try_insecure = yes
+  try_insecure: true
 
 config:
   # This should not be altered.

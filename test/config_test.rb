@@ -72,6 +72,7 @@ NOT_DEFAULT_CONFIG
     c = NicInfo::Config.new( dir )
     assert_equal( "NONE", c.config[ NicInfo::OUTPUT ][ NicInfo::MESSAGES ] )
     assert_equal( "TERSE", c.config[ NicInfo::OUTPUT ][ NicInfo::DATA ] )
+    assert_equal( true, c.config[ NicInfo::SECURITY ][ NicInfo::TRY_INSECURE ] )
     assert_nil( c.config[ NicInfo::OUTPUT ][ NicInfo::MESSAGES_FILE ] )
     assert_nil( c.config[ NicInfo::OUTPUT ][ NicInfo::DATA_FILE ] )
     assert_equal( "https://rdap.arin.net/bootstrap", c.config[ NicInfo::BOOTSTRAP ][ NicInfo::IP_ROOT_URL ] )

@@ -301,6 +301,7 @@ module NicInfo
           end
         rescue OpenSSL::SSL::SSLError => e
           if @config.config[ NicInfo::SECURITY ][ NicInfo::TRY_INSECURE ]
+            @config.logger.mesg( "Secure connection failed. Trying insecure connection." )
             uri.scheme = "http"
             return get( uri.to_s, try )
           else
