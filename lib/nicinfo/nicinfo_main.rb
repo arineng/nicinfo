@@ -265,6 +265,10 @@ module NicInfo
         puts e.message
         puts "use -h for help"
         exit
+      rescue
+        puts "Unable to parse command line options"
+        puts "use -h for help"
+        exit
       end
       @config.options.argv = args
 
