@@ -143,9 +143,9 @@ module NicInfo
         print_tree = true unless root.children.empty?
       end
       num_count = 1
+      @logger.start_data_item if print_tree
+      @logger.prose( @data_amount, "[ RESPONSE DATA ]", " ")
       @roots.each do |root|
-        @logger.start_data_item if print_tree
-        @logger.prose( @data_amount, "[ RESPONSE DATA ]", " ")
         if annotate
           if root.alert
             s = format( "   # %s", root.to_s )
@@ -170,8 +170,8 @@ module NicInfo
           child_num += 1 if child_num > 0
         end if root.children() != nil
         num_count += 1
-        @logger.end_data_item
       end if print_tree
+      @logger.end_data_item if print_tree
       return retval
     end
 

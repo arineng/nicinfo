@@ -86,10 +86,10 @@ with the latest RDAP specifications.
   * New Features
     * New --try-insecure option for those times with SSL/TLS negotiation just isn't gonna work
     * Now checks for older configs.
+    * Changes in the way data is displayed to make searches easier to understand.
   * Bug Fixes
     * Now showing nameservers on domains.
     * Namespacing of library files to let NicInfo work in some Ruby environments
-    
 
 # System Requirements
 
