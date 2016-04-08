@@ -197,6 +197,8 @@ module NicInfo
         data_dir = File.join(ENV['HOME'], ".NicInfo")
       elsif RUBY_PLATFORM =~ /freebsd/
         data_dir = File.join(ENV['HOME'], ".NicInfo")
+      elsif RUBY_PLATFORM =~ /cygwin/
+        data_dir = File.join(ENV['HOME'], ".NicInfo")
       else
         raise ScriptError, "system platform is not recognized."
       end
