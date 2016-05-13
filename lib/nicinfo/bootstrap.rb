@@ -33,6 +33,7 @@ module NicInfo
       end
       file = File.join( @config.rdap_bootstrap_dir , NicInfo::IPV6_BOOTSTRAP ) if addr.ipv6?
       file = File.join( @config.rdap_bootstrap_dir , NicInfo::IPV4_BOOTSTRAP ) if addr.ipv4?
+      @config.logger.trace "Looking up bootstrap from #{file}"
       data = JSON.parse( File.read( file ) )
       services = get_services data
       services.each do |service|
@@ -61,6 +62,7 @@ module NicInfo
       end
       retval = nil
       file = File.join( @config.rdap_bootstrap_dir , NicInfo::ASN_BOOTSTRAP )
+      @config.logger.trace "Looking up bootstrap from #{file}"
       data = JSON.parse( File.read( file ) )
       services = get_services data
       services.each do |service|
@@ -127,6 +129,7 @@ module NicInfo
     def find_url_by_forward_domain domain
       retval = nil
       file = File.join( @config.rdap_bootstrap_dir , NicInfo::DNS_BOOTSTRAP )
+      @config.logger.trace "Looking up bootstrap from #{file}"
       data = JSON.parse( File.read( file ) )
       longest_domain = nil
       longest_urls = nil
@@ -153,6 +156,7 @@ module NicInfo
       suffix = entity_name.downcase.split( '-' ).last
       if suffix
         file = File.join( @config.rdap_bootstrap_dir , NicInfo::ENTITY_BOOTSTRAP )
+        @config.logger.trace "Looking up bootstrap from #{file}"
         data = JSON.parse( File.read( file ) )
         services = get_services data
         services.each do |service|
@@ -169,10 +173,7 @@ module NicInfo
     end
 
     def get_services data
-      rdap_bootstrap = data["rdap_bootstrap"]
-      if rdap_bootstrap
-        rdap_bootstrap["services"]
-      end
+      data["services"]
     end
 
     def get_service_url service_url_array

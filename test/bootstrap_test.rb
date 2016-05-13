@@ -18,13 +18,13 @@ require 'nicinfo/constants'
 
 class BootStrapTest < Minitest::Test
 
+  CZ_URL = "https://rdap.nic.cz"
   IANA_URL = "https://rdap.iana.org"
   ARIN_URL = "https://rdap.arin.net/registry"
-  APNIC_URL = "https://rdap.apnic.net"
-  LACNIC_URL = "https://rdap.lacnic.net/rdap"
-  AFRINIC_URL = "https://rdap.rd.me.afrinic.net/whois/AFRINIC"
-  RIPE_URL = "https://rdap.db.ripe.net"
-  INFO_URL = "http://rdg.afilias.info/rdap"
+  APNIC_URL = "https://rdap.apnic.net/"
+  LACNIC_URL = "https://rdap.lacnic.net/rdap/"
+  AFRINIC_URL = "https://rdap.afrinic.net/rdap/"
+  RIPE_URL = "https://rdap.db.ripe.net/"
 
   @work_dir = nil
 
@@ -58,7 +58,6 @@ class BootStrapTest < Minitest::Test
     c.setup_workspace
     bootstrap = NicInfo::Bootstrap.new c
     assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::IP_ROOT_URL ], bootstrap.find_url_by_ip( "1001:0000::1") )
-    assert_equal( IANA_URL, bootstrap.find_url_by_ip( "2001:0000::1") )
     assert_equal( ARIN_URL, bootstrap.find_url_by_ip( "2001:0400::/23" ) )
     assert_equal( APNIC_URL, bootstrap.find_url_by_ip( "2001:0200::/23" ) )
     assert_equal( RIPE_URL, bootstrap.find_url_by_ip( "2001:0600::/23" ) )
@@ -115,7 +114,7 @@ class BootStrapTest < Minitest::Test
     bootstrap = NicInfo::Bootstrap.new c
     assert_equal( ARIN_URL, bootstrap.find_url_by_domain( "0.0.4.0.1.0.0.2.ip6.arpa.") )
     assert_equal( ARIN_URL, bootstrap.find_url_by_domain( "192.in-addr.arpa") )
-    assert_equal( INFO_URL, bootstrap.find_url_by_domain( "www.exmaple.info") )
+    assert_equal( CZ_URL, bootstrap.find_url_by_domain( "www.exmaple.cz") )
     assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::DOMAIN_ROOT_URL ], bootstrap.find_url_by_domain( "www.exmaple.museuum") )
   end
 
@@ -125,7 +124,7 @@ class BootStrapTest < Minitest::Test
     c.logger.message_level = "NONE"
     c.setup_workspace
     bootstrap = NicInfo::Bootstrap.new c
-    assert_equal( INFO_URL, bootstrap.find_url_by_forward_domain( "www.exmaple.info") )
+    assert_equal( CZ_URL, bootstrap.find_url_by_forward_domain( "www.exmaple.cz") )
     assert_equal( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::DOMAIN_ROOT_URL ], bootstrap.find_url_by_forward_domain( "www.exmaple.museuum") )
   end
 
