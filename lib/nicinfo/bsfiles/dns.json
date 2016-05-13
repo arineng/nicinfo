@@ -1,34 +1,15 @@
 {
-  "rdap_bootstrap": {
-    "version": "1.0",
-    "publication": "2014-09-09T15:39:03-0400",
-    "services": [
+  "description": "RDAP bootstrap file for Domain Name System registrations",
+  "publication": "2016-03-22T15:40:01Z",
+  "services": [
+    [
       [
-        [
-          "info"
-        ],
-        [
-          "http://rdg.afilias.info/rdap"
-        ]
+        "cz"
       ],
       [
-        [
-          "cn"
-        ],
-        [
-          "https://rdap.restfulwhois.org",
-          "http://rdap.restfulwhois.org"
-        ]
-      ],
-      [
-        [
-          "br"
-        ],
-        [
-          "https://rdap.beta.registro.br",
-          "http://rdap.beta.registro.br"
-        ]
+        "https://rdap.nic.cz"
       ]
     ]
-  }
+  ],
+  "version": "1.0"
 }

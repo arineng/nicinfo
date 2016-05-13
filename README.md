@@ -90,6 +90,13 @@ with the latest RDAP specifications.
   * Bug Fixes
     * Now showing nameservers on domains.
     * Namespacing of library files to let NicInfo work in some Ruby environments
+* 1.1.1
+  * Bug Fixes
+    * Bootstrap files were not being read properly
+    * Some more trace logging with bootstrapping
+    * Updated defaults to latest IANA file
+    * Fixed failing unit tests with data tree.
+    * Fix for running on cygwin
 
 # System Requirements
 
