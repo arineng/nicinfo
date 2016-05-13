@@ -96,6 +96,7 @@ with the latest RDAP specifications.
     * Some more trace logging with bootstrapping
     * Updated defaults to latest IANA file
     * Fixed failing unit tests with data tree.
+    * Fix for running on cygwin
 
 # System Requirements
 
