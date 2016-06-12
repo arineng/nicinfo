@@ -20,6 +20,7 @@ require 'nicinfo/utils'
 require 'nicinfo/common_json'
 require 'nicinfo/entity'
 require 'nicinfo/data_tree'
+require 'nicinfo/cidrs'
 
 module NicInfo
 
@@ -83,15 +84,18 @@ module NicInfo
     def get_CIDRs
       startAddress = NicInfo.get_startAddress @objectclass
       endAddress = NicInfo.get_endAddress @objectclass
-      lower = NetAddr::CIDR.create(startAddress)
-      upper = NetAddr::CIDR.create(endAddress)
-      range = NetAddr.range(lower, upper, :Inclusive => true, :Objectify => true)
-      cidrs = NetAddr.merge(range, :Objectify => true)
-      cidr_strs = []
-      for cidr in cidrs do
-        cidr_strs.push(cidr.to_s)
+      if startAddress and endAddress
+        cidrs = find_cidrs(startAddress, endAddress)
+        require('pry')
+        binding.pry
+        return cidrs.join(', ')
+      elsif startAddress
+        return NetAddr::CIDR.create(startAddress).to_s
+      elsif endAddress
+        return NetAddr::CIDR.create(endAddress).to_s
+      else
+        return ""
       end
-      return cidr_strs.join(', ')
     end
 
     def to_node
