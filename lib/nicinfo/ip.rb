@@ -12,6 +12,8 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+require 'netaddr'
+
 require 'nicinfo/config'
 require 'nicinfo/nicinfo_logger'
 require 'nicinfo/utils'
@@ -51,6 +53,7 @@ module NicInfo
       @config.logger.extra "Object Class Name", NicInfo::get_object_class_name( @objectclass )
       @config.logger.terse "Start Address", NicInfo.get_startAddress( @objectclass )
       @config.logger.terse "End Address", NicInfo.get_endAddress( @objectclass )
+      @config.logger.terse "CIDRs", get_CIDRs
       @config.logger.datum "IP Version", @objectclass[ "ipVersion" ]
       @config.logger.extra "Name", NicInfo.get_name( @objectclass )
       @config.logger.terse "Country", NicInfo.get_country( @objectclass )
@@ -75,6 +78,20 @@ module NicInfo
       end
       return handle if handle
       return "(unidentifiable network #{object_id})"
+    end
+
+    def get_CIDRs
+      startAddress = NicInfo.get_startAddress @objectclass
+      endAddress = NicInfo.get_endAddress @objectclass
+      lower = NetAddr::CIDR.create(startAddress)
+      upper = NetAddr::CIDR.create(endAddress)
+      range = NetAddr.range(lower, upper, :Inclusive => true, :Objectify => true)
+      cidrs = NetAddr.merge(range, :Objectify => true)
+      cidr_strs = []
+      for cidr in cidrs do
+        cidr_strs.push(cidr.to_s)
+      end
+      return cidr_strs.join(', ')
     end
 
     def to_node
