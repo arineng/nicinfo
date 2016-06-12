@@ -32,6 +32,7 @@ require 'nicinfo/autnum'
 require 'nicinfo/error_code'
 require 'ipaddr'
 require 'nicinfo/data_tree'
+require 'nicinfo/traceroute'
 begin
   require 'json'
 rescue LoadError
@@ -61,6 +62,7 @@ module NicInfo
     QueryType.add_item :SRCH_NS, "NAMESERVERS"
     QueryType.add_item :SRCH_NS_BY_NAME, "NSBYNAME"
     QueryType.add_item :SRCH_NS_BY_IP, "NSBYIP"
+    QueryType.add_item :TRACE, "TRACE"
     QueryType.add_item :BY_SERVER_HELP, "HELP"
     QueryType.add_item :BY_URL, "URL"
 
@@ -104,6 +106,7 @@ module NicInfo
                 "  dsbynsip     - domain search by nameserver IP address",
                 "  nsbyname     - nameserver search by nameserver name",
                 "  nsbyip       - nameserver search by IP address",
+                "  trace        - trace route",
                 "  url          - RDAP URL",
                 "  help         - server help") do |type|
           uptype = type.upcase
@@ -462,6 +465,28 @@ module NicInfo
         end
       end
 
+      #determine if this will be a single query or multiple
+      qtype = @config.options.query_type
+      case qtype
+        when QueryType::TRACE
+          ips = NicInfo.traceroute @config.options.argv[ 0 ], @config
+          if ips.empty?
+            @config.logger.mesg "Trace route yeilded no data"
+          else
+            ips.each do |ip|
+              @config.options.query_type = QueryType::BY_IP4_ADDR
+              @config.options.argv[ 0 ] = ip
+              @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = nil
+              json_data = do_rdap_query
+              display_rdap_query( json_data, false )
+            end
+          end
+        else
+          json_data = do_rdap_query
+          display_rdap_query( json_data, true )
+      end
+
+=begin
       if @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] == nil && !@config.options.url
         bootstrap = Bootstrap.new( @config )
         qtype = @config.options.query_type
@@ -626,7 +651,178 @@ module NicInfo
         end
         @config.logger.trace("Server response code was " + e.response.code)
       end
+=end
 
+    end
+
+    def do_rdap_query
+      if @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] == nil && !@config.options.url
+        bootstrap = Bootstrap.new( @config )
+        qtype = @config.options.query_type
+        if qtype == QueryType::BY_SERVER_HELP
+          qtype = guess_query_value_type( @config.options.argv )
+        end
+        case qtype
+          when QueryType::BY_IP4_ADDR
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @config.options.argv[ 0 ] )
+          when QueryType::BY_IP6_ADDR
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @config.options.argv[ 0 ] )
+          when QueryType::BY_IP4_CIDR
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @config.options.argv[ 0 ] )
+          when QueryType::BY_IP6_CIDR
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @config.options.argv[ 0 ] )
+          when QueryType::BY_AS_NUMBER
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_as( @config.options.argv[ 0 ] )
+          when QueryType::BY_DOMAIN
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
+          when QueryType::BY_NAMESERVER
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
+          when QueryType::BY_ENTITY_HANDLE
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_entity( @config.options.argv[ 0 ] )
+          when QueryType::SRCH_ENTITY_BY_NAME
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::ENTITY_ROOT_URL ]
+          when QueryType::SRCH_DOMAIN_BY_NAME
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
+          when QueryType::SRCH_DOMAIN_BY_NSNAME
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
+          when QueryType::SRCH_DOMAIN_BY_NSIP
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::DOMAIN_ROOT_URL ]
+          when QueryType::SRCH_NS_BY_NAME
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
+          when QueryType::SRCH_NS_BY_IP
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @config.options.argv[ 0 ] )
+          else
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::HELP_ROOT_URL ]
+        end
+      end
+      begin
+        rdap_url = nil
+        unless @config.options.url
+          path = create_resource_url(@config.options.argv, @config.options.query_type)
+          rdap_url = make_rdap_url(@config.config[NicInfo::BOOTSTRAP][NicInfo::BOOTSTRAP_URL], path)
+        else
+          rdap_url = @config.options.argv[0]
+        end
+        data = get( rdap_url, 0 )
+        json_data = JSON.load data
+        if (ec = json_data[ NicInfo::NICINFO_DEMO_ERROR ]) != nil
+          res = MyHTTPResponse.new( "1.1", ec, "Demo Exception" )
+          res["content-type"] = NicInfo::RDAP_CONTENT_TYPE
+          res.body=data
+          raise Net::HTTPServerException.new( "Demo Exception", res )
+        end
+        inspect_rdap_compliance json_data
+        cache_self_references json_data
+        json_data
+      rescue JSON::ParserError => a
+        @config.logger.mesg( "Server returned invalid JSON!" )
+      rescue SocketError => a
+        @config.logger.mesg(a.message)
+      rescue ArgumentError => a
+        @config.logger.mesg(a.message)
+      rescue Net::HTTPServerException => e
+        case e.response.code
+          when "200"
+            @config.logger.mesg( e.message )
+          when "401"
+            @config.logger.mesg("Authorization is required.")
+            handle_error_response e.response
+          when "404"
+            @config.logger.mesg("Query yielded no results.")
+            handle_error_response e.response
+          else
+            @config.logger.mesg("Error #{e.response.code}.")
+            handle_error_response e.response
+        end
+        @config.logger.trace("Server response code was " + e.response.code)
+      rescue Net::HTTPFatalError => e
+        case e.response.code
+          when "500"
+            @config.logger.mesg("RDAP server is reporting an internal error.")
+            handle_error_response e.response
+          when "501"
+            @config.logger.mesg("RDAP server does not implement the query.")
+            handle_error_response e.response
+          when "503"
+            @config.logger.mesg("RDAP server is reporting that it is unavailable.")
+            handle_error_response e.response
+          else
+            @config.logger.mesg("Error #{e.response.code}.")
+            handle_error_response e.response
+        end
+        @config.logger.trace("Server response code was " + e.response.code)
+      end
+    end
+
+    def display_rdap_query json_data, show_help = true
+      if @config.options.output_json
+        @config.logger.raw( DataAmount::TERSE_DATA, data, false )
+      elsif @config.options.json_values
+        @config.options.json_values.each do |value|
+          @config.logger.raw( DataAmount::TERSE_DATA, eval_json_value( value, json_data), false )
+        end
+      else
+        Notices.new.display_notices json_data, @config, @config.options.query_type == QueryType::BY_SERVER_HELP
+        if @config.options.query_type != QueryType::BY_SERVER_HELP
+          result_type = get_query_type_from_result( json_data )
+          if result_type != nil
+            if result_type != @config.options.query_type
+              @config.logger.mesg( "Query type is " + @config.options.query_type + ". Result type is " + result_type + "." )
+            else
+              @config.logger.mesg( "Result type is " + result_type + "." )
+            end
+            @config.options.query_type = result_type
+          elsif json_data[ "errorCode" ] == nil
+            @config.conf_msgs << "Response has no result type."
+          end
+          data_tree = DataTree.new( )
+          case @config.options.query_type
+            when QueryType::BY_IP4_ADDR
+              NicInfo::display_ip( json_data, @config, data_tree )
+            when QueryType::BY_IP6_ADDR
+              NicInfo::display_ip( json_data, @config, data_tree )
+            when QueryType::BY_IP4_CIDR
+              NicInfo::display_ip( json_data, @config, data_tree )
+            when QueryType::BY_IP6_CIDR
+              NicInfo::display_ip( json_data, @config, data_tree )
+            when QueryType::BY_IP
+              NicInfo::display_ip( json_data, @config, data_tree )
+            when QueryType::BY_AS_NUMBER
+              NicInfo::display_autnum( json_data, @config, data_tree )
+            when "NicInfo::DsData"
+              NicInfo::display_ds_data( json_data, @config, data_tree )
+            when "NicInfo::KeyData"
+              NicInfo::display_key_data( json_data, @config, data_tree )
+            when QueryType::BY_DOMAIN
+              NicInfo::display_domain( json_data, @config, data_tree )
+            when QueryType::BY_NAMESERVER
+              NicInfo::display_ns( json_data, @config, data_tree )
+            when QueryType::BY_ENTITY_HANDLE
+              NicInfo::display_entity( json_data, @config, data_tree )
+            when QueryType::SRCH_DOMAINS
+              NicInfo::display_domains( json_data, @config, data_tree )
+            when QueryType::SRCH_DOMAIN_BY_NAME
+              NicInfo::display_domains( json_data, @config, data_tree )
+            when QueryType::SRCH_DOMAIN_BY_NSNAME
+              NicInfo::display_domains( json_data, @config, data_tree )
+            when QueryType::SRCH_DOMAIN_BY_NSIP
+              NicInfo::display_domains( json_data, @config, data_tree )
+            when QueryType::SRCH_ENTITY_BY_NAME
+              NicInfo::display_entities( json_data, @config, data_tree )
+            when QueryType::SRCH_NS
+              NicInfo::display_nameservers( json_data, @config, data_tree )
+            when QueryType::SRCH_NS_BY_NAME
+              NicInfo::display_nameservers( json_data, @config, data_tree )
+            when QueryType::SRCH_NS_BY_IP
+              NicInfo::display_nameservers( json_data, @config, data_tree )
+          end
+          @config.save_as_yaml( NicInfo::LASTTREE_YAML, data_tree ) if !data_tree.empty?
+          show_search_results_truncated json_data
+          show_conformance_messages
+          show_helpful_messages json_data, data_tree if show_help
+        end
+      end
+      @config.logger.end_run
     end
 
     def handle_error_response (res)
