@@ -424,6 +424,20 @@ module NicInfo
         end
       end
 
+      if @config.options.argv[0] == '.'
+        @config.logger.mesg( "Obtaining current IP Address...")
+        data = get("https://stat.ripe.net/data/whats-my-ip/data.json", 0)
+        json_data = JSON.load(data)
+
+        if json_data["data"] == nil || json_data["data"]["ip"] == nil
+          @config.logger.mesg("Server repsonded with unknown JSON")
+          @config.logger.mesg("Unable to determine your IP Address. You must specify it.")
+          exit
+        elsif
+          @config.options.argv[0] = json_data["data"]["ip"]
+        end
+      end
+
       if @config.options.query_type == nil
         @config.options.query_type = guess_query_value_type(@config.options.argv)
         if (@config.options.query_type == QueryType::BY_IP4_ADDR ||
