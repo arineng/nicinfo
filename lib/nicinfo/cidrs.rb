@@ -40,7 +40,10 @@ def find_end_cidrs(r, end_val)
 end  
 
 def clean_ip(ip)
-  return ip.split('.').map(&:to_i).join('.')
+  if ip.include? '.'
+    ip = ip.split('.').map(&:to_i).join('.')
+  end
+  return ip
 end
 
 def find_cidrs(lower, upper)
