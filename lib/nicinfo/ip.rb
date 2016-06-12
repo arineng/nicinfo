@@ -86,8 +86,6 @@ module NicInfo
       endAddress = NicInfo.get_endAddress @objectclass
       if startAddress and endAddress
         cidrs = find_cidrs(startAddress, endAddress)
-        require('pry')
-        binding.pry
         return cidrs.join(', ')
       elsif startAddress
         return NetAddr::CIDR.create(startAddress).to_s

@@ -15,8 +15,6 @@ def find_start_cidrs(r, start)
   s = r[0]
   e = r[1]
   pfx = r[2]
-  p cidr_to_str(s, pfx, Socket::AF_INET)
-  p cidr_to_str(e, pfx, Socket::AF_INET)
   if s >= start
     return [r]
   elsif start > e  
@@ -63,7 +61,7 @@ def find_cidrs(lower, upper)
   s = s.to_i
   e = e.to_i
 
-  if s < e
+  if s > e
     tmp = e
     e = s
     s = tmp
@@ -79,10 +77,13 @@ def find_cidrs(lower, upper)
   r_start = s - (s % 2**i)
   r_end = r_start + (2**i) - 1
 
-  r1, r2 = split_range(r_start, r_end, maxlen - i)
-  #require('pry')
-  #binding.pry
-  rs = find_start_cidrs(r1, s) + find_end_cidrs(r2, e)
+  rs = []
+  if r_start == s and r_end == e
+    rs = [[s, e, maxlen - i]]
+  else
+    r1, r2 = split_range(r_start, r_end, maxlen - i)
+    rs = find_start_cidrs(r1, s) + find_end_cidrs(r2, e)
+  end
 
   ret = []
   for r in rs
