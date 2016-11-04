@@ -140,6 +140,12 @@ git clone https://github.com/arinlabs/nicinfo.git
 Once cloned, place the bin directory in your shell's execution path or refer directly to "nicinfo" 
 with a path when running the program.
 
+NicInfo requires the netaddr package in Ruby. Here's how to install it:
+
+```
+gem install netaddr --user-install
+```
+
 Once installed, use the -h option to view the help: `nicinfo -h`
 
 ## Getting Help
