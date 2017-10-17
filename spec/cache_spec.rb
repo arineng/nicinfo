@@ -13,19 +13,21 @@
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 
+require 'spec_helper'
+require 'rspec'
+require 'pp'
 require 'tmpdir'
 require 'fileutils'
-require 'minitest/autorun'
-require 'nicinfo/config'
-require 'nicinfo/cache'
-require 'nicinfo/constants'
+require_relative '../lib/nicinfo/config'
+require_relative '../lib/nicinfo/cache'
+require_relative '../lib/nicinfo/constants'
 
 
-class CacheTests < Minitest::Test
+describe 'cache rspec tests' do
 
   @work_dir = nil
 
-  def setup
+  before(:all) do
 
     @work_dir = Dir.mktmpdir
 
@@ -51,23 +53,21 @@ NET_XML
 
   end
 
-  def teardown
+  after(:all) do
 
     FileUtils.rm_r( @work_dir )
 
   end
 
-  def test_make_safe
+  it 'should make_safe correctly' do
 
-    assert_equal( NicInfo::make_safe( "http://" ), "http%3A%2F%2F" )
-    assert_equal( NicInfo::make_safe(
-                          "http://whois.arin.net/rest/nets;q=192.136.136.1?showDetails=true&showARIN=false" ),
-                  "http%3A%2F%2Fwhois.arin.net%2Frest%2Fnets%3Bq%3D192.136.136.1%3FshowDetails%3Dtrue%26showARIN%3Dfalse")
-    assert_equal( NicInfo::make_safe( "marry had a little lamb!" ), "marry%20had%20a%20little%20lamb%21" )
+    expect( NicInfo::make_safe( "http://" ) ).to eq( "http%3A%2F%2F" )
+    expect( NicInfo::make_safe( "http://whois.arin.net/rest/nets;q=192.136.136.1?showDetails=true&showARIN=false" ) ).to eq( "http%3A%2F%2Fwhois.arin.net%2Frest%2Fnets%3Bq%3D192.136.136.1%3FshowDetails%3Dtrue%26showARIN%3Dfalse" )
+    expect( NicInfo::make_safe( "marry had a little lamb!" ) ).to eq( "marry%20had%20a%20little%20lamb%21" )
 
   end
 
-  def test_create_or_update
+  it 'should create or update the cache' do
 
     dir = File.join( @work_dir, "test_create_or_update" )
     c = NicInfo::Config.new( dir )
@@ -80,29 +80,29 @@ NET_XML
 
     safe = NicInfo::make_safe( url )
     file_name = File.join( c.rdap_cache_dir, safe )
-    assert( File.exist?( file_name ) )
+    expect( File.exist?( file_name ) ).to be_truthy
     f = File.open( file_name, "r" )
     data = ''
     f.each_line do |line|
       data += line
     end
     f.close
-    assert_equal( @net_xml, data )
+    expect( data ).to eq( @net_xml )
 
     # do it again
     new_xml = @net_xml + "\n**Second**Time**\n"
     cache.create_or_update( url, new_xml )
-    assert( File.exist?( file_name ) )
+    expect( File.exist?( file_name ) ).to be_truthy
     f = File.open( file_name, "r" )
     data = ''
     f.each_line do |line|
       data += line
     end
     f.close
-    assert_equal( new_xml, data )
+    expect( new_xml ).to eq( data )
   end
 
-  def test_create
+  it 'should create a cache' do
 
     dir = File.join( @work_dir, "test_create" )
     c = NicInfo::Config.new( dir )
@@ -116,29 +116,29 @@ NET_XML
 
     safe = NicInfo::make_safe( url )
     file_name = File.join( c.rdap_cache_dir, safe )
-    assert( File.exist?( file_name ) )
+    expect( File.exist?( file_name ) ).to be_truthy
     f = File.open( file_name, "r" )
     data = ''
     f.each_line do |line|
       data += line
     end
     f.close
-    assert_equal( @net_xml, data )
+    expect( data ).to eq( @net_xml )
 
     # do it again, but the data should be the same as the first time when read back out
     new_xml = @net_xml + "\n**Second**Time**\n"
     cache.create( url, new_xml )
-    assert( File.exist?( file_name ) )
+    expect( File.exist?( file_name ) ).to be_truthy
     f = File.open( file_name, "r" )
     data = ''
     f.each_line do |line|
       data += line
     end
     f.close
-    assert_equal( @net_xml, data )
+    expect( data ).to eq( @net_xml )
   end
 
-  def test_get_hit
+  it 'should get a cache hit' do
 
     dir = File.join( @work_dir, "test_get_hit" )
     c = NicInfo::Config.new( dir )
@@ -152,11 +152,11 @@ NET_XML
     cache.create_or_update( url, @net_xml )
 
     data = cache.get( url )
-    assert_equal( @net_xml, data )
+    expect( data ).to eq( @net_xml )
 
   end
 
-  def test_get_no_hit
+  it 'should get no cache hit' do
 
     dir = File.join( @work_dir, "test_get_no_hit" )
     c = NicInfo::Config.new( dir )
@@ -170,11 +170,11 @@ NET_XML
     cache.create_or_update( url, @net_xml )
 
     data = cache.get( "http://whois.arin.net/rest/net/NET-192-136-136-0-2" )
-    assert_nil( data )
+    expect( data ).to be_nil
 
   end
 
-  def test_get_expired_hit
+  it 'should get expired hit' do
 
     dir = File.join( @work_dir, "test_get_expired_hit" )
     c = NicInfo::Config.new( dir )
@@ -188,11 +188,11 @@ NET_XML
     cache.create_or_update( url, @net_xml )
 
     data = cache.get( url )
-    assert_nil( data )
+    expect( data ).to be_nil
 
   end
 
-  def test_no_use_cache
+  it 'should not use the cache' do
 
     dir = File.join( @work_dir, "test_no_use_cache" )
     c = NicInfo::Config.new( dir )
@@ -206,11 +206,11 @@ NET_XML
     cache.create_or_update( url, @net_xml )
 
     data = cache.get( url )
-    assert_nil( data )
+    expect( data ).to be_nil
 
   end
 
-  def test_clean
+  it 'should clean out the cache' do
 
     dir = File.join( @work_dir, "test_clean" )
     c = NicInfo::Config.new( dir )
@@ -226,7 +226,7 @@ NET_XML
     cache.create_or_update( url + "3", @net_xml )
 
     count = cache.clean
-    assert_equal( 3, count )
+    expect( count ).to eq( 3 )
 
   end
 
