@@ -1,13 +1,38 @@
 {
   "description": "RDAP bootstrap file for Domain Name System registrations",
-  "publication": "2016-03-22T15:40:01Z",
+  "publication": "2017-10-05T15:42:56Z",
   "services": [
+    [
+      [
+        "com",
+        "net"
+      ],
+      [
+        "https://rdap-pilot.verisignlabs.com"
+      ]
+    ],
+    [
+      [
+        "ar"
+      ],
+      [
+        "https://rdap.nic.ar"
+      ]
+    ],
     [
       [
         "cz"
       ],
       [
         "https://rdap.nic.cz"
+      ]
+    ],
+    [
+      [
+        "br"
+      ],
+      [
+        "https://rdap.registro.br/"
       ]
     ]
   ],
