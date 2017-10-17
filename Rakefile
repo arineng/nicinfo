@@ -1,8 +1,10 @@
-require 'rubygems'
-require 'rake/testtask'
+require 'rspec/core/rake_task'
+require 'bundler/gem_tasks'
 
-Rake::TestTask.new do |t|
-  t.pattern = 'test/*_test.rb'
-end
+RSpec::Core::RakeTask.new(:spec)
 
+desc "by default run tests"
 task :default => :test
+
+desc "run all tests"
+task :test => [:spec ]
