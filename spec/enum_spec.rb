@@ -13,10 +13,11 @@
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 
-require 'minitest/autorun'
-require 'nicinfo/enum'
+require 'spec_helper'
+require 'rspec'
+require_relative '../lib/nicinfo/enum'
 
-class EnumTest < Minitest::Test
+describe 'enum tests' do
 
   class Color < NicInfo::Enum
 
@@ -34,72 +35,72 @@ class EnumTest < Minitest::Test
 
   end
 
-  def test_color_red
+  it 'should test for red' do
 
     my_color = Color::RED
-    assert_equal( 2, my_color )
+    expect( my_color ).to eq( 2 )
 
   end
 
-  def test_color_green
+  it 'should test for green' do
 
     my_color = Color::GREEN
-    assert_nil( my_color )
+    expect( my_color ).to be_nil
 
   end
 
-  def test_color_each
+  it 'should test iterating an enum' do
 
     a = []
     Color.each { |key,value|
       a << value
     }
-    assert_equal( true, a.include?( 1 ) )
-    assert_equal( true, a.include?( 2 ) )
-    assert_equal( true, a.include?( 3 ) )
+    expect( a.include?( 1 ) ).to be_truthy
+    expect( a.include?( 2 ) ).to be_truthy
+    expect( a.include?( 3 ) ).to be_truthy
 
   end
 
-  def test_has_color_red
-    assert( Color.has_value?( 2 ) )
+  it 'should have the color red' do
+    expect( Color.has_value?( 2 ) ).to be_truthy
   end
 
-  def test_has_color_green
-    assert( !Color.has_value?( 5 ) )
+  it 'should not have the color green' do
+    expect( Color.has_value?( 5 ) ).to be_falsey
   end
 
-  def test_level_high
+  it 'should be level high' do
 
     my_level = Level::HIGH
-    assert_equal( "HIGH", my_level )
+    expect( my_level ).to eq( "HIGH" )
 
   end
 
-  def test_level_bottom
+  it 'should not be bottom level' do
 
     my_level = Level::BOTTOM
-    assert_nil( my_level )
+    expect( my_level ).to be_nil
 
   end
 
-  def test_level_each
+  it 'should test each level' do
 
     a = []
     Level.each { |key,value|
       a << value
     }
-    assert_equal( true, a.include?( "HIGH" ) )
-    assert_equal( true, a.include?( "LOW" ) )
-    assert_equal( true, a.include?( "INBETWEEN" ) )
+    expect( a.include?( "HIGH" ) ).to be_truthy
+    expect( a.include?( "LOW" ) ).to be_truthy
+    expect( a.include?( "INBETWEEN" ) ).to be_truthy
 
   end
 
-  def test_has_level_high
-    assert( Level.has_value?( "HIGH" ) )
+  it 'should have level high' do
+    expect( Level.has_value?( "HIGH" ) ).to be_truthy
   end
 
-  def test_has_level_bottom
-    assert( ! Level.has_value?( "BOTTOM" ) )
+  it 'should not have level bottom' do
+    expect( Level.has_value?( "BOTTOM" ) ).to be_falsey
   end
 
 end
