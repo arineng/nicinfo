@@ -1,4 +1,4 @@
-# Copyright (C) 2011,2012,2013,2014 American Registry for Internet Numbers
+# Copyright (C) 2011-2017 American Registry for Internet Numbers
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -13,10 +13,11 @@
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 
+require 'spec_helper'
+require 'rspec'
 require 'tmpdir'
 require 'fileutils'
-require 'minitest/autorun'
-require 'nicinfo/notices'
+require_relative '../lib/nicinfo/notices'
 begin
   require 'json'
 rescue LoadError
@@ -24,9 +25,9 @@ rescue LoadError
   require 'json'
 end
 
-class NoticesTest < Minitest::Test
+describe 'notices tests' do
 
-  def setup
+  before( :all) do
 
     @non_excessive = <<NONEXCESSIVE
 {
@@ -192,10 +193,10 @@ EXCESSIVE2
 
   end
 
-  def test_is_excessive_notices
-    assert( ! NicInfo::Notices::is_excessive_notice( JSON.load( @non_excessive )[ "notices" ], nil ) )
-    assert(   NicInfo::Notices::is_excessive_notice( JSON.load( @excessive1 )[ "notices" ], nil ) )
-    assert(   NicInfo::Notices::is_excessive_notice( JSON.load( @excessive2 )[ "notices" ], nil ) )
+  it 'should test differenct versions of notice' do
+    expect( NicInfo::Notices::is_excessive_notice( JSON.load( @non_excessive )[ "notices" ], nil ) ).to be_falsey
+    expect( NicInfo::Notices::is_excessive_notice( JSON.load( @excessive1 )[ "notices" ], nil ) ).to be_truthy
+    expect( NicInfo::Notices::is_excessive_notice( JSON.load( @excessive2 )[ "notices" ], nil ) ).to be_truthy
   end
 
 end
