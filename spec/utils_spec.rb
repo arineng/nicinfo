@@ -12,27 +12,14 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-require "minitest/autorun"
-require 'nicinfo/utils'
+require 'spec_helper'
+require 'rspec'
+require_relative '../lib/nicinfo/utils'
 
-class UtilsTest < Minitest::Test
+describe 'tests for utility methods' do
 
-  # Called before every test method runs. Can be used
-  # to set up fixture information.
-  def setup
-    # Do nothing
-  end
-
-  # Called after every test method runs. Can be used to tear
-  # down fixture information.
-
-  def teardown
-    # Do nothing
-  end
-
-  # Fake test
-  def test_capitalize
-    assert_equal( "My Myself & I", NicInfo::capitalize( "my myself & i" ))
-    assert_equal( "Me", NicInfo::capitalize( "me" ))
+  it 'should capitalize' do
+    expect( NicInfo::capitalize( "my myself & i" ) ).to eq( "My Myself & I" )
+    expect( NicInfo::capitalize( "me" ) ).to eq( "Me" )
   end
 end
