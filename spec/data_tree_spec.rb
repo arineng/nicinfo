@@ -13,14 +13,15 @@
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 
-require 'minitest/autorun'
-require 'nicinfo/nicinfo_logger'
 require 'stringio'
-require 'nicinfo/data_tree'
+require 'spec_helper'
+require 'rspec'
+require_relative '../lib/nicinfo/nicinfo_logger'
+require_relative '../lib/nicinfo/data_tree'
 
-class DataTreeTest < Minitest::Test
+describe 'data tree tests' do
 
-  def test_to_log
+  it 'should test to_log' do
 
     #setup the logger
     logger = NicInfo::Logger.new
@@ -94,7 +95,7 @@ third root
   `- second child of third root
 EXPECTED_LOG
 
-    assert_equal( expected, logger.data_out.string )
+    expect( logger.data_out.string ).to eq( expected )
 =begin
     puts
     puts expected
@@ -104,7 +105,7 @@ EXPECTED_LOG
 
   end
 
-  def test_to_log_with_annotate
+  it 'should test to_log with annotate' do
 
     #setup the logger
     logger = NicInfo::Logger.new
@@ -200,7 +201,7 @@ EXPECTED_LOG
      `--- 2. second child of third root
 EXPECTED_LOG
 
-    assert_equal( expected, logger.data_out.string )
+    expect( logger.data_out.string ).to eq( expected )
 =begin
     puts
     puts expected
@@ -210,7 +211,7 @@ EXPECTED_LOG
 
   end
 
-  def test_find_data
+  it 'should test find_data' do
 
     #do a tree
     tree = NicInfo::DataTree.new
@@ -251,53 +252,53 @@ EXPECTED_LOG
     tree.add_root( root2 )
     tree.add_root( root3 )
 
-    assert_equal( "data:root1", tree.find_data( "1=" ) )
-    assert_equal( "handle:root1", tree.find_handle( "1=" ) )
-    assert_equal( "http:root1", tree.find_rest_ref( "1=" ) )
+    expect( tree.find_data( "1=" ) ).to eq( "data:root1" )
+    expect( tree.find_handle( "1=" ) ).to eq( "handle:root1" )
+    expect( tree.find_rest_ref( "1=" ) ).to eq( "http:root1" )
 
-    assert_equal( "data:root1child1", tree.find_data( "1.1=" ) )
-    assert_equal( "handle:root1child1", tree.find_handle( "1.1=" ) )
-    assert_equal( "http:root1child1", tree.find_rest_ref( "1.1=" ) )
+    expect( tree.find_data( "1.1=" ) ).to eq( "data:root1child1" )
+    expect( tree.find_handle( "1.1=" ) ).to eq( "handle:root1child1" )
+    expect( tree.find_rest_ref( "1.1=" ) ).to eq( "http:root1child1" )
 
-    assert_equal( "data:root1child2", tree.find_data( "1=2=" ) )
-    assert_equal( "handle:root1child2", tree.find_handle( "1=2=" ) )
-    assert_equal( "http:root1child2", tree.find_rest_ref( "1=2=" ) )
+    expect( tree.find_data( "1=2=" ) ).to eq( "data:root1child2" )
+    expect( tree.find_handle( "1=2=" ) ).to eq( "handle:root1child2" )
+    expect( tree.find_rest_ref( "1=2=" ) ).to eq( "http:root1child2" )
 
-    assert_equal( "data:root2", tree.find_data( "2=" ) )
-    assert_equal( "handle:root2", tree.find_handle( "2=" ) )
-    assert_equal( "http:root2", tree.find_rest_ref( "2=" ) )
+    expect( tree.find_data( "2=" ) ).to eq( "data:root2" )
+    expect( tree.find_handle( "2=" ) ).to eq( "handle:root2" )
+    expect( tree.find_rest_ref( "2=" ) ).to eq( "http:root2" )
 
-    assert_equal( "data:root2child1", tree.find_data( "2.1=" ) )
-    assert_equal( "handle:root2child1", tree.find_handle( "2.1=" ) )
-    assert_equal( "http:root2child1", tree.find_rest_ref( "2.1=" ) )
+    expect( tree.find_data( "2.1=" ) ).to eq( "data:root2child1" )
+    expect( tree.find_handle( "2.1=" ) ).to eq( "handle:root2child1" )
+    expect( tree.find_rest_ref( "2.1=" ) ).to eq( "http:root2child1" )
 
-    assert_equal( "data:root2child4", tree.find_data( "2.4=" ) )
-    assert_equal( "handle:root2child4", tree.find_handle( "2.4=" ) )
-    assert_equal( "http:root2child4", tree.find_rest_ref( "2.4=" ) )
+    expect( tree.find_data( "2.4=" ) ).to eq( "data:root2child4" )
+    expect( tree.find_handle( "2.4=" ) ).to eq( "handle:root2child4" )
+    expect( tree.find_rest_ref( "2.4=" ) ).to eq( "http:root2child4" )
 
-    assert_equal( "data:root2child4child1", tree.find_data( "2.4=1=" ) )
-    assert_equal( "handle:root2child4child1", tree.find_handle( "2.4=1=" ) )
-    assert_equal( "http:root2child4child1", tree.find_rest_ref( "2.4=1=" ) )
+    expect( tree.find_data( "2.4=1=" ) ).to eq( "data:root2child4child1" )
+    expect( tree.find_handle( "2.4=1=" ) ).to eq( "handle:root2child4child1" )
+    expect( tree.find_rest_ref( "2.4=1=" ) ).to eq( "http:root2child4child1" )
 
-    assert_equal( "data:root2child4child2", tree.find_data( "2.4=2=" ) )
-    assert_equal( "handle:root2child4child2", tree.find_handle( "2.4=2=" ) )
-    assert_equal( "http:root2child4child2", tree.find_rest_ref( "2.4=2=" ) )
+    expect( tree.find_data( "2.4=2=" ) ).to eq( "data:root2child4child2" )
+    expect( tree.find_handle( "2.4=2=" ) ).to eq( "handle:root2child4child2" )
+    expect( tree.find_rest_ref( "2.4=2=" ) ).to eq( "http:root2child4child2" )
 
-    assert_equal( "data:root2child4child3", tree.find_data( "2.4.3=" ) )
-    assert_equal( "handle:root2child4child3", tree.find_handle( "2.4.3=" ) )
-    assert_equal( "http:root2child4child3", tree.find_rest_ref( "2.4.3=" ) )
+    expect( tree.find_data( "2.4.3=" ) ).to eq( "data:root2child4child3" )
+    expect( tree.find_handle( "2.4.3=" ) ).to eq( "handle:root2child4child3" )
+    expect( tree.find_rest_ref( "2.4.3=" ) ).to eq( "http:root2child4child3" )
 
-    assert_equal( "data:root3", tree.find_data( "3=" ) )
-    assert_equal( "handle:root3", tree.find_handle( "3=" ) )
-    assert_equal( "http:root3", tree.find_rest_ref( "3=" ) )
+    expect( tree.find_data( "3=" ) ).to eq( "data:root3" )
+    expect( tree.find_handle( "3=" ) ).to eq( "handle:root3" )
+    expect( tree.find_rest_ref( "3=" ) ).to eq( "http:root3" )
 
-    assert_equal( "data:root3child1", tree.find_data( "3.1=" ) )
-    assert_equal( "handle:root3child1", tree.find_handle( "3.1=" ) )
-    assert_equal( "http:root3child1", tree.find_rest_ref( "3.1=" ) )
+    expect( tree.find_data( "3.1=" ) ).to eq( "data:root3child1" )
+    expect( tree.find_handle( "3.1=" ) ).to eq( "handle:root3child1" )
+    expect( tree.find_rest_ref( "3.1=" ) ).to eq( "http:root3child1" )
 
-    assert_equal( "data:root3child2", tree.find_data( "3.2=" ) )
-    assert_equal( "handle:root3child2", tree.find_handle( "3.2=" ) )
-    assert_equal( "http:root3child2", tree.find_rest_ref( "3.2=" ) )
+    expect( tree.find_data( "3.2=" ) ).to eq( "data:root3child2" )
+    expect( tree.find_handle( "3.2=" ) ).to eq( "handle:root3child2" )
+    expect( tree.find_rest_ref( "3.2=" ) ).to eq( "http:root3child2" )
 
   end
 
