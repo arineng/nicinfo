@@ -1,4 +1,5 @@
 # Overview
+[![Build Status](https://travis-ci.org/arineng/nicinfo.svg?branch=master)](https://travis-ci.org/arineng/nicinfo)
 
 NicInfo is a general purpose, command line Registry Data Access Protocol (RDAP) client released under 
 an open source, ISC derivative BSD style license. RDAP is an HTTP-based RESTful protocol defined by 
@@ -97,21 +98,25 @@ with the latest RDAP specifications.
     * Updated defaults to latest IANA file
     * Fixed failing unit tests with data tree.
     * Fix for running on cygwin
+* 1.2.0.alpha
+  * Dropped support for...
+    * Ruby 1.8.7, 1.9.3, and 2.0.
+    * OS specific packages (use Ruby gem install)
+  * New Features
+    * Look up network information based on your IP address.
+    * Added calculated CIDR ranges to IP networks.
+    * Added traceroute function (experimental)
 
 # System Requirements
 
-NicInfo requires Ruby 1.8.7 or higher and should run on any operating system that supports it. 
+NicInfo requires Ruby 2.1.3 or higher and should run on any operating system that supports it. 
 Some features such as the pager support and auto-detection of terminal width will only work on 
 Unix style systems such as Linux and Mac OS X. 
 
 Information on specific platforms are noted below:
 
-* Ruby 1.8.7: This will require you install the Ruby JSON parser. Depending on your system, that
-may be as simple as `gem install json`. You should probably moving away from Ruby 1.8.7.
-* RedHat / CentOS 6: This will require Ruby's JSON parser, as noted above. This may require installing
-multiple RPMs: `yum install gcc rubygems ruby-devel` before running `gem install json`.
-You should probably be moving away from RedHat or CentOS 6.
-* Docker ruby:2.0,2.1,2.2: This is a docker image based on a very scaled down Ubuntu Linux distribution.
+* RedHat / CentOS 6: Use [RVM](https://rvm.io/) to install a compatible version of Ruby.
+* Docker ruby:2.1,2.2: This is a docker image based on a very scaled down Ubuntu Linux distribution.
 The "less" pager is not installed, so you will need to install it or disable pager use in NicInfo.
 Installing "less" can be done with `apt-get update` followed by `apt-get install less`.
 
@@ -125,9 +130,10 @@ Once it is installed, try `nicinfo -h`
 
 ## As an OS Package
 
-OS-specific packages are also provided for RedHat/CentOS based systems, Debian based systems, and
-Mac OS X. See [GitHub](https://github.com/arinlabs/nicinfo/releases). These packages are based on
-the Ruby Gem using FPM.
+OS packages are no longer provided as they were troublesome and mostly broken. If you don't want to install from
+source, install using the Ruby gem method above. If you're OS doesn't provide a modern, compatible version of Ruby
+then use [Ruby Version Manager](https://rvm.io/) to install a newer version of Ruby and then install NicInfo as a
+gem.
 
 ## As Source from Git
 
@@ -177,4 +183,26 @@ domain along with many live demonstration queries.
 
     nicinfo http://rdg.afilias.info/rdap/domain/dnssec.test
 
+
+# Building and Testing
+
+To get the source, issue the following git command.
+
+```
+git clone https://github.com/arinlabs/nicinfo.git
+```
+
+To develop in isolation, use [Ruby Version Manager (RVM)](https://rvm.io/) and issue a command like
+
+```bash
+rvm use 2.3.1@nicinfo
+```
+
+Running and testing is best done with bundler. To install it `gem install bundler`.
+
+Then use bundler to install NicInfo's dependencies: `bundle install`.
+
+To run the tests: `bundle exec rake test`
+
+To run Nicinfo: `bundle exec bin/nicinfo -V .`
 
