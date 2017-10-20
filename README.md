@@ -78,6 +78,14 @@ The following is an example of using NicInfo:
     # Use "nicinfo -h" for help.
 
 
+# Live examples
+
+```bash
+nicinfo -V .
+nicinfo nic.br
+nicinfo nic.cz
+```
+
 # Versions
 
 * 0.2.0 - A pre-release to the first stable version. Considered feature complete and compatible
@@ -173,15 +181,6 @@ nicinfo --demo
 
 After the cache has been seeded, you will be presented with a list of example queries which will 
 pull information from the cache.
-
-In addition to these cached queries, Afilias has made available a proto RDAP server for the .info 
-domain along with many live demonstration queries.
-
-    nicinfo -V ns1.ams1.afilias-nst.info
-
-    nicinfo -V xn--114-vm7le44f.info
-
-    nicinfo http://rdg.afilias.info/rdap/domain/dnssec.test
 
 
 # Building and Testing
