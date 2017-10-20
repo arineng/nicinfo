@@ -13,236 +13,237 @@
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 
-require 'minitest/autorun'
-require 'nicinfo/nicinfo_logger'
 require 'stringio'
+require 'spec_helper'
+require 'rspec'
+require_relative '../lib/nicinfo/nicinfo_logger'
 
 # Tests the logger
-class LoggerTest < Minitest::Test
+describe 'logger tests' do
 
-  def test_unknown_data_amount
+  it 'tests unknown data amount' do
     logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
     logger.data_amount = NicInfo::DataAmount::FOO
-    assert_raises( ArgumentError ) { logger.terse( "Network Handle", "NET-192-136-136-0-1" ) }
+    expect{ logger.terse( "Network Handle", "NET-192-136-136-0-1" ) }.to raise_error( ArgumentError )
   end
 
-  def test_fake_data_amount
+  it 'tests fake data amount' do
     logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
     logger.data_amount = "FAKE"
-    assert_raises( ArgumentError ) { logger.terse( "Network Handle", "NET-192-136-136-0-1" ) }
+    expect{  logger.terse( "Network Handle", "NET-192-136-136-0-1" ) }.to raise_error( ArgumentError )
   end
 
-  def test_log_extra_at_default
+  it 'tests log extra at default' do
     logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
     logger.extra( "Network Handle", "NET-192-136-136-0-1" )
-    assert_equal( "", logger.data_out.string )
+    expect( logger.data_out.string ).to eq( "" )
   end
 
-  def test_log_extra_at_normal
+  it 'should log extra at normal' do
     logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
     logger.data_amount = NicInfo::DataAmount::NORMAL_DATA
     logger.extra( "Network Handle", "NET-192-136-136-0-1" )
-    assert_equal( "", logger.data_out.string )
+    expect( logger.data_out.string ).to eq( "" )
   end
 
-  def test_log_extra_at_terse
+  it 'should log extra at terse' do
     logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
     logger.data_amount = NicInfo::DataAmount::TERSE_DATA
     logger.extra( "Network Handle", "NET-192-136-136-0-1" )
-    assert_equal( "", logger.data_out.string )
+    expect( logger.data_out.string ).to eq( "" )
   end
 
-  def test_log_extra_at_extra
+  it 'should log extra at extra' do
     logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
     logger.data_amount = NicInfo::DataAmount::EXTRA_DATA
     logger.extra( "Network Handle", "NET-192-136-136-0-1" )
-    assert_equal( "           Network Handle:  NET-192-136-136-0-1\n", logger.data_out.string )
+    expect( logger.data_out.string ).to eq( "           Network Handle:  NET-192-136-136-0-1\n" )
   end
 
-  def test_log_terse_at_default
+  it 'should log terse at default' do
     logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
     logger.terse( "Network Handle", "NET-192-136-136-0-1" )
-    assert_equal( "           Network Handle:  NET-192-136-136-0-1\n", logger.data_out.string )
+    expect( logger.data_out.string ).to eq( "           Network Handle:  NET-192-136-136-0-1\n" )
   end
 
-  def test_log_terse_at_normal
+  it 'should log terse at normal' do
     logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
     logger.data_amount = NicInfo::DataAmount::NORMAL_DATA
     logger.terse( "Network Handle", "NET-192-136-136-0-1" )
-    assert_equal( "           Network Handle:  NET-192-136-136-0-1\n", logger.data_out.string )
+    expect( logger.data_out.string ).to eq( "           Network Handle:  NET-192-136-136-0-1\n" )
   end
 
-  def test_log_terse_at_terse
+  it 'should log terse at terse' do
     logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
     logger.data_amount = NicInfo::DataAmount::TERSE_DATA
     logger.terse( "Network Handle", "NET-192-136-136-0-1" )
-    assert_equal( "           Network Handle:  NET-192-136-136-0-1\n", logger.data_out.string )
+    expect( logger.data_out.string ).to eq( "           Network Handle:  NET-192-136-136-0-1\n" )
   end
 
-  def test_log_terse_at_extra
+  it 'should log terse at extra' do
     logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
     logger.data_amount = NicInfo::DataAmount::EXTRA_DATA
     logger.terse( "Network Handle", "NET-192-136-136-0-1" )
-    assert_equal( "           Network Handle:  NET-192-136-136-0-1\n", logger.data_out.string )
+    expect( logger.data_out.string ).to eq( "           Network Handle:  NET-192-136-136-0-1\n" )
   end
 
-  def test_log_normal_at_default
+  it 'should log normal at default' do
     logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
     logger.datum( "Network Handle", "NET-192-136-136-0-1" )
-    assert_equal( "           Network Handle:  NET-192-136-136-0-1\n", logger.data_out.string )
+    expect( logger.data_out.string ).to eq( "           Network Handle:  NET-192-136-136-0-1\n" )
   end
 
-  def test_log_normal_at_normal
+  it 'should log normal at normal' do
     logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
     logger.data_amount = NicInfo::DataAmount::NORMAL_DATA
     logger.datum( "Network Handle", "NET-192-136-136-0-1" )
-    assert_equal( "           Network Handle:  NET-192-136-136-0-1\n", logger.data_out.string )
+    expect( logger.data_out.string ).to eq( "           Network Handle:  NET-192-136-136-0-1\n" )
   end
 
-  def test_log_normal_at_terse
+  it 'should log normal at terse' do
     logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
     logger.data_amount = NicInfo::DataAmount::TERSE_DATA
     logger.datum( "Network Handle", "NET-192-136-136-0-1" )
-    assert_equal( "", logger.data_out.string )
+    expect( logger.data_out.string ).to eq( "" )
   end
 
-  def test_log_normal_at_extra
+  it 'should log normal at extra' do
     logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
     logger.data_amount = NicInfo::DataAmount::EXTRA_DATA
     logger.datum( "Network Handle", "NET-192-136-136-0-1" )
-    assert_equal( "           Network Handle:  NET-192-136-136-0-1\n", logger.data_out.string )
+    expect( logger.data_out.string ).to eq( "           Network Handle:  NET-192-136-136-0-1\n" )
   end
 
-  def test_unknown_message_level
+  it 'should error for an unknown message level' do
     logger = NicInfo::Logger.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_SUCH_LEVEL
-    assert_raises( ArgumentError ) { logger.mesg( "Network Handle" ) }
+    expect{ logger.mesg( "Network Handle" ) }.to raise_error( ArgumentError )
   end
 
-  def test_fake_message_level
+  it 'should error at a fake message level' do
     logger = NicInfo::Logger.new
     logger.message_out = StringIO.new
     logger.message_level = "FAKE"
-    assert_raises( ArgumentError ) { logger.mesg( "Network Handle" ) }
+    expect{ logger.mesg( "Network Handle" ) }.to raise_error( ArgumentError )
   end
 
-  def test_log_some_at_default
+  it 'should log some at default' do
     logger = NicInfo::Logger.new
     logger.message_out = StringIO.new
     logger.mesg( "blah" )
-    assert_equal( "# blah\n", logger.message_out.string )
+    expect( logger.message_out.string ).to eq( "# blah\n" )
   end
 
-  def test_log_some_at_some
+  it 'should log some at some level' do
     logger = NicInfo::Logger.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::SOME_MESSAGES
     logger.mesg( "blah" )
-    assert_equal( "# blah\n", logger.message_out.string )
+    expect( logger.message_out.string ).to eq( "# blah\n" )
   end
 
-  def test_log_some_at_trace
+  it 'should log some at trace' do
     logger = NicInfo::Logger.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::ALL_MESSAGES
     logger.mesg( "blah" )
-    assert_equal( "# blah\n", logger.message_out.string )
+    expect( logger.message_out.string ).to eq( "# blah\n" )
   end
 
-  def test_log_some_at_none
+  it 'should log some at none' do
     logger = NicInfo::Logger.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
     logger.mesg( "blah" )
-    assert_equal( "", logger.message_out.string )
+    expect( logger.message_out.string ).to eq( "" )
   end
 
-  def test_log_trace_at_default
+  it 'should log trace at default' do
     logger = NicInfo::Logger.new
     logger.message_out = StringIO.new
     logger.trace( "blah" )
-    assert_equal( "", logger.message_out.string )
+    expect( logger.message_out.string ).to eq( "" )
   end
 
-  def test_log_trace_at_some
+  it 'should log trace at some' do
     logger = NicInfo::Logger.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::SOME_MESSAGES
     logger.trace( "blah" )
-    assert_equal( "", logger.message_out.string )
+    expect( logger.message_out.string ).to eq( "" )
   end
 
-  def test_log_trace_at_trace
+  it 'should log trace at trace' do
     logger = NicInfo::Logger.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::ALL_MESSAGES
     logger.trace( "blah" )
-    assert_equal( "## blah\n", logger.message_out.string )
+    expect( logger.message_out.string ).to eq( "## blah\n" )
   end
 
-  def test_log_trace_at_none
+  it 'should log trace at non' do
     logger = NicInfo::Logger.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
     logger.trace( "blah" )
-    assert_equal( "", logger.message_out.string )
+    expect( logger.message_out.string ).to eq( "" )
   end
 
-  def test_messages_and_data
+  it 'should log messages and data' do
     logger = NicInfo::Logger.new
     logger.message_out = StringIO.new
     logger.data_out = logger.message_out
     logger.mesg( "blah" )
-    assert_equal( "# blah\n", logger.message_out.string )
+    expect( logger.message_out.string ).to eq( "# blah\n" )
     logger.datum( "Network Handle", "NET-192-136-136-0-1" )
-    assert_equal( "# blah\n           Network Handle:  NET-192-136-136-0-1\n", logger.data_out.string )
+    expect( logger.data_out.string ).to eq( "# blah\n           Network Handle:  NET-192-136-136-0-1\n" )
   end
 
-  def test_messages_vs_data
+  it 'should test messages vs data' do
     logger = NicInfo::Logger.new
     messages = StringIO.new
     logger.message_out = messages
     data = StringIO.new
     logger.data_out = data
     logger.mesg( "blah" )
-    assert_equal( "# blah\n", messages.string )
+    expect( messages.string ).to eq( "# blah\n" )
     logger.datum( "Network Handle", "NET-192-136-136-0-1" )
-    assert_equal( "           Network Handle:  NET-192-136-136-0-1\n", data.string )
+    expect( data.string ).to eq( "           Network Handle:  NET-192-136-136-0-1\n" )
   end
 
-  def test_log_ljust_item_name
+  it 'should ljust item name' do
     logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
     logger.data_amount = NicInfo::DataAmount::NORMAL_DATA
     logger.item_name_rjust = false
     logger.datum( "Network Handle", "NET-192-136-136-0-1" )
-    assert_equal( "Network Handle           :  NET-192-136-136-0-1\n", logger.data_out.string )
+    expect( logger.data_out.string ).to eq( "Network Handle           :  NET-192-136-136-0-1\n" )
   end
 
-  def test_log_empty_datum
+  it 'should log empty datum' do
     logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
     logger.data_amount = NicInfo::DataAmount::NORMAL_DATA
     logger.datum( "Network Handle", "" )
-    assert_equal( "", logger.data_out.string )
+    expect( logger.data_out.string ).to eq( "" )
   end
 
-  def test_get_terminal_columns
+  it 'should log terminal columns' do
 
     text1 = <<TEXT1
 speed 38400 baud;
@@ -289,32 +290,32 @@ TEXT3
 
     logger = NicInfo::Logger.new
 
-    assert_equal( 157, logger.get_terminal_columns( text1, 80 ))
-    assert_equal( 110, logger.get_terminal_columns( text2, 80 ))
-    assert_equal( 135, logger.get_terminal_columns( text3, 80 ))
-    assert_equal( 80, logger.get_terminal_columns( "blah", 80 ))
+    expect( logger.get_terminal_columns( text1, 80 ) ).to eq( 157 )
+    expect( logger.get_terminal_columns( text2, 80 ) ).to eq( 110 )
+    expect( logger.get_terminal_columns( text3, 80 ) ).to eq( 135 )
+    expect( logger.get_terminal_columns( "blah", 80 ) ).to eq( 80 )
   end
 
-  def test_break_up_line
+  it 'should break up line' do
     logger = NicInfo::Logger.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
 
     line = "this is a test of the emergency broadcast system"
     lines = logger.break_up_line( line, 20 )
-    assert_equal( 3, lines.length )
+    expect( lines.length ).to eq( 3 )
     line = "0123456789012345678 0123456789012345678 01234567 0123 0123"
     lines = logger.break_up_line( line, 20 )
-    assert_equal( 3, lines.length )
+    expect( lines.length ).to eq( 3 )
     line = "0123456789012345678012345678901234567801234567 0123 0123"
     lines = logger.break_up_line( line, 20 )
-    assert_equal( 2, lines.length )
+    expect( lines.length ).to eq( 2 )
     line = "012345678901234567801234567890123456780123456701230123"
     lines = logger.break_up_line( line, 20 )
-    assert_equal( 1, lines.length )
+    expect( lines.length ).to eq( 1 )
     line = "0123 012345678901234567801234567890123456780123456701230123"
     lines = logger.break_up_line( line, 20 )
-    assert_equal( 2, lines.length )
+    expect( lines.length ).to eq( 2 )
 
   end
 
