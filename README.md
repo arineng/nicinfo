@@ -106,7 +106,7 @@ with the latest RDAP specifications.
     * Updated defaults to latest IANA file
     * Fixed failing unit tests with data tree.
     * Fix for running on cygwin
-* 1.2.0.alpha
+* 1.2.0
   * Dropped support for...
     * Ruby 1.8.7, 1.9.3, and 2.0.
     * OS specific packages (use Ruby gem install)
