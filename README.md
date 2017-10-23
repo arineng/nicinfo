@@ -114,6 +114,7 @@ with the latest RDAP specifications.
     * Look up network information based on your IP address.
     * Added calculated CIDR ranges to IP networks.
     * Added traceroute function (experimental)
+  * Changed default pager to `more` from `less`
 
 # System Requirements
 
