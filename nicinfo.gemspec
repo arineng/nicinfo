@@ -6,7 +6,7 @@ require 'nicinfo/constants'
 Gem::Specification.new do |s|
   s.name        = 'nicinfo'
   s.version     = NicInfo::VERSION
-  s.date        = '2017-10-20'
+  s.date        = Time.now.strftime( "%Y-%m-%d" )
   s.summary     = "RDAP Client"
   s.description = "A command-line RDAP client."
   s.authors     = ["Andrew Newton"]
