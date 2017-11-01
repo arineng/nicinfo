@@ -121,14 +121,14 @@ module NicInfo
     end
 
     def set_bsfiles_last_update_time t = Time.now
-      f = File.open(File.join( @app_data, NicInfo::BSFILE_LAST_CHECK_FILENAME ), "w" )
+      f = File.open(bsfiles_last_update_filename, "w" )
       f.write t.strftime( "%Y-%m-%d %H:%M:%S")
       f.close
     end
 
     def get_bsfiles_last_update_time
       retval = nil
-      fname = File.join( @app_data, NicInfo::BSFILE_LAST_CHECK_FILENAME )
+      fname = bsfiles_last_update_filename
       if File.exists?( fname )
         f = File.open( fname, "r" )
         data = f.read
@@ -136,6 +136,29 @@ module NicInfo
         retval = Time.parse( data )
       end
       return retval
+    end
+
+    def bsfiles_last_update_filename
+      File.join(@rdap_bootstrap_dir, NicInfo::BSFILE_LAST_CHECK_FILENAME)
+    end
+
+    def check_bsfiles_age?
+      retval = false
+      if @config[ NicInfo::BOOTSTRAP ][ NicInfo::CHECK_BSFILES_AGE ]
+        t = get_bsfiles_last_update_time
+        if t != nil
+          configed_age = @config[ NicInfo::BOOTSTRAP ][ NicInfo::BSFILES_AGE ]
+          age = t + configed_age
+          retval = true if age < Time.now
+        else
+          retval = true
+        end
+      end
+      return retval
+    end
+
+    def update_bsfiles? aged
+      return aged && @config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]
     end
 
     def save name, data
@@ -294,6 +317,20 @@ bootstrap:
 
   ns_root_url: https://rdap.arin.net/registry
 
+  # Check for updates of the IANA RDAP bootstrap files
+  # If true, check for IANA bootstrap files once they have aged past bsfiles_age
+  # Values are true or false
+  check_bsfiles_age: true 
+
+  # The age at which IANA RDAP bootstrap files are to be checked if check_bsfiles is true
+  # This value is in seconds
+  bsfiles_age: 604800
+
+  # If the age of the IANA RDAP bootstrap files are considered old according to bsfiles_age
+  # and check_bsfiles is true, then this value will cause a fetch of new files if true.
+  # Values are true or false
+  update_bsfiles: true
+
 search:
 
   # Substring matching
@@ -307,7 +344,7 @@ security:
 
 config:
   # This should not be altered.
-  version: 3
+  version: 4
 
 YAML_CONFIG
 

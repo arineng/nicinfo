@@ -114,9 +114,74 @@ NOT_DEFAULT_CONFIG
     c.logger.message_level = "NONE"
     c.setup_workspace
 
+    expect( File.exists?( c.bsfiles_last_update_filename ) ).to be_falsey
     t2 = c.get_bsfiles_last_update_time
     expect( t2 ).to be_nil
 
+  end
+
+  it 'should update bsfiles based on aged and standard config' do
+    dir = File.join( @work_dir, "test_update_bsfiles_based_on_age_standard" )
+    c = NicInfo::Config.new( dir )
+    c.logger.message_level = "NONE"
+    c.setup_workspace
+
+    expect( c.update_bsfiles?( true ) ).to be_truthy
+    expect( c.update_bsfiles?( false ) ).to be_falsey
+  end
+
+  it 'should update bsfiles based on aged and no update config' do
+    dir = File.join( @work_dir, "test_update_bsfiles_based_on_age_no_update" )
+    c = NicInfo::Config.new( dir )
+    c.logger.message_level = "NONE"
+    c.setup_workspace
+
+    c.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ] = false
+    expect( c.update_bsfiles?( true ) ).to be_falsey
+    expect( c.update_bsfiles?( false ) ).to be_falsey
+  end
+
+  it 'should update bsfiles on new install' do
+    dir = File.join( @work_dir, "test_update_bsfiles_on_new_install" )
+
+    c = NicInfo::Config.new( dir )
+    c.logger.message_level = "NONE"
+    c.setup_workspace
+
+    expect( c.update_bsfiles?( c.check_bsfiles_age? ) ).to be_truthy
+
+  end
+
+  it 'should not update bsfiles if not aged' do
+    dir = File.join( @work_dir, "test_not_update_bsfiles_not_aged" )
+
+    c = NicInfo::Config.new( dir )
+    c.logger.message_level = "NONE"
+    c.setup_workspace
+
+    t1 = Time.now.round - 1
+    c.set_bsfiles_last_update_time t1
+    c.config[ NicInfo::BOOTSTRAP ][ NicInfo::BSFILES_AGE ] = 500
+
+    check_bsfiles_age = c.check_bsfiles_age?
+    expect( check_bsfiles_age ).to be_falsey
+    expect( c.update_bsfiles?( check_bsfiles_age ) ).to be_falsey
+  end
+
+  it 'should update bsfiles if aged' do
+    dir = File.join( @work_dir, "test_update_bsfiles_fi_aged" )
+
+    c = NicInfo::Config.new( dir )
+    c.logger.message_level = "NONE"
+    c.setup_workspace
+
+    t1 = Time.now.round - 500
+    c.set_bsfiles_last_update_time t1
+    c.config[ NicInfo::BOOTSTRAP ][ NicInfo::BSFILES_AGE ] = 1
+
+    check_bsfiles_age = c.check_bsfiles_age?
+    expect( check_bsfiles_age ).to be_truthy
+    expect( c.update_bsfiles?( c.check_bsfiles_age? ) ).to be_truthy
   end
 
 end
