@@ -14,6 +14,7 @@
 
 
 require 'fileutils'
+require 'time'
 require 'nicinfo/nicinfo_logger'
 require 'yaml'
 require 'ostruct'
@@ -117,6 +118,24 @@ module NicInfo
     def copy_bsfiles
       src_dir = File.join( File.dirname( __FILE__ ), NicInfo::BOOTSTRAP_FILE_DIR )
       FileUtils::cp_r( src_dir, @rdap_bootstrap_dir )
+    end
+
+    def set_bsfiles_last_update_time t = Time.now
+      f = File.open(File.join( @app_data, NicInfo::BSFILE_LAST_CHECK_FILENAME ), "w" )
+      f.write t.strftime( "%Y-%m-%d %H:%M:%S")
+      f.close
+    end
+
+    def get_bsfiles_last_update_time
+      retval = nil
+      fname = File.join( @app_data, NicInfo::BSFILE_LAST_CHECK_FILENAME )
+      if File.exists?( fname )
+        f = File.open( fname, "r" )
+        data = f.read
+        f.close
+        retval = Time.parse( data )
+      end
+      return retval
     end
 
     def save name, data

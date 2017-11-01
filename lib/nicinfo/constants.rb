@@ -104,4 +104,6 @@ module NicInfo
      255 =>  "reserved"
   }
 
+  BSFILE_LAST_CHECK_FILENAME = "_last_check_time.txt"
+
 end

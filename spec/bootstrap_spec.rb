@@ -34,6 +34,10 @@ describe 'bootstrap rspec tests' do
     @work_dir = Dir.mktmpdir
   end
 
+  after(:all) do
+    FileUtils.rm_r( @work_dir )
+  end
+
   it 'should test find urls by ipv4' do
     dir = File.join( @work_dir, "test_find_url_by_v4" )
     c = NicInfo::Config.new( dir )

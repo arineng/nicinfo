@@ -25,16 +25,12 @@ describe 'configuration tests' do
 
   @work_dir = nil
 
-  before( :all ) do
-
+  before(:all) do
     @work_dir = Dir.mktmpdir
-
   end
 
-  after( :all ) do
-
+  after(:all) do
     FileUtils.rm_r( @work_dir )
-
   end
 
   it 'test initialization with not config files' do
@@ -94,6 +90,32 @@ NOT_DEFAULT_CONFIG
     expect( File.exist?( File.join( dir, "config.yaml" ) ) ).to be_truthy
     expect( File.exist?( File.join( dir, "rdap_cache" ) ) ).to be_truthy
     expect( File.join( dir, "rdap_cache" ) ).to eq( c.rdap_cache_dir )
+
+  end
+
+  it 'should write and read bsfile update time' do
+    dir = File.join( @work_dir, "test_read_write_bsfiles" )
+
+    c = NicInfo::Config.new( dir )
+    c.logger.message_level = "NONE"
+    c.setup_workspace
+
+    t1 = Time.now.round
+    c.set_bsfiles_last_update_time t1
+    t2 = c.get_bsfiles_last_update_time
+    expect( t2 ).to eq( t1 )
+
+  end
+
+  it 'should return nil if no bsfile update' do
+    dir = File.join( @work_dir, "test_no_bsfile_update" )
+
+    c = NicInfo::Config.new( dir )
+    c.logger.message_level = "NONE"
+    c.setup_workspace
+
+    t2 = c.get_bsfiles_last_update_time
+    expect( t2 ).to be_nil
 
   end
 

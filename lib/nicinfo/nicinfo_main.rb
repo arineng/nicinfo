@@ -390,10 +390,7 @@ module NicInfo
       end
 
       if @config.options.get_iana_files
-        get_file_via_http( "http://data.iana.org/rdap/asn.json", File.join( @config.rdap_bootstrap_dir, "asn.json" ), 0 )
-        get_file_via_http( "http://data.iana.org/rdap/ipv4.json", File.join( @config.rdap_bootstrap_dir, "ipv4.json" ), 0 )
-        get_file_via_http( "http://data.iana.org/rdap/ipv6.json", File.join( @config.rdap_bootstrap_dir, "ipv6.json" ), 0 )
-        get_file_via_http( "http://data.iana.org/rdap/dns.json", File.join( @config.rdap_bootstrap_dir, "dns.json" ), 0 )
+        get_iana_files
       end
 
       if @config.options.demo
@@ -504,6 +501,13 @@ module NicInfo
       end
 
 
+    end
+
+    def get_iana_files
+      get_file_via_http("http://data.iana.org/rdap/asn.json", File.join(@config.rdap_bootstrap_dir, "asn.json"), 0)
+      get_file_via_http("http://data.iana.org/rdap/ipv4.json", File.join(@config.rdap_bootstrap_dir, "ipv4.json"), 0)
+      get_file_via_http("http://data.iana.org/rdap/ipv6.json", File.join(@config.rdap_bootstrap_dir, "ipv6.json"), 0)
+      get_file_via_http("http://data.iana.org/rdap/dns.json", File.join(@config.rdap_bootstrap_dir, "dns.json"), 0)
     end
 
     def do_rdap_query
