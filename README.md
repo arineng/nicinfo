@@ -115,6 +115,8 @@ with the latest RDAP specifications.
     * Added calculated CIDR ranges to IP networks.
     * Added traceroute function (experimental)
   * Changed default pager to `more` from `less`
+* 1.2.1
+  * Updated asn.json and dns.json bootstrap files from IANA.
 
 # System Requirements
 
