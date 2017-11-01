@@ -1,4 +1,5 @@
 # Overview
+[![Gem Version](https://badge.fury.io/rb/nicinfo.svg)](https://badge.fury.io/rb/nicinfo)
 [![Build Status](https://travis-ci.org/arineng/nicinfo.svg?branch=master)](https://travis-ci.org/arineng/nicinfo)
 
 NicInfo is a general purpose, command line Registry Data Access Protocol (RDAP) client released under 
@@ -140,6 +141,9 @@ Issue the following command: `gem install nicinfo`
 
 Once it is installed, try `nicinfo -h`
 
+NicInfo ships with a set of RDAP bootstrap files from the IANA. However, these files are always changing,
+and you may wish to update them from time to time: `nicinfo --iana -V`
+
 ## As an OS Package
 
 OS packages are no longer provided as they were troublesome and mostly broken. If you don't want to install from
@@ -165,6 +169,9 @@ gem install netaddr --user-install
 ```
 
 Once installed, use the -h option to view the help: `nicinfo -h`
+
+NicInfo ships with a set of RDAP bootstrap files from the IANA. However, these files are always changing,
+and you may wish to update them from time to time: `nicinfo --iana -V`
 
 ## Getting Help
 
