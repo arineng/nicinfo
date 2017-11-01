@@ -21,7 +21,7 @@ module NicInfo
   VERSION = "1.2.2-alpha"
   VERSION_LABEL = "NicInfo v." + VERSION
   COPYRIGHT = "Copyright (c) 2011-2017 American Registry for Internet Numbers (ARIN)"
-  CONFIG_VERSION = 3
+  CONFIG_VERSION = 4
 
   # regular expressions
   NET_HANDLE_REGEX = /^NET-.*/i
