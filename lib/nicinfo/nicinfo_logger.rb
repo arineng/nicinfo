@@ -266,7 +266,7 @@ module NicInfo
       ENV['LESS'] = 'FSRX' # Don't page if the input is short enough
 
       Kernel.select [STDIN] # Wait until we have input before we start the pager
-      pager = ENV['PAGER'] || 'less'
+      pager = ENV['PAGER'] || 'more'
       exec pager rescue exec "/bin/sh", "-c", pager
     end
 
