@@ -285,7 +285,7 @@ module NicInfo
     end
 
     # Do an HTTP GET with the path.
-    def get url, try
+    def get url, try, expect_rdap = true
 
       data = @cache.get(url)
       if data == nil
@@ -310,7 +310,7 @@ module NicInfo
           if @config.config[ NicInfo::SECURITY ][ NicInfo::TRY_INSECURE ]
             @config.logger.mesg( "Secure connection failed. Trying insecure connection." )
             uri.scheme = "http"
-            return get( uri.to_s, try )
+            return get( uri.to_s, try, expect_rdap )
           else
             raise e
           end
@@ -319,11 +319,13 @@ module NicInfo
         case res
           when Net::HTTPSuccess
             content_type = res[ "content-type" ].downcase
-            unless content_type.include?(NicInfo::RDAP_CONTENT_TYPE) or content_type.include?(NicInfo::JSON_CONTENT_TYPE)
-              raise Net::HTTPServerException.new("Bad Content Type", res)
-            end
-            if content_type.include? NicInfo::JSON_CONTENT_TYPE
-              @config.conf_msgs << "Server responded with non-RDAP content type but it is JSON"
+            if expect_rdap
+              unless content_type.include?(NicInfo::RDAP_CONTENT_TYPE) or content_type.include?(NicInfo::JSON_CONTENT_TYPE)
+                raise Net::HTTPServerException.new("Bad Content Type", res)
+              end
+              if content_type.include? NicInfo::JSON_CONTENT_TYPE
+                @config.conf_msgs << "Server responded with non-RDAP content type but it is JSON"
+              end
             end
             data = res.body
             @cache.create_or_update(url, data)
@@ -331,7 +333,7 @@ module NicInfo
             if res.code == "301" or res.code == "302" or res.code == "303" or res.code == "307" or res.code == "308"
               res.error! if try >= 5
               location = res["location"]
-              return get( location, try + 1)
+              return get( location, try + 1, expect_rdap)
             end
             res.error!
         end #end case
@@ -426,7 +428,7 @@ module NicInfo
 
       if @config.options.argv[0] == '.'
         @config.logger.mesg( "Obtaining current IP Address...")
-        data = get("https://stat.ripe.net/data/whats-my-ip/data.json", 0)
+        data = get("https://stat.ripe.net/data/whats-my-ip/data.json", 0, false )
         json_data = JSON.load(data)
 
         if json_data["data"] == nil || json_data["data"]["ip"] == nil

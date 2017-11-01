@@ -117,6 +117,7 @@ with the latest RDAP specifications.
   * Changed default pager to `more` from `less`
 * 1.2.1
   * Updated asn.json and dns.json bootstrap files from IANA.
+  * Fixed small bug in self IP lookup which incorrectly expected RIPE stat to be an RDAP server.
 
 # System Requirements
 
