@@ -49,6 +49,7 @@ describe 'web mocks' do
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
     config = NicInfo::Config.new( dir )
     config.logger=logger
+    config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
     args = [ "http://rdap.arin.net/registry/entity/arin-o" ]
 
@@ -67,6 +68,7 @@ describe 'web mocks' do
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
     config = NicInfo::Config.new( dir )
     config.logger=logger
+    config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
     args = [ "arin" ]
 
