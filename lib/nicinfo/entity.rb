@@ -258,7 +258,7 @@ module NicInfo
       json_networks = NicInfo::get_networks( @objectclass )
       json_networks.each do |json_network|
         if json_network.is_a?( Hash )
-          network = Ip.new( @config )
+          network = @config.factory.new_ip
           network.process( json_network )
           @networks << network
         else

@@ -25,7 +25,7 @@ require 'nicinfo/cidrs'
 module NicInfo
 
   def NicInfo.display_ip json_data, config, data_tree
-    ip = Ip.new( config ).process( json_data )
+    ip = config.factory.new_ip.process( json_data )
     NicInfo::display_object_with_entities( ip, config, data_tree )
   end
 

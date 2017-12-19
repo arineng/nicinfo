@@ -118,7 +118,7 @@ module NicInfo
       end if json_nses
       json_net = NicInfo::get_network json_data
       if json_net
-        ip = Ip.new @config
+        ip = @config.factory.new_ip
         ip.process json_net
         @network = ip
       end
