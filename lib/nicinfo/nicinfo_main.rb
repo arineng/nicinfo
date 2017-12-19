@@ -500,13 +500,14 @@ module NicInfo
           end
         else
           json_data = do_rdap_query
-          display_rdap_query( json_data, true )
+          display_rdap_query( json_data, true ) if json_data
       end
 
 
     end
 
     def do_rdap_query
+      retval = nil
       if @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] == nil && !@config.options.url
         bootstrap = Bootstrap.new( @config )
         qtype = @config.options.query_type
@@ -564,7 +565,7 @@ module NicInfo
         end
         inspect_rdap_compliance json_data
         cache_self_references json_data
-        json_data
+        retval = json_data
       rescue JSON::ParserError => a
         @config.logger.mesg( "Server returned invalid JSON!" )
       rescue SocketError => a
@@ -603,6 +604,7 @@ module NicInfo
         end
         @config.logger.trace("Server response code was " + e.response.code)
       end
+      return retval
     end
 
     def display_rdap_query json_data, show_help = true
