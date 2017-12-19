@@ -121,6 +121,8 @@ with the latest RDAP specifications.
 * 1.2.1
   * Updated asn.json and dns.json bootstrap files from IANA.
   * Fixed small bug in self IP lookup which incorrectly expected RIPE stat to be an RDAP server.
+* 1.2.2
+  * Fixed bug where 4xx and 5xx return codes caused a stack trace.
 
 # System Requirements
 

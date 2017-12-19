@@ -1,0 +1,25 @@
+HTTP/1.1 404 Not Found
+Date: Tue, 19 Dec 2017 13:18:09 GMT
+Server: WildFly/10
+X-Powered-By: Undertow/1
+Content-Type: application/rdap+json
+Content-Length: 544
+Set-Cookie: JSESSIONID=O6tVzpQGXHGxJ1obeG31BZN2oWLpM-NyPpEsfwgy.whoisrws3; path=/whoisrws; Max-Age=0; Expires=Thu, 01-Jan-1970 00:00:00 GMT
+Access-Control-Allow-Origin: *
+
+{
+  "rdapConformance" : [ "rdap_level_0" ],
+  "notices" : [ {
+    "title" : "Terms of Service",
+    "description" : [ "By using the ARIN RDAP/Whois service, you are agreeing to the RDAP/Whois Terms of Use" ],
+    "links" : [ {
+      "value" : "https://rdap.arin.net/registry/entity/arin-o",
+      "rel" : "about",
+      "type" : "text/html",
+      "href" : "https://www.arin.net/whois_tou.html"
+    } ]
+  } ],
+  "errorCode" : 404,
+  "title" : "ENTITY NOT FOUND",
+  "description" : [ "The entity you are seeking as 'ARIN-O' is/are not here." ]
+}
