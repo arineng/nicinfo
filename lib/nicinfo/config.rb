@@ -1,4 +1,4 @@
-# Copyright (C) 2011,2012,2013,2014,2015 American Registry for Internet Numbers
+# Copyright (C) 2011-2017 American Registry for Internet Numbers
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -15,9 +15,10 @@
 
 require 'fileutils'
 require 'time'
-require 'nicinfo/nicinfo_logger'
 require 'yaml'
 require 'ostruct'
+require 'nicinfo/nicinfo_logger'
+require 'nicinfo/factory'
 require 'nicinfo/constants'
 
 module NicInfo
@@ -25,7 +26,7 @@ module NicInfo
   # Handles configuration of the application
   class Config
 
-    attr_accessor :logger, :config, :rdap_cache_dir, :options, :conf_msgs, :rdap_bootstrap_dir
+    attr_accessor :logger, :config, :rdap_cache_dir, :options, :conf_msgs, :rdap_bootstrap_dir, :factory
 
     # Intializes the configuration with a place to look for the config file
     # If the file doesn't exist, a default is used.
@@ -36,6 +37,7 @@ module NicInfo
       @app_data = app_data
       @logger = NicInfo::Logger.new
       @conf_msgs = Array.new
+      @factory = NicInfo::Factory.new( self )
 
       config_file_name = Config.formulate_config_file_name( @app_data )
       if File.exist?( config_file_name )

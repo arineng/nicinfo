@@ -21,7 +21,7 @@ require 'nicinfo/data_tree'
 module NicInfo
 
   def NicInfo.display_entity json_data, config, data_tree
-    entity = Entity.new( config ).process( json_data )
+    entity = config.factory.new_entity.process( json_data )
 
     respobjs = ResponseObjSet.new config
     root = entity.to_node
@@ -64,7 +64,7 @@ module NicInfo
       if entity_array.instance_of? Array
         display_array = Array.new
         entity_array.each do |ea|
-          entity = Entity.new( config ).process( ea )
+          entity = config.factory.new_entity.process( ea )
           display_array << entity
         end
         NicInfo.display_object_with_entities( display_array, config, data_tree )

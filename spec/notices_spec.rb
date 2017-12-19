@@ -194,9 +194,10 @@ EXCESSIVE2
   end
 
   it 'should test differenct versions of notice' do
-    expect( NicInfo::Notices::is_excessive_notice( JSON.load( @non_excessive )[ "notices" ], nil ) ).to be_falsey
-    expect( NicInfo::Notices::is_excessive_notice( JSON.load( @excessive1 )[ "notices" ], nil ) ).to be_truthy
-    expect( NicInfo::Notices::is_excessive_notice( JSON.load( @excessive2 )[ "notices" ], nil ) ).to be_truthy
+    notices = NicInfo::Notices.new( nil )
+    expect( notices.is_excessive_notice( JSON.load( @non_excessive )[ "notices" ] ) ).to be_falsey
+    expect( notices.is_excessive_notice( JSON.load( @excessive1 )[ "notices" ] ) ).to be_truthy
+    expect( notices.is_excessive_notice( JSON.load( @excessive2 )[ "notices" ] ) ).to be_truthy
   end
 
 end

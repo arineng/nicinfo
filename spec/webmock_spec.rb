@@ -53,7 +53,11 @@ describe 'web mocks' do
 
     args = [ "http://rdap.arin.net/registry/entity/arin-o" ]
 
+    allow( config.factory ).to receive(:new_error_code).and_call_original
+    allow( config.factory ).to receive(:new_notices).and_call_original
     expect{ NicInfo::Main.new( args, config ).run }.to_not output.to_stdout
+    expect( config.factory).to have_received(:new_error_code).once
+    expect( config.factory).to have_received(:new_notices).once
     expect(a_request(:get, "http://rdap.arin.net/registry/entity/arin-o")).to have_been_made.once
   end
 
@@ -61,7 +65,7 @@ describe 'web mocks' do
     response = File.new( "spec/recorded_responses/arin-entity-search.txt")
     stub_request(:get, "https://rdap.arin.net/registry/entities?fn=arin").to_return(response)
 
-    dir = File.join( @work_dir, "test_search_200" )
+    dir = File.join( @work_dir, "test_search_entity_200" )
     logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
     logger.message_out = StringIO.new
@@ -72,7 +76,13 @@ describe 'web mocks' do
 
     args = [ "arin" ]
 
+    allow( config.factory ).to receive(:new_error_code).and_call_original
+    allow( config.factory ).to receive(:new_notices).and_call_original
+    allow( config.factory ).to receive(:new_entity).and_call_original
     expect{ NicInfo::Main.new( args, config ).run }.to_not output.to_stdout
+    expect( config.factory).to_not have_received(:new_error_code)
+    expect( config.factory).to have_received(:new_notices).exactly( 18 ).times
+    expect( config.factory).to have_received(:new_entity).exactly( 65 ).times
     expect(a_request(:get, "https://rdap.arin.net/registry/entities?fn=arin")).to have_been_made.once
   end
 end

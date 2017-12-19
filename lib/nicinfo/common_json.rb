@@ -1,4 +1,4 @@
-# Copyright (C) 2011,2012,2013,2014 American Registry for Internet Numbers
+# Copyright (C) 2011-2017 American Registry for Internet Numbers
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -67,7 +67,7 @@ module NicInfo
       entities = Array.new
       json_entities = NicInfo::get_entitites( objectclass )
       json_entities.each do |json_entity|
-        entity = Entity.new( @config )
+        entity = @config.factory.new_entity
         entity.process( json_entity )
         entities << entity
       end if json_entities
@@ -76,14 +76,15 @@ module NicInfo
 
     def display_remarks objectclass
       remarks = objectclass[ "remarks" ]
-      if (Notices::is_excessive_notice(remarks, @config)) && (@config.logger.data_amount != NicInfo::DataAmount::EXTRA_DATA)
-        @config.logger.datum "Excessive Remarks", "Use \"-V\" or \"--data extra\" to see them."
-      else
-        if remarks
-          if remarks.instance_of?( Array )
+      if remarks
+        excessive_notice = @config.factory.new_notices.is_excessive_notice(remarks)
+        if (excessive_notice && (@config.logger.data_amount != NicInfo::DataAmount::EXTRA_DATA))
+          @config.logger.datum "Excessive Remarks", "Use \"-V\" or \"--data extra\" to see them."
+        else
+          if remarks.instance_of?(Array)
             remarks.each do |remark|
-              if remark.instance_of?( Hash )
-                title = remark[ "title" ]
+              if remark.instance_of?(Hash)
+                title = remark["title"]
                 @config.logger.datum "Remarks", "-- #{title} --" if title
                 descriptions = NicInfo::get_descriptions remark, @config
                 i = 1
@@ -97,11 +98,11 @@ module NicInfo
                 end if descriptions
                 links = NicInfo::get_links remark, @config
                 if links
-                  @config.logger.datum "More", NicInfo::get_alternate_link( links )
-                  @config.logger.datum "About", NicInfo::get_about_link( links )
-                  @config.logger.datum "TOS", NicInfo::get_tos_link( links )
-                  @config.logger.datum "(C)", NicInfo::get_copyright_link( links )
-                  @config.logger.datum "License", NicInfo::get_license_link( links )
+                  @config.logger.datum "More", NicInfo::get_alternate_link(links)
+                  @config.logger.datum "About", NicInfo::get_about_link(links)
+                  @config.logger.datum "TOS", NicInfo::get_tos_link(links)
+                  @config.logger.datum "(C)", NicInfo::get_copyright_link(links)
+                  @config.logger.datum "License", NicInfo::get_license_link(links)
                 end
               else
                 @config.conf_msgs << "remark is not an object."

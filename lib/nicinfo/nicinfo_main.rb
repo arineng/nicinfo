@@ -1,4 +1,4 @@
-# Copyright (C) 2011,2012,2013,2014 American Registry for Internet Numbers
+# Copyright (C) 2011-2017 American Registry for Internet Numbers
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -629,7 +629,7 @@ module NicInfo
           @config.logger.raw( DataAmount::TERSE_DATA, eval_json_value( value, json_data), false )
         end
       else
-        Notices.new.display_notices json_data, @config, @config.options.query_type == QueryType::BY_SERVER_HELP
+        @config.factory.new_notices.display_notices json_data, @config.options.query_type == QueryType::BY_SERVER_HELP
         if @config.options.query_type != QueryType::BY_SERVER_HELP
           result_type = get_query_type_from_result( json_data )
           if result_type != nil
@@ -696,8 +696,8 @@ module NicInfo
     if res["content-type"] == NicInfo::RDAP_CONTENT_TYPE && res.body && res.body.to_s.size > 0
         json_data = JSON.load( res.body )
         inspect_rdap_compliance json_data
-        Notices.new.display_notices json_data, @config, true
-        ErrorCode.new.display_error_code json_data, @config
+        @config.factory.new_notices.display_notices json_data, true
+        @config.factory.new_error_code.display_error_code( json_data )
       end
     end
 
