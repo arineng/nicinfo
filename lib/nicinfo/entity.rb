@@ -269,7 +269,7 @@ module NicInfo
       json_autnums = NicInfo::get_autnums( @objectclass )
       json_autnums.each do |json_autnum|
         if json_autnum.is_a?( Hash )
-          autnum = Autnum.new( @config )
+          autnum = @config.factory.new_autnum
           autnum.process( json_autnum )
           @autnums << autnum
         else

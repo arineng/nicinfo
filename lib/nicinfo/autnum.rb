@@ -1,4 +1,4 @@
-# Copyright (C) 2011,2012,2013,2014 American Registry for Internet Numbers
+# Copyright (C) 2011-2017 American Registry for Internet Numbers
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -22,7 +22,7 @@ require 'nicinfo/data_tree'
 module NicInfo
 
   def NicInfo.display_autnum json_data, config, data_tree
-    autnum = Autnum.new( config ).process( json_data )
+    autnum = config.factory.new_autnum.process( json_data )
     NicInfo::display_object_with_entities( autnum, config, data_tree )
   end
 

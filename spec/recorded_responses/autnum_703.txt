@@ -1,0 +1,231 @@
+HTTP/1.1 200 OK
+Date: Tue, 19 Dec 2017 23:55:04 GMT
+Server: WildFly/10
+X-Powered-By: Undertow/1
+Content-Type: application/rdap+json
+Content-Length: 9563
+Set-Cookie: JSESSIONID=dq-sW6Px2lyMqEFfkE7GJvlMCIKkGdae3ly3lWtt.whoisrws1; path=/whoisrws; Max-Age=0; Expires=Thu, 01-Jan-1970 00:00:00 GMT
+Access-Control-Allow-Origin: *
+
+{
+  "rdapConformance" : [ "rdap_level_0" ],
+  "notices" : [ {
+    "title" : "Terms of Service",
+    "description" : [ "By using the ARIN RDAP/Whois service, you are agreeing to the RDAP/Whois Terms of Use" ],
+    "links" : [ {
+      "value" : "https://rdap.arin.net/registry/autnum/703",
+      "rel" : "about",
+      "type" : "text/html",
+      "href" : "https://www.arin.net/whois_tou.html"
+    } ]
+  } ],
+  "handle" : "AS701",
+  "startAutnum" : 701,
+  "endAutnum" : 705,
+  "name" : "UUNET",
+  "events" : [ {
+    "eventAction" : "last changed",
+    "eventDate" : "2012-03-20T09:38:58-04:00"
+  }, {
+    "eventAction" : "registration",
+    "eventDate" : "1990-08-02T23:00:00-04:00"
+  } ],
+  "links" : [ {
+    "value" : "https://rdap.arin.net/registry/autnum/703",
+    "rel" : "self",
+    "type" : "application/rdap+json",
+    "href" : "https://rdap.arin.net/registry/autnum/701"
+  }, {
+    "value" : "https://rdap.arin.net/registry/autnum/703",
+    "rel" : "alternate",
+    "type" : "application/xml",
+    "href" : "https://whois.arin.net/rest/asn/AS701"
+  } ],
+  "entities" : [ {
+    "handle" : "MCICS",
+    "vcardArray" : [ "vcard", [ [ "version", { }, "text", "4.0" ], [ "fn", { }, "text", "MCI Communications Services, Inc. d/b/a Verizon Business" ], [ "adr", {
+      "label" : "22001 Loudoun County Pkwy\nAshburn\nVA\n20147\nUnited States"
+    }, "text", [ "", "", "", "", "", "", "" ] ], [ "kind", { }, "text", "org" ] ] ],
+    "roles" : [ "registrant" ],
+    "links" : [ {
+      "value" : "https://rdap.arin.net/registry/autnum/703",
+      "rel" : "self",
+      "type" : "application/rdap+json",
+      "href" : "https://rdap.arin.net/registry/entity/MCICS"
+    }, {
+      "value" : "https://rdap.arin.net/registry/autnum/703",
+      "rel" : "alternate",
+      "type" : "application/xml",
+      "href" : "https://whois.arin.net/rest/org/MCICS"
+    } ],
+    "events" : [ {
+      "eventAction" : "last changed",
+      "eventDate" : "2017-01-28T08:32:29-05:00"
+    }, {
+      "eventAction" : "registration",
+      "eventDate" : "2006-05-30T13:02:27-04:00"
+    } ],
+    "entities" : [ {
+      "handle" : "SWIPP9-ARIN",
+      "vcardArray" : [ "vcard", [ [ "version", { }, "text", "4.0" ], [ "adr", {
+        "label" : "22001 Loudoun County Pkwy\nAshburn\nVA\n20147\nUnited States"
+      }, "text", [ "", "", "", "", "", "", "" ] ], [ "fn", { }, "text", "SWIPPER" ], [ "org", { }, "text", "SWIPPER" ], [ "kind", { }, "text", "group" ], [ "email", { }, "text", "stephen.r.middleton@verizon.com" ], [ "email", { }, "text", "swipper@verizon.com" ], [ "tel", {
+        "type" : [ "work", "voice" ]
+      }, "text", "+1-800-900-0241" ] ] ],
+      "roles" : [ "technical" ],
+      "links" : [ {
+        "value" : "https://rdap.arin.net/registry/autnum/703",
+        "rel" : "self",
+        "type" : "application/rdap+json",
+        "href" : "https://rdap.arin.net/registry/entity/SWIPP9-ARIN"
+      }, {
+        "value" : "https://rdap.arin.net/registry/autnum/703",
+        "rel" : "alternate",
+        "type" : "application/xml",
+        "href" : "https://whois.arin.net/rest/poc/SWIPP9-ARIN"
+      } ],
+      "events" : [ {
+        "eventAction" : "last changed",
+        "eventDate" : "2017-01-23T12:18:09-05:00"
+      }, {
+        "eventAction" : "registration",
+        "eventDate" : "2011-11-30T11:24:25-05:00"
+      } ],
+      "status" : [ "validated" ],
+      "port43" : "whois.arin.net",
+      "objectClassName" : "entity"
+    }, {
+      "handle" : "OA12-ARIN",
+      "vcardArray" : [ "vcard", [ [ "version", { }, "text", "4.0" ], [ "adr", {
+        "label" : "22001 Loudoun County Parkway\nAshburn\nVA\n20147\nUnited States"
+      }, "text", [ "", "", "", "", "", "", "" ] ], [ "fn", { }, "text", "Technologies UUnet Technologies, Inc." ], [ "n", { }, "text", [ "UUnet Technologies, Inc.", "Technologies", "", "", "" ] ], [ "kind", { }, "text", "individual" ], [ "email", { }, "text", "help4u@verizonbusiness.com" ], [ "tel", {
+        "type" : [ "work", "voice" ]
+      }, "text", "+1-800-900-0241" ] ] ],
+      "roles" : [ "noc" ],
+      "remarks" : [ {
+        "title" : "Unvalidated POC",
+        "description" : [ "ARIN has attempted to validate the data for this POC, but has received no response from the POC since 2012-06-20" ]
+      } ],
+      "links" : [ {
+        "value" : "https://rdap.arin.net/registry/autnum/703",
+        "rel" : "self",
+        "type" : "application/rdap+json",
+        "href" : "https://rdap.arin.net/registry/entity/OA12-ARIN"
+      }, {
+        "value" : "https://rdap.arin.net/registry/autnum/703",
+        "rel" : "alternate",
+        "type" : "application/xml",
+        "href" : "https://whois.arin.net/rest/poc/OA12-ARIN"
+      } ],
+      "events" : [ {
+        "eventAction" : "last changed",
+        "eventDate" : "2011-06-21T06:51:13-04:00"
+      }, {
+        "eventAction" : "registration",
+        "eventDate" : "1992-08-03T23:00:00-04:00"
+      } ],
+      "port43" : "whois.arin.net",
+      "objectClassName" : "entity"
+    }, {
+      "handle" : "SWIPP-ARIN",
+      "vcardArray" : [ "vcard", [ [ "version", { }, "text", "4.0" ], [ "adr", {
+        "label" : "22001 Loudoun County Parkway\nAshburn\nVA\n20147\nUnited States"
+      }, "text", [ "", "", "", "", "", "", "" ] ], [ "fn", { }, "text", "swipper" ], [ "org", { }, "text", "swipper" ], [ "kind", { }, "text", "group" ], [ "email", { }, "text", "swipper@verizonbusiness.com" ], [ "tel", {
+        "type" : [ "work", "voice" ]
+      }, "text", "+1-800-900-0241" ] ] ],
+      "roles" : [ "technical" ],
+      "remarks" : [ {
+        "title" : "Registration Comments",
+        "description" : [ "ADDRESSES WITHIN THIS BLOCK ARE NON-PORTABLE" ]
+      }, {
+        "title" : "Unvalidated POC",
+        "description" : [ "ARIN has attempted to validate the data for this POC, but has received no response from the POC since 2016-11-03" ]
+      } ],
+      "links" : [ {
+        "value" : "https://rdap.arin.net/registry/autnum/703",
+        "rel" : "self",
+        "type" : "application/rdap+json",
+        "href" : "https://rdap.arin.net/registry/entity/SWIPP-ARIN"
+      }, {
+        "value" : "https://rdap.arin.net/registry/autnum/703",
+        "rel" : "alternate",
+        "type" : "application/xml",
+        "href" : "https://whois.arin.net/rest/poc/SWIPP-ARIN"
+      } ],
+      "events" : [ {
+        "eventAction" : "last changed",
+        "eventDate" : "2015-11-04T07:12:09-05:00"
+      }, {
+        "eventAction" : "registration",
+        "eventDate" : "2002-08-24T07:16:46-04:00"
+      } ],
+      "port43" : "whois.arin.net",
+      "objectClassName" : "entity"
+    }, {
+      "handle" : "VIS1-ARIN",
+      "vcardArray" : [ "vcard", [ [ "version", { }, "text", "4.0" ], [ "adr", {
+        "label" : "1880 Campus Commons Dr\nReston\nVA\n20191\nUnited States"
+      }, "text", [ "", "", "", "", "", "", "" ] ], [ "fn", { }, "text", "Verizon Internet Services" ], [ "org", { }, "text", "Verizon Internet Services" ], [ "kind", { }, "text", "group" ], [ "email", { }, "text", "IPMGMT@verizon.com" ], [ "email", { }, "text", "stephen.r.middleton@verizon.com" ], [ "tel", {
+        "type" : [ "work", "voice" ]
+      }, "text", "800-243-6994" ] ] ],
+      "roles" : [ "administrative" ],
+      "links" : [ {
+        "value" : "https://rdap.arin.net/registry/autnum/703",
+        "rel" : "self",
+        "type" : "application/rdap+json",
+        "href" : "https://rdap.arin.net/registry/entity/VIS1-ARIN"
+      }, {
+        "value" : "https://rdap.arin.net/registry/autnum/703",
+        "rel" : "alternate",
+        "type" : "application/xml",
+        "href" : "https://whois.arin.net/rest/poc/VIS1-ARIN"
+      } ],
+      "events" : [ {
+        "eventAction" : "last changed",
+        "eventDate" : "2017-11-02T10:06:20-04:00"
+      }, {
+        "eventAction" : "registration",
+        "eventDate" : "2002-11-06T17:57:04-05:00"
+      } ],
+      "status" : [ "validated" ],
+      "port43" : "whois.arin.net",
+      "objectClassName" : "entity"
+    }, {
+      "handle" : "ABUSE3-ARIN",
+      "vcardArray" : [ "vcard", [ [ "version", { }, "text", "4.0" ], [ "adr", {
+        "label" : "22001 Loudoun County Parkway\nAshburn\nVA\n20147\nUnited States"
+      }, "text", [ "", "", "", "", "", "", "" ] ], [ "fn", { }, "text", "abuse" ], [ "org", { }, "text", "abuse" ], [ "kind", { }, "text", "group" ], [ "email", { }, "text", "abuse-mail@verizonbusiness.com" ], [ "tel", {
+        "type" : [ "work", "voice" ]
+      }, "text", "+1-800-900-0241" ] ] ],
+      "roles" : [ "abuse" ],
+      "remarks" : [ {
+        "title" : "Unvalidated POC",
+        "description" : [ "ARIN has attempted to validate the data for this POC, but has received no response from the POC since 2010-06-08" ]
+      } ],
+      "links" : [ {
+        "value" : "https://rdap.arin.net/registry/autnum/703",
+        "rel" : "self",
+        "type" : "application/rdap+json",
+        "href" : "https://rdap.arin.net/registry/entity/ABUSE3-ARIN"
+      }, {
+        "value" : "https://rdap.arin.net/registry/autnum/703",
+        "rel" : "alternate",
+        "type" : "application/xml",
+        "href" : "https://whois.arin.net/rest/poc/ABUSE3-ARIN"
+      } ],
+      "events" : [ {
+        "eventAction" : "last changed",
+        "eventDate" : "2007-05-23T18:27:31-04:00"
+      }, {
+        "eventAction" : "registration",
+        "eventDate" : "2002-08-24T07:09:34-04:00"
+      } ],
+      "port43" : "whois.arin.net",
+      "objectClassName" : "entity"
+    } ],
+    "port43" : "whois.arin.net",
+    "objectClassName" : "entity"
+  } ],
+  "port43" : "whois.arin.net",
+  "objectClassName" : "autnum"
+}
