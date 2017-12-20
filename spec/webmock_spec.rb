@@ -166,4 +166,34 @@ describe 'web mocks' do
     expect( config.factory).to have_received(:new_ns).once
     expect(a_request(:get, "https://rdap-pilot.verisignlabs.com/rdap/v1/nameserver/ns1.arin.net")).to have_been_made.once
   end
+
+  it 'should process a domain lookup' do
+    response = File.new( "spec/recorded_responses/arin_net.txt")
+    stub_request(:get, "https://rdap-pilot.verisignlabs.com/rdap/v1/domain/arin.net").to_return(response)
+
+    dir = File.join( @work_dir, "test_lookup_ns1_arin_net_200" )
+    logger = NicInfo::Logger.new
+    logger.data_out = StringIO.new
+    logger.message_out = StringIO.new
+    logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
+    config = NicInfo::Config.new( dir )
+    config.logger=logger
+    config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
+
+    args = [ "arin.net" ]
+
+    allow( config.factory ).to receive(:new_error_code).and_call_original
+    allow( config.factory ).to receive(:new_notices).and_call_original
+    allow( config.factory ).to receive(:new_entity).and_call_original
+    allow( config.factory ).to receive(:new_ns).and_call_original
+    allow( config.factory ).to receive(:new_domain).and_call_original
+    expect{ NicInfo::Main.new( args, config ).run }.to_not output.to_stdout
+    expect( config.factory).to_not have_received(:new_error_code)
+    expect( config.factory).to have_received(:new_notices).once
+    expect( config.factory).to have_received(:new_entity).once
+    expect( config.factory).to have_received(:new_ns).exactly( 4 ).times
+    expect( config.factory).to have_received(:new_domain).once
+    expect(a_request(:get, "https://rdap-pilot.verisignlabs.com/rdap/v1/domain/arin.net")).to have_been_made.once
+  end
+
 end

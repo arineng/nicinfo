@@ -32,7 +32,7 @@ module NicInfo
     end
     respObjs = ResponseObjSet.new config
     obj_array.each do |array_object|
-      domain = Domain.new( config ).process( array_object )
+      domain = config.factory.new_domain.process( array_object )
       root = domain.to_node
       data_node.add_root( root )
       if !domain.entities.empty? or !domain.nameservers.empty?
