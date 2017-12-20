@@ -22,7 +22,7 @@ require 'nicinfo/data_tree'
 module NicInfo
 
   def NicInfo.display_ns json_data, config, data_node
-    ns = Ns.new( config ).process( json_data )
+    ns = config.factory.new_ns.process( json_data )
     NicInfo::display_object_with_entities( ns, config, data_node )
   end
 
@@ -32,7 +32,7 @@ module NicInfo
       if ns_array.instance_of? Array
         display_array = Array.new
         ns_array.each do |ea|
-          ns = Ns.new( config ).process( ea )
+          ns = config.factory.new_ns.process( ea )
           display_array << ns
         end
         NicInfo::display_object_with_entities( display_array, config, data_node )

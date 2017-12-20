@@ -112,7 +112,7 @@ module NicInfo
       @entities = @common.process_entities @objectclass
       json_nses = NicInfo::get_nameservers json_data
       json_nses.each do |json_ns|
-        ns = Ns.new( @config )
+        ns = @config.factory.new_ns
         ns.process( json_ns )
         @nameservers << ns
       end if json_nses

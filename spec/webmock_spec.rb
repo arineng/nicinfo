@@ -90,7 +90,7 @@ describe 'web mocks' do
     response = File.new( "spec/recorded_responses/ip_108_45_128_208.txt")
     stub_request(:get, "https://rdap.arin.net/registry/ip/108.45.128.208").to_return(response)
 
-    dir = File.join( @work_dir, "test_search_entity_200" )
+    dir = File.join( @work_dir, "test_lookup_ip_108_45_128_208_200" )
     logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
     logger.message_out = StringIO.new
@@ -117,7 +117,7 @@ describe 'web mocks' do
     response = File.new( "spec/recorded_responses/autnum_703.txt")
     stub_request(:get, "https://rdap.arin.net/registry/autnum/703").to_return(response)
 
-    dir = File.join( @work_dir, "test_search_entity_200" )
+    dir = File.join( @work_dir, "test_lookup_autnum_703_200" )
     logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
     logger.message_out = StringIO.new
@@ -138,5 +138,32 @@ describe 'web mocks' do
     expect( config.factory).to have_received(:new_entity).exactly( 6 ).times
     expect( config.factory).to have_received(:new_autnum).once
     expect(a_request(:get, "https://rdap.arin.net/registry/autnum/703")).to have_been_made.once
+  end
+
+  it 'should process an ns lookup' do
+    response = File.new( "spec/recorded_responses/ns1_arin_net.txt")
+    stub_request(:get, "https://rdap-pilot.verisignlabs.com/rdap/v1/nameserver/ns1.arin.net").to_return(response)
+
+    dir = File.join( @work_dir, "test_lookup_ns1_arin_net_200" )
+    logger = NicInfo::Logger.new
+    logger.data_out = StringIO.new
+    logger.message_out = StringIO.new
+    logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
+    config = NicInfo::Config.new( dir )
+    config.logger=logger
+    config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
+
+    args = [ "ns1.arin.net" ]
+
+    allow( config.factory ).to receive(:new_error_code).and_call_original
+    allow( config.factory ).to receive(:new_notices).and_call_original
+    allow( config.factory ).to receive(:new_entity).and_call_original
+    allow( config.factory ).to receive(:new_ns).and_call_original
+    expect{ NicInfo::Main.new( args, config ).run }.to_not output.to_stdout
+    expect( config.factory).to_not have_received(:new_error_code)
+    expect( config.factory).to have_received(:new_notices).once
+    expect( config.factory).to_not have_received(:new_entity)
+    expect( config.factory).to have_received(:new_ns).once
+    expect(a_request(:get, "https://rdap-pilot.verisignlabs.com/rdap/v1/nameserver/ns1.arin.net")).to have_been_made.once
   end
 end
