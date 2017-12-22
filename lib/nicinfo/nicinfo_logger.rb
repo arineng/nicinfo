@@ -52,6 +52,7 @@ module NicInfo
 
     attr_accessor :message_level, :data_amount, :message_out, :data_out, :item_name_length, :item_name_rjust, :pager
     attr_accessor :auto_wrap, :detect_width, :default_width, :prose_name_rjust, :prose_name_length
+    attr_accessor :is_less_available
 
     def initialize
 
@@ -242,10 +243,24 @@ module NicInfo
       return retval
     end
 
+    def is_less_available?
+      if @is_less_available == nil
+        avail = ENV['PATH'].split(File::PATH_SEPARATOR).any? do |dir|
+          File.executable?(File.join(dir, "less"))
+        end
+        if avail
+          @is_less_available = "less"
+        else
+          @is_less_available = false
+        end
+      end
+      return @is_less_available
+    end
+
     # This code came from http://nex-3.com/posts/73-git-style-automatic-paging-in-ruby
     def run_pager
       return unless @pager
-      return if RUBY_PLATFORM =~ /win32/
+      return if Gem.win_platform?
       return unless STDOUT.tty?
 
       read, write = IO.pipe
@@ -266,7 +281,7 @@ module NicInfo
       ENV['LESS'] = 'FSRX' # Don't page if the input is short enough
 
       Kernel.select [STDIN] # Wait until we have input before we start the pager
-      pager = ENV['PAGER'] || 'more'
+      pager = ENV['PAGER'] || is_less_available? || 'more'
       exec pager rescue exec "/bin/sh", "-c", pager
     end
 
