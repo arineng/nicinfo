@@ -288,13 +288,17 @@ module NicInfo
       return @is_less_available
     end
 
+    def get_pager
+      ENV['PAGER'] || is_less_available? || 'more'
+    end
+
     # This code came from http://nex-3.com/posts/73-git-style-automatic-paging-in-ruby
     def run_pager
       return unless @pager
       return if Gem.win_platform?
       return unless STDOUT.tty?
 
-      @color_scheme = ColorScheme::NONE unless is_less_available?
+      @color_scheme = ColorScheme::NONE unless get_pager == "less"
 
       read, write = IO.pipe
 
@@ -314,7 +318,7 @@ module NicInfo
       ENV['LESS'] = 'FSRX' # Don't page if the input is short enough
 
       Kernel.select [STDIN] # Wait until we have input before we start the pager
-      pager = ENV['PAGER'] || is_less_available? || 'more'
+      pager = get_pager
       exec pager rescue exec "/bin/sh", "-c", pager
     end
 
