@@ -282,20 +282,20 @@ module NicInfo
     def display
       @config.logger.start_data_item
       @config.logger.data_title "[ ENTITY ]"
-      @config.logger.terse "Handle", NicInfo::get_handle( @objectclass )
+      @config.logger.terse "Handle", NicInfo::get_handle( @objectclass ), NicInfo::AttentionType::SUCCESS
       @config.logger.extra "Object Class Name", NicInfo::get_object_class_name( @objectclass )
       @jcard.fns.each do |fn|
-        @config.logger.terse "Name", fn
+        @config.logger.terse "Name", fn, NicInfo::AttentionType::SUCCESS
       end
       @jcard.names.each do |n|
-        @config.logger.extra "Name", n
+        @config.logger.extra "Name", n, NicInfo::AttentionType::SUCCESS
       end
       @jcard.orgs.each do |org|
         item_value = org.names.join( ", " )
         if !org.type.empty?
           item_value << " ( #{org.type.join( ", " )} )"
         end
-        @config.logger.terse "Organization", item_value
+        @config.logger.terse "Organization", item_value, NicInfo::AttentionType::SUCCESS
       end
       @jcard.titles.each do |title|
         @config.logger.extra "Title", title

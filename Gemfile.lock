@@ -17,6 +17,7 @@ GEM
     json (2.1.0)
     netaddr (1.5.1)
     public_suffix (3.0.1)
+    rainbow (3.0.0)
     rake (12.3.0)
     rspec (3.7.0)
       rspec-core (~> 3.7.0)
@@ -52,6 +53,7 @@ PLATFORMS
 DEPENDENCIES
   coveralls
   netaddr
+  rainbow (~> 3.0)
   rake
   rspec
   webmock

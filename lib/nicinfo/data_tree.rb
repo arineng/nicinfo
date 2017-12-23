@@ -144,7 +144,7 @@ module NicInfo
       end
       num_count = 1
       @logger.start_data_item if print_tree
-      @logger.prose( @data_amount, "[ RESPONSE DATA ]", " ")
+      @logger.prose( @data_amount, "[ RESPONSE DATA ]", " ", NicInfo::AttentionType::SUCCESS )
       @roots.each do |root|
         if annotate
           if root.alert
@@ -157,7 +157,7 @@ module NicInfo
         else
           s = root.to_s
         end
-        retval = @logger.log_tree_item( @data_amount, s )
+        retval = @logger.log_tree_item( @data_amount, s, NicInfo::AttentionType::SUCCESS )
         if annotate
           prefix = " "
           child_num = 1
@@ -193,7 +193,7 @@ module NicInfo
         child_num = 0
       end
       prefix = prefix.tr( "`", " ") + spacer + ( node == parent.children.last ? "`" : "|" )
-      @logger.log_tree_item( @data_amount, prefix + num_str + node.to_s )
+      @logger.log_tree_item( @data_amount, prefix + num_str + node.to_s, NicInfo::AttentionType::SUCCESS )
       node.children.each do |child|
         rprint( child_num, node, child, prefix )
         child_num += 1 if child_num > 0

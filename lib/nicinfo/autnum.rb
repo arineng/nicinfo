@@ -47,15 +47,15 @@ module NicInfo
     def display
       @config.logger.start_data_item
       @config.logger.data_title "[ AS NUMBER ]"
-      @config.logger.terse "Handle", NicInfo::get_handle( @objectclass )
+      @config.logger.terse "Handle", NicInfo::get_handle( @objectclass ), NicInfo::AttentionType::SUCCESS
       @config.logger.extra "Object Class Name", NicInfo::get_object_class_name( @objectclass )
       endNum = NicInfo.get_endAutnum @objectclass
       startNum = NicInfo.get_startAutnum @objectclass
       if endNum
-        @config.logger.terse "Start AS Number", startNum
-        @config.logger.terse "End AS Number", endNum
+        @config.logger.terse "Start AS Number", startNum, NicInfo::AttentionType::SUCCESS
+        @config.logger.terse "End AS Number", endNum, NicInfo::AttentionType::SUCCESS
       else
-        @config.logger.terse "AS Number", startNum
+        @config.logger.terse "AS Number", startNum, NicInfo::AttentionType::SUCCESS
       end
       @config.logger.extra "Name", NicInfo.get_name( @objectclass )
       @config.logger.terse "Country", NicInfo.get_country( @objectclass )

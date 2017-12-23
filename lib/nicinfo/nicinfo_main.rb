@@ -379,7 +379,7 @@ module NicInfo
     def run
 
       @config.logger.run_pager
-      @config.logger.mesg(NicInfo::VERSION_LABEL)
+      @config.logger.mesg(NicInfo::VERSION_LABEL, NicInfo::AttentionType::PRIMARY )
       @config.setup_workspace
       @config.check_config_version
       @cache = Cache.new(@config)
@@ -395,16 +395,16 @@ module NicInfo
         check_bsfiles_age = @config.check_bsfiles_age?
         update_bsfiles = @config.update_bsfiles?( check_bsfiles_age )
         if update_bsfiles
-          @config.logger.mesg( "IANA RDAP bootstrap files are old and need to be updated." )
+          @config.logger.mesg( "IANA RDAP bootstrap files are old and need to be updated.", NicInfo::AttentionType::ERROR )
           get_iana_files
         elsif check_bsfiles_age
-          @config.logger.mesg( "IANA RDAP bootstrap files are old. Update them with --iana option" )
+          @config.logger.mesg( "IANA RDAP bootstrap files are old. Update them with --iana option", NicInfo::AttentionType::ERROR )
         end
       end
 
       if @config.options.demo
-        @config.logger.mesg( "Populating cache with demonstration results" )
-        @config.logger.mesg( "Try the following demonstration queries:" )
+        @config.logger.mesg( "Populating cache with demonstration results", NicInfo::AttentionType::INFO )
+        @config.logger.mesg( "Try the following demonstration queries:", NicInfo::AttentionType::INFO )
         demo_dir = File.join( File.dirname( __FILE__ ), NicInfo::DEMO_DIR )
         demo_files = Dir::entries( demo_dir )
         demo_files.each do |file|
@@ -415,7 +415,7 @@ module NicInfo
             demo_url = json_data[ NicInfo::NICINFO_DEMO_URL ]
             demo_hint = json_data[ NicInfo::NICINFO_DEMO_HINT ]
             @cache.create( demo_url, demo_data )
-            @config.logger.mesg( "  " + demo_hint )
+            @config.logger.mesg( "  " + demo_hint, NicInfo::AttentionType::INFO )
           end
         end
       end
@@ -442,7 +442,7 @@ module NicInfo
           @config.logger.mesg("Unable to determine your IP Address. You must specify it.")
           exit
         elsif
-          @config.logger.mesg("Your IP address is " + json_data["data"]["ip"])
+          @config.logger.mesg("Your IP address is " + json_data["data"]["ip"], NicInfo::AttentionType::SUCCESS )
           @config.options.argv[0] = json_data["data"]["ip"]
         end
       end
@@ -581,39 +581,39 @@ module NicInfo
         cache_self_references json_data
         retval = json_data
       rescue JSON::ParserError => a
-        @config.logger.mesg( "Server returned invalid JSON!" )
+        @config.logger.mesg( "Server returned invalid JSON!", NicInfo::AttentionType::ERROR )
       rescue SocketError => a
-        @config.logger.mesg(a.message)
+        @config.logger.mesg(a.message, NicInfo::AttentionType::ERROR )
       rescue ArgumentError => a
-        @config.logger.mesg(a.message)
+        @config.logger.mesg(a.message, NicInfo::AttentionType::ERROR )
       rescue Net::HTTPServerException => e
         case e.response.code
           when "200"
-            @config.logger.mesg( e.message )
+            @config.logger.mesg( e.message, NicInfo::AttentionType::SUCCESS )
           when "401"
-            @config.logger.mesg("Authorization is required.")
+            @config.logger.mesg("Authorization is required.", NicInfo::AttentionType::ERROR )
             handle_error_response e.response
           when "404"
-            @config.logger.mesg("Query yielded no results.")
+            @config.logger.mesg("Query yielded no results.", NicInfo::AttentionType::INFO )
             handle_error_response e.response
           else
-            @config.logger.mesg("Error #{e.response.code}.")
+            @config.logger.mesg("Error #{e.response.code}.", NicInfo::AttentionType::ERROR )
             handle_error_response e.response
         end
         @config.logger.trace("Server response code was " + e.response.code)
       rescue Net::HTTPFatalError => e
         case e.response.code
           when "500"
-            @config.logger.mesg("RDAP server is reporting an internal error.")
+            @config.logger.mesg("RDAP server is reporting an internal error.", NicInfo::AttentionType::ERROR )
             handle_error_response e.response
           when "501"
-            @config.logger.mesg("RDAP server does not implement the query.")
+            @config.logger.mesg("RDAP server does not implement the query.", NicInfo::AttentionType::ERROR )
             handle_error_response e.response
           when "503"
-            @config.logger.mesg("RDAP server is reporting that it is unavailable.")
+            @config.logger.mesg("RDAP server is reporting that it is unavailable.", NicInfo::AttentionType::ERROR )
             handle_error_response e.response
           else
-            @config.logger.mesg("Error #{e.response.code}.")
+            @config.logger.mesg("Error #{e.response.code}.", NicInfo::AttentionType::ERROR )
             handle_error_response e.response
         end
         @config.logger.trace("Server response code was " + e.response.code)
@@ -705,7 +705,7 @@ module NicInfo
       rdap_conformance = json[ "rdapConformance" ]
       if rdap_conformance
         rdap_conformance.each do |conformance|
-          @config.logger.trace( "Server conforms to #{conformance}" )
+          @config.logger.trace( "Server conforms to #{conformance}", NicInfo::AttentionType::SECONDARY )
         end
       else
         @config.conf_msgs << "Response has no RDAP Conformance level specified."
@@ -967,10 +967,10 @@ HELP_SUMMARY
 
     def show_conformance_messages
       return if @config.conf_msgs.size == 0
-      @config.logger.mesg( "** WARNING: There are problems in the response that might cause some data to discarded. **" )
+      @config.logger.mesg( "** WARNING: There are problems in the response that might cause some data to discarded. **", NicInfo::AttentionType::ERROR )
       i = 1
       @config.conf_msgs.each do |msg|
-        @config.logger.trace( "#{i} : #{msg}" )
+        @config.logger.trace( "#{i} : #{msg}", NicInfo::AttentionType::ERROR )
         i = i + 1
       end
     end
@@ -979,7 +979,7 @@ HELP_SUMMARY
       truncated = json_data[ "searchResultsTruncated" ]
       if truncated.instance_of?(TrueClass) || truncated.instance_of?(FalseClass)
         if truncated
-          @config.logger.mesg( "Results have been truncated by the server." )
+          @config.logger.mesg( "Results have been truncated by the server.", NicInfo::AttentionType::INFO )
         end
       end
       if truncated != nil

@@ -101,7 +101,7 @@ module NicInfo
       if config_version == nil || config_version < NicInfo::CONFIG_VERSION
         # if a reset hasn't been asked for
         if !@options.reset_config
-          @logger.mesg( "Your configuration is old. Use --reset to create a new one.")
+          @logger.mesg( "Your configuration is old. Use --reset to create a new one.", NicInfo::AttentionType::ERROR )
         end
       end
     end

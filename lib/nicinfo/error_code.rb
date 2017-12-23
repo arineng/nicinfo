@@ -33,7 +33,7 @@ module NicInfo
       if title == nil
         title = ""
       end
-      @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "[ ERROR ]", title
+      @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "[ ERROR ]", title, NicInfo::AttentionType::ERROR
       @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "Code", ec[ "errorCode" ]
       description = ec[ "description" ]
       i = 1

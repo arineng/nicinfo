@@ -52,10 +52,10 @@ module NicInfo
       return if notices == nil
       if (is_excessive_notice(notices) ) && (@config.logger.data_amount != NicInfo::DataAmount::EXTRA_DATA) && !ignore_excessive
         @config.logger.start_data_item
-        @config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "Excessive Notices"
-        @config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "-----------------"
-        @config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "Response contains excessive notices."
-        @config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "Use the \"-V\" or \"--data extra\" options to see them."
+        @config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "Excessive Notices", NicInfo::AttentionType::INFO
+        @config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "-----------------", NicInfo::AttentionType::INFO
+        @config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "Response contains excessive notices.", NicInfo::AttentionType::INFO
+        @config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "Use the \"-V\" or \"--data extra\" options to see them.", NicInfo::AttentionType::INFO
         @config.logger.end_data_item
       else
         notices.each do |notice|
@@ -72,17 +72,17 @@ module NicInfo
         title = ""
       end
       @config.conf_msgs << "'title' in 'notice' is not a string." unless title.instance_of?( String )
-      @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "[ NOTICE ]", title
+      @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "[ NOTICE ]", title, NicInfo::AttentionType::SECONDARY
       type = notice[ "type" ]
       if type != nil
-        @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "Type", NicInfo.capitalize( type )
+        @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "Type", NicInfo.capitalize( type ), NicInfo::AttentionType::SECONDARY
       end
       description = notice[ "description" ]
       i = 1
       if description.instance_of?( Array )
         description.each do |line|
           if line.instance_of?( String )
-            @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, i.to_s, line
+            @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, i.to_s, line, NicInfo::AttentionType::SECONDARY
             i = i + 1
           else
             @config.conf_msgs << "eleemnt of 'description' in 'notice' is not a string."
@@ -95,15 +95,15 @@ module NicInfo
       if links
         if links.instance_of?( Array )
           alternate = NicInfo.get_alternate_link links
-          @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "More", alternate if alternate
+          @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "More", alternate, NicInfo::AttentionType::SECONDARY if alternate
           about = NicInfo.get_about_link links
-          @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "About", about if about
+          @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "About", about, NicInfo::AttentionType::SECONDARY if about
           tos = NicInfo.get_tos_link links
-          @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "TOS", tos if tos
+          @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "TOS", tos, NicInfo::AttentionType::SECONDARY if tos
           copyright = NicInfo.get_copyright_link links
-          @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "(C)", copyright if copyright
+          @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "(C)", copyright, NicInfo::AttentionType::SECONDARY if copyright
           license = NicInfo.get_license_link links
-          @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "License", license if license
+          @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "License", license, NicInfo::AttentionType::SECONDARY if license
         else
           @config.conf_msgs << "'links' is not an array."
         end

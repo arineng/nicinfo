@@ -65,19 +65,19 @@ module NicInfo
     def display
       @config.logger.start_data_item
       @config.logger.data_title "[ NAME SERVER ]"
-      @config.logger.terse "Handle", NicInfo::get_handle( @objectclass )
+      @config.logger.terse "Handle", NicInfo::get_handle( @objectclass ), NicInfo::AttentionType::SUCCESS
       @config.logger.extra "Object Class Name", NicInfo::get_object_class_name( @objectclass )
-      @config.logger.terse "Host Name", NicInfo::get_ldhName( @objectclass )
-      @config.logger.terse "IDN Host Name", NicInfo::get_unicodeName( @objectclass )
+      @config.logger.terse "Host Name", NicInfo::get_ldhName( @objectclass ), NicInfo::AttentionType::SUCCESS
+      @config.logger.terse "IDN Host Name", NicInfo::get_unicodeName( @objectclass ), NicInfo::AttentionType::SUCCESS
       ipAddrs = @objectclass[ "ipAddresses" ]
       if ipAddrs
         v6Addrs = ipAddrs[ "v6" ]
         v6Addrs.each do |v6|
-          @config.logger.terse "IPv6 Address", v6
+          @config.logger.terse "IPv6 Address", v6, NicInfo::AttentionType::SUCCESS
         end if v6Addrs
         v4Addrs = ipAddrs[ "v4" ]
         v4Addrs.each do |v4|
-          @config.logger.terse "IPv4 Address", v4
+          @config.logger.terse "IPv4 Address", v4, NicInfo::AttentionType::SUCCESS
         end if v4Addrs
       end
       @common.display_status @objectclass

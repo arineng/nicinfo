@@ -140,10 +140,10 @@ module NicInfo
     def display
       @config.logger.start_data_item
       @config.logger.data_title "[ DOMAIN ]"
-      @config.logger.terse "Handle", NicInfo::get_handle( @objectclass )
+      @config.logger.terse "Handle", NicInfo::get_handle( @objectclass ), NicInfo::AttentionType::SUCCESS
       @config.logger.extra "Object Class Name", NicInfo::get_object_class_name( @objectclass )
-      @config.logger.terse "Domain Name", NicInfo::get_ldhName( @objectclass )
-      @config.logger.datum "I18N Domain Name", NicInfo::get_unicodeName( @objectclass )
+      @config.logger.terse "Domain Name", NicInfo::get_ldhName( @objectclass ), NicInfo::AttentionType::SUCCESS
+      @config.logger.datum "I18N Domain Name", NicInfo::get_unicodeName( @objectclass ), NicInfo::AttentionType::SUCCESS
       variants = @objectclass[ "variants" ]
       variant_no = 1
       variants.each do |variant|

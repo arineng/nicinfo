@@ -50,10 +50,10 @@ module NicInfo
     def display
       @config.logger.start_data_item
       @config.logger.data_title "[ IP NETWORK ]"
-      @config.logger.terse "Handle", NicInfo::get_handle( @objectclass )
+      @config.logger.terse "Handle", NicInfo::get_handle( @objectclass ), NicInfo::AttentionType::SUCCESS
       @config.logger.extra "Object Class Name", NicInfo::get_object_class_name( @objectclass )
-      @config.logger.terse "Start Address", NicInfo.get_startAddress( @objectclass )
-      @config.logger.terse "End Address", NicInfo.get_endAddress( @objectclass )
+      @config.logger.terse "Start Address", NicInfo.get_startAddress( @objectclass ), NicInfo::AttentionType::SUCCESS
+      @config.logger.terse "End Address", NicInfo.get_endAddress( @objectclass ), NicInfo::AttentionType::SUCCESS
       @config.logger.terse "CIDRs", get_CIDRs
       @config.logger.datum "IP Version", @objectclass[ "ipVersion" ]
       @config.logger.extra "Name", NicInfo.get_name( @objectclass )

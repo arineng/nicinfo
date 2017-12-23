@@ -27,6 +27,7 @@ describe 'data tree tests' do
     logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
     logger.data_amount = NicInfo::DataAmount::EXTRA_DATA
+    logger.color_scheme = NicInfo::ColorScheme::NONE
 
     #do a tree
     tree = NicInfo::DataTree.new
@@ -111,6 +112,7 @@ EXPECTED_LOG
     logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
     logger.data_amount = NicInfo::DataAmount::EXTRA_DATA
+    logger.color_scheme = NicInfo::ColorScheme::NONE
 
     #do a tree
     tree = NicInfo::DataTree.new

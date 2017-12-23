@@ -15,6 +15,7 @@
 # The run_pager code came from http://nex-3.com/posts/73-git-style-automatic-paging-in-ruby
 # and is credited to Nathan Weizenbaum
 
+require 'rainbow'
 require 'nicinfo/enum'
 
 module NicInfo
@@ -47,19 +48,44 @@ module NicInfo
 
   end
 
+  class AttentionType < NicInfo::Enum
+
+    AttentionType.add_item(:SUCCESS, "SUCCESS" )
+    AttentionType.add_item(:INFO, "INFO" )
+    AttentionType.add_item(:PRIMARY, "PRIMARY" )
+    AttentionType.add_item(:SECONDARY, "SECONDARY" )
+    AttentionType.add_item(:ERROR, "ERROR" )
+
+  end
+
+  class ColorScheme < NicInfo::Enum
+
+    # dark background
+    ColorScheme.add_item(:DARK, "DARK")
+
+    # light background
+    ColorScheme.add_item(:LIGHT, "LIGHT")
+
+    # none
+    ColorScheme.add_item(:NONE, "NONE")
+
+  end
+
   # A logger for this application.
   class Logger
 
     attr_accessor :message_level, :data_amount, :message_out, :data_out, :item_name_length, :item_name_rjust, :pager
     attr_accessor :auto_wrap, :detect_width, :default_width, :prose_name_rjust, :prose_name_length
-    attr_accessor :is_less_available
+    attr_accessor :is_less_available, :color_scheme, :rainbow
 
     def initialize
 
       @message_level = MessageLevel::SOME_MESSAGES
       @data_amount = DataAmount::NORMAL_DATA
+      @color_scheme = ColorScheme::DARK
       @message_out = $stdout
       @data_out = $stdout
+      @rainbow = Rainbow.new
       @item_name_length = 25
       @item_name_rjust = true
       @prose_name_length = 10
@@ -81,12 +107,17 @@ module NicInfo
 
     def validate_message_level
       raise ArgumentError, "Message log level not defined" if @message_level == nil
-      raise ArgumentError, "Unknown message log level '" + @message_level.to_s + "'" if !MessageLevel.has_value?(@message_level.to_s)
+      raise ArgumentError, "Unknown message log level '" + @message_level.to_s + "'" unless MessageLevel.has_value?(@message_level.to_s)
     end
 
     def validate_data_amount
       raise ArgumentError, "Data log level not defined" if @data_amount == nil
-      raise ArgumentError, "Unknown data log level '" + @data_amount.to_s + "'" if !DataAmount.has_value?(@data_amount.to_s)
+      raise ArgumentError, "Unknown data log level '" + @data_amount.to_s + "'" unless DataAmount.has_value?(@data_amount.to_s)
+    end
+
+    def validate_color_scheme
+      raise ArgumentError, "Color scheme not defined" if @color_scheme == nil
+      raise ArgumentError, "Unknown color scheme '" + @color_scheme.to_s + "'" unless ColorScheme.has_value?(@color_scheme.to_s)
     end
 
     def start_data_item
@@ -108,135 +139,135 @@ module NicInfo
     end
 
     # Outputs at the :SOME_MESSAGES level
-    def mesg message
+    def mesg message, attention_type = nil
       validate_message_level()
       if (@message_level != MessageLevel::NO_MESSAGES)
-        log_info("# " + message.to_s)
+        log_info("# " + message.to_s, attention_type )
         return true
       end
       return false
     end
 
     # Outputs at the :ALL_MESSAGES level
-    def trace message
+    def trace message, attention_type = nil
       validate_message_level()
       if (@message_level != MessageLevel::NO_MESSAGES && @message_level != MessageLevel::SOME_MESSAGES)
-        log_info("## " + message.to_s)
+        log_info("## " + message.to_s, attention_type )
         return true
       end
       return false
     end
 
     # Outputs a datum at :TERSE_DATA level
-    def terse item_name, item_value
+    def terse item_name, item_value, attention_type = nil
       validate_data_amount()
-      log_data(item_name, item_value)
+      log_data(item_name, item_value, attention_type )
       return true
     end
 
     # Outputs a data at :NORMAL_DATA level
-    def datum item_name, item_value
+    def datum item_name, item_value, attention_type = nil
       validate_data_amount()
       if (@data_amount != DataAmount::TERSE_DATA)
-        log_data(item_name, item_value)
+        log_data(item_name, item_value, attention_type )
         return true
       end
       return false
     end
 
-    def extra item_name, item_value
+    def extra item_name, item_value, attention_type = nil
       validate_data_amount()
       if (@data_amount != DataAmount::TERSE_DATA && @data_amount != DataAmount::NORMAL_DATA)
-        log_data(item_name, item_value)
+        log_data(item_name, item_value, attention_type )
         return true
       end
       return false
     end
 
-    def data_title title
+    def data_title title, attention_type = nil
       validate_data_amount()
-      log_just title, " ", @item_name_length, @item_name_rjust, ""
+      log_just title, " ", @item_name_length, @item_name_rjust, "", attention_type
       return true
     end
 
-    def info data_amount, item_name, item_value
+    def info data_amount, item_name, item_value, attention_type = nil
       retval = false
       validate_data_amount()
       case data_amount
         when DataAmount::TERSE_DATA
-          log_data(item_name, item_value)
+          log_data(item_name, item_value, attention_type )
           retval = true
         when DataAmount::NORMAL_DATA
           if (@data_amount != DataAmount::TERSE_DATA)
-            log_data( item_name, item_value)
+            log_data( item_name, item_value, attention_type )
             retval = true
           end
         when DataAmount::EXTRA_DATA
           if (@data_amount != DataAmount::TERSE_DATA && @data_amount != DataAmount::NORMAL_DATA)
-            log_data( item_name, item_value )
+            log_data( item_name, item_value, attention_type )
             retval = true
           end
       end
       return retval
     end
 
-    def raw data_amount, raw_data, wrap = true
+    def raw data_amount, raw_data, wrap = true, attention_type = nil
       retval = false
       validate_data_amount()
       case data_amount
         when DataAmount::TERSE_DATA
-          log_raw(raw_data, wrap)
+          log_raw(raw_data, wrap, attention_type )
           retval = true
         when DataAmount::NORMAL_DATA
           if (@data_amount != DataAmount::TERSE_DATA)
-            log_raw(raw_data, wrap)
+            log_raw(raw_data, wrap, attention_type )
             retval = true
           end
         when DataAmount::EXTRA_DATA
           if (@data_amount != DataAmount::TERSE_DATA && @data_amount != DataAmount::NORMAL_DATA)
-            log_raw(raw_data, wrap)
+            log_raw(raw_data, wrap, attention_type )
             retval = true
           end
       end
       return retval
     end
 
-    def prose data_amount, prose_name, prose_value
+    def prose data_amount, prose_name, prose_value, attention_type = nil
       retval = false
       validate_data_amount()
       case data_amount
         when DataAmount::TERSE_DATA
-          log_prose prose_name, prose_value
+          log_prose prose_name, prose_value, attention_type
           retval = true
         when DataAmount::NORMAL_DATA
           if (@data_amount != DataAmount::TERSE_DATA)
-            log_prose prose_name, prose_value
+            log_prose prose_name, prose_value, attention_type
             retval = true
           end
         when DataAmount::EXTRA_DATA
           if (@data_amount != DataAmount::TERSE_DATA && @data_amount != DataAmount::NORMAL_DATA)
-            log_prose prose_name, prose_value
+            log_prose prose_name, prose_value, attention_type
             retval = true
           end
       end
       return retval
     end
 
-    def log_tree_item data_amount, tree_item
+    def log_tree_item data_amount, tree_item, attention_type = nil
       retval = false
       validate_data_amount()
       case data_amount
         when DataAmount::TERSE_DATA
-          log_raw(tree_item, true)
+          log_raw(tree_item, true, attention_type )
           retval = true
         when DataAmount::NORMAL_DATA
           if (@data_amount != DataAmount::TERSE_DATA)
-            log_raw(tree_item, true)
+            log_raw(tree_item, true, attention_type )
             retval = true
           end
         when DataAmount::EXTRA_DATA
           if (@data_amount != DataAmount::TERSE_DATA && @data_amount != DataAmount::NORMAL_DATA)
-            log_raw(tree_item, true)
+            log_raw(tree_item, true, attention_type )
             retval = true
           end
       end
@@ -262,6 +293,8 @@ module NicInfo
       return unless @pager
       return if Gem.win_platform?
       return unless STDOUT.tty?
+
+      @color_scheme = ColorScheme::NONE unless is_less_available?
 
       read, write = IO.pipe
 
@@ -325,24 +358,24 @@ module NicInfo
 
     private
 
-    def log_info message
+    def log_info message, attention_type
       if @data_last_written_to && @message_out == @data_out
         @data_out.puts
       end
-      @message_out.puts(message)
+      puts_color( @message_out, message, attention_type)
       @message_last_written_to = true
       @data_last_written_to = false
     end
 
-    def log_data item_name, item_value
-      log_just item_name, item_value, @item_name_length, @item_name_rjust, ":  "
+    def log_data item_name, item_value, attention_type
+      log_just item_name, item_value, @item_name_length, @item_name_rjust, ":  ", attention_type
     end
 
-    def log_prose item_name, item_value
-      log_just item_name, item_value, @prose_name_length, @prose_name_rjust, " "
+    def log_prose item_name, item_value, attention_type
+      log_just item_name, item_value, @prose_name_length, @prose_name_rjust, " ", attention_type
     end
 
-    def log_just item_name, item_value, name_length, name_rjust, separator
+    def log_just item_name, item_value, name_length, name_rjust, separator, attention_type
       if (item_value != nil && !item_value.to_s.empty?)
         format_string = "%" + name_length.to_s + "s%s%s"
         if (!name_rjust)
@@ -353,31 +386,78 @@ module NicInfo
           i = 0
           lines.each do |line|
             if i == 0
-              @data_out.puts(format(format_string, item_name, separator, line))
+              puts_color( @data_out, format(format_string, item_name, separator, line), attention_type )
             else
-              @data_out.puts(format(format_string, " ", separator, line))
+              puts_color( @data_out, format(format_string, " ", separator, line), attention_type )
             end
             i = i + 1
           end
         else
-          @data_out.puts(format(format_string, item_name, separator, item_value))
+          puts_color( @data_out, format(format_string, item_name, separator, item_value), attention_type )
         end
         @data_last_written_to = true
         @message_last_written_to = false
       end
     end
 
-    def log_raw item_value, wrap
+    def log_raw item_value, wrap, attention_type
       if @auto_wrap and wrap
         lines = break_up_line item_value, get_width
         lines.each do |line|
-          @data_out.puts(line)
+          puts_color( @data_out, line, attention_type )
         end
       else
-        @data_out.puts(item_value)
+        puts_color( @data_out, item_value, attention_type )
       end
       @data_last_written_to = true
       @message_last_written_to = false
+    end
+
+    def puts_color out, string, attention_type
+      if !attention_type || @color_scheme == ColorScheme::NONE || attention_type == AttentionType::PRIMARY
+        out.puts string
+      else
+        case attention_type
+          when AttentionType::SUCCESS
+            case @color_scheme
+              when ColorScheme::DARK
+                out.puts @rainbow.wrap(string).aqua
+              when ColorScheme::LIGHT
+                out.puts @rainbow.wrap(string).blue
+              else
+                out.puts string
+            end
+          when AttentionType::SECONDARY
+            case @color_scheme
+              when ColorScheme::DARK
+                out.puts @rainbow.wrap(string).green
+              when ColorScheme::LIGHT
+                out.puts @rainbow.wrap(string).green
+              else
+                out.puts string
+            end
+          when AttentionType::INFO
+            case @color_scheme
+              when ColorScheme::DARK
+                out.puts @rainbow.wrap(string).yellow.bright
+              when ColorScheme::LIGHT
+                out.puts @rainbow.wrap(string).blue.bright
+              else
+                out.puts string
+            end
+          when AttentionType::ERROR
+            case @color_scheme
+              when ColorScheme::DARK
+                out.puts @rainbow.wrap(string).red.bright
+              when ColorScheme::LIGHT
+                out.puts @rainbow.wrap(string).red
+              else
+                out.puts string
+            end
+          else
+            out.puts string
+        end
+      end
     end
 
   end
