@@ -199,6 +199,15 @@ module NicInfo
           raise OptionParser::InvalidArgument, pager.to_s unless pager =~ /yes|no|true|false/i
         end
 
+        opts.on( "--color-scheme DARK|LIGHT|NONE",
+                 "Determines color scheme to use:",
+                 "  dark  - for terminals with dark backgrounds",
+                 "  light - for terminals with light backgrounds",
+                 "  none  - turn off colors" ) do |cs|
+          @config.logger.color_scheme = cs.to_s.upcase
+          raise OptionParser::InvalidArgument, cs.to_s unless cs =~ /dark|light|none/i
+        end
+
         opts.on( "-V",
                  "Equivalent to --messages all and --data extra" ) do |v|
           @config.logger.data_amount = NicInfo::DataAmount::EXTRA_DATA

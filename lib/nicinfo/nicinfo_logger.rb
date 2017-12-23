@@ -94,7 +94,7 @@ module NicInfo
       @message_last_written_to = false
       @data_last_written_to = false
 
-      return if RUBY_PLATFORM =~ /win32/
+      return if Gem.win_platform?
       #else
       @columns = get_terminal_columns( `stty -a`, @default_width )
     end

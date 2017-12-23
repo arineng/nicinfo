@@ -224,6 +224,9 @@ module NicInfo
       @logger.auto_wrap=output[ NicInfo::AUTO_WRAP ]
       @logger.default_width=output[ NicInfo::DEFAULT_WIDTH ]
       @logger.detect_width=output[ NicInfo::DETECT_WIDTH ]
+
+      @logger.color_scheme = output[ NicInfo::COLOR_SCHEME ]
+      @logger.validate_color_scheme
     end
 
     def self.clean
@@ -233,7 +236,7 @@ module NicInfo
     end
 
     def self.formulate_app_data_dir
-      if RUBY_PLATFORM =~ /win32/
+      if Gem.win_platform?
         data_dir = File.join(ENV['APPDATA'], "NicInfo")
       elsif RUBY_PLATFORM =~ /linux/
         data_dir = File.join(ENV['HOME'], ".NicInfo")
@@ -283,6 +286,13 @@ output:
   # The default terminal width if it is not to be detected
   # or cannot be detected
   default_width: 80
+
+  # The color scheme to use. Possible values are
+  # - DARK for terminals with dark background
+  # - LIGHT for terminals with light background
+  # - NONE for no color
+  # color is turned off automatically if a pager is used and the pager is not 'less'.
+  color_scheme: DARK
 
 cache:
 

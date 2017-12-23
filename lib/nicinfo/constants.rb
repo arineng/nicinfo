@@ -63,6 +63,7 @@ module NicInfo
   AUTO_WRAP = "auto_wrap"
   DETECT_WIDTH = "detect_width"
   DEFAULT_WIDTH = "default_width"
+  COLOR_SCHEME = "color_scheme"
   CACHE = "cache"
   CACHE_EXPIRY = "cache_expiry"
   CACHE_EVICTION = "cache_eviction"
