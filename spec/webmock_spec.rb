@@ -171,7 +171,7 @@ describe 'web mocks' do
     response = File.new( "spec/recorded_responses/arin_net.txt")
     stub_request(:get, "https://rdap-pilot.verisignlabs.com/rdap/v1/domain/arin.net").to_return(response)
 
-    dir = File.join( @work_dir, "test_lookup_ns1_arin_net_200" )
+    dir = File.join( @work_dir, "test_lookup_domain_arin_net_200" )
     logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
     logger.message_out = StringIO.new
