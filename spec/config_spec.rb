@@ -77,6 +77,8 @@ NOT_DEFAULT_CONFIG
     expect( c.logger.data_amount ).to eq( "TERSE" )
     expect( c.logger.message_level ).to eq( "NONE" )
 
+    File.delete( f )
+
   end
 
   it 'should setup the workspace' do
