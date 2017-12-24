@@ -1,6 +1,7 @@
 # Overview
 [![Gem Version](https://badge.fury.io/rb/nicinfo.svg)](https://badge.fury.io/rb/nicinfo)
 [![Build Status](https://travis-ci.org/arineng/nicinfo.svg?branch=master)](https://travis-ci.org/arineng/nicinfo)
+[![Build status](https://ci.appveyor.com/api/projects/status/8rr7uqn7gscq9dm2?svg=true)](https://ci.appveyor.com/project/anewton1998/nicinfo)
 [![Dependency Status](https://gemnasium.com/badges/github.com/arineng/nicinfo.svg)](https://gemnasium.com/github.com/arineng/nicinfo)
 [![Coverage Status](https://coveralls.io/repos/github/arineng/nicinfo/badge.svg?branch=master)](https://coveralls.io/github/arineng/nicinfo?branch=master)
 
@@ -91,93 +92,21 @@ nicinfo nic.cz
 
 # Versions
 
-* 0.2.0 - A pre-release to the first stable version. Considered feature complete and compatible
-with the latest RDAP specifications.
-* 1.0.0 - First production release.
-* 1.1.0 -
-  * New Features
-    * New --try-insecure option for those times with SSL/TLS negotiation just isn't gonna work
-    * Now checks for older configs.
-    * Changes in the way data is displayed to make searches easier to understand.
-  * Bug Fixes
-    * Now showing nameservers on domains.
-    * Namespacing of library files to let NicInfo work in some Ruby environments
-* 1.1.1
-  * Bug Fixes
-    * Bootstrap files were not being read properly
-    * Some more trace logging with bootstrapping
-    * Updated defaults to latest IANA file
-    * Fixed failing unit tests with data tree.
-    * Fix for running on cygwin
-* 1.2.0
-  * Dropped support for...
-    * Ruby 1.8.7, 1.9.3, and 2.0.
-    * OS specific packages (use Ruby gem install)
-  * New Features
-    * Look up network information based on your IP address.
-    * Added calculated CIDR ranges to IP networks.
-    * Added traceroute function (experimental)
-  * Changed default pager to `more` from `less`
-* 1.2.1
-  * Updated asn.json and dns.json bootstrap files from IANA.
-  * Fixed small bug in self IP lookup which incorrectly expected RIPE stat to be an RDAP server.
-* 1.2.2
-  * Fixed bug where 4xx and 5xx return codes caused a stack trace.
-
-# System Requirements
-
-NicInfo requires Ruby 2.1.3 or higher and should run on any operating system that supports it. 
-Some features such as the pager support and auto-detection of terminal width will only work on 
-Unix style systems such as Linux and Mac OS X. 
-
-Information on specific platforms are noted below:
-
-* RedHat / CentOS 6: Use [RVM](https://rvm.io/) to install a compatible version of Ruby.
-* Docker ruby:2.1,2.2: This is a docker image based on a very scaled down Ubuntu Linux distribution.
-The "less" pager is not installed, so you will need to install it or disable pager use in NicInfo.
-Installing "less" can be done with `apt-get update` followed by `apt-get install less`.
+Information about the various versions of NicInfo can be found in the [CHANGE LOG](https://github.com/arineng/nicinfo/wiki/CHANGELOG)
+on the [project wiki](https://github.com/arineng/nicinfo/wiki).
 
 # Getting and Installing
 
-## As a Ruby Gem
+Getting and installing NicInfo is easily accomplished as a Ruby Gem using the command `gem install nicinfo`.
+If that does not work for you, follow the instructions and advice for your platform on the project Wiki
+[here](https://github.com/arineng/nicinfo/wiki/Installing).
 
-Issue the following command: `gem install nicinfo`
-
-Once it is installed, try `nicinfo -h`
-
-NicInfo ships with a set of RDAP bootstrap files from the IANA. However, these files are always changing,
-and you may wish to update them from time to time: `nicinfo --iana -V`
-
-## As an OS Package
-
-OS packages are no longer provided as they were troublesome and mostly broken. If you don't want to install from
-source, install using the Ruby gem method above. If you're OS doesn't provide a modern, compatible version of Ruby
-then use [Ruby Version Manager](https://rvm.io/) to install a newer version of Ruby and then install NicInfo as a
-gem.
-
-## As Source from Git
-
-To get the source, issue the following git command.
-
-```
-git clone https://github.com/arinlabs/nicinfo.git
-```
-
-Once cloned, place the bin directory in your shell's execution path or refer directly to "nicinfo" 
-with a path when running the program.
-
-NicInfo requires the netaddr package in Ruby. Here's how to install it:
-
-```
-gem install netaddr --user-install
-```
-
-Once installed, use the -h option to view the help: `nicinfo -h`
-
-NicInfo ships with a set of RDAP bootstrap files from the IANA. However, these files are always changing,
-and you may wish to update them from time to time: `nicinfo --iana -V`
+If you wish to build and test this software from source, it follows the typical Ruby development process.
+More information may be found [here](https://github.com/arineng/nicinfo/wiki/Building-and-Testing).
 
 ## Getting Help
+
+Helpful information about NicInfo (and RDAP) may be found on the [project wiki](https://github.com/arineng/nicinfo/wiki).
 
 If you have questions or need help with this software, you may use the issue tracker on
 [GitHub](https://github.com/arinlabs/nicinfo/issues) or you may use the
@@ -196,27 +125,4 @@ nicinfo --demo
 
 After the cache has been seeded, you will be presented with a list of example queries which will 
 pull information from the cache.
-
-
-# Building and Testing
-
-To get the source, issue the following git command.
-
-```
-git clone https://github.com/arinlabs/nicinfo.git
-```
-
-To develop in isolation, use [Ruby Version Manager (RVM)](https://rvm.io/) and issue a command like
-
-```bash
-rvm use 2.3.1@nicinfo
-```
-
-Running and testing is best done with bundler. To install it `gem install bundler`.
-
-Then use bundler to install NicInfo's dependencies: `bundle install`.
-
-To run the tests: `bundle exec rake test`
-
-To run Nicinfo: `bundle exec bin/nicinfo -V .`
 
