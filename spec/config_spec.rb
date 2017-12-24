@@ -30,7 +30,7 @@ describe 'configuration tests' do
   end
 
   after(:all) do
-    FileUtils.rm_r( @work_dir )
+    FileUtils.rm_rf( @work_dir )
   end
 
   it 'test initialization with not config files' do
@@ -76,8 +76,6 @@ NOT_DEFAULT_CONFIG
 
     expect( c.logger.data_amount ).to eq( "TERSE" )
     expect( c.logger.message_level ).to eq( "NONE" )
-
-    File.delete( f )
 
   end
 
