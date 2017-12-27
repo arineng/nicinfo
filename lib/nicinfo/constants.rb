@@ -1,4 +1,4 @@
-# Copyright (C) 2011,2012,2013,2014,2015 American Registry for Internet Numbers
+# Copyright (C) 2011-2017 American Registry for Internet Numbers
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -18,7 +18,7 @@
 
 module NicInfo
 
-  VERSION = "1.3.0-alpha3"
+  VERSION = "1.3.0"
   VERSION_LABEL = "NicInfo v." + VERSION
   COPYRIGHT = "Copyright (c) 2011-2017 American Registry for Internet Numbers (ARIN)"
   CONFIG_VERSION = 4
