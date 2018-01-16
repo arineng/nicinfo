@@ -68,6 +68,12 @@ module NicInfo
 
   end
 
+  class JcrMode < NicInfo::Enum
+    JcrMode.add_item :NO_VALIDATION, "NONE"
+    JcrMode.add_item :STANDARD_VALIDATION, "STANDARD"
+    JcrMode.add_item :STRICT_VALIDATION, "STRICT"
+  end
+
   # The main class for the nicinfo command.
   class Main
 
@@ -80,6 +86,7 @@ module NicInfo
       end
 
       @config.options.require_query = true
+      @config.options.jcr = JcrMode::NO_VALIDATION
 
       @opts = OptionParser.new do |opts|
 
@@ -263,6 +270,13 @@ module NicInfo
                  "Download RDAP bootstrap files from IANA" ) do
           @config.options.get_iana_files = true
           @config.options.require_query = false
+        end
+
+        opts.on( "--jcr STANDARD|STRICT",
+                 "Validate RDAP response with JCR") do |mode|
+          upmode = mode.upcase
+          raise OptionParser::InvalidArgument, type.to_s unless JcrMode.has_value?(upmode)
+          @config.options.jcr = upmode
         end
 
       end
@@ -587,6 +601,11 @@ module NicInfo
           raise Net::HTTPServerException.new( "Demo Exception", res )
         end
         inspect_rdap_compliance json_data
+        if @config.options.jcr == JcrMode::STANDARD_VALIDATION
+          @config.logger.mesg( "Standard JSON Content Rules validation mode enabled.")
+        elsif @config.options.jcr == JcrMode::STRICT_VALIDATION
+          @config.logger.mesg( "Strict JSON Content Rules validation mode enabled.")
+        end
         cache_self_references json_data
         retval = json_data
       rescue JSON::ParserError => a
