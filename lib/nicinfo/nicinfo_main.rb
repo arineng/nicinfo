@@ -33,6 +33,7 @@ require 'nicinfo/error_code'
 require 'ipaddr'
 require 'nicinfo/data_tree'
 require 'nicinfo/traceroute'
+require 'nicinfo/jcr'
 begin
   require 'json'
 rescue LoadError
@@ -601,11 +602,6 @@ module NicInfo
           raise Net::HTTPServerException.new( "Demo Exception", res )
         end
         inspect_rdap_compliance json_data
-        if @config.options.jcr == JcrMode::STANDARD_VALIDATION
-          @config.logger.mesg( "Standard JSON Content Rules validation mode enabled.")
-        elsif @config.options.jcr == JcrMode::STRICT_VALIDATION
-          @config.logger.mesg( "Strict JSON Content Rules validation mode enabled.")
-        end
         cache_self_references json_data
         retval = json_data
       rescue JSON::ParserError => a
@@ -674,42 +670,59 @@ module NicInfo
           case @config.options.query_type
             when QueryType::BY_IP4_ADDR
               NicInfo::display_ip( json_data, @config, data_tree )
+              NicInfo::do_jcr( json_data, @config, NicInfo::JCR_ROOT_NETWORK )
             when QueryType::BY_IP6_ADDR
               NicInfo::display_ip( json_data, @config, data_tree )
+              NicInfo::do_jcr( json_data, @config, NicInfo::JCR_ROOT_NETWORK )
             when QueryType::BY_IP4_CIDR
               NicInfo::display_ip( json_data, @config, data_tree )
+              NicInfo::do_jcr( json_data, @config, NicInfo::JCR_ROOT_NETWORK )
             when QueryType::BY_IP6_CIDR
               NicInfo::display_ip( json_data, @config, data_tree )
+              NicInfo::do_jcr( json_data, @config, NicInfo::JCR_ROOT_NETWORK )
             when QueryType::BY_IP
               NicInfo::display_ip( json_data, @config, data_tree )
+              NicInfo::do_jcr( json_data, @config, NicInfo::JCR_ROOT_NETWORK )
             when QueryType::BY_AS_NUMBER
               NicInfo::display_autnum( json_data, @config, data_tree )
+              NicInfo::do_jcr( json_data, @config, NicInfo::JCR_ROOT_AUTNUM )
             when "NicInfo::DsData"
               NicInfo::display_ds_data( json_data, @config, data_tree )
             when "NicInfo::KeyData"
               NicInfo::display_key_data( json_data, @config, data_tree )
             when QueryType::BY_DOMAIN
               NicInfo::display_domain( json_data, @config, data_tree )
+              NicInfo::do_jcr( json_data, @config, NicInfo::JCR_ROOT_DOMAIN )
             when QueryType::BY_NAMESERVER
               NicInfo::display_ns( json_data, @config, data_tree )
+              NicInfo::do_jcr( json_data, @config, NicInfo::JCR_ROOT_NAMESERVER )
             when QueryType::BY_ENTITY_HANDLE
               NicInfo::display_entity( json_data, @config, data_tree )
+              NicInfo::do_jcr( json_data, @config, NicInfo::JCR_ROOT_ENTITY )
             when QueryType::SRCH_DOMAINS
               NicInfo::display_domains( json_data, @config, data_tree )
+              NicInfo::do_jcr( json_data, @config, NicInfo::JCR_ROOT_DOMAIN_SEARCH )
             when QueryType::SRCH_DOMAIN_BY_NAME
               NicInfo::display_domains( json_data, @config, data_tree )
+              NicInfo::do_jcr( json_data, @config, NicInfo::JCR_ROOT_DOMAIN_SEARCH )
             when QueryType::SRCH_DOMAIN_BY_NSNAME
               NicInfo::display_domains( json_data, @config, data_tree )
+              NicInfo::do_jcr( json_data, @config, NicInfo::JCR_ROOT_DOMAIN_SEARCH )
             when QueryType::SRCH_DOMAIN_BY_NSIP
               NicInfo::display_domains( json_data, @config, data_tree )
+              NicInfo::do_jcr( json_data, @config, NicInfo::JCR_ROOT_DOMAIN_SEARCH )
             when QueryType::SRCH_ENTITY_BY_NAME
               NicInfo::display_entities( json_data, @config, data_tree )
+              NicInfo::do_jcr( json_data, @config, NicInfo::JCR_ROOT_ENTITY_SEARCH )
             when QueryType::SRCH_NS
               NicInfo::display_nameservers( json_data, @config, data_tree )
+              NicInfo::do_jcr( json_data, @config, NicInfo::JCR_ROOT_NAMESERVER_SEARCH )
             when QueryType::SRCH_NS_BY_NAME
               NicInfo::display_nameservers( json_data, @config, data_tree )
+              NicInfo::do_jcr( json_data, @config, NicInfo::JCR_ROOT_NAMESERVER_SEARCH )
             when QueryType::SRCH_NS_BY_IP
               NicInfo::display_nameservers( json_data, @config, data_tree )
+              NicInfo::do_jcr( json_data, @config, NicInfo::JCR_ROOT_NAMESERVER_SEARCH )
           end
           @config.save_as_yaml( NicInfo::LASTTREE_YAML, data_tree ) if !data_tree.empty?
           show_search_results_truncated json_data

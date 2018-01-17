@@ -43,7 +43,7 @@ module NicInfo
   IPV6_REGEX = /\A(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}\z/
   IPV6_HEXCOMPRESS_REGEX = /\A((?:[0-9A-Fa-f]{1,4}(?::[0-9A-Fa-f]{1,4})*)?)::((?:[0-9A-Fa-f]{1,4}(?::[0-9A-Fa-f]{1,4})*)?)\z/
 
-  #File Name Constants
+  # File Name Constants
   LASTTREE_YAML          = "lasttree.yaml"
   DEMO_DIR               = "demo"
   BOOTSTRAP_FILE_DIR     = "bsfiles"
@@ -52,6 +52,21 @@ module NicInfo
   ENTITY_BOOTSTRAP       = "entity.json"
   IPV4_BOOTSTRAP         = "ipv4.json"
   IPV6_BOOTSTRAP         = "ipv6.json"
+
+  # JCR Constants
+  JCR_DIR                    = "jcr"
+  RDAP_JCR                   = "rdap.jcr"
+  STRICT_RDAP_JCR            = "strict.jcr"
+  JCR_ROOT_ENTITY            = "entity_response"
+  JCR_ROOT_NAMESERVER        = "nameserver_response"
+  JCR_ROOT_DOMAIN            = "domain_response"
+  JCR_ROOT_NETWORK           = "network_response"
+  JCR_ROOT_AUTNUM            = "autnum_response"
+  JCR_ROOT_ERROR             = "error_response"
+  JCR_ROOT_HELP              = "help_response"
+  JCR_ROOT_DOMAIN_SEARCH     = "domainSearch_response"
+  JCR_ROOT_NAMESERVER_SEARCH = "nameserverSearch_response"
+  JCR_ROOT_ENTITY_SEARCH     = "entitySearch_response"
 
   # Config constants
   OUTPUT = "output"
