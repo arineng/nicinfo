@@ -19,20 +19,22 @@ module NicInfo
   def NicInfo.do_jcr( json_data, config, root_name )
 
     if config.options.jcr == JcrMode::STANDARD_VALIDATION
-      config.logger.mesg( "Standard JSON Content Rules validation mode enabled.")
+      config.logger.trace( "Standard JSON Content Rules validation mode enabled.")
     elsif config.options.jcr == JcrMode::STRICT_VALIDATION
-      config.logger.mesg( "Strict JSON Content Rules validation mode enabled.")
+      config.logger.trace( "Strict JSON Content Rules validation mode enabled.")
     else
       return
     end
 
     # Create a JCR context.
-    ruleset = File.join( File.dirname( __FILE__ ), NicInfo::JCR_DIR, NicInfo::RDAP_JCR )
+    ruleset_file = File.join( File.dirname( __FILE__ ), NicInfo::JCR_DIR, NicInfo::RDAP_JCR )
+    ruleset = File.open( ruleset_file ).read
     ctx = JCR::Context.new( ruleset, false )
 
     if config.options.jcr == JcrMode::STRICT_VALIDATION
-      strict = File.join( File.dirname( __FILE__ ), NicInfo::JCR_DIR, NicInfo::STRICT_RDAP_JCR )
-      ctx.override!( strict, root_name )
+      strict_file = File.join( File.dirname( __FILE__ ), NicInfo::JCR_DIR, NicInfo::STRICT_RDAP_JCR )
+      strict = File.open( strict_file ).read
+      ctx.override!( strict )
     end
 
     e1 = ctx.evaluate( json_data )
