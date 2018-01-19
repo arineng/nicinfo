@@ -98,9 +98,37 @@ describe 'demos' do
 
     args = [ "--jcr", "standard", "xn--fo-5ja.example" ]
     main = NicInfo::Main.new( args, config )
+    allow( main.jcr_context ).to receive( :evaluate ).and_call_original
     allow( config.factory ).to receive(:new_domain).and_call_original
     main.run
     expect( config.factory ).to have_received(:new_domain).once
+    expect( main.jcr_context ).to have_received( :evaluate ).once
+
+  end
+
+  it 'domain-rir.json' do
+
+    dir = File.join( @work_dir, "domain-rir_json" )
+    logger = NicInfo::Logger.new
+    logger.data_out = StringIO.new
+    logger.message_out = StringIO.new
+    logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
+    config = NicInfo::Config.new( dir )
+    config.logger=logger
+    config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
+
+    args = [ "--demo" ]
+    main = NicInfo::Main.new( args, config )
+    main.run
+    expect( main.cache.count).to eq( 16 )
+
+    args = [ "--jcr", "strict", "192.in-addr.arpa" ]
+    main = NicInfo::Main.new( args, config )
+    allow( main.jcr_strict_context ).to receive( :evaluate ).and_call_original
+    allow( config.factory ).to receive(:new_domain).and_call_original
+    main.run
+    expect( config.factory ).to have_received(:new_domain).once
+    expect( main.jcr_strict_context ).to have_received( :evaluate ).once
 
   end
 
