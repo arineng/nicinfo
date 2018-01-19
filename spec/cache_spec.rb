@@ -55,7 +55,7 @@ NET_XML
 
   after(:all) do
 
-    FileUtils.rm_r( @work_dir )
+    FileUtils.rm_rf( @work_dir )
 
   end
 
@@ -227,6 +227,26 @@ NET_XML
 
     count = cache.clean
     expect( count ).to eq( 3 )
+
+  end
+
+  it 'should empty the cache' do
+
+    dir = File.join( @work_dir, "test_empty" )
+    c = NicInfo::Config.new( dir )
+    c.logger.message_level = "NONE"
+    c.setup_workspace
+
+    c.config[ NicInfo::CACHE ][ NicInfo::USE_CACHE ] = true
+    cache = NicInfo::Cache.new c
+    url = "http://whois.arin.net/rest/net/NET-192-136-136-0-"
+    cache.create_or_update( url + "1", @net_xml )
+    cache.create_or_update( url + "2", @net_xml )
+    cache.create_or_update( url + "3", @net_xml )
+
+    count = cache.empty
+    expect( count ).to eq( 3 )
+    expect( cache.count ).to eq( 0 )
 
   end
 
