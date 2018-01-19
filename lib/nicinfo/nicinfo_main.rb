@@ -78,6 +78,8 @@ module NicInfo
   # The main class for the nicinfo command.
   class Main
 
+    attr_accessor :config, :cache
+
     def initialize args, config = nil
 
       if config
@@ -450,7 +452,7 @@ module NicInfo
 
       if @config.options.argv == nil || @config.options.argv == [] && !@config.options.query_type
         unless @config.options.require_query
-          exit
+          return
         else
           help
         end
@@ -464,7 +466,7 @@ module NicInfo
         if json_data["data"] == nil || json_data["data"]["ip"] == nil
           @config.logger.mesg("Server repsonded with unknown JSON")
           @config.logger.mesg("Unable to determine your IP Address. You must specify it.")
-          exit
+          return
         elsif
           @config.logger.mesg("Your IP address is " + json_data["data"]["ip"], NicInfo::AttentionType::SUCCESS )
           @config.options.argv[0] = json_data["data"]["ip"]
@@ -496,7 +498,7 @@ module NicInfo
             end
           else
             @config.logger.mesg( "#{@config.options.argv[0]} is not retrievable.")
-            exit
+            return
           end
         elsif @config.options.query_type == QueryType::BY_URL
           @config.options.url = @config.options.argv[0]
@@ -506,7 +508,7 @@ module NicInfo
         end
         if @config.options.query_type == nil
           @config.logger.mesg("Unable to guess type of query. You must specify it.")
-          exit
+          return
         else
           @config.logger.trace("Assuming query value is " + @config.options.query_type)
         end
@@ -641,7 +643,10 @@ module NicInfo
             handle_error_response e.response
         end
         @config.logger.trace("Server response code was " + e.response.code)
+      rescue Net::HTTPRetriableError => e
+        @config.logger.mesg("Too many redirections, retries, or a redirect loop has been detected." )
       end
+
       return retval
     end
 

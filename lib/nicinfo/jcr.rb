@@ -1,4 +1,4 @@
-# Copyright (C) 2011-2017 American Registry for Internet Numbers
+# Copyright (C) 2018 American Registry for Internet Numbers
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -37,7 +37,7 @@ module NicInfo
       ctx.override!( strict )
     end
 
-    e1 = ctx.evaluate( json_data )
+    e1 = ctx.evaluate( json_data, root_name )
 
     unless e1.success
       ctx.failure_report.each do |line|
