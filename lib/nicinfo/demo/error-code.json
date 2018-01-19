@@ -20,6 +20,35 @@
                     "href":"http://www.example.com/tos.html"
                 }
             ]
+        },
+        {
+            "title":"Copyright",
+            "description":[
+                "This test data is Copyright (C) 2015-2018 ARIN."
+            ],
+            "links":[
+                {
+                    "value":"https://rdap.arin.net/bootstrap/entity/restricted",
+                    "rel":"copyright",
+                    "type":"text/html",
+                    "href":"http://www.example.com/copyright.html"
+                }
+            ]
+        },
+        {
+            "title":"About",
+            "description":[
+                "Questions regarding ARIN's RDAP service should be sent to arin-tech-discuss@arin.net.",
+                "See our mailing list for more info."
+            ],
+            "links":[
+                {
+                    "value":"https://rdap.arin.net/bootstrap/entity/restricted",
+                    "rel":"about",
+                    "type":"text/html",
+                    "href":"https://lists.arin.net/mailman/listinfo/arin-tech-discuss"
+                }
+            ]
         }
     ],
     "errorCode":418,

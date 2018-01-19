@@ -80,6 +80,30 @@ describe 'demos' do
 
   end
 
+  it 'error-code.json' do
+
+    dir = File.join( @work_dir, "error_code_json" )
+    logger = NicInfo::Logger.new
+    logger.data_out = StringIO.new
+    logger.message_out = StringIO.new
+    logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
+    config = NicInfo::Config.new( dir )
+    config.logger=logger
+    config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
+
+    args = [ "--demo" ]
+    main = NicInfo::Main.new( args, config )
+    main.run
+    expect( main.cache.count).to eq( 16 )
+
+    args = [ "--type", "entityhandle", "restricted" ]
+    main = NicInfo::Main.new( args, config )
+    allow( config.factory ).to receive(:new_error_code).and_call_original
+    main.run
+    expect( config.factory ).to have_received(:new_error_code).once
+
+  end
+
   it 'domain-dnr.json' do
 
     dir = File.join( @work_dir, "domain-dnr_json" )
