@@ -51,7 +51,7 @@ module NicInfo
       @config.logger.start_data_item
       @config.logger.data_title "[ IP NETWORK ]"
       @config.logger.terse "Handle", NicInfo::get_handle( @objectclass ), NicInfo::AttentionType::SUCCESS
-      @config.logger.extra "Object Class Name", NicInfo::get_object_class_name( @objectclass )
+      @config.logger.extra "Object Class Name", NicInfo::get_object_class_name( @objectclass, "ip network", @config )
       start_addr = NicInfo.get_startAddress( @objectclass )
       if start_addr.include?( '/' )
         @config.conf_msgs << "start IP #{start_addr} is not an IP address (possibly a CIDR)"

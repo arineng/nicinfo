@@ -289,7 +289,7 @@ module NicInfo
       @config.logger.start_data_item
       @config.logger.data_title "[ ENTITY ]"
       @config.logger.terse "Handle", NicInfo::get_handle( @objectclass ), NicInfo::AttentionType::SUCCESS
-      @config.logger.extra "Object Class Name", NicInfo::get_object_class_name( @objectclass )
+      @config.logger.extra "Object Class Name", NicInfo::get_object_class_name( @objectclass, "entity", @config )
       @jcard.fns.each do |fn|
         @config.logger.terse "Name", fn, NicInfo::AttentionType::SUCCESS
       end
