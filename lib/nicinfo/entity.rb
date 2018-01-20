@@ -157,7 +157,7 @@ module NicInfo
             if element[ 3 ][ -2 ].instance_of? Array
               name << " " << element[ 3 ][ -2 ].join( ' ' )
             end
-            @names << name
+            @names << name.strip
           end
           if element[ 0 ] == "tel"
             tel = Tel.new
@@ -222,6 +222,9 @@ module NicInfo
             org.names = org.names + names if names.instance_of? Array
             @orgs << org
           end
+        end
+        if @fns.empty?
+          @config.conf_msgs << "jCard (vCard) has no required 'fn' property."
         end
       end
       return self
@@ -291,13 +294,10 @@ module NicInfo
       @config.logger.terse "Handle", NicInfo::get_handle( @objectclass ), NicInfo::AttentionType::SUCCESS
       @config.logger.extra "Object Class Name", NicInfo::get_object_class_name( @objectclass, "entity", @config )
       @jcard.fns.each do |fn|
-        @config.logger.terse "Name", fn, NicInfo::AttentionType::SUCCESS
-      end
-      if @jcard.fns.empty?
-        @config.conf_msgs << "jCard (vCard) has no required 'fn' property."
+        @config.logger.terse "Common Name", fn, NicInfo::AttentionType::SUCCESS
       end
       @jcard.names.each do |n|
-        @config.logger.extra "Name", n, NicInfo::AttentionType::SUCCESS
+        @config.logger.extra "Formal Name", n, NicInfo::AttentionType::SUCCESS
       end
       @jcard.orgs.each do |org|
         item_value = org.names.join( ", " )

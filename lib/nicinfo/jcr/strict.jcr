@@ -116,3 +116,123 @@ $search_results = (
     $entitySearchResult
 )
 ; end_part
+;
+; IANA Status Values
+;
+
+; start_part strict_iana_status_values.jcr
+$status = "status" : [ $status_values * ]
+
+$status_values = (
+    "validated" |
+    "renew prohibited" |
+    "update prohibited" |
+    "transfer prohibited" |
+    "delete prohibited" |
+    "proxy" |
+    "private" |
+    "removed" |
+    "obscured" |
+    "associated" |
+    "active" |
+    "inactive" |
+    "locked" |
+    "pending create" |
+    "pending renew" |
+    "pending transfer" |
+    "pending update" |
+    "pending delete" |
+    "add period" |
+    "auto renew period" |
+    "client delete prohibited" |
+    "client hold" |
+    "client renew prohibited" |
+    "client transfer prohibited" |
+    "client update prohibited" |
+    "pending restore" |
+    "redemption period" |
+    "renew period" |
+    "server delete prohibited" |
+    "server renew prohibited" |
+    "server transfer prohibited" |
+    "server update prohibited" |
+    "server hold" |
+    "transfer period"
+)
+; end_part
+;
+; IANA Notice and Remark Types
+;
+
+; start_part strict_iana_notice_remark_types.jcr
+$noticeRemarkType = "type" : $noticeRemarkType_values
+
+$noticeRemarkType_values = (
+    "result set truncated due to authorization" |
+    "result set truncated due to excessive load" |
+    "result set truncated due to unexplainable reasons" |
+    "object truncated due to authorization" |
+    "object truncated due to excessive load" |
+    "object truncated due to unexplainable reasons"
+)
+; end_part
+;
+; IANA Roles
+;
+
+; start_part strict_iana_roles.jcr
+$roles = "roles" : [ $role_values * ]
+
+$role_values = (
+    "registrant" |
+    "technical" |
+    "administrative" |
+    "abuse" |
+    "billing" |
+    "registrar" |
+    "reseller" |
+    "sponsor" |
+    "proxy" |
+    "notifications" |
+    "noc"
+)
+
+; end_part
+;
+; IANA Domain Variant Relations
+;
+
+; start_part strict_iana_domain_variant_relations.jcr
+$variantRelation = "relation" : [ $variantRelation_values * ]
+
+$variantRelation_values = (
+    "registered" |
+    "unregistered" |
+    "registration restricted" |
+    "open registration" |
+    "conjoined"
+)
+; end_part
+;
+; IANA Event Actions
+;
+
+; start_part strict_iana_event_actions.jcr
+$eventAction = "eventAction" : $eventAction_values
+
+$eventAction_values = (
+    "registration" |
+    "reregistration" |
+    "last changed" |
+    "expiration" |
+    "deletion" |
+    "reinstantiation" |
+    "transfer" |
+    "locked" |
+    "unlocked" |
+    "last update of RDAP database" |
+    "registrar expiration" |
+    "enum validation expiration"
+)
+; end_part
+
