@@ -1064,8 +1064,9 @@ HELP_SUMMARY
       return if @config.conf_msgs.size == 0
       @config.logger.mesg( "** WARNING: There are problems in the response that might cause some data to discarded. **", NicInfo::AttentionType::ERROR )
       i = 1
+      pad = @config.conf_msgs.length.to_s.length
       @config.conf_msgs.each do |msg|
-        @config.logger.trace( "#{i} : #{msg}", NicInfo::AttentionType::ERROR )
+        @config.logger.trace( "#{i.to_s.rjust(pad," ")} : #{msg}", NicInfo::AttentionType::ERROR )
         i = i + 1
       end
     end
