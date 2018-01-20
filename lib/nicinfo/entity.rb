@@ -112,7 +112,8 @@ module NicInfo
 
     attr_accessor :fns, :names, :phones, :emails, :adrs, :kind, :titles, :roles, :orgs
 
-    def initialize
+    def initialize( config )
+      @config = config
       @fns = Array.new
       @names = Array.new
       @phones = Array.new
@@ -130,6 +131,11 @@ module NicInfo
     def process entity
       if ( vcard = get_vcard( entity ) ) != nil
         vcardElements = vcard[ 1 ]
+        if vcardElements.size == 0
+          @config.conf_msgs << "jCard (vCard) is empty."
+        elsif vcardElements[ 0 ][ 0 ] != "version"
+          @config.conf_msgs << "jCard (vCard) does not have required version first element."
+        end
         vcardElements.each do |element|
           if element[ 0 ] == "fn"
             @fns << element[ 3 ]
@@ -232,7 +238,7 @@ module NicInfo
 
     def initialize config
       @config = config
-      @jcard = JCard.new
+      @jcard = JCard.new( config )
       @common = CommonJson.new config
       @entity = nil
       @asEvents = Array.new
@@ -286,6 +292,9 @@ module NicInfo
       @config.logger.extra "Object Class Name", NicInfo::get_object_class_name( @objectclass )
       @jcard.fns.each do |fn|
         @config.logger.terse "Name", fn, NicInfo::AttentionType::SUCCESS
+      end
+      if @jcard.fns.empty?
+        @config.conf_msgs << "jCard (vCard) has no required 'fn' property."
       end
       @jcard.names.each do |n|
         @config.logger.extra "Name", n, NicInfo::AttentionType::SUCCESS
