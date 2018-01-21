@@ -1119,7 +1119,7 @@ HELP_SUMMARY
 
 QUERIES
   For most query values, the query type is inferred. However, some types of queries
-  cannot be inferred and so the -t option must be used. The domain search by name
+  cannot be inferred and so the -t parameter must be used. The domain search by name
   (dsbyname) and entity search by name (esbyname) queries can take wildcards ('*'),
   but these must be quoted or escaped to avoid processing by the invoking OS shell
   on Unix-like operating systems.
@@ -1141,11 +1141,11 @@ CONFIGURATION
 
 CACHING
   This program will write query responses to a cache. By default, answers are pulled
-  from the cache if present. This can be turned on or off with the --cache option or
+  from the cache if present. This can be turned on or off with the --cache parameter or
   using the cache/use_cache value in the configuration file.
 
   Expiration of items in the cache and eviction of items from the cache can also be
-  controlled. The cache can be manually emptied using the --empty-cache option.
+  controlled. The cache can be manually emptied using the --empty-cache parameter.
 
 BOOTSTRAPPING
   Bootstrapping is the process of finding an appropriate RDAP server in which to send
@@ -1192,6 +1192,13 @@ DEMONSTRATION QUERIES
 
   When the --demo option is given, the list of demonstration queries will be printed
   out.
+
+RDAP VALIDATION
+  This program has built-in checks for verifying the validity of RDAP responses.
+  Beyond these normal built-in checks, it can also JSON Content Rules to check
+  the validity of the responses using the --jcr parameter, which requires either
+  the standard (i.e. --jcr standard) or strict (i.e. --jcr strict) parameter
+  options.
 EXTENDED_HELP
 
 end
