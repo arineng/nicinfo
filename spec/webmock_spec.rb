@@ -196,4 +196,31 @@ describe 'web mocks' do
     expect(a_request(:get, "https://rdap-pilot.verisignlabs.com/rdap/v1/domain/arin.net")).to have_been_made.once
   end
 
+  it 'should download IANA files' do
+    asn_response = File.new( "spec/recorded_responses/iana_asn.txt")
+    ipv4_response = File.new( "spec/recorded_responses/iana_ipv4.txt")
+    ipv6_response = File.new( "spec/recorded_responses/iana_ipv6.txt")
+    dns_response = File.new( "spec/recorded_responses/iana_dns.txt")
+    stub_request(:get, "http://data.iana.org/rdap/asn.json").to_return(asn_response)
+    stub_request(:get, "http://data.iana.org/rdap/ipv4.json").to_return(ipv4_response)
+    stub_request(:get, "http://data.iana.org/rdap/ipv6.json").to_return(ipv6_response)
+    stub_request(:get, "http://data.iana.org/rdap/dns.json").to_return(dns_response)
+
+    dir = File.join( @work_dir, "test_download_iana_files" )
+    logger = NicInfo::Logger.new
+    logger.data_out = StringIO.new
+    logger.message_out = StringIO.new
+    logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
+    config = NicInfo::Config.new( dir )
+    config.logger=logger
+    config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
+
+    args = [ "--iana" ]
+
+    expect{ NicInfo::Main.new( args, config ).run }.to_not output.to_stdout
+    expect(a_request(:get, "http://data.iana.org/rdap/asn.json" )).to have_been_made.once
+    expect(a_request(:get, "http://data.iana.org/rdap/ipv4.json" )).to have_been_made.once
+    expect(a_request(:get, "http://data.iana.org/rdap/ipv6.json" )).to have_been_made.once
+    expect(a_request(:get, "http://data.iana.org/rdap/dns.json" )).to have_been_made.once
+  end
 end

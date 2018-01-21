@@ -185,4 +185,21 @@ JSON_DATA
     expect( config.options.help ).to be_truthy
 
   end
+
+  it 'should understand a bunch of parameters' do
+
+    dir = File.join( @work_dir, "test_a_bunch_of_parameters" )
+    logger = NicInfo::Logger.new
+    logger.message_out = StringIO.new
+    logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
+    config = NicInfo::Config.new( dir )
+    config.logger=logger
+    args = [ "-r", "-b", "https://rdap.example" ]
+    e = NicInfo::Main.new( args, config )
+
+    expect( config.options.argv ).to eq( [] )
+    expect( config.options.reverse_ip ).to be_truthy
+    expect( config.config[NicInfo::BOOTSTRAP][NicInfo::BOOTSTRAP_URL] ).to eq( "https://rdap.example" )
+
+  end
 end
