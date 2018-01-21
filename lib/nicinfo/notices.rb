@@ -15,6 +15,7 @@
 require 'nicinfo/config'
 require 'nicinfo/nicinfo_logger'
 require 'nicinfo/utils'
+require 'nicinfo/common_json'
 
 module NicInfo
 
@@ -25,6 +26,7 @@ module NicInfo
 
     def initialize( config )
       @config = config
+      @common = CommonJson.new( config )
     end
 
     def is_excessive_notice notices
@@ -92,22 +94,7 @@ module NicInfo
         @config.conf_msgs << "'description' in 'notice' is not an array."
       end
       links = notice[ "links" ]
-      if links
-        if links.instance_of?( Array )
-          alternate = NicInfo.get_alternate_link links
-          @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "More", alternate, NicInfo::AttentionType::SECONDARY if alternate
-          about = NicInfo.get_about_link links
-          @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "About", about, NicInfo::AttentionType::SECONDARY if about
-          tos = NicInfo.get_tos_link links
-          @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "TOS", tos, NicInfo::AttentionType::SECONDARY if tos
-          copyright = NicInfo.get_copyright_link links
-          @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "(C)", copyright, NicInfo::AttentionType::SECONDARY if copyright
-          license = NicInfo.get_license_link links
-          @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "License", license, NicInfo::AttentionType::SECONDARY if license
-        else
-          @config.conf_msgs << "'links' is not an array."
-        end
-      end
+      @common.display_simple_links( links )
       @config.logger.end_data_item
     end
 

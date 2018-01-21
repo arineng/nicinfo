@@ -204,6 +204,25 @@ module NicInfo
       end
     end
 
+    def display_simple_links links
+      if links
+        if links.instance_of?( Array )
+          alternate = NicInfo.get_alternate_link links
+          @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "More", alternate, NicInfo::AttentionType::SECONDARY if alternate
+          about = NicInfo.get_about_link links
+          @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "About", about, NicInfo::AttentionType::SECONDARY if about
+          tos = NicInfo.get_tos_link links
+          @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "TOS", tos, NicInfo::AttentionType::SECONDARY if tos
+          copyright = NicInfo.get_copyright_link links
+          @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "(C)", copyright, NicInfo::AttentionType::SECONDARY if copyright
+          license = NicInfo.get_license_link links
+          @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "License", license, NicInfo::AttentionType::SECONDARY if license
+        else
+          @config.conf_msgs << "'links' is not an array."
+        end
+      end
+    end
+
   end
 
   class EventActor
