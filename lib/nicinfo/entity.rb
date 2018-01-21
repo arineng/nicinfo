@@ -112,7 +112,8 @@ module NicInfo
 
     attr_accessor :fns, :names, :phones, :emails, :adrs, :kind, :titles, :roles, :orgs
 
-    def initialize
+    def initialize( config )
+      @config = config
       @fns = Array.new
       @names = Array.new
       @phones = Array.new
@@ -130,6 +131,11 @@ module NicInfo
     def process entity
       if ( vcard = get_vcard( entity ) ) != nil
         vcardElements = vcard[ 1 ]
+        if vcardElements.size == 0
+          @config.conf_msgs << "jCard (vCard) is empty."
+        elsif vcardElements[ 0 ][ 0 ] != "version"
+          @config.conf_msgs << "jCard (vCard) does not have required version first element."
+        end
         vcardElements.each do |element|
           if element[ 0 ] == "fn"
             @fns << element[ 3 ]
@@ -151,7 +157,7 @@ module NicInfo
             if element[ 3 ][ -2 ].instance_of? Array
               name << " " << element[ 3 ][ -2 ].join( ' ' )
             end
-            @names << name
+            @names << name.strip
           end
           if element[ 0 ] == "tel"
             tel = Tel.new
@@ -217,6 +223,9 @@ module NicInfo
             @orgs << org
           end
         end
+        if @fns.empty?
+          @config.conf_msgs << "jCard (vCard) has no required 'fn' property."
+        end
       end
       return self
     end
@@ -232,7 +241,7 @@ module NicInfo
 
     def initialize config
       @config = config
-      @jcard = JCard.new
+      @jcard = JCard.new( config )
       @common = CommonJson.new config
       @entity = nil
       @asEvents = Array.new
@@ -283,12 +292,12 @@ module NicInfo
       @config.logger.start_data_item
       @config.logger.data_title "[ ENTITY ]"
       @config.logger.terse "Handle", NicInfo::get_handle( @objectclass ), NicInfo::AttentionType::SUCCESS
-      @config.logger.extra "Object Class Name", NicInfo::get_object_class_name( @objectclass )
+      @config.logger.extra "Object Class Name", NicInfo::get_object_class_name( @objectclass, "entity", @config )
       @jcard.fns.each do |fn|
-        @config.logger.terse "Name", fn, NicInfo::AttentionType::SUCCESS
+        @config.logger.terse "Common Name", fn, NicInfo::AttentionType::SUCCESS
       end
       @jcard.names.each do |n|
-        @config.logger.extra "Name", n, NicInfo::AttentionType::SUCCESS
+        @config.logger.extra "Formal Name", n, NicInfo::AttentionType::SUCCESS
       end
       @jcard.orgs.each do |org|
         item_value = org.names.join( ", " )

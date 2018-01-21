@@ -1,6 +1,6 @@
 {
-    "nicInfo_demoUrl" : "https://rdap.arin.net/registry/nameserver/ns2.example.com",
-    "nicInfo_demoHint" : "nicinfo ns2.example.com",
+    "nicInfo_demoUrl" : "https://rdap.arin.net/registry/nameserver/ns2.example.example",
+    "nicInfo_demoHint" : "nicinfo ns2.example.example",
     "rdapConformance":[
         "rdap_level_0"
     ],

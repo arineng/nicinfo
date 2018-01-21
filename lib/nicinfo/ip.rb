@@ -51,9 +51,17 @@ module NicInfo
       @config.logger.start_data_item
       @config.logger.data_title "[ IP NETWORK ]"
       @config.logger.terse "Handle", NicInfo::get_handle( @objectclass ), NicInfo::AttentionType::SUCCESS
-      @config.logger.extra "Object Class Name", NicInfo::get_object_class_name( @objectclass )
-      @config.logger.terse "Start Address", NicInfo.get_startAddress( @objectclass ), NicInfo::AttentionType::SUCCESS
-      @config.logger.terse "End Address", NicInfo.get_endAddress( @objectclass ), NicInfo::AttentionType::SUCCESS
+      @config.logger.extra "Object Class Name", NicInfo::get_object_class_name( @objectclass, "ip network", @config )
+      start_addr = NicInfo.get_startAddress( @objectclass )
+      if start_addr.include?( '/' )
+        @config.conf_msgs << "start IP #{start_addr} is not an IP address (possibly a CIDR)"
+      end
+      @config.logger.terse "Start Address", start_addr , NicInfo::AttentionType::SUCCESS
+      end_addr = NicInfo.get_endAddress( @objectclass )
+      if end_addr.include?( '/' )
+        @config.conf_msgs << "end IP #{end_addr} is not an IP address (possibly a CIDR)"
+      end
+      @config.logger.terse "End Address", end_addr, NicInfo::AttentionType::SUCCESS
       @config.logger.terse "CIDRs", get_CIDRs
       @config.logger.datum "IP Version", @objectclass[ "ipVersion" ]
       @config.logger.extra "Name", NicInfo.get_name( @objectclass )

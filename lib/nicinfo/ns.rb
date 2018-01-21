@@ -66,7 +66,7 @@ module NicInfo
       @config.logger.start_data_item
       @config.logger.data_title "[ NAME SERVER ]"
       @config.logger.terse "Handle", NicInfo::get_handle( @objectclass ), NicInfo::AttentionType::SUCCESS
-      @config.logger.extra "Object Class Name", NicInfo::get_object_class_name( @objectclass )
+      @config.logger.extra "Object Class Name", NicInfo::get_object_class_name( @objectclass, "nameserver", @config )
       @config.logger.terse "Host Name", NicInfo::get_ldhName( @objectclass ), NicInfo::AttentionType::SUCCESS
       @config.logger.terse "IDN Host Name", NicInfo::get_unicodeName( @objectclass ), NicInfo::AttentionType::SUCCESS
       ipAddrs = @objectclass[ "ipAddresses" ]

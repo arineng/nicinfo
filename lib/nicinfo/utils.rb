@@ -55,8 +55,14 @@ module NicInfo
     return json_data[ "handle" ]
   end
 
-  def NicInfo.get_object_class_name json_data
-    return json_data[ "objectClassName" ]
+  def NicInfo.get_object_class_name json_data, expected, config
+    objectClassName =  json_data[ "objectClassName" ]
+    if objectClassName == nil
+      config.conf_msgs << "Expected 'objectClassName' is not present."
+    elsif objectClassName != expected
+      config.conf_msgs << "Expected 'objectClassName' to be '#{expected}' but it is '#{objectClassName}'."
+    end
+    return objectClassName
   end
 
   def NicInfo.get_ldhName json_data

@@ -1,5 +1,5 @@
 {
-    "nicInfo_demoUrl" : "https://rdap.arin.net/bootstrap/nameserver/ns1.xn--fo-5ja.example",
+    "nicInfo_demoUrl" : "https://rdap.arin.net/registry/nameserver/ns1.xn--fo-5ja.example",
     "nicInfo_demoHint" : "nicinfo ns1.xn--fo-5ja.example",
     "rdapConformance":[
         "rdap_level_0"
@@ -25,9 +25,9 @@
         }
     ],
     "handle":"XXXX",
-    "objectClassName":"entity",
+    "objectClassName":"nameserver",
     "ldhName":"ns1.xn--fo-5ja.example",
-    "unicodeName":"foo.example",
+    "unicodeName":"ns1.foo.example",
     "status":[ "active" ],
     "ipAddresses":{
         "v4":[ "192.0.2.1", "192.0.2.2" ],

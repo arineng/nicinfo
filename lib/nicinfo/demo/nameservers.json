@@ -27,8 +27,9 @@
     "nameserverSearchResults": [
       {
         "handle":"XXXX",
+        "objectClassName" : "nameserver",
         "ldhName":"ns1.xn--fo-5ja.example",
-        "unicodeName":"foo.example",
+        "unicodeName":"ns1.foo.example",
         "status":[ "active" ],
         "ipAddresses":{
           "v4":[ "192.0.2.1", "192.0.2.2" ],
@@ -229,9 +230,9 @@
       },
       {
         "handle":"XXXX2",
-        "objectClassName":"domain",
+        "objectClassName":"nameserver",
         "ldhName":"ns1.xn--fo-5ja.example",
-        "unicodeName":"foo.example",
+        "unicodeName":"ns1.foo.example",
         "status":[ "active" ],
         "ipAddresses":{
           "v4":[ "192.0.2.1", "192.0.2.2" ],

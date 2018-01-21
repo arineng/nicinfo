@@ -1,0 +1,807 @@
+; all_parts rdap_all.jcr
+;
+; JSON Content Rules (JCR) ruleset
+; for the Registry Data Access Protocol (RDAP)
+;
+; Specified in RFC 7483
+;
+
+# ruleset-id rdap_level_0
+
+;
+; The various types of responses
+;
+
+; start_part rdap_roots.jcr
+@{root} $entity_response = {
+    $response_mixin,
+    $entity_mixin
+}
+
+@{root} $nameserver_response = {
+    $response_mixin,
+    $nameserver_mixin
+}
+
+@{root} $domain_response = {
+    $response_mixin,
+    $domain_mixin
+}
+
+@{root} $network_response = {
+    $response_mixin,
+    $network_mixin
+}
+
+@{root} $autnum_response = {
+    $response_mixin,
+    $autnum_mixin
+}
+
+@{root} $error_response = {
+    $response_mixin,
+    $error_mixin
+}
+
+@{root} $help_response = {
+    $response_mixin,
+    $lang ?
+}
+
+@{root} $domainSearch_response = {
+    $response_mixin,
+    $lang ?,
+    $domainSearchResult
+}
+
+@{root} $nameserverSearch_response = {
+    $response_mixin,
+    $lang ?,
+    $nameserverSearchResult
+}
+
+@{root} $entitySearch_response = {
+    $response_mixin,
+    $lang ?,
+    $entitySearchResult
+}
+; end_part
+
+; start_part rdap_response_mixin.jcr
+$response_mixin = (
+   $rdapConformance ?,
+   "notices" : $notices ?
+)
+; end_part
+
+;
+; RFC 7483 Section 4.1 - RDAP Conformance                   
+;
+
+; start_part rdap_conformance.jcr
+$rdapConformance = "rdapConformance" : [ string * ]
+; end_part
+
+;
+; RFC 7483 Section 4.2 - Links
+;
+
+; start_part rdap_links.jcr
+$links = ( "links" : [ $link * ] )
+
+; see RFC 5988
+$link = {
+   "value"    : uri ?,
+   "rel"      : string ?,
+   "href"     : uri,
+   "hreflang" : [ $lang_value * ] ?,
+   "title"    : string ?,
+   "media"    : string ?,
+   "type"     :
+       /[a-zA-Z][a-zA-Z0-9]*\/[a-zA-Z][a-zA-Z0-9]*/ ?
+}
+; end_part
+
+;
+; RFC 7483 Section 4.3 - Notices
+;
+
+; start_part rdap_notices.jcr
+$notices = [ $notice * ]
+
+$notice = {
+    "title"       : string ?,
+    "description" : [ string * ],
+    $noticeRemarkType ?,
+    $links ?,
+    $lang ?
+}
+
+$noticeRemarkType = "type" : string
+; end_part
+
+;
+; RFC 7483 Section 4.4 - Language Identifier
+;
+
+; start_part rdap_language.jcr
+; the language value as defined in RFC 5646
+$lang_value =: /[a-z]{2}(\-[A-Z][a-zA-Z]*(\-[A-Z]{2})?)?/
+
+$lang = ( "lang" : $lang_value )
+; end_part
+
+;
+; RFC 7483 Section 4.5 - Events
+;
+
+; start_part rdap_events.jcr
+$events = "events" : [ $event * ]
+
+$noActorEvent_mixin = (
+    $eventAction,
+    "eventDate"   : datetime,
+    $links ?,
+    $lang ?
+)
+
+$eventAction = "eventAction" : string
+
+$noActorEvent = {
+    $noActorEvent_mixin
+}
+
+$event = {
+    $noActorEvent_mixin,
+    "eventActor" : string ?
+}
+
+; end_part
+
+;
+; RFC 7483 Section 4.6 - Status
+;
+
+; start_part rdap_status.jcr
+$status = "status" : [ string * ]
+; end_part
+
+;
+; RFC 7483 Section 4.7 - Port43
+;
+
+; start_part rdap_port.jcr
+$port43 = "port43" : string
+; end_part
+
+;
+; RFC 7482 Section 4.8 - Public Ids
+;
+
+; start_part rdap_publicids.jcr
+$publicIds = "publicIds" : [ $publicId * ]
+
+$publicId = {
+  "type"       : string,
+  "identifier" : string
+}
+; end_part
+
+;
+; Common Object Class Structures
+;
+
+; start_part rdap_common_mixin.jcr
+$common_mixin = (
+   "handle"  : string ?,
+   "remarks" : [ $notice * ] ?,
+   $links ?,
+   $events ?,
+   $status ?,
+   $port43 ?,
+   $lang ?
+)
+; end_part
+
+;
+; RFC 7483 Section 5.1 - Entity Object Class
+;
+
+; start_part rdap_entity.jcr
+$entities = "entities" : [ $entity_oc * ]
+
+$entity_oc = {
+   $entity_mixin
+}
+
+$entity_mixin = (
+   "objectClassName" : "entity",
+   $common_mixin,
+   "vcardArray"      : [ "vcard", $vcard * ] ?,
+   "asEventActor"    : [ $noActorEvent * ] ?,
+   $roles ?,
+   $publicIds ?,
+   $entities ?,
+   "networks"        : [ $network_oc * ] ?,
+   "autnums"         : [ $autnum_oc * ] ?
+)
+
+$roles = "roles" : [ string * ]
+; end_part
+
+; jCard (see RFC 7095) is an algorithm for converting
+; vCard to JSON. Each jCard is represented by an array of
+; vCard properties. The "version" property must be the
+; first property, and there must be one and only one "fn"
+; property in some part of the array.
+;
+; Here we represent this by an ordered array, with "version"
+; being the first property, then listing all the properties
+; that match by property name, then matching
+; the "fn" property, then matching any other property again.
+; start_part rdap_vcard_array.jcr
+$vcard = [
+   [ "version", {}, "text", "4.0" ],
+   $vcard_not_fn_properties * ,
+   [ "fn", { $vcard_type_param?, $vcard_language_param? ,
+             $vcard_altid_param? , $vcard_pid_param? ,
+             $vcard_pref_param?, $vcard_any_param? },
+             "text", string ],
+   $vcard_not_fn_properties *
+]
+
+$vcard_not_fn_properties =
+   (
+     $vcard_source |
+     $vcard_kind |
+     $vcard_n |
+     $vcard_nicname |
+     $vcard_photo |
+     $vcard_bday |
+     $vcard_anniversary |
+     $vcard_gender |
+     $vcard_adr |
+     $vcard_tel |
+     $vcard_email |
+     $vcard_impp |
+     $vcard_lang |
+     $vcard_tz |
+     $vcard_geo |
+     $vcard_title |
+     $vcard_role |
+     $vcard_logo |
+     $vcard_org |
+     $vcard_member |
+     $vcard_related |
+     $vcard_categories |
+     $vcard_note |
+     $vcard_prodid |
+     $vcard_rev |
+     $vcard_sound |
+     $vcard_uid |
+     $vcard_clientpidmap |
+     $vcard_url |
+     $vcard_key |
+     $vcard_fburl |
+     $vcard_caladruri |
+     $vcard_caluri |
+     $vcard_x10
+   )
+; end_part
+
+; vCard properties. Each one is defined with a common
+; definition, and then a group that matches the property name.
+; start_part rdap_vcard_properties.jcr
+$vcard_source = [ "source", $vcard_source_prop ]
+$vcard_source_prop = (
+  { $vcard_pid_param? , $vcard_pref_param?, $vcard_altid_param? ,
+    $vcard_mediatype_param?, $vcard_any_param? } ,
+  "uri", uri
+)
+
+$vcard_kind = [ "kind", $vcard_kind_prop ]
+$vcard_kind_prop = (
+  { $vcard_any_param? },
+  "text", $vcard_kind_type
+)
+
+$vcard_n = [ "n", $vcard_n_prop ]
+$vcard_n_prop = (
+  { $vcard_sort_as_param? , $vcard_language_param? ,
+    $vcard_altid_param? , $vcard_any_param? },
+  "text", $vcard_string_type_array
+)
+
+$vcard_nicname = [ "nicname", $vcard_nicname_prop ]
+$vcard_nicname_prop = (
+  { $vcard_type_param? , $vcard_language_param? ,
+    $vcard_altid_param? , $vcard_pid_param? ,
+    $vcard_pref_param? , $vcard_any_param ? },
+  "text", $vcard_string_type_array
+)
+
+$vcard_photo = [ "photo", $vcard_photo_prop ]
+$vcard_photo_prop = (
+  { $vcard_altid_param? , $vcard_type_param? ,
+    $vcard_mediatype_param? , $vcard_pref_param? ,
+    $vcard_pid_param? , $vcard_any_param? },
+  "uri", uri
+)
+
+$vcard_bday = [ "bday", $vcard_bday_prop ]
+$vcard_bday_prop = (
+  ( { $vcard_language_param?, $vcard_altid_param?,
+      $vcard_calscale_param?, $vcard_any_param? },
+    "text", string
+  ) |
+  ( { $vcard_altid_param?, $vcard_calscale_param?,
+      $vcard_any_param? },
+    "date-and-or-time", $vcard_date_and_or_time_type
+  )
+)
+
+$vcard_anniversary = [ "anniversary", $vcard_anniversary_prop ]
+$vcard_anniversary_prop = (
+  { $vcard_altid_param?, $vcard_calscale_param?, $vcard_any_param? },
+  "date-and-or-time", $vcard_date_and_or_time_type
+)
+
+$vcard_gender = [ "gender", $vcard_gender_prop ]
+$vcard_gender_prop = (
+  { $vcard_any_param? },
+  "text",
+  ( $vcard_gender_type | [ $vcard_gender_type, string + ] )
+)
+
+$vcard_adr = [ "adr", $vcard_adr_prop ]
+$vcard_adr_prop = (
+  { $vcard_label_param? , $vcard_language_param? ,
+    $vcard_geo_param ? , $vcard_tz_param? ,
+    $vcard_altid_param? , $vcard_pid_param? ,
+    $vcard_pref_param? , $vcard_type_param? ,
+    $vcard_any_param? },
+  "text", $vcard_string_type_array
+)
+
+$vcard_tel = [ "tel", $vcard_tel_prop ]
+$vcard_tel_prop = (
+  ( { $vcard_type_param? , $vcard_pid_param? , $vcard_pref_param? ,
+      $vcard_altid_param?, $vcard_any_param? }, "text", string
+  ) |
+  ( { $vcard_type_param? , $vcard_pid_param? , $vcard_pref_param? ,
+      $vcard_altid_param?, $vcard_mediatype_param?,
+      $vcard_any_param? },
+    "uri", uri..tel
+  )
+)
+
+$vcard_email = [ "email", $vcard_email_prop ]
+$vcard_email_prop = (
+  { $vcard_pid_param? , $vcard_pref_param? , $vcard_type_param? ,
+    $vcard_altid_param? , $vcard_any_param ? },
+  "text", string
+)
+
+$vcard_impp = [ "impp", $vcard_impp_prop ]
+$vcard_impp_prop = (
+  { $vcard_pid_param? , $vcard_pref_param? , $vcard_type_param? ,
+    $vcard_mediatype_param? , $vcard_altid_param? ,
+    $vcard_any_param },
+  "uri", uri..impp
+)
+
+$vcard_lang = [ "lang", $vcard_lang_prop ]
+$vcard_lang_prop = (
+  { $vcard_pid_param? , $vcard_pref_param? , $vcard_altid_param? ,
+    $vcard_type_param? , $vcard_any_param? },
+  "language-tag", $vcard_language_tag_type
+)
+
+$vcard_tz = [ "tz", $vcard_tz_prop ]
+$vcard_tz_prop = (
+  { $vcard_altid_param?, $vcard_pid_param? , $vcard_pref_param? ,
+    $vcard_type_param? , $vcard_mediatype_param?,
+    $vcard_any_param? },
+  ( ( "text", string ) |
+  ( "uri" , uri ) |
+  ( "utc-offset" , $vcard_utc_offset_type ) )
+)
+
+$vcard_geo = [ "geo", $vcard_geo_prop ]
+$vcard_geo_prop = (
+  { $vcard_pid_param? , $vcard_pref_param? , $vcard_type_param? ,
+    $vcard_mediatype_param? , $vcard_altid_param? ,
+    $vcard_any_param? },
+  "uri", uri..geo
+)
+
+$vcard_title = [ "title", $vcard_title_prop ]
+$vcard_title_prop = (
+  { $vcard_language_param? , $vcard_pid_param? , $vcard_pref_param? ,
+    $vcard_altid_param? , $vcard_type_param? , $vcard_any_param? },
+  "text", string
+)
+
+$vcard_role = [ "role", $vcard_role_prop ]
+$vcard_role_prop = (
+  { $vcard_language_param? , $vcard_pid_param? , $vcard_pref_param? ,
+    $vcard_altid_param? , $vcard_type_param? , $vcard_any_param? },
+  "text", string
+)
+
+$vcard_logo = [ "logo", $vcard_logo_prop ]
+$vcard_logo_prop = (
+  { $vcard_altid_param? , $vcard_type_param? ,
+    $vcard_mediatype_param? , $vcard_pref_param? ,
+    $vcard_pid_param? , $vcard_language_param? ,
+    $vcard_any_param? },
+  "uri", uri
+)
+
+$vcard_org = [ "org", $vcard_org_prop ]
+$vcard_org_prop = (
+  { $vcard_sort_as_param? , $vcard_language_param? ,
+    $vcard_pid_param? , $vcard_pref_param? , $vcard_altid_param? ,
+    $vcard_type_param? , $vcard_any_param? },
+  "text", $vcard_string_type_array
+  )
+
+$vcard_member = [ "member", $vcard_member_prop ]
+$vcard_member_prop = (
+  { $vcard_altid_param? , $vcard_mediatype_param? ,
+    $vcard_pref_param? , $vcard_pid_param? ,  $vcard_any_param? },
+  "uri", uri
+)
+
+$vcard_related = [ "related", $vcard_related_prop ]
+$vcard_related_prop = (
+  ( { $vcard_mediatype_param? , $vcard_pref_param? ,
+      $vcard_altid_param? , $vcard_type_param? ,
+      $vcard_any_param? },
+    "uri", uri
+  ) |
+  ( { $vcard_language_param? , $vcard_pref_param? ,
+      $vcard_altid_param? , $vcard_type_param? ,
+      $vcard_any_param? },
+    "text", $vcard_related_type_array
+  )
+)
+
+$vcard_categories = [ "categories", $vcard_categories_prop ]
+$vcard_categories_prop = (
+  { $vcard_pid_param? , $vcard_pref_param? , $vcard_type_param ?,
+    $vcard_altid_param? , $vcard_any_param? },
+  "text", $vcard_string_type_array
+)
+
+$vcard_note = [ "note", $vcard_note_prop ]
+$vcard_note_prop = (
+  { $vcard_language_param? , $vcard_pid_param? ,
+    $vcard_pref_param? , $vcard_type_param? ,
+    $vcard_altid_param? , $vcard_any_param ? },
+  "text", string
+)
+
+$vcard_prodid = [ "prodid", $vcard_prodid_prop ]
+$vcard_prodid_prop = ( { $vcard_any_param ? }, "text", string )
+
+$vcard_rev = [ "rev", $vcard_rev_prop ]
+$vcard_rev_prop = (
+  { $vcard_any_param ? }, "timestamp", datetime
+)
+
+$vcard_sound = [ "sound", $vcard_sound_prop ]
+$vcard_sound_prop = (
+  { $vcard_altid_param? , $vcard_mediatype_param? ,
+    $vcard_language_param? , $vcard_pref_param? ,
+    $vcard_pid_param? ,  $vcard_any_param? },
+  "uri", uri
+)
+
+$vcard_uid = [ "uid", $vcard_uid_prop ]
+$vcard_uid_prop = (
+  ( { $vcard_any_param? }, "uri", uri ) |
+  ( { $vcard_any_param? }, "text", string )
+)
+
+$vcard_clientpidmap = [ "clientpidmap", $vcard_clientpidmap_prop ]
+$vcard_clientpidmap_prop = ( {}, "text", [ /^[0-9]+$/, uri ] )
+
+$vcard_url = [ "url", $vcard_url_prop ]
+$vcard_url_prop = (
+  { $vcard_altid_param? , $vcard_mediatype_param? ,
+    $vcard_pref_param? , $vcard_pid_param? ,  $vcard_any_param? },
+  "uri", uri
+)
+
+$vcard_key = [ "key", $vcard_key_prop ]
+$vcard_key_prop = (
+  ( { $vcard_mediatype_param? , $vcard_pref_param? ,
+      $vcard_altid_param? , $vcard_type_param? ,
+      $vcard_any_param? },
+    "uri", uri
+  ) |
+  ( { $vcard_pref_param? , $vcard_altid_param? ,
+      $vcard_type_param? , $vcard_any_param? },
+    "text", string
+  )
+)
+
+$vcard_fburl = [ "fburl", $vcard_fburl_prop ]
+$vcard_fburl_prop = (
+  { $vcard_altid_param? , $vcard_mediatype_param? ,
+    $vcard_altid_param? , $vcard_pref_param? ,
+    $vcard_pid_param? ,  $vcard_any_param? },
+  "uri", uri
+)
+
+$vcard_caladruri = [ "caladruri", $vcard_caladruri_prop ]
+$vcard_caladruri_prop = (
+  { $vcard_altid_param? , $vcard_mediatype_param? ,
+    $vcard_altid_param? , $vcard_pref_param? ,
+    $vcard_pid_param? ,  $vcard_any_param? },
+  "uri", uri
+)
+
+$vcard_caluri = [ "caluri", $vcard_caluri_prop ]
+$vcard_caluri_prop = (
+  { $vcard_altid_param? , $vcard_mediatype_param? ,
+    $vcard_altid_param? , $vcard_pref_param? ,
+    $vcard_pid_param? ,  $vcard_any_param? },
+  "uri", uri
+)
+
+$vcard_x10 = [ $vcard_x_name_type, $vcard_x10_prop ]
+$vcard_x10_prop = (
+  { $vcard_language_param? , $vcard_pref_param? ,
+    $vcard_altid_param? , $vcard_pid_param? ,
+    $vcard_type_param? , $vcard_mediatype_param? ,
+    $vcard_calscale_param? , $vcard_sort_as_param? ,
+    $vcard_geo_param? , $vcard_tz_param? ,
+    $vcard_label_param? , $vcard_any_param? },
+  $vcard_x_name_type, $vcard_string_type_array
+)
+; end_part
+
+; Each vCard property can have parameters.
+; start_part rdap_vcard_params.jcr
+$vcard_language_param = "language" : $vcard_language_tag_type
+$vcard_pref_param = "pref" : $vcard_pref_type
+$vcard_altid_param = "altid" : string
+$vcard_pid_param = "pid" : $vcard_pid_type_array
+$vcard_type_param = "type" : $vcard_type_type_array
+$vcard_mediatype_param = "mediatype" : $vcard_mediatype_type
+$vcard_calscale_param = "calscale" : $vcard_calscale_type
+$vcard_sort_as_param = "sort-as" : $vcard_string_type_array
+$vcard_geo_param = "geo" : uri..geo
+$vcard_tz_param = "tz" : $vcard_utc_offset_type
+$vcard_label_param = "label" : $vcard_string_type_array
+$vcard_any_param = /^x\-[A-Za-z0-9\-]*$/ : $vcard_string_type_array
+; end_part
+
+; Each vCard property has a value type.
+; start_part rdap_vcard_values.jcr
+$vcard_string_type_array =
+  ( string | [ ( string | [ string * ] ) * ] )
+$vcard_language_tag_type =:
+  /[a-z]{2}(-[A-Z][a-zA-Z]*(\-[A-Z]{2})?)?/
+$vcard_mediatype_type =: /^\w+\/[\-.\w]+(?:\+[\-.\w]+)?$/
+$vcard_utc_offset_type =: /^(([\-\+]\d{1,2}):?(\d{2})?)?$/
+$vcard_date_or_time =: (
+  /^(\d{4})-?(\d{2})-?(\d{2})$/ |
+  /^(\d{4})$/ |
+  /^--(\d{2})-?(\d{2})$/ |
+  /^--(\d{2})$/ |
+  /^---(\d{2})$/ |
+  /^(\d{2})(([-+]\d{1,2}):?(\d{2})?)?$/ |
+  /^(\d{2}):?(\d{2})(([\-\+]\d{1,2}):?(\d{2})?)?$/ |
+  /^(\d{2}):?(\d{2}):?(\d{2})(Z|([\-\+]\d{1,2}):?(\d{2})?)?$/ |
+  /^-(\d{2}):?(\d{2})(Z|([\-\+]\d{1,2}):?(\d{2})?)?$/ |
+  /^-(\d{2})(([\-\+]\d{1,2}):?(\d{2})?)?$/ |
+  /^--(\d{2})(([\-\+]\d{1,2}):?(\d{2})?)?$/
+)
+$vcard_date_and_or_time_type =: (
+  datetime | $vcard_date_or_time
+)
+$vcard_group_type =: /^[a-zA-Z0-9\-]+$/
+$vcard_type_type =: (
+  "home" | "work" | $vcard_tel_type | $vcard_related_type |
+  $vcard_x_name_type
+)
+$vcard_type_type_array = (
+  $vcard_type_type | [ $vcard_type_type * ]
+)
+$vcard_tel_type =: (
+  "text" | "voice" | "fax" | "cell" | "video" |
+  "pager" | "textphone" | "main-number"
+)
+$vcard_tel_type_array = ( $vcard_tel_type | [ $vcard_tel_type * ] )
+$vcard_related_type =: (
+  "contact" | "acquaintance" | "friend" | "met" |
+  "co-worker" | "colleague" | "co-resident" |
+  "neighbor" | "child" | "parent" | "sibling" |
+  "spouse" | "kin" | "muse" | "crush" | "date" |
+  "sweetheart" | "me" | "agent" | "emergency"
+)
+$vcard_related_type_array = (
+  $vcard_related_type | [ $vcard_related_type * ]
+)
+$vcard_index_type =: /^[1-9]?[0-9]*$/
+$vcard_expertise_level_type =: (
+  "beginner" | "average" | "expert"
+)
+$vcard_hobby_type =: ( "high" | "medium" | "low" )
+$vcard_pref_type =: /^[1-9]?[0-9]{1}$|^100$/
+$vcard_pid_type =: /^[0-9]+(\.[0-9]+)?$/
+$vcard_pid_type_array = (
+  $vcard_pid_type | [ $vcard_pid_type * ]
+)
+$vcard_gender_type =: ( "M" | "F" | "O" | "N" | "U" )
+$vcard_gender_type_array = (
+  $vcard_gender_type | [ $vcard_gender_type * ]
+)
+$vcard_kind_type =: (
+  "individual" | "group" | "org" | "location" |
+  "application" | "device"
+)
+$vcard_iana_token_type =: /^[A-Za-z0-9\-]*$/
+$vcard_x_name_type =: /^x\-[A-Za-z0-9\-]*$/
+$vcard_calscale_type =: (
+  "gregorian" | $vcard_iana_token_type | $vcard_x_name_type
+)
+; end_part
+
+;
+; RFC 7483 Section 5.2 - Nameserver Object Class
+;
+
+; start_part rdap_nameserver.jcr
+$nameservers = "nameservers" : [ $nameserver_oc * ]
+
+$nameserver_oc = {
+   $nameserver_mixin
+}
+
+$nameserver_mixin = (
+   "objectClassName" : "nameserver",
+   $common_mixin,
+   "ldhName"         : fqdn,
+   "unicodeName"     : idn ?,
+   "ipAddresses"     : {
+       "v4" : [ ipv4 + ] ?,
+       "v6" : [ ipv6 + ] ?
+   } ?,
+   $entities ?
+)
+; end_part
+
+;
+; RFC 7483 Section 5.3 - Domain Object Class
+;
+
+; start_part rdap_domain.jcr
+$domain_oc = {
+   $domain_mixin
+}
+
+$domain_mixin = (
+   "objectClassName" : "domain",
+   $common_mixin,
+   "ldhName"         : fqdn,
+   "unicodeName"     : idn ?,
+   "variants"        : [ $variant * ] ?,
+   $nameservers ?,
+   $secureDNS ?,
+   $entities ?,
+   $publicIds ?,
+   "network"          : $network_oc ?
+)
+
+$variant = {
+   $variantRelation ?,
+   "relation"     : [ string * ] ?,
+   "idnTable"     : string ?,
+   "variantNames" : [
+       { "ldhName" : fqdn, "unicodeName" : idn } *
+   ]
+}
+
+$variantRelation = "relation" : [ string * ]
+
+$secureDNS = "secureDNS" : {
+   "zoneSigned"       : boolean ?,
+   "delegationSigned" : boolean ?,
+   "maxSigLife"       : integer ?,
+   "dsData"           : [ $dsData_obj * ] ?,
+   "keyData"          : [ $keyData_obj * ] ?
+}
+
+$dsData_obj = {
+   "keyTag"     : integer,
+   "algorithm"  : integer,
+   "digest"     : string,
+   "digestType" : integer,
+   $events ?,
+   $links ?
+}
+
+$keyData_obj = {
+   "flags"     : integer,
+   "protocol"  : integer,
+   "publicKey" : string,
+   "algorithm" : integer,
+   $events ?,
+   $links ?
+}
+; end_part
+
+;
+; RFC 7483 Section 5.4 - IP Network Object Class
+;
+
+; start_part rdap_network.jcr
+$network_oc = {
+   $network_mixin
+}
+
+$network_mixin = (
+   "objectClassName" : "ip network",
+   $common_mixin,
+   "startAddress"    : ( ipv4 | ipv6 ) ?,
+   "endAddres"       : ( ipv4 | ipv6 ) ?,
+   "ipVersion"       : ( "v4" | "v6" ) ?,
+   "name"            : string ?,
+   "type"            : string ?,
+   "country"         : /[A-Z]{2}/ ?,
+   "parentHandle"    : string ?,
+   $entities ?
+)
+; end_part
+
+;
+; RFC 7483 Section 5.5 - Autnum Object Class
+;
+
+; start_part rdap_autnum.jcr
+$autnum_oc = {
+   $autnum_mixin
+}
+
+$autnum_mixin = (
+   "objectClassName" : "autnum",
+   $common_mixin,
+   "startAutnum"     : int32 ?,
+   "endAutnum"       : int32 ?,
+   "name"            : string ?,
+   "type"            : string ?,
+   "country"         : string ?,
+   $entities ?
+)
+; end_part
+
+;
+; RFC 7483 Section 6 - Error
+;
+
+; start_part rdap_error.jcr
+$error_mixin = (
+   "errorCode"   : integer,
+   "title"       : string ?, 
+   "description" : [ string * ] ?
+)
+; end_part
+
+;
+; RFC 7483 Section 8 - Search Results
+;
+
+; start_part rdap_searches.jcr
+$domainSearchResult =
+    "domainSearchResults"     : [ $domain_oc + ]
+
+$nameserverSearchResult =
+    "nameserverSearchResults" : [ $nameserver_oc + ]
+
+$entitySearchResult =
+    "entitySearchResults"     : [ $entity_oc + ]
+; end_part
