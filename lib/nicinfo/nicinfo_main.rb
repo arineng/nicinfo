@@ -1166,15 +1166,15 @@ BOOTSTRAPPING
   configuration file).
 
 USAGE FOR SCRIPTING
-  For usage with shell scripting, there are a couple of useful command line switches.
+  For usage with shell scripting, there are a couple of useful command line parameters.
 
-  The --json option suppresses the human-readable output and instead emits the JSON
+  The --json parameter suppresses the human-readable output and instead emits the JSON
   returned by the server. When not writing to an output file, this options should be
   used with the -Q option to suppress the pager and program runtime messages so that
   the JSON maybe run through a JSON parser.
 
-  The --jv option instructs this program to parse the JSON and emit specific JSON
-  values.  This option is also useful in combination with the -Q option to feed the
+  The --jv parameter instructs this program to parse the JSON and emit specific JSON
+  values.  This parameter is also useful in combination with the -Q option to feed the
   JSON values into other programs.  The syntax for specifying a JSON value is a
   list of JSON object member names or integers signifying JSON array indexes separated
   by a period, such as name1.name2.3.name4.5. For example, "entities.0.handle" would
@@ -1182,15 +1182,15 @@ USAGE FOR SCRIPTING
 
     { "entities" : [ { "handle": "foo" } ] }
 
-  Multiple --jv options may be specified.
+  Multiple --jv parameters may be specified.
 
 DEMONSTRATION QUERIES
   There are several built-in demonstration queries that may be exercised to show the
-  utility of RDAP. To use these queries, the --demo option must be used to populate
+  utility of RDAP. To use these queries, the --demo parameter must be used to populate
   the query answers into the cache. If the cache is already populated with items, it
-  may be necessary to clean the cache using the --empty-cache option.
+  may be necessary to clean the cache using the --empty-cache parameter.
 
-  When the --demo option is given, the list of demonstration queries will be printed
+  When the --demo parameter is given, the list of demonstration queries will be printed
   out.
 
 RDAP VALIDATION
@@ -1199,6 +1199,10 @@ RDAP VALIDATION
   the validity of the responses using the --jcr parameter, which requires either
   the standard (i.e. --jcr standard) or strict (i.e. --jcr strict) parameter
   options.
+
+MORE INFORMATION
+  More information about this program may be found at 
+  https://github.com/arineng/nicinfo/wiki
 EXTENDED_HELP
 
 end
