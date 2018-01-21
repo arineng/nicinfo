@@ -1,3 +1,11 @@
+PATH
+  remote: .
+  specs:
+    nicinfo (1.4.0)
+      jcrvalidator (= 0.8.3)
+      netaddr (~> 1.5, >= 1.5.1)
+      rainbow (~> 3.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -58,9 +66,7 @@ PLATFORMS
 
 DEPENDENCIES
   coveralls
-  jcrvalidator (= 0.8.3)
-  netaddr
-  rainbow (~> 3.0)
+  nicinfo!
   rake
   rspec
   webmock

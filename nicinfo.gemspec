@@ -16,4 +16,6 @@ Gem::Specification.new do |s|
   s.license      = 'ISC'
   s.executables << 'nicinfo'
   s.add_dependency 'netaddr', '~> 1.5' , '>= 1.5.1'
+  s.add_dependency 'rainbow', '~> 3.0'
+  s.add_dependency 'jcrvalidator', '= 0.8.3'
 end
