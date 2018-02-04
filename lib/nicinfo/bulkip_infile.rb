@@ -17,33 +17,59 @@ require 'ipaddr'
 module NicInfo
 
   class BulkIPInFile
+    IpColumn = "ip column"
+    StripIp = "strip ip"
+    DateTimeType = "datetime type"
+    DateTimeColumn = "datetime column"
+    StripDateTime = "strip datetime"
 
-    attr_accessor :file_name, :column, :strip_column
+    DateTimeNoneType = "no datetime"
+    DateTimeRubyType = "datetime ruby type"
+    DateTimeApacheType = "datetime apache type"
+    DateTimeApacheNoTZType = "datetime apache no timezone type"
+
+    IpStripRegex = /^([^\h.:]*)([\h.:]*)([^\h.:]*)$/
+    DateTimeStripRegex = /^([^\w\-\/:\s]*)([\w\-\/:\s]*)([^\w\-\/:\s]*)$/
+    ApacheTimeFormat = '%d/%b/%Y:%H:%M:%S %z'
+    ApacheNoTZTimeFormat = '%d/%b/%Y:%H:%M:%S'
+
+    OopsTime = Time.now.to_date.to_time
+
+    attr_accessor :file_name, :strategy
 
     def initialize file_name
       @file_name = file_name
-      @regex = /^([^\h.:]*)([\h.:]*)([^\h.:]*)$/
     end
 
     def has_strategy
       retval = true
       i = 0
       File.foreach( @file_name ) do |line|
-        column, strip_column = guess_line( line )
-        if i == 0
-          @column = column
-          @strip_column = strip_column
-        elsif i > 3
-          break
-        elsif column != @column || strip_column != @strip_column
+        strategy = guess_line( line )
+        if strategy == nil
           retval = false
           break
         end
+        if i == 0
+          @strategy = strategy
+        elsif i > 3
+          break
+        elsif strategy != @strategy
+          retval = false
+          break
+        end
+        i = i + 1
       end
       return retval
     end
 
     def guess_line line
+      strategy = guess_ip( line )
+      strategy.merge!( guess_time( line ) )
+      return strategy
+    end
+
+    def guess_ip line
       column = -1
       strip_column = false
       fields = line.split(/\s/)
@@ -52,7 +78,7 @@ module NicInfo
           column = i
           break
         else
-          m = @regex.match(field)
+          m = IpStripRegex.match(field)
           if m != nil && m[2] != nil && is_ipaddr( m[2] )
             column = i
             strip_column = true
@@ -60,7 +86,8 @@ module NicInfo
           end
         end
       end
-      return column, strip_column
+      strategy = { IpColumn => column, StripIp => strip_column }
+      return strategy
     end
 
     def is_ipaddr s
@@ -73,6 +100,91 @@ module NicInfo
       end
       return retval
     end
+
+    def guess_time line
+      column = -1
+      strip = false
+      type = DateTimeNoneType
+      fields = line.split(/\s/)
+      for i in 0..fields.length do
+        if i+1 < fields.length && is_time( fields[i] + " " + fields[i+1] )
+          column = i
+          strip = false
+          type = DateTimeRubyType
+          break
+        elsif i+1 < fields.length && is_time( datetimestrip( fields[i] + " " + fields[i+1] ) )
+          column = i
+          strip = true
+          type = DateTimeRubyType
+          break
+        elsif i+1 < fields.length && is_apache_time( fields[i] + " " + fields[i+1] )
+          column = i
+          strip = false
+          type = DateTimeApacheType
+          break
+        elsif i+1 < fields.length && is_apache_time( datetimestrip( fields[i] + " " + fields[i+1] ) )
+          column = i
+          strip = true
+          type = DateTimeApacheType
+          break
+        elsif is_apachenotz_time( fields[i] )
+          column = i
+          strip = false
+          type = DateTimeApacheNoTZType
+          break
+        elsif is_apachenotz_time( datetimestrip( fields[i] ) )
+          column = i
+          strip = true
+          type = DateTimeApacheNoTZType
+          break
+        end
+      end
+      strategy = { DateTimeType => type, DateTimeColumn => column, StripDateTime => strip }
+      return strategy
+    end
+
+    def datetimestrip s
+      retval = nil
+      m = DateTimeStripRegex.match( s )
+      if m != nil && m[2] != nil
+        retval = m[2]
+      end
+      return retval
+    end
+
+    def is_time s
+      retval = false
+      begin
+        t = Time.parse( s )
+        retval = true if t != OopsTime
+      rescue ArgumentError
+        retval = false
+      end if s != nil
+      return retval
+    end
+
+    def is_apache_time s
+      retval = false
+      begin
+        Time.strptime( s, ApacheTimeFormat )
+        retval = true
+      rescue ArgumentError
+        retval = false
+      end if s != nil
+      return retval
+    end
+
+    def is_apachenotz_time s
+      retval = false
+      begin
+        Time.strptime( s, ApacheNoTZTimeFormat )
+        retval = true
+      rescue ArgumentError
+        retval = false
+      end if s != nil
+      return retval
+    end
+
 
   end
 
