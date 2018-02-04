@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    nicinfo (1.4.0)
+    nicinfo (1.5.0.pre.alpha1)
       jcrvalidator (= 0.8.3)
       netaddr (~> 1.5, >= 1.5.1)
       rainbow (~> 3.0)
