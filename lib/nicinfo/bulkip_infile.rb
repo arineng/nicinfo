@@ -185,6 +185,50 @@ module NicInfo
       return retval
     end
 
+    def get_ip fields
+      ip = fields[@strategy[IpColumn]]
+      if @strategy[StripIp]
+        ip = IpStripRegex.match( ip )[2]
+      end
+      return ip
+    end
+
+    def get_time fields
+      retval = nil
+      if @strategy[DateTimeType] != DateTimeNoneType
+        column = @strategy[DateTimeColumn]
+        if column+1 < fields.length &&
+           ( @strategy[DateTimeType] == DateTimeRubyType || @strategy[DateTimeType] == DateTimeApacheType )
+          time_field = fields[column] + " " + fields[column+1]
+        else
+          time_field = fields[column]
+        end
+        if @strategy[StripDateTime]
+          time_field = DateTimeStripRegex.match( time_field )[2]
+        end
+        case @strategy[DateTimeType]
+          when DateTimeRubyType
+            retval = Time.parse( time_field )
+          when DateTimeApacheType
+            retval = Time.strptime( time_field, ApacheTimeFormat )
+          when DateTimeApacheNoTZType
+            retval = Time.strptime( time_field, ApacheNoTZTimeFormat )
+        end
+      end
+      return retval
+    end
+
+    def foreach
+      if @strategy == nil
+        raise RuntimeError unless has_strategy
+      end
+      File.foreach( @file_name ) do |line|
+        fields = line.split( /\s/ )
+        ip = get_ip( fields )
+        time = get_time( fields )
+        yield( ip, time )
+      end
+    end
 
   end
 

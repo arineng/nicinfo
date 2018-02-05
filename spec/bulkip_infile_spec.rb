@@ -233,4 +233,95 @@ describe 'bulk_infile test' do
 
   end
 
+  it 'should have strategies' do
+
+    b = NicInfo::BulkIPInFile.new( "spec/bulkip/ex1.log" )
+    expect( b.has_strategy ).to be_truthy
+
+    b = NicInfo::BulkIPInFile.new( "spec/bulkip/ex2.log" )
+    expect( b.has_strategy ).to be_truthy
+
+    b = NicInfo::BulkIPInFile.new( "spec/bulkip/ex3.log" )
+    expect( b.has_strategy ).to be_truthy
+
+    b = NicInfo::BulkIPInFile.new( "spec/bulkip/ex4.log" )
+    expect( b.has_strategy ).to be_truthy
+  end
+
+  it 'should iterate ex1.log' do
+    b = NicInfo::BulkIPInFile.new( "spec/bulkip/ex1.log" )
+    i=0
+    b.foreach do |ip,time|
+      case i
+        when 0
+          expect( ip ).to eq( "139.226.146.173" )
+          expect( time ).to eq( Time.parse( "2018-02-04 10:00:00,005") )
+        when 1
+          expect( ip ).to eq( "2a02:d8:0:0:250:56ff:fe95:ca7e" )
+          expect( time ).to eq( Time.parse( "2018-02-04 00:00:00,112") )
+        when 22
+          expect( ip ).to eq( "112.65.5.56" )
+          expect( time ).to eq( Time.parse( "2018-02-04 02:10:03,495") )
+      end
+      i=i+1
+    end
+  end
+
+  it 'should iterate ex2.log' do
+    b = NicInfo::BulkIPInFile.new( "spec/bulkip/ex2.log" )
+    i=0
+    b.foreach do |ip,time|
+      case i
+        when 0
+          expect( ip ).to eq( "35.165.55.47" )
+          expect( time ).to eq( Time.strptime( "04/Feb/2018:06:02:15 -0500", NicInfo::BulkIPInFile::ApacheTimeFormat ) )
+        when 3
+          expect( ip ).to eq( "2607:5300:60:6cd::1" )
+          expect( time ).to eq( Time.strptime( "04/Feb/2018:06:01:51 -0500", NicInfo::BulkIPInFile::ApacheTimeFormat ) )
+        when 24
+          expect( ip ).to eq( "2001:500:13::7" )
+          expect( time ).to eq( Time.strptime( "04/Feb/2018:06:02:06 -0500", NicInfo::BulkIPInFile::ApacheTimeFormat ) )
+      end
+      i=i+1
+    end
+  end
+
+  it 'should iterate ex3.log' do
+    b = NicInfo::BulkIPInFile.new( "spec/bulkip/ex3.log" )
+    i=0
+    b.foreach do |ip,time|
+      case i
+        when 0
+          expect( ip ).to eq( "0:0:0:0:0:0:0:1" )
+          expect( time ).to eq( Time.parse( "2018-02-04 00:00:00,006") )
+        when 1
+          expect( ip ).to eq( "0:0:0:0:0:0:0:1" )
+          expect( time ).to eq( Time.parse( "2018-02-04 00:00:00,012") )
+        when 25
+          expect( ip ).to eq( "0:0:0:0:0:0:0:1" )
+          expect( time ).to eq( Time.parse( "2018-02-04 00:00:00,431") )
+      end
+      i=i+1
+    end
+  end
+
+  it 'should iterate ex4.log' do
+    b = NicInfo::BulkIPInFile.new( "spec/bulkip/ex4.log" )
+    i=0
+    b.foreach do |ip,time|
+      case i
+        when 0
+          expect( ip ).to eq( "58.244.2.230" )
+          expect( time ).to eq( Time.strptime( "04/Feb/2018:06:01:49 -0500", NicInfo::BulkIPInFile::ApacheTimeFormat ) )
+        when 1
+          expect( ip ).to eq( "2001:500:13::7" )
+          expect( time ).to eq( Time.strptime( "04/Feb/2018:06:01:56 -0500", NicInfo::BulkIPInFile::ApacheTimeFormat ) )
+        when 23
+          expect( ip ).to eq( "61.181.2.38" )
+          expect( time ).to eq( Time.strptime( "04/Feb/2018:06:02:06 -0500", NicInfo::BulkIPInFile::ApacheTimeFormat ) )
+      end
+      i=i+1
+    end
+  end
+
 end
