@@ -3,3 +3,4 @@
 coverage/
 *.gem
 !/README.md
+Gemfile.lock
