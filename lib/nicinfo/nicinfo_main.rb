@@ -34,6 +34,7 @@ require 'nicinfo/error_code'
 require 'ipaddr'
 require 'nicinfo/data_tree'
 require 'nicinfo/traceroute'
+require 'nicinfo/bulkip_infile'
 begin
   require 'json'
 rescue LoadError
@@ -284,6 +285,16 @@ module NicInfo
           get_jcr_strict_context if upmode == JcrMode::STRICT_VALIDATION
         end
 
+        opts.separator ""
+        opts.separator "Bulk IP Options:"
+
+        opts.on( "--bulkip-in FILES",
+                 "Bulk IP input files" ) do |files|
+          @config.options.bulkip_in = files
+          @config.options.do_bulkip = true
+          @config.options.require_query = false
+        end
+
       end
 
       begin
@@ -450,6 +461,10 @@ module NicInfo
 
       if @config.options.help
         help()
+      end
+
+      if @config.options.do_bulkip
+        do_bulkip()
       end
 
       if @config.options.argv == nil || @config.options.argv == [] && !@config.options.query_type
@@ -1107,6 +1122,22 @@ HELP_SUMMARY
       self_link = NicInfo.get_self_link( NicInfo.get_links( json_data, @config ) )
       @config.logger.mesg("Use \"nicinfo #{self_link}\" to directly query this resource in the future.") if self_link and @config.options.externally_queriable
       @config.logger.mesg('Use "nicinfo -h" for help.')
+    end
+
+    def do_bulkip
+      Dir.glob( @config.options.bulkip_in ).each do |file|
+        b = BulkIPInFile.new( file )
+        if !b.has_strategy
+          raise ArgumentError.new( "cannot determine parsing strategy for #{file}")
+        end
+        @config.logger.trace( "file #{file} strategry is #{b.strategy}")
+      end
+      Dir.glob( @config.options.bulkip_in ).each do |file|
+        b = BulkIPInFile.new( file )
+        b.foreach do |ip,time|
+          @config.logger.trace( "bulk ip: #{ip} time: #{time}")
+        end
+      end
     end
 
   end
