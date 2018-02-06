@@ -14,7 +14,7 @@
 
 require 'netaddr'
 
-require 'nicinfo/config'
+require 'nicinfo/appctx'
 require 'nicinfo/nicinfo_logger'
 require 'nicinfo/utils'
 require 'nicinfo/common_json'

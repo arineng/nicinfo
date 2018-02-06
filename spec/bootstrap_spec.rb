@@ -16,7 +16,7 @@ require 'spec_helper'
 require 'rspec'
 require 'pp'
 require_relative '../lib/nicinfo/bootstrap'
-require_relative '../lib/../lib/nicinfo/config'
+require_relative '../lib/nicinfo/appctx'
 
 describe 'bootstrap rspec tests' do
 

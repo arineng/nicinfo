@@ -15,7 +15,7 @@
 
 require 'stringio'
 require 'uri'
-require 'nicinfo/config'
+require 'nicinfo/appctx'
 
 module NicInfo
 

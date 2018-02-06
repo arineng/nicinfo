@@ -18,7 +18,7 @@ require 'fileutils'
 require 'pp'
 require 'spec_helper'
 require 'rspec'
-require_relative '../lib/nicinfo/config'
+require_relative '../lib/nicinfo/appctx'
 require_relative '../lib/nicinfo/nicinfo_main'
 require_relative '../lib/nicinfo/nicinfo_logger'
 

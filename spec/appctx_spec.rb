@@ -17,7 +17,7 @@ require 'spec_helper'
 require 'rspec'
 require 'tmpdir'
 require 'fileutils'
-require_relative '../lib/nicinfo/config'
+require_relative '../lib/nicinfo/appctx'
 require_relative '../lib/nicinfo/nicinfo_logger'
 require_relative '../lib/nicinfo/constants'
 

@@ -28,7 +28,7 @@
 
 require 'timeout'
 require 'socket'
-require 'nicinfo/config'
+require 'nicinfo/appctx'
 require 'nicinfo/nicinfo_logger'
 
 module NicInfo
