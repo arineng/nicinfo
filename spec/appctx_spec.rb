@@ -37,7 +37,7 @@ describe 'configuration tests' do
 
     dir = File.join( @work_dir, "test_init_no_config_file" )
 
-    c = NicInfo::Config.new( dir )
+    c = NicInfo::AppContext.new(dir )
     expect( c.config[ "output" ][ "messages" ] ).to eq( "SOME" )
     expect( c.config[ "output" ][ "data" ] ).to eq( "NORMAL" )
     expect( c.config[ NicInfo::OUTPUT ][ NicInfo::MESSAGES_FILE ] ).to be_nil
@@ -66,7 +66,7 @@ NOT_DEFAULT_CONFIG
     f.puts( not_default_config )
     f.close
 
-    c = NicInfo::Config.new( dir )
+    c = NicInfo::AppContext.new(dir )
     expect( c.config[ NicInfo::OUTPUT ][ NicInfo::MESSAGES ] ).to eq( "NONE" )
     expect( c.config[ NicInfo::OUTPUT ][ NicInfo::DATA ] ).to eq( "TERSE" )
     expect( c.config[ NicInfo::SECURITY ][ NicInfo::TRY_INSECURE ] ).to be_truthy
@@ -83,7 +83,7 @@ NOT_DEFAULT_CONFIG
 
     dir = File.join( @work_dir, "test_setup_workspace" )
 
-    c = NicInfo::Config.new( dir )
+    c = NicInfo::AppContext.new(dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
 
@@ -96,7 +96,7 @@ NOT_DEFAULT_CONFIG
   it 'should write and read bsfile update time' do
     dir = File.join( @work_dir, "test_read_write_bsfiles" )
 
-    c = NicInfo::Config.new( dir )
+    c = NicInfo::AppContext.new(dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
 
@@ -110,7 +110,7 @@ NOT_DEFAULT_CONFIG
   it 'should return nil if no bsfile update' do
     dir = File.join( @work_dir, "test_no_bsfile_update" )
 
-    c = NicInfo::Config.new( dir )
+    c = NicInfo::AppContext.new(dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
 
@@ -122,7 +122,7 @@ NOT_DEFAULT_CONFIG
 
   it 'should update bsfiles based on aged and standard config' do
     dir = File.join( @work_dir, "test_update_bsfiles_based_on_age_standard" )
-    c = NicInfo::Config.new( dir )
+    c = NicInfo::AppContext.new(dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
 
@@ -132,7 +132,7 @@ NOT_DEFAULT_CONFIG
 
   it 'should update bsfiles based on aged and no update config' do
     dir = File.join( @work_dir, "test_update_bsfiles_based_on_age_no_update" )
-    c = NicInfo::Config.new( dir )
+    c = NicInfo::AppContext.new(dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
 
@@ -144,7 +144,7 @@ NOT_DEFAULT_CONFIG
   it 'should update bsfiles on new install' do
     dir = File.join( @work_dir, "test_update_bsfiles_on_new_install" )
 
-    c = NicInfo::Config.new( dir )
+    c = NicInfo::AppContext.new(dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
 
@@ -155,7 +155,7 @@ NOT_DEFAULT_CONFIG
   it 'should not update bsfiles if not aged' do
     dir = File.join( @work_dir, "test_not_update_bsfiles_not_aged" )
 
-    c = NicInfo::Config.new( dir )
+    c = NicInfo::AppContext.new(dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
 
@@ -171,7 +171,7 @@ NOT_DEFAULT_CONFIG
   it 'should update bsfiles if aged' do
     dir = File.join( @work_dir, "test_update_bsfiles_fi_aged" )
 
-    c = NicInfo::Config.new( dir )
+    c = NicInfo::AppContext.new(dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
 

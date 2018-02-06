@@ -17,38 +17,38 @@ module NicInfo
   # Creates objects we want to mock
   class Factory
 
-    attr_accessor :config
+    attr_accessor :appctx
 
-    def initialize( config )
-      @config = config
+    def initialize( appctx )
+      @appctx = appctx
     end
 
     def new_error_code
-      return ErrorCode.new( config )
+      return ErrorCode.new( appctx )
     end
 
     def new_autnum
-      return Autnum.new( config )
+      return Autnum.new( appctx )
     end
 
     def new_domain
-      return Domain.new( config )
+      return Domain.new( appctx )
     end
 
     def new_entity
-      return Entity.new( config )
+      return Entity.new( appctx )
     end
 
     def new_ip
-      return Ip.new( config )
+      return Ip.new( appctx )
     end
 
     def new_notices
-      return Notices.new( config )
+      return Notices.new( appctx )
     end
 
     def new_ns
-      return Ns.new( config )
+      return Ns.new( appctx )
     end
 
   end

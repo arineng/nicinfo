@@ -21,8 +21,8 @@ module NicInfo
 
   class Bootstrap
 
-    def initialize config
-      @config = config
+    def initialize appctx
+      @appctx = appctx
     end
 
 
@@ -31,9 +31,9 @@ module NicInfo
       if ! addr.instance_of? IPAddr
         addr = IPAddr.new addr
       end
-      file = File.join( @config.rdap_bootstrap_dir , NicInfo::IPV6_BOOTSTRAP ) if addr.ipv6?
-      file = File.join( @config.rdap_bootstrap_dir , NicInfo::IPV4_BOOTSTRAP ) if addr.ipv4?
-      @config.logger.trace "Looking up bootstrap from #{file}"
+      file = File.join( @appctx.rdap_bootstrap_dir , NicInfo::IPV6_BOOTSTRAP ) if addr.ipv6?
+      file = File.join( @appctx.rdap_bootstrap_dir , NicInfo::IPV4_BOOTSTRAP ) if addr.ipv4?
+      @appctx.logger.trace "Looking up bootstrap from #{file}"
       data = JSON.parse( File.read( file ) )
       services = get_services data
       services.each do |service|
@@ -51,7 +51,7 @@ module NicInfo
           end
         end
       end if services
-      retval = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::IP_ROOT_URL ] if retval == nil
+      retval = @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::IP_ROOT_URL ] if retval == nil
       return retval
     end
 
@@ -61,8 +61,8 @@ module NicInfo
         as = as.to_i
       end
       retval = nil
-      file = File.join( @config.rdap_bootstrap_dir , NicInfo::ASN_BOOTSTRAP )
-      @config.logger.trace "Looking up bootstrap from #{file}"
+      file = File.join( @appctx.rdap_bootstrap_dir , NicInfo::ASN_BOOTSTRAP )
+      @appctx.logger.trace "Looking up bootstrap from #{file}"
       data = JSON.parse( File.read( file ) )
       services = get_services data
       services.each do |service|
@@ -76,7 +76,7 @@ module NicInfo
           end
         end
       end if services
-      retval = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::AS_ROOT_URL ] if retval == nil
+      retval = @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::AS_ROOT_URL ] if retval == nil
       return retval
     end
 
@@ -128,8 +128,8 @@ module NicInfo
 
     def find_url_by_forward_domain domain
       retval = nil
-      file = File.join( @config.rdap_bootstrap_dir , NicInfo::DNS_BOOTSTRAP )
-      @config.logger.trace "Looking up bootstrap from #{file}"
+      file = File.join( @appctx.rdap_bootstrap_dir , NicInfo::DNS_BOOTSTRAP )
+      @appctx.logger.trace "Looking up bootstrap from #{file}"
       data = JSON.parse( File.read( file ) )
       longest_domain = nil
       longest_urls = nil
@@ -147,7 +147,7 @@ module NicInfo
       if longest_urls != nil
         retval = get_service_url( longest_urls )
       end
-      retval = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::DOMAIN_ROOT_URL ] if retval == nil
+      retval = @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::DOMAIN_ROOT_URL ] if retval == nil
       return retval
     end
 
@@ -155,8 +155,8 @@ module NicInfo
       retval = nil
       suffix = entity_name.downcase.split( '-' ).last
       if suffix
-        file = File.join( @config.rdap_bootstrap_dir , NicInfo::ENTITY_BOOTSTRAP )
-        @config.logger.trace "Looking up bootstrap from #{file}"
+        file = File.join(@appctx.rdap_bootstrap_dir , NicInfo::ENTITY_BOOTSTRAP )
+        @appctx.logger.trace "Looking up bootstrap from #{file}"
         data = JSON.parse( File.read( file ) )
         services = get_services data
         services.each do |service|
@@ -168,7 +168,7 @@ module NicInfo
           end
         end if services
       end
-      retval = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::ENTITY_ROOT_URL ] if retval == nil
+      retval = @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::ENTITY_ROOT_URL ] if retval == nil
       return retval
     end
 

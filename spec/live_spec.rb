@@ -46,7 +46,7 @@ describe 'live', :live => true do
     logger.message_level = NicInfo::MessageLevel::ALL_MESSAGES
     logger.data_amount = NicInfo::DataAmount::EXTRA_DATA
     logger.pager = false
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
 
     args = [ "http://rdap.arin.net/registry/entity/arin-o" ]
@@ -65,7 +65,7 @@ describe 'live', :live => true do
     logger.message_level = NicInfo::MessageLevel::ALL_MESSAGES
     logger.data_amount = NicInfo::DataAmount::EXTRA_DATA
     logger.pager = false
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
     config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
@@ -85,7 +85,7 @@ describe 'live', :live => true do
     logger.message_level = NicInfo::MessageLevel::ALL_MESSAGES
     logger.data_amount = NicInfo::DataAmount::EXTRA_DATA
     logger.pager = false
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
     config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
@@ -107,7 +107,7 @@ describe 'live', :live => true do
     logger.message_level = NicInfo::MessageLevel::ALL_MESSAGES
     logger.data_amount = NicInfo::DataAmount::EXTRA_DATA
     logger.pager = false
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
 
     args = [ "http://rdap.arin.net/registry/entity/arin-hostmaster" ]
@@ -128,7 +128,7 @@ describe 'live', :live => true do
     logger.message_level = NicInfo::MessageLevel::ALL_MESSAGES
     logger.data_amount = NicInfo::DataAmount::EXTRA_DATA
     logger.pager = false
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
     config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
@@ -150,7 +150,7 @@ describe 'live', :live => true do
     logger.message_level = NicInfo::MessageLevel::ALL_MESSAGES
     logger.data_amount = NicInfo::DataAmount::EXTRA_DATA
     logger.pager = false
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
     config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
@@ -174,7 +174,7 @@ describe 'live', :live => true do
     logger.message_level = NicInfo::MessageLevel::ALL_MESSAGES
     logger.data_amount = NicInfo::DataAmount::EXTRA_DATA
     logger.pager = false
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
     config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
@@ -198,7 +198,7 @@ describe 'live', :live => true do
     logger.message_level = NicInfo::MessageLevel::ALL_MESSAGES
     logger.data_amount = NicInfo::DataAmount::EXTRA_DATA
     logger.pager = false
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
     config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
@@ -222,7 +222,7 @@ describe 'live', :live => true do
     logger.message_level = NicInfo::MessageLevel::ALL_MESSAGES
     logger.data_amount = NicInfo::DataAmount::EXTRA_DATA
     logger.pager = false
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
     config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 

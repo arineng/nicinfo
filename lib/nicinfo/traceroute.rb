@@ -37,17 +37,17 @@ module NicInfo
     1024 + rand(64511)
   end
 
-  def NicInfo.traceroute host, config
+  def NicInfo.traceroute host, appctx
     ips = Array.new
 
     begin
       myname = Socket.gethostname
     rescue SocketError => err_msg
-      config.logger.mesg "Can't get my own host name (#{err_msg})."
+      appctx.logger.mesg "Can't get my own host name (#{err_msg})."
       exit 1
     end
 
-    config.logger.mesg "Tracing route to #{host}"
+    appctx.logger.mesg "Tracing route to #{host}"
 
     ttl                     = 1
     max_ttl                 = 255
@@ -67,7 +67,7 @@ module NicInfo
       icmp_sockaddr = Socket.pack_sockaddr_in( localport, myname )
       icmp_sock.bind( icmp_sockaddr )
     rescue SystemCallError => socket_error
-      config.logger.mesg "Error with ICMP socket. You probably need to be root: #{socket_error}"
+      appctx.logger.mesg "Error with ICMP socket. You probably need to be root: #{socket_error}"
       exit 1
     end
 
@@ -75,7 +75,7 @@ module NicInfo
     begin
       dgram_sock.connect( host, 999 )
     rescue SocketError => err_msg
-      config.logger.mesg "Can't connect to remote host (#{err_msg})."
+      appctx.logger.mesg "Can't connect to remote host (#{err_msg})."
       exit 1
     end
 
@@ -94,18 +94,18 @@ module NicInfo
           # Extract the ICMP sender from response.
           ip = Socket.unpack_sockaddr_in( sender )[1].to_s
           ips << ip
-          config.logger.mesg "TTL = #{ttl}:  " + ip
+          appctx.logger.mesg "TTL = #{ttl}:  " + ip
           continguous_timeout = 0
           if ( icmp_type == 3 and icmp_code == 13 )
-            config.logger.mesg "'Communication Administratively Prohibited' from this hop."
+            appctx.logger.mesg "'Communication Administratively Prohibited' from this hop."
             # ICMP 3/3 is port unreachable and usually means that we've hit the target.
           elsif ( icmp_type == 3 and icmp_code == 3 )
-            config.logger.mesg "Destination reached. Trace complete."
+            appctx.logger.mesg "Destination reached. Trace complete."
             stop_tracing = true
           end
         }
       rescue Timeout::Error
-        config.logger.mesg "Timeout error with TTL = #{ttl}!"
+        appctx.logger.mesg "Timeout error with TTL = #{ttl}!"
         continguous_timeout += 1
       end
 
@@ -113,7 +113,7 @@ module NicInfo
       stop_tracing = true if ttl > max_ttl
       if continguous_timeout > max_contiguaous_timeout
         stop_tracing = true
-        config.logger.mesg "Getting a lot of contiguous timeouts. Prematurely terminating trace."
+        appctx.logger.mesg "Getting a lot of contiguous timeouts. Prematurely terminating trace."
       end
     end
 

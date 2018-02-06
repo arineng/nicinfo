@@ -79,7 +79,7 @@ module NicInfo
       if remarks
         excessive_notice = @config.factory.new_notices.is_excessive_notice(remarks)
         if (excessive_notice && (@config.logger.data_amount != NicInfo::DataAmount::EXTRA_DATA))
-          @config.logger.datum "Excessive Remarks", "Use \"-V\" or \"--data extra\" to see them."
+          @appctx.logger.datum "Excessive Remarks", "Use \"-V\" or \"--data extra\" to see them."
         else
           if remarks.instance_of?(Array)
             remarks.each do |remark|
@@ -109,7 +109,7 @@ module NicInfo
               end
             end
           else
-            @config.conf_msgs << "'remarks' is not an array."
+            @appctx.conf_msgs << "'remarks' is not an array."
           end
         end
       end
@@ -218,7 +218,7 @@ module NicInfo
           license = NicInfo.get_license_link links
           @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "License", license, NicInfo::AttentionType::SECONDARY if license
         else
-          @config.conf_msgs << "'links' is not an array."
+          @appctx.conf_msgs << "'links' is not an array."
         end
       end
     end

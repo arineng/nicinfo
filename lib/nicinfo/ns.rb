@@ -21,26 +21,26 @@ require 'nicinfo/data_tree'
 
 module NicInfo
 
-  def NicInfo.display_ns json_data, config, data_node
-    ns = config.factory.new_ns.process( json_data )
-    NicInfo::display_object_with_entities( ns, config, data_node )
+  def NicInfo.display_ns json_data, appctx, data_node
+    ns = appctx.factory.new_ns.process( json_data )
+    NicInfo::display_object_with_entities( ns, appctx, data_node )
   end
 
-  def NicInfo.display_nameservers json_data, config, data_node
+  def NicInfo.display_nameservers json_data, appctx, data_node
     ns_array = json_data[ "nameserverSearchResults" ]
     if ns_array != nil
       if ns_array.instance_of? Array
         display_array = Array.new
         ns_array.each do |ea|
-          ns = config.factory.new_ns.process( ea )
+          ns = appctx.factory.new_ns.process( ea )
           display_array << ns
         end
-        NicInfo::display_object_with_entities( display_array, config, data_node )
+        NicInfo::display_object_with_entities( display_array, appctx, data_node )
       else
-        config.conf_msgs << "'nameserverSearchResults' is not an array"
+        appctx.conf_msgs << "'nameserverSearchResults' is not an array"
       end
     else
-      config.conf_msgs << "'nameserverSearchResults' is not present"
+      appctx.conf_msgs << "'nameserverSearchResults' is not present"
     end
   end
 
@@ -49,9 +49,9 @@ module NicInfo
 
     attr_accessor :entities, :objectclass, :asEventActors
 
-    def initialize config
-      @config = config
-      @common = CommonJson.new config
+    def initialize appctx
+      @appctx = appctx
+      @common = CommonJson.new appctx
       @entities = Array.new
       @asEventActors = Array.new
     end
@@ -63,21 +63,21 @@ module NicInfo
     end
 
     def display
-      @config.logger.start_data_item
-      @config.logger.data_title "[ NAME SERVER ]"
-      @config.logger.terse "Handle", NicInfo::get_handle( @objectclass ), NicInfo::AttentionType::SUCCESS
-      @config.logger.extra "Object Class Name", NicInfo::get_object_class_name( @objectclass, "nameserver", @config )
-      @config.logger.terse "Host Name", NicInfo::get_ldhName( @objectclass ), NicInfo::AttentionType::SUCCESS
-      @config.logger.terse "IDN Host Name", NicInfo::get_unicodeName( @objectclass ), NicInfo::AttentionType::SUCCESS
+      @appctx.logger.start_data_item
+      @appctx.logger.data_title "[ NAME SERVER ]"
+      @appctx.logger.terse "Handle", NicInfo::get_handle( @objectclass ), NicInfo::AttentionType::SUCCESS
+      @appctx.logger.extra "Object Class Name", NicInfo::get_object_class_name( @objectclass, "nameserver", @appctx )
+      @appctx.logger.terse "Host Name", NicInfo::get_ldhName( @objectclass ), NicInfo::AttentionType::SUCCESS
+      @appctx.logger.terse "IDN Host Name", NicInfo::get_unicodeName( @objectclass ), NicInfo::AttentionType::SUCCESS
       ipAddrs = @objectclass[ "ipAddresses" ]
       if ipAddrs
         v6Addrs = ipAddrs[ "v6" ]
         v6Addrs.each do |v6|
-          @config.logger.terse "IPv6 Address", v6, NicInfo::AttentionType::SUCCESS
+          @appctx.logger.terse "IPv6 Address", v6, NicInfo::AttentionType::SUCCESS
         end if v6Addrs
         v4Addrs = ipAddrs[ "v4" ]
         v4Addrs.each do |v4|
-          @config.logger.terse "IPv4 Address", v4, NicInfo::AttentionType::SUCCESS
+          @appctx.logger.terse "IPv4 Address", v4, NicInfo::AttentionType::SUCCESS
         end if v4Addrs
       end
       @common.display_status @objectclass
@@ -86,7 +86,7 @@ module NicInfo
       @common.display_port43 @objectclass
       @common.display_remarks @objectclass
       @common.display_links( get_cn, @objectclass )
-      @config.logger.end_data_item
+      @appctx.logger.end_data_item
     end
 
     def get_cn
@@ -100,7 +100,7 @@ module NicInfo
     end
 
     def to_node
-      DataNode.new( get_cn, nil, NicInfo::get_self_link( NicInfo::get_links( @objectclass, @config ) ) )
+      DataNode.new( get_cn, nil, NicInfo::get_self_link( NicInfo::get_links( @objectclass, @appctx ) ) )
     end
 
   end

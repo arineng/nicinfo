@@ -46,13 +46,13 @@ module NicInfo
           when QueryType::BY_IP6_CIDR
             @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @config.options.argv[ 0 ] )
           when QueryType::BY_AS_NUMBER
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_as( @config.options.argv[ 0 ] )
+            @appctx.config[NicInfo::BOOTSTRAP ][NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_as(@config.options.argv[0 ] )
           when QueryType::BY_DOMAIN
             @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
           when QueryType::BY_NAMESERVER
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
+            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain(@appctx.options.argv[0 ] )
           when QueryType::BY_ENTITY_HANDLE
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_entity( @config.options.argv[ 0 ] )
+            @config.appctx[NicInfo::BOOTSTRAP ][NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_entity(@config.options.argv[0 ] )
           when QueryType::SRCH_ENTITY_BY_NAME
             @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::ENTITY_ROOT_URL ]
           when QueryType::SRCH_DOMAIN_BY_NAME
@@ -62,7 +62,7 @@ module NicInfo
           when QueryType::SRCH_DOMAIN_BY_NSIP
             @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::DOMAIN_ROOT_URL ]
           when QueryType::SRCH_NS_BY_NAME
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
+            @config.appctx[NicInfo::BOOTSTRAP ][NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain(@config.options.argv[0 ] )
           when QueryType::SRCH_NS_BY_IP
             @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @config.options.argv[ 0 ] )
           else
@@ -120,7 +120,7 @@ module NicInfo
       rescue Net::HTTPFatalError => e
         case e.response.code
           when "500"
-            @config.logger.mesg("RDAP server is reporting an internal error.", NicInfo::AttentionType::ERROR )
+            @appctx.logger.mesg("RDAP server is reporting an internal error.", NicInfo::AttentionType::ERROR )
             handle_error_response( e, retval )
           when "501"
             @config.logger.mesg("RDAP server does not implement the query.", NicInfo::AttentionType::ERROR )

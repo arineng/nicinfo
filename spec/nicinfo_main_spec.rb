@@ -45,7 +45,7 @@ describe 'main entry tests' do
     logger = NicInfo::Logger.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
 
     nicinfo = NicInfo::Main.new( [], config )
@@ -85,7 +85,7 @@ describe 'main entry tests' do
     logger = NicInfo::Logger.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
 
     nicinfo = NicInfo::Main.new( [], config )
@@ -141,7 +141,7 @@ JSON_DATA
     logger = NicInfo::Logger.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
 
     nicinfo = NicInfo::Main.new( [], config )
@@ -159,7 +159,7 @@ JSON_DATA
     logger = NicInfo::Logger.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
 
     args = [ "--messages", "ALL", "BAR" ]
@@ -176,7 +176,7 @@ JSON_DATA
     logger = NicInfo::Logger.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
     args = [ "-h" ]
     e = NicInfo::Main.new( args, config )
@@ -192,7 +192,7 @@ JSON_DATA
     logger = NicInfo::Logger.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
     args = [ "-r", "-b", "https://rdap.example" ]
     e = NicInfo::Main.new( args, config )

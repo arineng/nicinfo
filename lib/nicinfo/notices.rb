@@ -22,11 +22,11 @@ module NicInfo
   # deals with RDAP notices structures
   class Notices
 
-    attr_accessor :config
+    attr_accessor :appctx
 
-    def initialize( config )
-      @config = config
-      @common = CommonJson.new( config )
+    def initialize( appctx )
+      @appctx = appctx
+      @common = CommonJson.new( appctx )
     end
 
     def is_excessive_notice notices
@@ -36,7 +36,7 @@ module NicInfo
       word_count = 0
       line_count = 0
       notices.each do |notice|
-        descriptions = NicInfo::get_descriptions notice, @config
+        descriptions = NicInfo::get_descriptions notice, @appctx
         descriptions.each do |line|
           line_count = line_count + 1
           word_count = word_count + line.length
@@ -52,13 +52,13 @@ module NicInfo
 
       notices = json_response[ "notices" ]
       return if notices == nil
-      if (is_excessive_notice(notices) ) && (@config.logger.data_amount != NicInfo::DataAmount::EXTRA_DATA) && !ignore_excessive
-        @config.logger.start_data_item
-        @config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "Excessive Notices", NicInfo::AttentionType::INFO
-        @config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "-----------------", NicInfo::AttentionType::INFO
-        @config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "Response contains excessive notices.", NicInfo::AttentionType::INFO
-        @config.logger.raw NicInfo::DataAmount::NORMAL_DATA, "Use the \"-V\" or \"--data extra\" options to see them.", NicInfo::AttentionType::INFO
-        @config.logger.end_data_item
+      if (is_excessive_notice(notices) ) && (@appctx.logger.data_amount != NicInfo::DataAmount::EXTRA_DATA) && !ignore_excessive
+        @appctx.logger.start_data_item
+        @appctx.logger.raw NicInfo::DataAmount::NORMAL_DATA, "Excessive Notices", NicInfo::AttentionType::INFO
+        @appctx.logger.raw NicInfo::DataAmount::NORMAL_DATA, "-----------------", NicInfo::AttentionType::INFO
+        @appctx.logger.raw NicInfo::DataAmount::NORMAL_DATA, "Response contains excessive notices.", NicInfo::AttentionType::INFO
+        @appctx.logger.raw NicInfo::DataAmount::NORMAL_DATA, "Use the \"-V\" or \"--data extra\" options to see them.", NicInfo::AttentionType::INFO
+        @appctx.logger.end_data_item
       else
         notices.each do |notice|
           display_single_notice notice
@@ -68,34 +68,34 @@ module NicInfo
     end
 
     def display_single_notice notice
-      @config.logger.start_data_item
+      @appctx.logger.start_data_item
       title = notice[ "title" ]
       if title == nil
         title = ""
       end
-      @config.conf_msgs << "'title' in 'notice' is not a string." unless title.instance_of?( String )
-      @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "[ NOTICE ]", title, NicInfo::AttentionType::SECONDARY
+      @appctx.conf_msgs << "'title' in 'notice' is not a string." unless title.instance_of?( String )
+      @appctx.logger.prose NicInfo::DataAmount::NORMAL_DATA, "[ NOTICE ]", title, NicInfo::AttentionType::SECONDARY
       type = notice[ "type" ]
       if type != nil
-        @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "Type", NicInfo.capitalize( type ), NicInfo::AttentionType::SECONDARY
+        @appctx.logger.prose NicInfo::DataAmount::NORMAL_DATA, "Type", NicInfo.capitalize( type ), NicInfo::AttentionType::SECONDARY
       end
       description = notice[ "description" ]
       i = 1
       if description.instance_of?( Array )
         description.each do |line|
           if line.instance_of?( String )
-            @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, i.to_s, line, NicInfo::AttentionType::SECONDARY
+            @appctx.logger.prose NicInfo::DataAmount::NORMAL_DATA, i.to_s, line, NicInfo::AttentionType::SECONDARY
             i = i + 1
           else
-            @config.conf_msgs << "eleemnt of 'description' in 'notice' is not a string."
+            @appctx.conf_msgs << "eleemnt of 'description' in 'notice' is not a string."
           end
         end
       else
-        @config.conf_msgs << "'description' in 'notice' is not an array."
+        @appctx.conf_msgs << "'description' in 'notice' is not an array."
       end
       links = notice[ "links" ]
       @common.display_simple_links( links )
-      @config.logger.end_data_item
+      @appctx.logger.end_data_item
     end
 
   end

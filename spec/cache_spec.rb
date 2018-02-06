@@ -70,7 +70,7 @@ NET_XML
   it 'should create or update the cache' do
 
     dir = File.join( @work_dir, "test_create_or_update" )
-    c = NicInfo::Config.new( dir )
+    c = NicInfo::AppContext.new(dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
 
@@ -105,7 +105,7 @@ NET_XML
   it 'should create a cache' do
 
     dir = File.join( @work_dir, "test_create" )
-    c = NicInfo::Config.new( dir )
+    c = NicInfo::AppContext.new(dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
     c.config[ NicInfo::CACHE ][ NicInfo::CACHE_EXPIRY ] = 9000 # really any number above 1 should be good
@@ -141,7 +141,7 @@ NET_XML
   it 'should get a cache hit' do
 
     dir = File.join( @work_dir, "test_get_hit" )
-    c = NicInfo::Config.new( dir )
+    c = NicInfo::AppContext.new(dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
 
@@ -159,7 +159,7 @@ NET_XML
   it 'should get no cache hit' do
 
     dir = File.join( @work_dir, "test_get_no_hit" )
-    c = NicInfo::Config.new( dir )
+    c = NicInfo::AppContext.new(dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
 
@@ -177,7 +177,7 @@ NET_XML
   it 'should get expired hit' do
 
     dir = File.join( @work_dir, "test_get_expired_hit" )
-    c = NicInfo::Config.new( dir )
+    c = NicInfo::AppContext.new(dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
 
@@ -195,7 +195,7 @@ NET_XML
   it 'should not use the cache' do
 
     dir = File.join( @work_dir, "test_no_use_cache" )
-    c = NicInfo::Config.new( dir )
+    c = NicInfo::AppContext.new(dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
 
@@ -213,7 +213,7 @@ NET_XML
   it 'should clean out the cache' do
 
     dir = File.join( @work_dir, "test_clean" )
-    c = NicInfo::Config.new( dir )
+    c = NicInfo::AppContext.new(dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
 
@@ -233,7 +233,7 @@ NET_XML
   it 'should empty the cache' do
 
     dir = File.join( @work_dir, "test_empty" )
-    c = NicInfo::Config.new( dir )
+    c = NicInfo::AppContext.new(dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
 

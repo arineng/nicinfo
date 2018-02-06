@@ -47,7 +47,7 @@ describe 'web mocks' do
     logger.data_out = StringIO.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
     config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
@@ -70,7 +70,7 @@ describe 'web mocks' do
     logger.data_out = StringIO.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
     config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
@@ -95,7 +95,7 @@ describe 'web mocks' do
     logger.data_out = StringIO.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
     config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
@@ -122,7 +122,7 @@ describe 'web mocks' do
     logger.data_out = StringIO.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
     config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
@@ -149,7 +149,7 @@ describe 'web mocks' do
     logger.data_out = StringIO.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
     config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
@@ -176,7 +176,7 @@ describe 'web mocks' do
     logger.data_out = StringIO.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
     config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
@@ -211,7 +211,7 @@ describe 'web mocks' do
     logger.data_out = StringIO.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
     config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 

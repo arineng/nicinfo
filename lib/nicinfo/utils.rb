@@ -55,12 +55,12 @@ module NicInfo
     return json_data[ "handle" ]
   end
 
-  def NicInfo.get_object_class_name json_data, expected, config
+  def NicInfo.get_object_class_name json_data, expected, appctx
     objectClassName =  json_data[ "objectClassName" ]
     if objectClassName == nil
-      config.conf_msgs << "Expected 'objectClassName' is not present."
+      appctx.conf_msgs << "Expected 'objectClassName' is not present."
     elsif objectClassName != expected
-      config.conf_msgs << "Expected 'objectClassName' to be '#{expected}' but it is '#{objectClassName}'."
+      appctx.conf_msgs << "Expected 'objectClassName' to be '#{expected}' but it is '#{objectClassName}'."
     end
     return objectClassName
   end
@@ -73,16 +73,16 @@ module NicInfo
     return json_data[ "unicodeName" ]
   end
 
-  def NicInfo.get_descriptions json_data, config
+  def NicInfo.get_descriptions json_data, appctx
     return if !json_data
     if json_data.instance_of?( Hash )
       retval = json_data[ "description" ]
       unless retval.instance_of?( Array )
-        config.conf_msgs << "'description' is not an array."
+        appctx.conf_msgs << "'description' is not an array."
         retval = nil
       end
     else
-      config.conf_msgs << "expected object for 'remarks' or 'notices'."
+      appctx.conf_msgs << "expected object for 'remarks' or 'notices'."
       retval = nil
     end
     return retval
@@ -136,11 +136,11 @@ module NicInfo
     return json_data[ "country" ]
   end
 
-  def NicInfo.get_links json_data, config
+  def NicInfo.get_links json_data, appctx
     retval = json_data[ "links" ]
     return nil unless retval
     if !retval.instance_of?( Array )
-      config.conf_msgs << "'links' is not an array."
+      appctx.conf_msgs << "'links' is not an array."
       retval = nil
     end
     return retval

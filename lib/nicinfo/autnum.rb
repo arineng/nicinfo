@@ -21,9 +21,9 @@ require 'nicinfo/data_tree'
 
 module NicInfo
 
-  def NicInfo.display_autnum json_data, config, data_tree
-    autnum = config.factory.new_autnum.process( json_data )
-    NicInfo::display_object_with_entities( autnum, config, data_tree )
+  def NicInfo.display_autnum json_data, appctx, data_tree
+    autnum = appctx.factory.new_autnum.process( json_data )
+    NicInfo::display_object_with_entities( autnum, appctx, data_tree )
   end
 
   # deals with RDAP autonomous number structures
@@ -31,9 +31,9 @@ module NicInfo
 
     attr_accessor :entities, :objectclass, :asEventActors
 
-    def initialize config
-      @config = config
-      @common = CommonJson.new config
+    def initialize appctx
+      @appctx = appctx
+      @common = CommonJson.new appctx
       @entities = Array.new
       @asEventActors = Array.new
     end
@@ -45,27 +45,27 @@ module NicInfo
     end
 
     def display
-      @config.logger.start_data_item
-      @config.logger.data_title "[ AS NUMBER ]"
-      @config.logger.terse "Handle", NicInfo::get_handle( @objectclass ), NicInfo::AttentionType::SUCCESS
-      @config.logger.extra "Object Class Name", NicInfo::get_object_class_name( @objectclass, "autnum", @config )
+      @appctx.logger.start_data_item
+      @appctx.logger.data_title "[ AS NUMBER ]"
+      @appctx.logger.terse "Handle", NicInfo::get_handle( @objectclass ), NicInfo::AttentionType::SUCCESS
+      @appctx.logger.extra "Object Class Name", NicInfo::get_object_class_name( @objectclass, "autnum", @appctx )
       endNum = NicInfo.get_endAutnum @objectclass
       startNum = NicInfo.get_startAutnum @objectclass
       if endNum
-        @config.logger.terse "Start AS Number", startNum, NicInfo::AttentionType::SUCCESS
-        @config.logger.terse "End AS Number", endNum, NicInfo::AttentionType::SUCCESS
+        @appctx.logger.terse "Start AS Number", startNum, NicInfo::AttentionType::SUCCESS
+        @appctx.logger.terse "End AS Number", endNum, NicInfo::AttentionType::SUCCESS
       else
-        @config.logger.terse "AS Number", startNum, NicInfo::AttentionType::SUCCESS
+        @appctx.logger.terse "AS Number", startNum, NicInfo::AttentionType::SUCCESS
       end
-      @config.logger.extra "Name", NicInfo.get_name( @objectclass )
-      @config.logger.terse "Country", NicInfo.get_country( @objectclass )
-      @config.logger.datum "Type", NicInfo.get_type( @objectclass )
+      @appctx.logger.extra "Name", NicInfo.get_name( @objectclass )
+      @appctx.logger.terse "Country", NicInfo.get_country( @objectclass )
+      @appctx.logger.datum "Type", NicInfo.get_type(@objectclass )
       @common.display_status @objectclass
       @common.display_events @objectclass
       @common.display_as_events_actors @asEventActors
       @common.display_remarks @objectclass
       @common.display_links( get_cn, @objectclass )
-      @config.logger.end_data_item
+      @appctx.logger.end_data_item
     end
 
     def get_cn
@@ -82,7 +82,7 @@ module NicInfo
     end
 
     def to_node
-      DataNode.new( get_cn, nil, NicInfo::get_self_link( NicInfo::get_links( @objectclass, @config ) ) )
+      DataNode.new( get_cn, nil, NicInfo::get_self_link( NicInfo::get_links( @objectclass, @appctx ) ) )
     end
 
   end

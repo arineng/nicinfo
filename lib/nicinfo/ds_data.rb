@@ -20,8 +20,8 @@ require 'nicinfo/data_tree'
 
 module NicInfo
 
-  def NicInfo.display_ds_data json_data, config, data_node
-    ds_data = DsData.new( config ).process( json_data ).display
+  def NicInfo.display_ds_data json_data, appctx, data_node
+    ds_data = DsData.new( appctx ).process( json_data ).display
   end
 
   # deals with RDAP ds_data structures
@@ -29,9 +29,9 @@ module NicInfo
 
     attr_accessor :objectclass, :asEventActors
 
-    def initialize config
-      @config = config
-      @common = CommonJson.new config
+    def initialize appctx
+      @appctx = appctx
+      @common = CommonJson.new appctx
       @asEventActors = Array.new
     end
 
@@ -41,15 +41,15 @@ module NicInfo
     end
 
     def display
-      @config.logger.start_data_item
-      @config.logger.data_title "[ DELEGATION SIGNER ]"
-      @config.logger.terse "Algorithm", NicInfo::get_algorithm( @objectclass )
-      @config.logger.terse "Digest", @objectclass[ "digest" ]
-      @config.logger.terse "Digest Type", @objectclass[ "digestType" ]
-      @config.logger.terse "Key Tag", @objectclass[ "keyTag" ]
+      @appctx.logger.start_data_item
+      @appctx.logger.data_title "[ DELEGATION SIGNER ]"
+      @appctx.logger.terse "Algorithm", NicInfo::get_algorithm( @objectclass )
+      @appctx.logger.terse "Digest", @objectclass[ "digest" ]
+      @appctx.logger.terse "Digest Type", @objectclass[ "digestType" ]
+      @appctx.logger.terse "Key Tag", @objectclass[ "keyTag" ]
       @common.display_events @objectclass
       @common.display_as_events_actors @asEventActors
-      @config.logger.end_data_item
+      @appctx.logger.end_data_item
     end
 
     def get_cn
@@ -60,7 +60,7 @@ module NicInfo
     end
 
     def to_node
-      node = DataNode.new( get_cn, nil, NicInfo::get_self_link( NicInfo::get_links( @objectclass, @config ) ) )
+      node = DataNode.new( get_cn, nil, NicInfo::get_self_link( NicInfo::get_links( @objectclass, @appctx ) ) )
       node.data_type=self.class.name
       return node
     end
