@@ -29,7 +29,7 @@ module NicInfo
     end
 
     def do_rdap_query
-      retval = nil
+      retval = RDAPResponse.new
       if @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] == nil && !@config.options.url
         bootstrap = Bootstrap.new( @config )
         qtype = @config.options.query_type
@@ -77,55 +77,65 @@ module NicInfo
         else
           rdap_url = @config.options.argv[0]
         end
-        data = get( rdap_url, 0 )
-        json_data = JSON.load data
-        if (ec = json_data[ NicInfo::NICINFO_DEMO_ERROR ]) != nil
+        retval.data = get( rdap_url, 0 )
+        retval.json_data = JSON.load retval.data
+        if (ec = retval.json_data[ NicInfo::NICINFO_DEMO_ERROR ]) != nil
           res = MyHTTPResponse.new( "1.1", ec, "Demo Exception" )
           res["content-type"] = NicInfo::RDAP_CONTENT_TYPE
           res.body=data
           raise Net::HTTPServerException.new( "Demo Exception", res )
         end
-        inspect_rdap_compliance json_data
-        cache_self_references json_data
-        retval = json_data
+        inspect_rdap_compliance retval.json_data
+        cache_self_references retval.json_data
+        retval.code = 200
+        retval.error_state = false
       rescue JSON::ParserError => a
         @config.logger.mesg( "Server returned invalid JSON!", NicInfo::AttentionType::ERROR )
+        retval.error_state = true
+        retval.exception = a
       rescue SocketError => a
         @config.logger.mesg(a.message, NicInfo::AttentionType::ERROR )
+        retval.error_state = true
+        retval.exception = a
       rescue ArgumentError => a
         @config.logger.mesg(a.message, NicInfo::AttentionType::ERROR )
+        retval.error_state = true
+        retval.exception = a
       rescue Net::HTTPServerException => e
         case e.response.code
           when "200"
             @config.logger.mesg( e.message, NicInfo::AttentionType::SUCCESS )
+            retval.code = 200
           when "401"
             @config.logger.mesg("Authorization is required.", NicInfo::AttentionType::ERROR )
-            handle_error_response e.response
+            handle_error_response(e,retval)
           when "404"
             @config.logger.mesg("Query yielded no results.", NicInfo::AttentionType::INFO )
-            handle_error_response e.response
+            handle_error_response( e, retval )
           else
             @config.logger.mesg("Error #{e.response.code}.", NicInfo::AttentionType::ERROR )
-            handle_error_response e.response
+            handle_error_response( e, retval )
         end
         @config.logger.trace("Server response code was " + e.response.code)
       rescue Net::HTTPFatalError => e
         case e.response.code
           when "500"
             @config.logger.mesg("RDAP server is reporting an internal error.", NicInfo::AttentionType::ERROR )
-            handle_error_response e.response
+            handle_error_response( e, retval )
           when "501"
             @config.logger.mesg("RDAP server does not implement the query.", NicInfo::AttentionType::ERROR )
-            handle_error_response e.response
+            handle_error_response( e, retval )
           when "503"
             @config.logger.mesg("RDAP server is reporting that it is unavailable.", NicInfo::AttentionType::ERROR )
-            handle_error_response e.response
+            handle_error_response( e, retval )
           else
             @config.logger.mesg("Error #{e.response.code}.", NicInfo::AttentionType::ERROR )
-            handle_error_response e.response
+            handle_error_response( e, retval)
         end
         @config.logger.trace("Server response code was " + e.response.code)
       rescue Net::HTTPRetriableError => e
+        retval.error_state = true
+        retval.exception = e
         @config.logger.mesg("Too many redirections, retries, or a redirect loop has been detected." )
       end
 
@@ -252,14 +262,18 @@ module NicInfo
 
     end #end def
 
-    def handle_error_response (res)
+    def handle_error_response ( exception, rdap_response )
+      res = exception.response
+      rdap_response.code = res.code.to_i
+      rdap_response.data = res.body
+      rdap_response.error_state = true
+      rdap_response.exception = exception
       if res["content-type"] == NicInfo::RDAP_CONTENT_TYPE && res.body && res.body.to_s.size > 0
-        json_data = JSON.load( res.body )
-        inspect_rdap_compliance json_data
-        @config.factory.new_notices.display_notices json_data, true
-        @config.factory.new_error_code.display_error_code( json_data )
+        rdap_response.json_data = JSON.load( res.body )
+        inspect_rdap_compliance rdap_response.json_data
       end
     end
+
 
     def inspect_rdap_compliance json
       rdap_conformance = json[ "rdapConformance" ]
@@ -378,6 +392,36 @@ module NicInfo
       end
 
       return retval
+    end
+
+    def get_query_type_from_url url
+      queryType = nil
+      case url
+        when /.*\/ip\/.*/
+          # covers all IP cases
+          queryType = QueryType::BY_IP
+        when /.*\/autnum\/.*/
+          queryType = QueryType::BY_AS_NUMBER
+        when /.*\/nameserver\/.*/
+          queryType = QueryType::BY_NAMESERVER
+        when /.*\/domain\/.*/
+          queryType = QueryType::BY_DOMAIN
+        when /.*\/entity\/.*/
+          queryType = QueryType::BY_ENTITY_HANDLE
+        when /.*\/entities.*/
+          queryType = QueryType::SRCH_ENTITY_BY_NAME
+        when /.*\/domains.*/
+          # covers all domain searches
+          queryType = QueryType::SRCH_DOMAIN
+        when /.*\/nameservers.*/
+          # covers all nameserver searches
+          queryType = QueryType::SRCH_NS
+        when /.*\/help.*/
+          queryType = QueryType::BY_SERVER_HELP
+        else
+          raise ArgumentError.new( "Unable to determine query type from url '#{url}'" )
+      end
+      return queryType
     end
 
   end
