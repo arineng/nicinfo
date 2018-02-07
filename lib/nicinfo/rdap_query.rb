@@ -20,6 +20,24 @@ module NicInfo
 
   end
 
+  class TrackedUrl
+
+    attr_accessor :url, :total_queries, :first_query_time, :last_query_time
+
+    def initialize( url )
+      @url = url
+      @total_queries = 1
+      @first_query_time = Time.now
+      @last_query_time = Time.now
+    end
+
+    def queried
+      @total_queries = @total_queries + 1
+      @last_query_time = Time.now
+    end
+
+  end
+
   class RDAPQuery
 
     attr_accessor :appctx
@@ -30,6 +48,7 @@ module NicInfo
 
     def do_rdap_query( query, qtype, explicit_url )
       retval = RDAPResponse.new
+      bootstrap_url = nil
       if @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] == nil && !explicit_url
         bootstrap = Bootstrap.new( @appctx )
         if qtype == QueryType::BY_SERVER_HELP
@@ -37,46 +56,46 @@ module NicInfo
         end
         case qtype
           when QueryType::BY_IP4_ADDR
-            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( query[ 0 ] )
+            bootstrap_url = bootstrap.find_url_by_ip( query[ 0 ] )
           when QueryType::BY_IP6_ADDR
-            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( query[ 0 ] )
+            bootstrap_url = bootstrap.find_url_by_ip( query[ 0 ] )
           when QueryType::BY_IP4_CIDR
-            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( query[ 0 ] )
+            bootstrap_url = bootstrap.find_url_by_ip( query[ 0 ] )
           when QueryType::BY_IP6_CIDR
-            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( query[ 0 ] )
+            bootstrap_url = bootstrap.find_url_by_ip( query[ 0 ] )
           when QueryType::BY_AS_NUMBER
-            @appctx.config[NicInfo::BOOTSTRAP ][NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_as(query[0 ] )
+            bootstrap_url = bootstrap.find_url_by_as(query[0 ] )
           when QueryType::BY_DOMAIN
-            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( query[ 0 ] )
+            bootstrap_url = bootstrap.find_url_by_domain( query[ 0 ] )
           when QueryType::BY_NAMESERVER
-            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( query[0 ] )
+            bootstrap_url = bootstrap.find_url_by_domain( query[0 ] )
           when QueryType::BY_ENTITY_HANDLE
-            @appctx.config[NicInfo::BOOTSTRAP ][NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_entity( query[0 ] )
+            bootstrap_url = bootstrap.find_url_by_entity( query[0 ] )
           when QueryType::SRCH_ENTITY_BY_NAME
-            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::ENTITY_ROOT_URL ]
+            bootstrap_url = @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::ENTITY_ROOT_URL ]
           when QueryType::SRCH_DOMAIN_BY_NAME
-            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( query[ 0 ] )
+            bootstrap_url = bootstrap.find_url_by_domain( query[ 0 ] )
           when QueryType::SRCH_DOMAIN_BY_NSNAME
-            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( query[ 0 ] )
+            bootstrap_url = bootstrap.find_url_by_domain( query[ 0 ] )
           when QueryType::SRCH_DOMAIN_BY_NSIP
-            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::DOMAIN_ROOT_URL ]
+            bootstrap_url = @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::DOMAIN_ROOT_URL ]
           when QueryType::SRCH_NS_BY_NAME
-            @appctx.appctx[NicInfo::BOOTSTRAP ][NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( query[0 ] )
+            bootstrap_url = bootstrap.find_url_by_domain( query[0 ] )
           when QueryType::SRCH_NS_BY_IP
-            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( query[ 0 ] )
+            bootstrap_url = bootstrap.find_url_by_ip( query[ 0 ] )
           else
-            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::HELP_ROOT_URL ]
+            bootstrap_url = @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::HELP_ROOT_URL ]
         end
       end
       begin
         rdap_url = nil
         unless explicit_url
           path = create_resource_url( query, qtype )
-          rdap_url = make_rdap_url(@appctx.config[NicInfo::BOOTSTRAP][NicInfo::BOOTSTRAP_URL], path)
+          rdap_url = make_rdap_url( bootstrap_url, path)
         else
           rdap_url = query[0]
         end
-        retval.data = get( rdap_url, 0 )
+        retval.data = get( rdap_url, 0, true, bootstrap_url )
         retval.json_data = JSON.load retval.data
         if (ec = retval.json_data[ NicInfo::NICINFO_DEMO_ERROR ]) != nil
           res = MyHTTPResponse.new( "1.1", ec, "Demo Exception" )
@@ -204,12 +223,20 @@ module NicInfo
     end
 
     # Do an HTTP GET with the path.
-    def get url, try, expect_rdap = true
+    def get url, try, expect_rdap = true, tracking_url = nil
 
       data = @appctx.cache.get(url)
       if data == nil
 
         @appctx.logger.trace("Issuing GET for " + url)
+        tracking_url = url if tracking_url == nil
+        tracker = @appctx.tracked_urls[ tracking_url ]
+        if tracker
+          tracker.queried
+        else
+          tracker = TrackedUrl.new( tracking_url )
+          @appctx.tracked_urls[ tracking_url ] = tracker
+        end
         uri = URI.parse( URI::encode( url ) )
         req = Net::HTTP::Get.new(uri.request_uri)
         req["User-Agent"] = NicInfo::VERSION_LABEL
@@ -229,7 +256,7 @@ module NicInfo
           if @appctx.config[ NicInfo::SECURITY ][ NicInfo::TRY_INSECURE ]
             @appctx.logger.mesg( "Secure connection failed. Trying insecure connection." )
             uri.scheme = "http"
-            return get( uri.to_s, try, expect_rdap )
+            return get( uri.to_s, try, expect_rdap, tracking_url )
           else
             raise e
           end
@@ -253,14 +280,14 @@ module NicInfo
               res.error! if try >= 5
               location = res["location"]
               @appctx.cache.create_or_update( url, NicInfo::REDIRECT_TO + location )
-              return get( location, try + 1, expect_rdap)
+              return get( location, try + 1, expect_rdap, tracking_url )
             end
             res.error!
         end #end case
 
       elsif data.start_with?( NicInfo::REDIRECT_TO )
         location = data.sub( NicInfo::REDIRECT_TO, "" ).strip
-        return get( location, try + 1, expect_rdap)
+        return get( location, try + 1, expect_rdap, tracking_url)
       end #end if
 
       return data

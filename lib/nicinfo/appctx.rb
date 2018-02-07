@@ -26,7 +26,8 @@ module NicInfo
   # Handles configuration of the application
   class AppContext
 
-    attr_accessor :logger, :config, :cache, :rdap_cache_dir, :options, :conf_msgs, :rdap_bootstrap_dir, :factory
+    attr_accessor :logger, :config, :rdap_cache_dir, :options, :conf_msgs, :rdap_bootstrap_dir, :factory
+    attr_accessor :cache, :tracked_urls
 
     # Intializes the configuration with a place to look for the config file
     # If the file doesn't exist, a default is used.
@@ -37,6 +38,7 @@ module NicInfo
       @app_data = app_data
       @logger = NicInfo::Logger.new
       @conf_msgs = Array.new
+      @tracked_urls = Hash.new
       @factory = NicInfo::Factory.new( self )
 
       config_file_name = AppContext.formulate_config_file_name(@app_data )

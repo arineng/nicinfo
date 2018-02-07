@@ -590,6 +590,7 @@ module NicInfo
           @appctx.save_as_yaml( NicInfo::LASTTREE_YAML, data_tree ) if !data_tree.empty?
           show_search_results_truncated json_data
           show_conformance_messages
+          show_tracked_urls
           show_helpful_messages json_data, data_tree if show_help
         end
       end
@@ -733,6 +734,13 @@ HELP_SUMMARY
       end
     end
 
+    def show_tracked_urls
+      @appctx.tracked_urls.each_value do |tracker|
+        qps = ( tracker.last_query_time.to_i - tracker.first_query_time.to_i ).fdiv( tracker.total_queries )
+        @appctx.logger.trace( "#{tracker.total_queries} queries to #{tracker.url} rated at #{qps} queries per second")
+      end
+    end
+
     def show_search_results_truncated json_data
       truncated = json_data[ "searchResultsTruncated" ]
       if truncated.instance_of?(TrueClass) || truncated.instance_of?(FalseClass)
@@ -774,7 +782,8 @@ HELP_SUMMARY
     def do_bulkip
       file_list = @appctx.options.bulkip_in
       if File.directory?( file_list )
-        file_list = file_list + File::SEPARATOR + "*"
+        file_list = file_list + File::SEPARATOR unless file_list.end_with?( File::SEPARATOR )
+        file_list = file_list + "*"
       end
       Dir.glob( file_list ).each do |file|
         b = BulkIPInFile.new( file )
@@ -783,17 +792,26 @@ HELP_SUMMARY
         end
         @appctx.logger.trace( "file #{file} strategry is #{b.strategy}")
       end
+      local = IPAddr.new( "127.0.0.1" )
+      local6 = IPAddr.new( "::1" )
       rdap_query = NicInfo::RDAPQuery.new( @appctx )
-      guess = NicInfo::RDAPQueryGuess.new( @appctx )
       Dir.glob( file_list ).each do |file|
+        @appctx.logger.mesg( "Processing #{file}")
         b = BulkIPInFile.new( file )
         b.foreach do |ip,time|
           @appctx.logger.trace( "bulk ip: #{ip} time: #{time}")
-          query_value = [ ip ]
-          qtype = guess.guess_query_value_type( query_value )
-          rdap_query.do_rdap_query( query_value, qtype, nil )
+          ipaddr = IPAddr.new( ip )
+          if ipaddr != local && ipaddr != local6
+            query_value = [ ip ]
+            qtype = QueryType::BY_IP4_ADDR
+            qtype = QueryType::BY_IP6_ADDR if ipaddr.ipv6?
+            rdap_query.do_rdap_query( query_value, qtype, nil )
+          else
+            @appctx.logger.trace( "skipping localhost address")
+          end
         end
       end
+      show_tracked_urls
     end
 
   end
