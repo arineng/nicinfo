@@ -28,61 +28,60 @@ module NicInfo
       @appctx = appctx
     end
 
-    def do_rdap_query
+    def do_rdap_query( query, qtype, explicit_url )
       retval = RDAPResponse.new
-      if @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] == nil && !@appctx.options.url
+      if @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] == nil && !explicit_url
         bootstrap = Bootstrap.new( @appctx )
-        qtype = @appctx.options.query_type
         if qtype == QueryType::BY_SERVER_HELP
-          qtype = guess_query_value_type( @appctx.options.argv )
+          qtype = guess_query_value_type( query )
         end
         case qtype
           when QueryType::BY_IP4_ADDR
-            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @appctx.options.argv[ 0 ] )
+            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( query[ 0 ] )
           when QueryType::BY_IP6_ADDR
-            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @appctx.options.argv[ 0 ] )
+            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( query[ 0 ] )
           when QueryType::BY_IP4_CIDR
-            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @appctx.options.argv[ 0 ] )
+            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( query[ 0 ] )
           when QueryType::BY_IP6_CIDR
-            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @appctx.options.argv[ 0 ] )
+            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( query[ 0 ] )
           when QueryType::BY_AS_NUMBER
-            @appctx.config[NicInfo::BOOTSTRAP ][NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_as(@appctx.options.argv[0 ] )
+            @appctx.config[NicInfo::BOOTSTRAP ][NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_as(query[0 ] )
           when QueryType::BY_DOMAIN
-            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @appctx.options.argv[ 0 ] )
+            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( query[ 0 ] )
           when QueryType::BY_NAMESERVER
-            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain(@appctx.options.argv[0 ] )
+            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( query[0 ] )
           when QueryType::BY_ENTITY_HANDLE
-            @appctx.appctx[NicInfo::BOOTSTRAP ][NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_entity(@appctx.options.argv[0 ] )
+            @appctx.config[NicInfo::BOOTSTRAP ][NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_entity( query[0 ] )
           when QueryType::SRCH_ENTITY_BY_NAME
             @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::ENTITY_ROOT_URL ]
           when QueryType::SRCH_DOMAIN_BY_NAME
-            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @appctx.options.argv[ 0 ] )
+            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( query[ 0 ] )
           when QueryType::SRCH_DOMAIN_BY_NSNAME
-            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @appctx.options.argv[ 0 ] )
+            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( query[ 0 ] )
           when QueryType::SRCH_DOMAIN_BY_NSIP
             @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::DOMAIN_ROOT_URL ]
           when QueryType::SRCH_NS_BY_NAME
-            @appctx.appctx[NicInfo::BOOTSTRAP ][NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain(@appctx.options.argv[0 ] )
+            @appctx.appctx[NicInfo::BOOTSTRAP ][NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( query[0 ] )
           when QueryType::SRCH_NS_BY_IP
-            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @appctx.options.argv[ 0 ] )
+            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( query[ 0 ] )
           else
             @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::HELP_ROOT_URL ]
         end
       end
       begin
         rdap_url = nil
-        unless @appctx.options.url
-          path = create_resource_url(@appctx.options.argv, @appctx.options.query_type)
+        unless explicit_url
+          path = create_resource_url( query, qtype )
           rdap_url = make_rdap_url(@appctx.config[NicInfo::BOOTSTRAP][NicInfo::BOOTSTRAP_URL], path)
         else
-          rdap_url = @appctx.options.argv[0]
+          rdap_url = query[0]
         end
         retval.data = get( rdap_url, 0 )
         retval.json_data = JSON.load retval.data
         if (ec = retval.json_data[ NicInfo::NICINFO_DEMO_ERROR ]) != nil
           res = MyHTTPResponse.new( "1.1", ec, "Demo Exception" )
           res["content-type"] = NicInfo::RDAP_CONTENT_TYPE
-          res.body=data
+          res.body=retval.data
           raise Net::HTTPServerException.new( "Demo Exception", res )
         end
         inspect_rdap_compliance retval.json_data

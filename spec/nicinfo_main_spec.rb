@@ -38,66 +38,6 @@ describe 'main entry tests' do
 
   end
 
-  it 'should guess queries right' do
-
-    dir = File.join( @work_dir, "test_guess_query" )
-
-    logger = NicInfo::Logger.new
-    logger.message_out = StringIO.new
-    logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
-    config = NicInfo::AppContext.new(dir )
-    config.logger=logger
-
-    nicinfo = NicInfo::Main.new( [], config )
-
-    expect( nicinfo.guess_query_value_type( [ "1.0.0.0" ] ) ).to eq( "IP4ADDR" )
-    expect( nicinfo.guess_query_value_type( [ "199.0.0.0" ] ) ).to eq( "IP4ADDR" )
-    expect( nicinfo.guess_query_value_type( [ "255.255.255.255" ] ) ).to eq( "IP4ADDR" )
-    expect( nicinfo.guess_query_value_type( [ "255.255.255.256" ] ) ).to be_nil
-    expect( nicinfo.guess_query_value_type( [ "256.255.255.255" ] ) ).to be_nil
-    expect( nicinfo.guess_query_value_type( [ "2001:500:13::" ] ) ).to eq( "IP6ADDR" )
-    expect( nicinfo.guess_query_value_type( [ "2001:500:13:FFFF:FFFF:FFFF:FFFF:FFFF" ] ) ).to eq( "IP6ADDR" )
-    expect( nicinfo.guess_query_value_type( [ "10745" ] ) ).to eq( "ASNUMBER" )
-    expect( nicinfo.guess_query_value_type( [ "11110745" ] ) ).to eq( "ASNUMBER" )
-    expect( nicinfo.guess_query_value_type( [ "AS10745" ] ) ).to eq( "ASNUMBER" )
-    expect( nicinfo.guess_query_value_type( [ "AS11110745" ] ) ).to eq( "ASNUMBER" )
-    expect( nicinfo.guess_query_value_type( [ "199.in-addr.arpa" ] ) ).to eq( "DOMAIN" )
-    expect( nicinfo.guess_query_value_type( [ "199.in-addr.arpa." ] ) ).to eq( "DOMAIN" )
-    expect( nicinfo.guess_query_value_type( [ "136.199.in-addr.arpa" ] ) ).to eq( "DOMAIN" )
-    expect( nicinfo.guess_query_value_type( [ "136.199.in-addr.arpa." ] ) ).to eq( "DOMAIN" )
-    expect( nicinfo.guess_query_value_type( [ "8.f.4.0.1.0.0.2.ip6.arpa" ] ) ).to eq( "DOMAIN" )
-    expect( nicinfo.guess_query_value_type( [ "8.f.4.0.1.0.0.2.ip6.arpa." ] ) ).to eq( "DOMAIN" )
-    expect( nicinfo.guess_query_value_type( [ "example.com" ] ) ).to eq( "DOMAIN" )
-    expect( nicinfo.guess_query_value_type( [ "example.com." ] ) ).to eq( "DOMAIN" )
-    expect( nicinfo.guess_query_value_type( [ "ns1.example.com." ] ) ).to eq( "NAMESERVER" )
-    expect( nicinfo.guess_query_value_type( [ "1=" ] ) ).to eq( "RESULT" )
-    expect( nicinfo.guess_query_value_type( [ "1.1=" ] ) ).to eq( "RESULT" )
-    expect( nicinfo.guess_query_value_type( [ "1.1.1=" ] ) ).to eq( "RESULT" )
-    expect( nicinfo.guess_query_value_type( [ "foo" ] ) ).to eq( "ESBYNAME" )
-    expect( nicinfo.guess_query_value_type( [ "http://rdap.arin.net/ip/1.1.1.1" ] ) ).to eq( "URL" )
-
-  end
-
-  it 'should qet query from url' do
-
-    dir = File.join( @work_dir, "test_get_query_type_from_url" )
-
-    logger = NicInfo::Logger.new
-    logger.message_out = StringIO.new
-    logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
-    config = NicInfo::AppContext.new(dir )
-    config.logger=logger
-
-    nicinfo = NicInfo::Main.new( [], config )
-
-    expect( nicinfo.get_query_type_from_url( "http://example.com/rdap/ip/2001:db8:00" ) ).to eq( "IP" )
-    expect( nicinfo.get_query_type_from_url( "http://example.com/rdap/ip/192.0.2.0/24" ) ).to eq( "IP" )
-    expect( nicinfo.get_query_type_from_url( "http://example.com/rdap/autnum/21" ) ).to eq( "ASNUMBER" )
-    expect( nicinfo.get_query_type_from_url( "http://example.com/rdap/domain/example.com" ) ).to eq( "DOMAIN" )
-    expect( nicinfo.get_query_type_from_url( "http://example.com/rdap/entity/CE12" ) ).to eq( "ENTITYHANDLE" )
-
-  end
-
   it 'should evaluate json values' do
 
     data = <<JSON_DATA
