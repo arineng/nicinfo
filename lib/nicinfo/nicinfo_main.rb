@@ -772,17 +772,26 @@ HELP_SUMMARY
     end
 
     def do_bulkip
-      Dir.glob( @appctx.options.bulkip_in ).each do |file|
+      file_list = @appctx.options.bulkip_in
+      if File.directory?( file_list )
+        file_list = file_list + File::SEPARATOR + "*"
+      end
+      Dir.glob( file_list ).each do |file|
         b = BulkIPInFile.new( file )
         if !b.has_strategy
           raise ArgumentError.new( "cannot determine parsing strategy for #{file}")
         end
         @appctx.logger.trace( "file #{file} strategry is #{b.strategy}")
       end
-      Dir.glob( @appctx.options.bulkip_in ).each do |file|
+      rdap_query = NicInfo::RDAPQuery.new( @appctx )
+      guess = NicInfo::RDAPQueryGuess.new( @appctx )
+      Dir.glob( file_list ).each do |file|
         b = BulkIPInFile.new( file )
         b.foreach do |ip,time|
           @appctx.logger.trace( "bulk ip: #{ip} time: #{time}")
+          query_value = [ ip ]
+          qtype = guess.guess_query_value_type( query_value )
+          rdap_query.do_rdap_query( query_value, qtype, nil )
         end
       end
     end

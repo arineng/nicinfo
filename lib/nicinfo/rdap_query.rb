@@ -195,10 +195,12 @@ module NicInfo
     end
 
     def make_rdap_url( base_url, resource_path )
+      retval = base_url
       unless base_url.end_with?("/")
-        base_url << "/"
+        retval = retval + "/"
       end
-      base_url << resource_path
+      retval = retval + resource_path
+      return retval
     end
 
     # Do an HTTP GET with the path.
