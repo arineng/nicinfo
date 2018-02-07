@@ -52,7 +52,7 @@ describe 'demos' do
 
     main = NicInfo::Main.new( args, config )
     main.run
-    expect( main.cache.count).to eq( 16 )
+    expect( main.appctx.cache.count).to eq( 16 )
 
   end
 
@@ -70,7 +70,7 @@ describe 'demos' do
     args = [ "--demo" ]
     main = NicInfo::Main.new( args, config )
     main.run
-    expect( main.cache.count).to eq( 16 )
+    expect( main.appctx.cache.count).to eq( 16 )
 
     args = [ "as10" ]
     main = NicInfo::Main.new( args, config )
@@ -94,7 +94,7 @@ describe 'demos' do
     args = [ "--demo" ]
     main = NicInfo::Main.new( args, config )
     main.run
-    expect( main.cache.count).to eq( 16 )
+    expect( main.appctx.cache.count).to eq( 16 )
 
     args = [ "--type", "entityhandle", "restricted" ]
     main = NicInfo::Main.new( args, config )
@@ -118,7 +118,7 @@ describe 'demos' do
     args = [ "--demo" ]
     main = NicInfo::Main.new( args, config )
     main.run
-    expect( main.cache.count).to eq( 16 )
+    expect( main.appctx.cache.count).to eq( 16 )
 
     args = [ "--jcr", "standard", "xn--fo-5ja.example" ]
     main = NicInfo::Main.new( args, config )
@@ -144,7 +144,7 @@ describe 'demos' do
     args = [ "--demo" ]
     main = NicInfo::Main.new( args, config )
     main.run
-    expect( main.cache.count).to eq( 16 )
+    expect( main.appctx.cache.count).to eq( 16 )
 
     args = [ "--jcr", "strict", "192.in-addr.arpa" ]
     main = NicInfo::Main.new( args, config )

@@ -79,7 +79,7 @@ module NicInfo
   # The main class for the nicinfo command.
   class Main
 
-    attr_accessor :appctx, :cache, :jcr_context, :jcr_strict_context
+    attr_accessor :appctx, :jcr_context, :jcr_strict_context
 
     def initialize args, appctx = nil
 
@@ -326,7 +326,7 @@ module NicInfo
     # Do an HTTP GET with the path.
     def get url, try, expect_rdap = true
 
-      data = @cache.get(url)
+      data = @appctx.cache.get(url)
       if data == nil
 
         @appctx.logger.trace("Issuing GET for " + url)
@@ -367,7 +367,7 @@ module NicInfo
               end
             end
             data = res.body
-            @cache.create_or_update(url, data)
+            @appctx.cache.create_or_update(url, data)
           else
             if res.code == "301" or res.code == "302" or res.code == "303" or res.code == "307" or res.code == "308"
               res.error! if try >= 5
@@ -421,11 +421,10 @@ module NicInfo
       @appctx.logger.mesg(NicInfo::VERSION_LABEL, NicInfo::AttentionType::PRIMARY )
       @appctx.setup_workspace
       @appctx.check_config_version
-      @cache = Cache.new(@appctx)
-      @cache.clean if @appctx.config[NicInfo::CACHE ][NicInfo::CLEAN_CACHE ]
+      @appctx.configure_cache
 
       if @appctx.options.empty_cache
-        @cache.empty
+        @appctx.cache.empty
       end
 
       if @appctx.options.get_iana_files
@@ -453,7 +452,7 @@ module NicInfo
             json_data = JSON.load demo_data
             demo_url = json_data[ NicInfo::NICINFO_DEMO_URL ]
             demo_hint = json_data[ NicInfo::NICINFO_DEMO_HINT ]
-            @cache.create( demo_url, demo_data )
+            @appctx.cache.create( demo_url, demo_data )
             @appctx.logger.mesg( "  " + demo_hint, NicInfo::AttentionType::INFO )
           end
         end
@@ -1054,7 +1053,7 @@ HELP_SUMMARY
         self_link = NicInfo.get_self_link links
         if self_link
           pretty = JSON::pretty_generate( json_data )
-          @cache.create( self_link, pretty )
+          @appctx.cache.create( self_link, pretty )
         end
       end
       entities = NicInfo::get_entitites json_data

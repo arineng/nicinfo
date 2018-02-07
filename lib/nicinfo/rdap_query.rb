@@ -22,60 +22,60 @@ module NicInfo
 
   class RDAPQuery
 
-    attr_accessor :config
+    attr_accessor :appctx
 
-    def initialize( config )
-      @config = config
+    def initialize( appctx )
+      @appctx = appctx
     end
 
     def do_rdap_query
       retval = RDAPResponse.new
-      if @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] == nil && !@config.options.url
-        bootstrap = Bootstrap.new( @config )
-        qtype = @config.options.query_type
+      if @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] == nil && !@appctx.options.url
+        bootstrap = Bootstrap.new( @appctx )
+        qtype = @appctx.options.query_type
         if qtype == QueryType::BY_SERVER_HELP
-          qtype = guess_query_value_type( @config.options.argv )
+          qtype = guess_query_value_type( @appctx.options.argv )
         end
         case qtype
           when QueryType::BY_IP4_ADDR
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @config.options.argv[ 0 ] )
+            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @appctx.options.argv[ 0 ] )
           when QueryType::BY_IP6_ADDR
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @config.options.argv[ 0 ] )
+            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @appctx.options.argv[ 0 ] )
           when QueryType::BY_IP4_CIDR
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @config.options.argv[ 0 ] )
+            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @appctx.options.argv[ 0 ] )
           when QueryType::BY_IP6_CIDR
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @config.options.argv[ 0 ] )
+            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @appctx.options.argv[ 0 ] )
           when QueryType::BY_AS_NUMBER
-            @appctx.config[NicInfo::BOOTSTRAP ][NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_as(@config.options.argv[0 ] )
+            @appctx.config[NicInfo::BOOTSTRAP ][NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_as(@appctx.options.argv[0 ] )
           when QueryType::BY_DOMAIN
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
+            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @appctx.options.argv[ 0 ] )
           when QueryType::BY_NAMESERVER
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain(@appctx.options.argv[0 ] )
+            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain(@appctx.options.argv[0 ] )
           when QueryType::BY_ENTITY_HANDLE
-            @config.appctx[NicInfo::BOOTSTRAP ][NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_entity(@config.options.argv[0 ] )
+            @appctx.appctx[NicInfo::BOOTSTRAP ][NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_entity(@appctx.options.argv[0 ] )
           when QueryType::SRCH_ENTITY_BY_NAME
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::ENTITY_ROOT_URL ]
+            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::ENTITY_ROOT_URL ]
           when QueryType::SRCH_DOMAIN_BY_NAME
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
+            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @appctx.options.argv[ 0 ] )
           when QueryType::SRCH_DOMAIN_BY_NSNAME
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
+            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @appctx.options.argv[ 0 ] )
           when QueryType::SRCH_DOMAIN_BY_NSIP
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::DOMAIN_ROOT_URL ]
+            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::DOMAIN_ROOT_URL ]
           when QueryType::SRCH_NS_BY_NAME
-            @config.appctx[NicInfo::BOOTSTRAP ][NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain(@config.options.argv[0 ] )
+            @appctx.appctx[NicInfo::BOOTSTRAP ][NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain(@appctx.options.argv[0 ] )
           when QueryType::SRCH_NS_BY_IP
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @config.options.argv[ 0 ] )
+            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @appctx.options.argv[ 0 ] )
           else
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::HELP_ROOT_URL ]
+            @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::HELP_ROOT_URL ]
         end
       end
       begin
         rdap_url = nil
-        unless @config.options.url
-          path = create_resource_url(@config.options.argv, @config.options.query_type)
-          rdap_url = make_rdap_url(@config.config[NicInfo::BOOTSTRAP][NicInfo::BOOTSTRAP_URL], path)
+        unless @appctx.options.url
+          path = create_resource_url(@appctx.options.argv, @appctx.options.query_type)
+          rdap_url = make_rdap_url(@appctx.config[NicInfo::BOOTSTRAP][NicInfo::BOOTSTRAP_URL], path)
         else
-          rdap_url = @config.options.argv[0]
+          rdap_url = @appctx.options.argv[0]
         end
         retval.data = get( rdap_url, 0 )
         retval.json_data = JSON.load retval.data
@@ -90,53 +90,53 @@ module NicInfo
         retval.code = 200
         retval.error_state = false
       rescue JSON::ParserError => a
-        @config.logger.mesg( "Server returned invalid JSON!", NicInfo::AttentionType::ERROR )
+        @appctx.logger.mesg( "Server returned invalid JSON!", NicInfo::AttentionType::ERROR )
         retval.error_state = true
         retval.exception = a
       rescue SocketError => a
-        @config.logger.mesg(a.message, NicInfo::AttentionType::ERROR )
+        @appctx.logger.mesg(a.message, NicInfo::AttentionType::ERROR )
         retval.error_state = true
         retval.exception = a
       rescue ArgumentError => a
-        @config.logger.mesg(a.message, NicInfo::AttentionType::ERROR )
+        @appctx.logger.mesg(a.message, NicInfo::AttentionType::ERROR )
         retval.error_state = true
         retval.exception = a
       rescue Net::HTTPServerException => e
         case e.response.code
           when "200"
-            @config.logger.mesg( e.message, NicInfo::AttentionType::SUCCESS )
+            @appctx.logger.mesg( e.message, NicInfo::AttentionType::SUCCESS )
             retval.code = 200
           when "401"
-            @config.logger.mesg("Authorization is required.", NicInfo::AttentionType::ERROR )
+            @appctx.logger.mesg("Authorization is required.", NicInfo::AttentionType::ERROR )
             handle_error_response(e,retval)
           when "404"
-            @config.logger.mesg("Query yielded no results.", NicInfo::AttentionType::INFO )
+            @appctx.logger.mesg("Query yielded no results.", NicInfo::AttentionType::INFO )
             handle_error_response( e, retval )
           else
-            @config.logger.mesg("Error #{e.response.code}.", NicInfo::AttentionType::ERROR )
+            @appctx.logger.mesg("Error #{e.response.code}.", NicInfo::AttentionType::ERROR )
             handle_error_response( e, retval )
         end
-        @config.logger.trace("Server response code was " + e.response.code)
+        @appctx.logger.trace("Server response code was " + e.response.code)
       rescue Net::HTTPFatalError => e
         case e.response.code
           when "500"
             @appctx.logger.mesg("RDAP server is reporting an internal error.", NicInfo::AttentionType::ERROR )
             handle_error_response( e, retval )
           when "501"
-            @config.logger.mesg("RDAP server does not implement the query.", NicInfo::AttentionType::ERROR )
+            @appctx.logger.mesg("RDAP server does not implement the query.", NicInfo::AttentionType::ERROR )
             handle_error_response( e, retval )
           when "503"
-            @config.logger.mesg("RDAP server is reporting that it is unavailable.", NicInfo::AttentionType::ERROR )
+            @appctx.logger.mesg("RDAP server is reporting that it is unavailable.", NicInfo::AttentionType::ERROR )
             handle_error_response( e, retval )
           else
-            @config.logger.mesg("Error #{e.response.code}.", NicInfo::AttentionType::ERROR )
+            @appctx.logger.mesg("Error #{e.response.code}.", NicInfo::AttentionType::ERROR )
             handle_error_response( e, retval)
         end
-        @config.logger.trace("Server response code was " + e.response.code)
+        @appctx.logger.trace("Server response code was " + e.response.code)
       rescue Net::HTTPRetriableError => e
         retval.error_state = true
         retval.exception = e
-        @config.logger.mesg("Too many redirections, retries, or a redirect loop has been detected." )
+        @appctx.logger.mesg("Too many redirections, retries, or a redirect loop has been detected." )
       end
 
       return retval
@@ -162,7 +162,7 @@ module NicInfo
         when QueryType::BY_DOMAIN
           path << "domain/" << args[0]
         when QueryType::BY_RESULT
-          tree = @config.load_as_yaml(NicInfo::ARININFO_LASTTREE_YAML)
+          tree = @appctx.load_as_yaml(NicInfo::ARININFO_LASTTREE_YAML)
           path = tree.find_rest_ref(args[0])
           raise ArgumentError.new("Unable to find result for " + args[0]) unless path
         when QueryType::BY_ENTITY_HANDLE
@@ -205,10 +205,10 @@ module NicInfo
     # Do an HTTP GET with the path.
     def get url, try, expect_rdap = true
 
-      data = @cache.get(url)
+      data = @appctx.cache.get(url)
       if data == nil
 
-        @config.logger.trace("Issuing GET for " + url)
+        @appctx.logger.trace("Issuing GET for " + url)
         uri = URI.parse( URI::encode( url ) )
         req = Net::HTTP::Get.new(uri.request_uri)
         req["User-Agent"] = NicInfo::VERSION_LABEL
@@ -225,8 +225,8 @@ module NicInfo
             http_req.request(req)
           end
         rescue OpenSSL::SSL::SSLError => e
-          if @config.config[ NicInfo::SECURITY ][ NicInfo::TRY_INSECURE ]
-            @config.logger.mesg( "Secure connection failed. Trying insecure connection." )
+          if @appctx.config[ NicInfo::SECURITY ][ NicInfo::TRY_INSECURE ]
+            @appctx.logger.mesg( "Secure connection failed. Trying insecure connection." )
             uri.scheme = "http"
             return get( uri.to_s, try, expect_rdap )
           else
@@ -242,11 +242,11 @@ module NicInfo
                 raise Net::HTTPServerException.new("Bad Content Type", res)
               end
               if content_type.include? NicInfo::JSON_CONTENT_TYPE
-                @config.conf_msgs << "Server responded with non-RDAP content type but it is JSON"
+                @appctx.conf_msgs << "Server responded with non-RDAP content type but it is JSON"
               end
             end
             data = res.body
-            @cache.create_or_update(url, data)
+            @appctx.cache.create_or_update(url, data)
           else
             if res.code == "301" or res.code == "302" or res.code == "303" or res.code == "307" or res.code == "308"
               res.error! if try >= 5
@@ -279,20 +279,20 @@ module NicInfo
       rdap_conformance = json[ "rdapConformance" ]
       if rdap_conformance
         rdap_conformance.each do |conformance|
-          @config.logger.trace( "Server conforms to #{conformance}", NicInfo::AttentionType::SECONDARY )
+          @appctx.logger.trace( "Server conforms to #{conformance}", NicInfo::AttentionType::SECONDARY )
         end
       else
-        @config.conf_msgs << "Response has no RDAP Conformance level specified."
+        @appctx.conf_msgs << "Response has no RDAP Conformance level specified."
       end
     end
 
     def cache_self_references json_data
-      links = NicInfo::get_links json_data, @config
+      links = NicInfo::get_links json_data, @appctx
       if links
         self_link = NicInfo.get_self_link links
         if self_link
           pretty = JSON::pretty_generate( json_data )
-          @cache.create( self_link, pretty )
+          @appctx.cache.create( self_link, pretty )
         end
       end
       entities = NicInfo::get_entitites json_data
@@ -317,10 +317,10 @@ module NicInfo
 
   class RDAPQueryGuess
 
-    attr_accessor :config
+    attr_accessor :appctx
 
-    def initialize( config )
-      @config = config
+    def initialize( appctx )
+      @appctx = appctx
     end
 
     # Evaluates the args and guesses at the type of query.
@@ -345,7 +345,7 @@ module NicInfo
           when NicInfo::ASN_REGEX
             old = args[0]
             args[0] = args[0].sub(/^AS/i, "")
-            @config.logger.trace("Interpretting " + old + " as autonomous system number " + args[0])
+            @appctx.logger.trace("Interpretting " + old + " as autonomous system number " + args[0])
             retval = QueryType::BY_AS_NUMBER
           when NicInfo::IP4_ARPA
             retval = QueryType::BY_DOMAIN

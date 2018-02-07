@@ -26,7 +26,7 @@ module NicInfo
   # Handles configuration of the application
   class AppContext
 
-    attr_accessor :logger, :config, :rdap_cache_dir, :options, :conf_msgs, :rdap_bootstrap_dir, :factory
+    attr_accessor :logger, :config, :cache, :rdap_cache_dir, :options, :conf_msgs, :rdap_bootstrap_dir, :factory
 
     # Intializes the configuration with a place to look for the config file
     # If the file doesn't exist, a default is used.
@@ -227,6 +227,11 @@ module NicInfo
 
       @logger.color_scheme = output[ NicInfo::COLOR_SCHEME ]
       @logger.validate_color_scheme
+    end
+
+    def configure_cache
+      @cache = Cache.new(self)
+      @cache.clean if @config[NicInfo::CACHE ][NicInfo::CLEAN_CACHE ]
     end
 
     def self.clean
