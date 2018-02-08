@@ -792,8 +792,6 @@ HELP_SUMMARY
         end
         @appctx.logger.trace( "file #{file} strategry is #{b.strategy}")
       end
-      local = IPAddr.new( "127.0.0.1" )
-      local6 = IPAddr.new( "::1" )
       rdap_query = NicInfo::RDAPQuery.new( @appctx )
       Dir.glob( file_list ).each do |file|
         @appctx.logger.mesg( "Processing #{file}")
@@ -801,13 +799,17 @@ HELP_SUMMARY
         b.foreach do |ip,time|
           @appctx.logger.trace( "bulk ip: #{ip} time: #{time}")
           ipaddr = IPAddr.new( ip )
-          if ipaddr != local && ipaddr != local6
+          if ipaddr.link_local?
+            @appctx.logger.trace( "skipping link local address")
+          elsif ipaddr.private?
+            @appctx.logger.trace( "skipping private address")
+          elsif ipaddr.loopback?
+            @appctx.logger.trace( "skipping loopback address")
+          else
             query_value = [ ip ]
             qtype = QueryType::BY_IP4_ADDR
             qtype = QueryType::BY_IP6_ADDR if ipaddr.ipv6?
             rdap_query.do_rdap_query( query_value, qtype, nil )
-          else
-            @appctx.logger.trace( "skipping localhost address")
           end
         end
       end
