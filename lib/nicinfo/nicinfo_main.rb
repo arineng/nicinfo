@@ -799,12 +799,8 @@ HELP_SUMMARY
         b.foreach do |ip,time|
           @appctx.logger.trace( "bulk ip: #{ip} time: #{time}")
           ipaddr = IPAddr.new( ip )
-          if ipaddr.link_local?
-            @appctx.logger.trace( "skipping link local address")
-          elsif ipaddr.private?
-            @appctx.logger.trace( "skipping private address")
-          elsif ipaddr.loopback?
-            @appctx.logger.trace( "skipping loopback address")
+          unless NicInfo.is_global_unicast?( ipaddr )
+            @appctx.logger.trace( "skipping non-global-unicast address #{ip}")
           else
             query_value = [ ip ]
             qtype = QueryType::BY_IP4_ADDR
