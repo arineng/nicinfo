@@ -237,7 +237,7 @@ module NicInfo
 
     attr_accessor :asEvents, :selfhref
     attr_accessor :entities, :objectclass, :asEventActors
-    attr_accessor :networks, :autnums
+    attr_accessor :networks, :autnums, :jcard
 
     def initialize appctx
       @appctx = appctx
