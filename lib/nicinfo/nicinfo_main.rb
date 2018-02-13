@@ -510,10 +510,10 @@ module NicInfo
 
     def display_rdap_query json_data, show_help = true
       if @appctx.options.output_json
-        @appctx.logger.raw( DataAmount::TERSE_DATA, json_data, false )
+        @appctx.logger.raw( DataAmount::TERSE_DATA, JSON.generate( json_data ), false )
       elsif @appctx.options.json_values
         @appctx.options.json_values.each do |value|
-          @appctx.logger.raw( DataAmount::TERSE_DATA, eval_json_value( value, json_data), false )
+          @appctx.logger.raw( DataAmount::TERSE_DATA, JSON.generate( eval_json_value( value, json_data) ), false )
         end
       else
         @appctx.factory.new_notices.display_notices json_data, @appctx.options.query_type == QueryType::BY_SERVER_HELP
@@ -708,6 +708,160 @@ HELP_SUMMARY
       return retval
     end
 
+    # Evaluates the args and guesses at the type of query.
+    # Args is an array of strings, most likely what is left
+    # over after parsing ARGV
+    def guess_query_value_type(args)
+      retval = nil
+
+      if args.length() == 1
+
+        case args[0]
+          when NicInfo::URL_REGEX
+            retval = QueryType::BY_URL
+          when NicInfo::IPV4_REGEX
+            retval = QueryType::BY_IP4_ADDR
+          when NicInfo::IPV6_REGEX
+            retval = QueryType::BY_IP6_ADDR
+          when NicInfo::IPV6_HEXCOMPRESS_REGEX
+            retval = QueryType::BY_IP6_ADDR
+          when NicInfo::AS_REGEX
+            retval = QueryType::BY_AS_NUMBER
+          when NicInfo::ASN_REGEX
+            old = args[0]
+            args[0] = args[0].sub(/^AS/i, "")
+            @config.logger.trace("Interpretting " + old + " as autonomous system number " + args[0])
+            retval = QueryType::BY_AS_NUMBER
+          when NicInfo::IP4_ARPA
+            retval = QueryType::BY_DOMAIN
+          when NicInfo::IP6_ARPA
+            retval = QueryType::BY_DOMAIN
+          when /(.*)\/\d/
+            ip = $+
+            if ip =~ NicInfo::IPV4_REGEX
+              retval = QueryType::BY_IP4_CIDR
+            elsif ip =~ NicInfo::IPV6_REGEX || ip =~ NicInfo::IPV6_HEXCOMPRESS_REGEX
+              retval = QueryType::BY_IP6_CIDR
+            end
+          when NicInfo::DATA_TREE_ADDR_REGEX
+            retval = QueryType::BY_RESULT
+          when NicInfo::NS_REGEX
+            retval = QueryType::BY_NAMESERVER
+          when NicInfo::DOMAIN_REGEX
+            retval = QueryType::BY_DOMAIN
+          when NicInfo::ENTITY_REGEX
+            retval = QueryType::BY_ENTITY_HANDLE
+          else
+            last_name = args[ 0 ].sub( /\*/, '' ).upcase
+            if NicInfo::is_last_name( last_name )
+              retval = QueryType::SRCH_ENTITY_BY_NAME
+            end
+        end
+
+      elsif args.length() == 2
+
+        last_name = args[ 1 ].sub( /\*/, '' ).upcase
+        first_name = args[ 0 ].sub( /\*/, '' ).upcase
+        if NicInfo::is_last_name(last_name) && (NicInfo::is_male_name(first_name) || NicInfo::is_female_name(first_name))
+          retval = QueryType::SRCH_ENTITY_BY_NAME
+        end
+
+      elsif args.length() == 3
+
+        last_name = args[ 2 ].sub( /\*/, '' ).upcase
+        first_name = args[ 0 ].sub( /\*/, '' ).upcase
+        if NicInfo::is_last_name(last_name) && (NicInfo::is_male_name(first_name) || NicInfo::is_female_name(first_name))
+          retval = QueryType::SRCH_ENTITY_BY_NAME
+        end
+
+      end
+
+      return retval
+    end
+
+    # Creates a query type
+    def create_resource_url(args, queryType)
+
+      path = ""
+      case queryType
+        when QueryType::BY_IP4_ADDR
+          path << "ip/" << args[0]
+        when QueryType::BY_IP6_ADDR
+          path << "ip/" << args[0]
+        when QueryType::BY_IP4_CIDR
+          path << "ip/" << args[0]
+        when QueryType::BY_IP6_CIDR
+          path << "ip/" << args[0]
+        when QueryType::BY_AS_NUMBER
+          path << "autnum/" << args[0]
+        when QueryType::BY_NAMESERVER
+          path << "nameserver/" << args[0]
+        when QueryType::BY_DOMAIN
+          path << "domain/" << args[0]
+        when QueryType::BY_RESULT
+          tree = @config.load_as_yaml(NicInfo::ARININFO_LASTTREE_YAML)
+          path = tree.find_rest_ref(args[0])
+          raise ArgumentError.new("Unable to find result for " + args[0]) unless path
+        when QueryType::BY_ENTITY_HANDLE
+          path << "entity/" << URI.escape( args[ 0 ] )
+        when QueryType::SRCH_ENTITY_BY_NAME
+          case args.length
+            when 1
+              path << "entities?fn=" << URI.escape( args[ 0 ] )
+            when 2
+              path << "entities?fn=" << URI.escape( args[ 0 ] + " " + args[ 1 ] )
+            when 3
+              path << "entities?fn=" << URI.escape( args[ 0 ] + " " + args[ 1 ] + " " + args[ 2 ] )
+          end
+        when QueryType::SRCH_DOMAIN_BY_NAME
+          path << "domains?name=" << args[ 0 ]
+        when QueryType::SRCH_DOMAIN_BY_NSNAME
+          path << "domains?nsLdhName=" << args[ 0 ]
+        when QueryType::SRCH_DOMAIN_BY_NSIP
+          path << "domains?nsIp=" << args[ 0 ]
+        when QueryType::SRCH_NS_BY_NAME
+          path << "nameservers?name=" << args[ 0 ]
+        when QueryType::SRCH_NS_BY_IP
+          path << "nameservers?ip=" << args[ 0 ]
+        when QueryType::BY_SERVER_HELP
+          path << "help"
+        else
+          raise ArgumentError.new("Unable to create a resource URL for " + queryType)
+      end
+
+      return path
+    end
+
+    def get_query_type_from_url url
+      queryType = nil
+      case url
+        when /.*\/ip\/.*/
+          # covers all IP cases
+          queryType = QueryType::BY_IP
+        when /.*\/autnum\/.*/
+          queryType = QueryType::BY_AS_NUMBER
+        when /.*\/nameserver\/.*/
+          queryType = QueryType::BY_NAMESERVER
+        when /.*\/domain\/.*/
+          queryType = QueryType::BY_DOMAIN
+        when /.*\/entity\/.*/
+          queryType = QueryType::BY_ENTITY_HANDLE
+        when /.*\/entities.*/
+          queryType = QueryType::SRCH_ENTITY_BY_NAME
+        when /.*\/domains.*/
+          # covers all domain searches
+          queryType = QueryType::SRCH_DOMAIN
+        when /.*\/nameservers.*/
+          # covers all nameserver searches
+          queryType = QueryType::SRCH_NS
+        when /.*\/help.*/
+          queryType = QueryType::BY_SERVER_HELP
+        else
+          raise ArgumentError.new( "Unable to determine query type from url '#{url}'" )
+      end
+      return queryType
+    end
+
     def eval_json_value json_value, json_data
       appended_code = String.new
       values = json_value.split( "." )
@@ -721,6 +875,33 @@ HELP_SUMMARY
       end
       code = "json_data#{appended_code}"
       return eval( code )
+    end
+
+    def cache_self_references json_data
+      links = NicInfo::get_links json_data, @config
+      if links
+        self_link = NicInfo.get_self_link links
+        if self_link
+          pretty = JSON::pretty_generate( json_data )
+          @cache.create( self_link, pretty )
+        end
+      end
+      entities = NicInfo::get_entitites json_data
+      entities.each do |entity|
+        cache_self_references( entity )
+      end if entities
+      nameservers = NicInfo::get_nameservers json_data
+      nameservers.each do |ns|
+        cache_self_references( ns )
+      end if nameservers
+      ds_data_objs = NicInfo::get_ds_data_objs json_data
+      ds_data_objs.each do |ds|
+        cache_self_references( ds )
+      end if ds_data_objs
+      key_data_objs = NicInfo::get_key_data_objs json_data
+      key_data_objs.each do |key|
+        cache_self_references( key )
+      end if key_data_objs
     end
 
     def show_conformance_messages
