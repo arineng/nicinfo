@@ -779,59 +779,6 @@ HELP_SUMMARY
       return retval
     end
 
-    # Creates a query type
-    def create_resource_url(args, queryType)
-
-      path = ""
-      case queryType
-        when QueryType::BY_IP4_ADDR
-          path << "ip/" << args[0]
-        when QueryType::BY_IP6_ADDR
-          path << "ip/" << args[0]
-        when QueryType::BY_IP4_CIDR
-          path << "ip/" << args[0]
-        when QueryType::BY_IP6_CIDR
-          path << "ip/" << args[0]
-        when QueryType::BY_AS_NUMBER
-          path << "autnum/" << args[0]
-        when QueryType::BY_NAMESERVER
-          path << "nameserver/" << args[0]
-        when QueryType::BY_DOMAIN
-          path << "domain/" << args[0]
-        when QueryType::BY_RESULT
-          tree = @config.load_as_yaml(NicInfo::ARININFO_LASTTREE_YAML)
-          path = tree.find_rest_ref(args[0])
-          raise ArgumentError.new("Unable to find result for " + args[0]) unless path
-        when QueryType::BY_ENTITY_HANDLE
-          path << "entity/" << URI.escape( args[ 0 ] )
-        when QueryType::SRCH_ENTITY_BY_NAME
-          case args.length
-            when 1
-              path << "entities?fn=" << URI.escape( args[ 0 ] )
-            when 2
-              path << "entities?fn=" << URI.escape( args[ 0 ] + " " + args[ 1 ] )
-            when 3
-              path << "entities?fn=" << URI.escape( args[ 0 ] + " " + args[ 1 ] + " " + args[ 2 ] )
-          end
-        when QueryType::SRCH_DOMAIN_BY_NAME
-          path << "domains?name=" << args[ 0 ]
-        when QueryType::SRCH_DOMAIN_BY_NSNAME
-          path << "domains?nsLdhName=" << args[ 0 ]
-        when QueryType::SRCH_DOMAIN_BY_NSIP
-          path << "domains?nsIp=" << args[ 0 ]
-        when QueryType::SRCH_NS_BY_NAME
-          path << "nameservers?name=" << args[ 0 ]
-        when QueryType::SRCH_NS_BY_IP
-          path << "nameservers?ip=" << args[ 0 ]
-        when QueryType::BY_SERVER_HELP
-          path << "help"
-        else
-          raise ArgumentError.new("Unable to create a resource URL for " + queryType)
-      end
-
-      return path
-    end
-
     def get_query_type_from_url url
       queryType = nil
       case url
@@ -877,32 +824,6 @@ HELP_SUMMARY
       return eval( code )
     end
 
-    def cache_self_references json_data
-      links = NicInfo::get_links json_data, @config
-      if links
-        self_link = NicInfo.get_self_link links
-        if self_link
-          pretty = JSON::pretty_generate( json_data )
-          @cache.create( self_link, pretty )
-        end
-      end
-      entities = NicInfo::get_entitites json_data
-      entities.each do |entity|
-        cache_self_references( entity )
-      end if entities
-      nameservers = NicInfo::get_nameservers json_data
-      nameservers.each do |ns|
-        cache_self_references( ns )
-      end if nameservers
-      ds_data_objs = NicInfo::get_ds_data_objs json_data
-      ds_data_objs.each do |ds|
-        cache_self_references( ds )
-      end if ds_data_objs
-      key_data_objs = NicInfo::get_key_data_objs json_data
-      key_data_objs.each do |key|
-        cache_self_references( key )
-      end if key_data_objs
-    end
 
     def show_conformance_messages
       return if @appctx.conf_msgs.size == 0
