@@ -1,0 +1,138 @@
+HTTP/1.1 200 OK
+Date: Tue, 13 Feb 2018 23:19:50 GMT
+Server: WildFly/10
+X-Powered-By: Undertow/1
+Content-Type: application/rdap+json
+Content-Length: 5185
+Set-Cookie: JSESSIONID=GaVcKJS0FlixnLZnijW1-6IyDISQoNBfuatDJbjv.whoisrws3; path=/whoisrws; Max-Age=0; Expires=Thu, 01-Jan-1970 00:00:00 GMT
+Access-Control-Allow-Origin: *
+
+{
+  "rdapConformance" : [ "rdap_level_0" ],
+  "notices" : [ {
+    "title" : "Terms of Service",
+    "description" : [ "By using the ARIN RDAP/Whois service, you are agreeing to the RDAP/Whois Terms of Use" ],
+    "links" : [ {
+      "value" : "https://rdap.arin.net/registry/ip/2604:180:3:2e2::d865",
+      "rel" : "about",
+      "type" : "text/html",
+      "href" : "https://www.arin.net/whois_tou.html"
+    } ]
+  } ],
+  "handle" : "NET6-2604-180-1",
+  "startAddress" : "2604:180::",
+  "endAddress" : "2604:180:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF",
+  "ipVersion" : "v6",
+  "name" : "RAMNODE-IPV6-1",
+  "parentHandle" : "NET6-2600-1",
+  "events" : [ {
+    "eventAction" : "last changed",
+    "eventDate" : "2012-08-07T13:27:04-04:00"
+  }, {
+    "eventAction" : "registration",
+    "eventDate" : "2012-08-07T13:27:04-04:00"
+  } ],
+  "links" : [ {
+    "value" : "https://rdap.arin.net/registry/ip/2604:180:3:2e2::d865",
+    "rel" : "self",
+    "type" : "application/rdap+json",
+    "href" : "https://rdap.arin.net/registry/ip/2604:180::"
+  }, {
+    "value" : "https://rdap.arin.net/registry/ip/2604:180:3:2e2::d865",
+    "rel" : "alternate",
+    "type" : "application/xml",
+    "href" : "https://whois.arin.net/rest/net/NET6-2604-180-1"
+  } ],
+  "entities" : [ {
+    "handle" : "RL-82",
+    "vcardArray" : [ "vcard", [ [ "version", { }, "text", "4.0" ], [ "fn", { }, "text", "RamNode LLC" ], [ "adr", {
+      "label" : "2870 Peachtree Rd NW #915-5414\nAtlanta\nGA\n30305\nUnited States"
+    }, "text", [ "", "", "", "", "", "", "" ] ], [ "kind", { }, "text", "org" ] ] ],
+    "roles" : [ "registrant" ],
+    "links" : [ {
+      "value" : "https://rdap.arin.net/registry/ip/2604:180:3:2e2::d865",
+      "rel" : "self",
+      "type" : "application/rdap+json",
+      "href" : "https://rdap.arin.net/registry/entity/RL-82"
+    }, {
+      "value" : "https://rdap.arin.net/registry/ip/2604:180:3:2e2::d865",
+      "rel" : "alternate",
+      "type" : "application/xml",
+      "href" : "https://whois.arin.net/rest/org/RL-82"
+    } ],
+    "events" : [ {
+      "eventAction" : "last changed",
+      "eventDate" : "2017-06-21T13:06:21-04:00"
+    }, {
+      "eventAction" : "registration",
+      "eventDate" : "2012-07-09T14:16:08-04:00"
+    } ],
+    "entities" : [ {
+      "handle" : "RAMNO-ARIN",
+      "vcardArray" : [ "vcard", [ [ "version", { }, "text", "4.0" ], [ "adr", {
+        "label" : "2870 Peachtree Rd NW #915-5414\nAtlanta\nGA\n30305\nUnited States"
+      }, "text", [ "", "", "", "", "", "", "" ] ], [ "fn", { }, "text", "RamNode" ], [ "org", { }, "text", "RamNode" ], [ "kind", { }, "text", "group" ], [ "email", { }, "text", "arin@ramnode.com" ], [ "tel", {
+        "type" : [ "work", "voice" ]
+      }, "text", "+1-844-726-6633" ] ] ],
+      "roles" : [ "administrative", "noc", "technical" ],
+      "remarks" : [ {
+        "title" : "Registration Comments",
+        "description" : [ "RamNode LLC", "http://www.ramnode.com" ]
+      } ],
+      "links" : [ {
+        "value" : "https://rdap.arin.net/registry/ip/2604:180:3:2e2::d865",
+        "rel" : "self",
+        "type" : "application/rdap+json",
+        "href" : "https://rdap.arin.net/registry/entity/RAMNO-ARIN"
+      }, {
+        "value" : "https://rdap.arin.net/registry/ip/2604:180:3:2e2::d865",
+        "rel" : "alternate",
+        "type" : "application/xml",
+        "href" : "https://whois.arin.net/rest/poc/RAMNO-ARIN"
+      } ],
+      "events" : [ {
+        "eventAction" : "last changed",
+        "eventDate" : "2017-06-21T13:07:19-04:00"
+      }, {
+        "eventAction" : "registration",
+        "eventDate" : "2014-07-17T11:15:31-04:00"
+      } ],
+      "status" : [ "validated" ],
+      "port43" : "whois.arin.net",
+      "objectClassName" : "entity"
+    }, {
+      "handle" : "ABUSE3621-ARIN",
+      "vcardArray" : [ "vcard", [ [ "version", { }, "text", "4.0" ], [ "adr", {
+        "label" : "2870 Peachtree Rd NW #915-5414\nAtlanta\nGA\n30305\nUnited States"
+      }, "text", [ "", "", "", "", "", "", "" ] ], [ "fn", { }, "text", "Abuse" ], [ "org", { }, "text", "Abuse" ], [ "kind", { }, "text", "group" ], [ "email", { }, "text", "abuse@ramnode.com" ], [ "tel", {
+        "type" : [ "work", "voice" ]
+      }, "text", "+1-844-726-6633" ] ] ],
+      "roles" : [ "abuse" ],
+      "links" : [ {
+        "value" : "https://rdap.arin.net/registry/ip/2604:180:3:2e2::d865",
+        "rel" : "self",
+        "type" : "application/rdap+json",
+        "href" : "https://rdap.arin.net/registry/entity/ABUSE3621-ARIN"
+      }, {
+        "value" : "https://rdap.arin.net/registry/ip/2604:180:3:2e2::d865",
+        "rel" : "alternate",
+        "type" : "application/xml",
+        "href" : "https://whois.arin.net/rest/poc/ABUSE3621-ARIN"
+      } ],
+      "events" : [ {
+        "eventAction" : "last changed",
+        "eventDate" : "2017-06-21T13:08:58-04:00"
+      }, {
+        "eventAction" : "registration",
+        "eventDate" : "2013-01-07T14:48:27-05:00"
+      } ],
+      "status" : [ "validated" ],
+      "port43" : "whois.arin.net",
+      "objectClassName" : "entity"
+    } ],
+    "port43" : "whois.arin.net",
+    "objectClassName" : "entity"
+  } ],
+  "port43" : "whois.arin.net",
+  "objectClassName" : "ip network"
+}

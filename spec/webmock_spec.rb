@@ -22,6 +22,12 @@ require_relative '../lib/nicinfo/appctx'
 require_relative '../lib/nicinfo/nicinfo_main'
 require_relative '../lib/nicinfo/nicinfo_logger'
 
+
+# getting recorded responses according to webmock docs:
+#    curl -is www.example.com > /tmp/example_curl_-is_output.txt
+# for our purposes that would be
+#    curl -is http://.... > spec/recorded_responses
+
 describe 'web mocks' do
 
   @work_dir = nil
