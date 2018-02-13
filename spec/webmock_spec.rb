@@ -223,4 +223,51 @@ describe 'web mocks' do
     expect(a_request(:get, "http://data.iana.org/rdap/ipv6.json" )).to have_been_made.once
     expect(a_request(:get, "http://data.iana.org/rdap/dns.json" )).to have_been_made.once
   end
+
+  it 'IP lookup should generate json' do
+    response = File.new( "spec/recorded_responses/ip_108_45_128_208.txt")
+    stub_request(:get, "https://rdap.arin.net/registry/ip/108.45.128.208").to_return(response)
+
+    dir = File.join( @work_dir, "test_lookup_ip_108_45_128_208_200_for_json" )
+    logger = NicInfo::Logger.new
+    logger.data_out = StringIO.new
+    logger.message_out = StringIO.new
+    logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
+    config = NicInfo::Config.new( dir )
+    config.logger=logger
+    config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
+
+    args = [ "--json", "108.45.128.208" ]
+
+    expect{ NicInfo::Main.new( args, config ).run }.to_not output.to_stdout
+    expect(a_request(:get, "https://rdap.arin.net/registry/ip/108.45.128.208")).to have_been_made.once
+
+    json = JSON.load( logger.data_out.string )
+    expect( json[ "objectClassName" ] ).to eq( "ip network" )
+  end
+
+  it 'IP lookup should generate jv' do
+    response = File.new( "spec/recorded_responses/ip_108_45_128_208.txt")
+    stub_request(:get, "https://rdap.arin.net/registry/ip/108.45.128.208").to_return(response)
+
+    dir = File.join( @work_dir, "test_lookup_ip_108_45_128_208_200_for_jv" )
+    logger = NicInfo::Logger.new
+    logger.data_out = StringIO.new
+    logger.message_out = StringIO.new
+    logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
+    config = NicInfo::Config.new( dir )
+    config.logger=logger
+    config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
+
+    args = [ "--jv", "links", "108.45.128.208" ]
+
+    expect{ NicInfo::Main.new( args, config ).run }.to_not output.to_stdout
+    expect(a_request(:get, "https://rdap.arin.net/registry/ip/108.45.128.208")).to have_been_made.once
+
+    json = JSON.load( logger.data_out.string )
+    expect( json.length ).to eq( 2 )
+    expect( json[0]["rel"] ).to eq( "self" )
+    expect( json[1]["rel"] ).to eq( "alternate" )
+  end
+
 end
