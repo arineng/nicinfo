@@ -654,10 +654,10 @@ module NicInfo
 
     def display_rdap_query json_data, show_help = true
       if @config.options.output_json
-        @config.logger.raw( DataAmount::TERSE_DATA, json_data, false )
+        @config.logger.raw( DataAmount::TERSE_DATA, JSON.generate( json_data ), false )
       elsif @config.options.json_values
         @config.options.json_values.each do |value|
-          @config.logger.raw( DataAmount::TERSE_DATA, eval_json_value( value, json_data), false )
+          @config.logger.raw( DataAmount::TERSE_DATA, JSON.generate( eval_json_value( value, json_data) ), false )
         end
       else
         @config.factory.new_notices.display_notices json_data, @config.options.query_type == QueryType::BY_SERVER_HELP
