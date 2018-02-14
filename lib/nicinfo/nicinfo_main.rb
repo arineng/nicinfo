@@ -679,6 +679,35 @@ HELP_SUMMARY
 
     end
 
+    def process_result( json_data )
+      success = false
+      type = get_query_type_from_result( json_data )
+      case type
+        when QueryType::BY_IP
+          NicInfo::process_ip(json_data, @appctx )
+          do_jcr( json_data, NicInfo::JCR_ROOT_NETWORK )
+        when QueryType::BY_AS_NUMBER
+          NicInfo::display_autnum( json_data, @appctx, data_tree )
+          do_jcr( json_data, NicInfo::JCR_ROOT_AUTNUM )
+        when QueryType::BY_DOMAIN
+          NicInfo::display_domain( json_data, @appctx, data_tree )
+          do_jcr( json_data, NicInfo::JCR_ROOT_DOMAIN )
+        when QueryType::BY_NAMESERVER
+          NicInfo::display_ns( json_data, @appctx, data_tree )
+          do_jcr( json_data, NicInfo::JCR_ROOT_NAMESERVER )
+        when QueryType::BY_ENTITY_HANDLE
+          NicInfo::display_entity( json_data, @appctx, data_tree )
+          do_jcr( json_data, NicInfo::JCR_ROOT_ENTITY )
+        when QueryType::SRCH_DOMAINS
+          NicInfo::display_domains( json_data, @appctx, data_tree )
+          do_jcr( json_data, NicInfo::JCR_ROOT_DOMAIN_SEARCH )
+        when QueryType::SRCH_NS
+          NicInfo::display_nameservers( json_data, @appctx, data_tree )
+          do_jcr( json_data, NicInfo::JCR_ROOT_NAMESERVER_SEARCH )
+      end
+      return success
+    end
+
     # Looks at the returned JSON and attempts to match that
     # to a query type.
     def get_query_type_from_result( json_data )
@@ -706,107 +735,6 @@ HELP_SUMMARY
         retval = QueryType::SRCH_ENTITY_BY_NAME
       end
       return retval
-    end
-
-    # Evaluates the args and guesses at the type of query.
-    # Args is an array of strings, most likely what is left
-    # over after parsing ARGV
-    def guess_query_value_type(args)
-      retval = nil
-
-      if args.length() == 1
-
-        case args[0]
-          when NicInfo::URL_REGEX
-            retval = QueryType::BY_URL
-          when NicInfo::IPV4_REGEX
-            retval = QueryType::BY_IP4_ADDR
-          when NicInfo::IPV6_REGEX
-            retval = QueryType::BY_IP6_ADDR
-          when NicInfo::IPV6_HEXCOMPRESS_REGEX
-            retval = QueryType::BY_IP6_ADDR
-          when NicInfo::AS_REGEX
-            retval = QueryType::BY_AS_NUMBER
-          when NicInfo::ASN_REGEX
-            old = args[0]
-            args[0] = args[0].sub(/^AS/i, "")
-            @config.logger.trace("Interpretting " + old + " as autonomous system number " + args[0])
-            retval = QueryType::BY_AS_NUMBER
-          when NicInfo::IP4_ARPA
-            retval = QueryType::BY_DOMAIN
-          when NicInfo::IP6_ARPA
-            retval = QueryType::BY_DOMAIN
-          when /(.*)\/\d/
-            ip = $+
-            if ip =~ NicInfo::IPV4_REGEX
-              retval = QueryType::BY_IP4_CIDR
-            elsif ip =~ NicInfo::IPV6_REGEX || ip =~ NicInfo::IPV6_HEXCOMPRESS_REGEX
-              retval = QueryType::BY_IP6_CIDR
-            end
-          when NicInfo::DATA_TREE_ADDR_REGEX
-            retval = QueryType::BY_RESULT
-          when NicInfo::NS_REGEX
-            retval = QueryType::BY_NAMESERVER
-          when NicInfo::DOMAIN_REGEX
-            retval = QueryType::BY_DOMAIN
-          when NicInfo::ENTITY_REGEX
-            retval = QueryType::BY_ENTITY_HANDLE
-          else
-            last_name = args[ 0 ].sub( /\*/, '' ).upcase
-            if NicInfo::is_last_name( last_name )
-              retval = QueryType::SRCH_ENTITY_BY_NAME
-            end
-        end
-
-      elsif args.length() == 2
-
-        last_name = args[ 1 ].sub( /\*/, '' ).upcase
-        first_name = args[ 0 ].sub( /\*/, '' ).upcase
-        if NicInfo::is_last_name(last_name) && (NicInfo::is_male_name(first_name) || NicInfo::is_female_name(first_name))
-          retval = QueryType::SRCH_ENTITY_BY_NAME
-        end
-
-      elsif args.length() == 3
-
-        last_name = args[ 2 ].sub( /\*/, '' ).upcase
-        first_name = args[ 0 ].sub( /\*/, '' ).upcase
-        if NicInfo::is_last_name(last_name) && (NicInfo::is_male_name(first_name) || NicInfo::is_female_name(first_name))
-          retval = QueryType::SRCH_ENTITY_BY_NAME
-        end
-
-      end
-
-      return retval
-    end
-
-    def get_query_type_from_url url
-      queryType = nil
-      case url
-        when /.*\/ip\/.*/
-          # covers all IP cases
-          queryType = QueryType::BY_IP
-        when /.*\/autnum\/.*/
-          queryType = QueryType::BY_AS_NUMBER
-        when /.*\/nameserver\/.*/
-          queryType = QueryType::BY_NAMESERVER
-        when /.*\/domain\/.*/
-          queryType = QueryType::BY_DOMAIN
-        when /.*\/entity\/.*/
-          queryType = QueryType::BY_ENTITY_HANDLE
-        when /.*\/entities.*/
-          queryType = QueryType::SRCH_ENTITY_BY_NAME
-        when /.*\/domains.*/
-          # covers all domain searches
-          queryType = QueryType::SRCH_DOMAIN
-        when /.*\/nameservers.*/
-          # covers all nameserver searches
-          queryType = QueryType::SRCH_NS
-        when /.*\/help.*/
-          queryType = QueryType::BY_SERVER_HELP
-        else
-          raise ArgumentError.new( "Unable to determine query type from url '#{url}'" )
-      end
-      return queryType
     end
 
     def eval_json_value json_value, json_data

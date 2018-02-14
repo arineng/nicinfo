@@ -18,6 +18,7 @@ require 'nicinfo/appctx'
 require 'nicinfo/nicinfo_logger'
 require 'nicinfo/utils'
 require 'nicinfo/common_json'
+require 'nicinfo/common_meta'
 require 'nicinfo/entity'
 require 'nicinfo/data_tree'
 require 'nicinfo/cidrs'
@@ -25,8 +26,12 @@ require 'nicinfo/cidrs'
 module NicInfo
 
   def NicInfo.display_ip json_data, appctx, data_tree
-    ip = appctx.factory.new_ip.process( json_data )
+    ip = NicInfo::process_ip( json_data, appctx )
     NicInfo::display_object_with_entities( ip, appctx, data_tree )
+  end
+
+  def NicInfo.process_ip( json_data, appctx )
+    return appctx.factory.new_ip.process( json_data )
   end
 
   # deals with RDAP IP network structures
@@ -44,6 +49,8 @@ module NicInfo
     def process json_data
       @objectclass = json_data
       @entities = @common.process_entities @objectclass
+      common_meta = CommonMeta.new( @objectclass, @entities, @appctx )
+      common_meta.inject
       return self
     end
 
