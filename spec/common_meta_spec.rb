@@ -56,6 +56,7 @@ describe 'common_meta' do
 
     expect( c.meta_data[ NicInfo::CommonMeta::REGISTRANT_NAME ] ).to eq( "ARIN Operations ( ARIN-OPS )" )
     expect( c.meta_data[ NicInfo::CommonMeta::REGISTRANT_COUNTRY ] ).to eq( "United States" )
+    expect( c.meta_data[ NicInfo::CommonMeta::ABUSE_EMAIL ] ).to eq( "info@arin.net" )
   end
 
 end

@@ -21,6 +21,7 @@ module NicInfo
     SERVICE_OPERATOR = "service_operator"
     REGISTRANT_NAME = "registrant_name"
     REGISTRANT_COUNTRY = "registrant_country"
+    ABUSE_EMAIL = "abuse_email"
 
     attr_accessor :meta_data
 
@@ -35,28 +36,41 @@ module NicInfo
         @meta_data[ SERVICE_OPERATOR ] = /(http|https):\/\/.*\.([^.]+\.[^\/]+)\/.*/.match( self_link )[2].downcase
       end
 
-      if entities
-        registrant = nil
-        entities.each do |e|
-          roles = e.objectclass[ "roles" ]
-          if roles && roles.include?( "registrant" )
-            registrant = e
-            break
-          end
+      registrant = find_entity_by_role( entities, "registrant" )
+      if registrant
+        @meta_data[ REGISTRANT_NAME ] = registrant.get_cn
+        if registrant.jcard.adrs.length > 0
+          c = registrant.jcard.adrs[0].country
+          @meta_data[ REGISTRANT_COUNTRY ] = c if c
         end
-        if registrant
-          @meta_data[ REGISTRANT_NAME ] = registrant.get_cn
-          if registrant.jcard.adrs.length > 0
-            c = registrant.jcard.adrs[0].country
-            @meta_data[ REGISTRANT_COUNTRY ] = c if c
-          end
-        end
+      end
+
+      abuse = find_entity_by_role( entities, "abuse" )
+      if abuse && abuse.jcard.emails.length > 0
+        @meta_data[ ABUSE_EMAIL ] = abuse.jcard.emails[0].addr
       end
 
     end
 
     def inject
       @object_class[ META_DATA_NAME ] = @meta_data
+    end
+
+    def find_entity_by_role( entities, role )
+      retval = nil
+      if entities
+        entities.each do |e|
+          roles = e.objectclass[ "roles" ]
+          if roles && roles.include?( role )
+            retval = e
+            break
+          else
+            retval = find_entity_by_role( e.entities, role )
+            break if retval
+          end
+        end
+      end
+      return retval
     end
 
   end
