@@ -272,6 +272,7 @@ module NicInfo
               if content_type.include? NicInfo::JSON_CONTENT_TYPE
                 @appctx.conf_msgs << "Server responded with non-RDAP content type but it is JSON"
               end
+              # TODO check for CORS header as well
             end
             data = res.body
             @appctx.cache.create_or_update(url, data)

@@ -600,6 +600,7 @@ module NicInfo
       retval = false
 
       if @appctx.options.output_json
+        process_result( json_data )
         if @appctx.options.pretty
           o = JSON.pretty_generate( json_data )
         else
@@ -608,6 +609,7 @@ module NicInfo
         @appctx.logger.raw( DataAmount::TERSE_DATA, o, false )
         retval = true
       elsif @appctx.options.json_values
+        process_result( json_data )
         @appctx.options.json_values.each do |value|
           if @appctx.options.pretty
             o = JSON.pretty_generate( eval_json_value( value, json_data ) )
