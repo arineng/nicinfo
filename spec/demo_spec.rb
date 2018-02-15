@@ -130,6 +130,11 @@ describe 'demos' do
 
   end
 
+  # TODO look at JCR checking status values properly
+  # TODO tell LACNIC they are doing status values wrong
+  # TODO tell RIPE they are doing IP addresses wrong
+  # TODO look into jcr strict checking for roles
+
   it 'domain-rir.json' do
 
     dir = File.join( @work_dir, "domain-rir_json" )
