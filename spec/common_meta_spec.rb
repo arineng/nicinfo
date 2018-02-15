@@ -48,9 +48,14 @@ describe 'common_meta' do
     appctx.logger=logger
 
     json_data = JSON.load( File.read( "spec/other_resources/common_meta_ex1.json" ) )
+    cj = NicInfo::CommonJson.new( appctx )
+    entities = cj.process_entities( json_data )
 
-    c = NicInfo::CommonMeta.new( json_data, nil, appctx )
+    c = NicInfo::CommonMeta.new( json_data, entities, appctx )
     expect( c.meta_data[ NicInfo::CommonMeta::SERVICE_OPERATOR ] ).to eq( "apnic.net" )
+
+    expect( c.meta_data[ NicInfo::CommonMeta::REGISTRANT_NAME ] ).to eq( "ARIN Operations ( ARIN-OPS )" )
+    expect( c.meta_data[ NicInfo::CommonMeta::REGISTRANT_COUNTRY ] ).to eq( "United States" )
   end
 
 end
