@@ -246,6 +246,11 @@ module NicInfo
           @appctx.options.json_values << value
         end
 
+        opts.on( "--pretty",
+                 "Output JSON in a pretty format" ) do |pretty|
+          @appctx.options.pretty = true
+        end
+
         opts.separator ""
         opts.separator "Security Options:"
 
@@ -509,13 +514,7 @@ module NicInfo
 
 
     def display_rdap_query json_data, show_help = true
-      if @appctx.options.output_json
-        @appctx.logger.raw( DataAmount::TERSE_DATA, JSON.generate( json_data ), false )
-      elsif @appctx.options.json_values
-        @appctx.options.json_values.each do |value|
-          @appctx.logger.raw( DataAmount::TERSE_DATA, JSON.generate( eval_json_value( value, json_data) ), false )
-        end
-      else
+      unless do_json_output( json_data )
         @appctx.factory.new_notices.display_notices json_data, @appctx.options.query_type == QueryType::BY_SERVER_HELP
         if @appctx.options.query_type != QueryType::BY_SERVER_HELP
           result_type = get_query_type_from_result( json_data )
@@ -595,6 +594,31 @@ module NicInfo
         end
       end
       @appctx.logger.end_run
+    end
+
+    def do_json_output( json_data )
+      retval = false
+
+      if @appctx.options.output_json
+        if @appctx.options.pretty
+          o = JSON.pretty_generate( json_data )
+        else
+          o = JSON.generate( json_data )
+        end
+        @appctx.logger.raw( DataAmount::TERSE_DATA, o, false )
+        retval = true
+      elsif @appctx.options.json_values
+        @appctx.options.json_values.each do |value|
+          if @appctx.options.pretty
+            o = JSON.pretty_generate( eval_json_value( value, json_data ) )
+          else
+            o = JSON.generate( eval_json_value( value, json_data ) )
+          end
+          @appctx.logger.raw( DataAmount::TERSE_DATA, o, false )
+        end
+        retval = true
+      end
+      return retval
     end
 
     def show_error_response( json_data )
@@ -687,22 +711,22 @@ HELP_SUMMARY
           NicInfo::process_ip(json_data, @appctx )
           do_jcr( json_data, NicInfo::JCR_ROOT_NETWORK )
         when QueryType::BY_AS_NUMBER
-          NicInfo::display_autnum( json_data, @appctx, data_tree )
+          #NicInfo::display_autnum( json_data, @appctx, data_tree )
           do_jcr( json_data, NicInfo::JCR_ROOT_AUTNUM )
         when QueryType::BY_DOMAIN
-          NicInfo::display_domain( json_data, @appctx, data_tree )
+          #NicInfo::display_domain( json_data, @appctx, data_tree )
           do_jcr( json_data, NicInfo::JCR_ROOT_DOMAIN )
         when QueryType::BY_NAMESERVER
-          NicInfo::display_ns( json_data, @appctx, data_tree )
+          #NicInfo::display_ns( json_data, @appctx, data_tree )
           do_jcr( json_data, NicInfo::JCR_ROOT_NAMESERVER )
         when QueryType::BY_ENTITY_HANDLE
-          NicInfo::display_entity( json_data, @appctx, data_tree )
+          #NicInfo::display_entity( json_data, @appctx, data_tree )
           do_jcr( json_data, NicInfo::JCR_ROOT_ENTITY )
         when QueryType::SRCH_DOMAINS
-          NicInfo::display_domains( json_data, @appctx, data_tree )
+          #NicInfo::display_domains( json_data, @appctx, data_tree )
           do_jcr( json_data, NicInfo::JCR_ROOT_DOMAIN_SEARCH )
         when QueryType::SRCH_NS
-          NicInfo::display_nameservers( json_data, @appctx, data_tree )
+          #NicInfo::display_nameservers( json_data, @appctx, data_tree )
           do_jcr( json_data, NicInfo::JCR_ROOT_NAMESERVER_SEARCH )
       end
       return success
