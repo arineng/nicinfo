@@ -22,6 +22,9 @@ module NicInfo
     REGISTRANT_NAME = "registrant_name"
     REGISTRANT_COUNTRY = "registrant_country"
     ABUSE_EMAIL = "abuse_email"
+    REGISTRATION_DATE = "registration_date"
+    EXPIRATION_DATE = "expiration_date"
+    LAST_CHANGED_DATE = "last_changed_date"
 
     attr_accessor :meta_data
 
@@ -50,6 +53,15 @@ module NicInfo
         @meta_data[ ABUSE_EMAIL ] = abuse.jcard.emails[0].addr
       end
 
+      registration_date = find_event_date_by_action( object_class, "registration" )
+      @meta_data[ REGISTRATION_DATE ] = registration_date if registration_date
+
+      expiration_date = find_event_date_by_action( object_class, "expiration" )
+      @meta_data[ EXPIRATION_DATE ] = expiration_date if expiration_date
+
+      last_changed_date = find_event_date_by_action( object_class, "last changed" )
+      @meta_data[ LAST_CHANGED_DATE ] = last_changed_date if last_changed_date
+
     end
 
     def inject
@@ -70,6 +82,18 @@ module NicInfo
           end
         end
       end
+      return retval
+    end
+
+    def find_event_date_by_action( object_class, event_action )
+      retval = nil
+      events = object_class[ "events" ]
+      events.each do |event|
+        if event[ "eventAction" ] == event_action
+          # TODO check spec to see if eventDate is optional for meaning "never expires"
+          retval = Time.parse( event[ "eventDate" ] ).rfc2822
+        end
+      end if events
       return retval
     end
 

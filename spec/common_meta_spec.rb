@@ -57,6 +57,9 @@ describe 'common_meta' do
     expect( c.meta_data[ NicInfo::CommonMeta::REGISTRANT_NAME ] ).to eq( "ARIN Operations ( ARIN-OPS )" )
     expect( c.meta_data[ NicInfo::CommonMeta::REGISTRANT_COUNTRY ] ).to eq( "United States" )
     expect( c.meta_data[ NicInfo::CommonMeta::ABUSE_EMAIL ] ).to eq( "info@arin.net" )
+    expect( c.meta_data[ NicInfo::CommonMeta::REGISTRATION_DATE ] ).to eq( "Mon, 31 Dec 1990 23:59:10 -0000" )
+    expect( c.meta_data[ NicInfo::CommonMeta::EXPIRATION_DATE ] ).to eq( "Sun, 30 Nov 1997 23:59:10 -0000" )
+    expect( c.meta_data[ NicInfo::CommonMeta::LAST_CHANGED_DATE ] ).to eq( "Thu, 30 Nov 1995 23:59:10 -0000" )
   end
 
 end

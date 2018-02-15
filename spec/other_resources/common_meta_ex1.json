@@ -61,7 +61,15 @@
     "events":[
         {
             "eventAction":"registration",
-            "eventDate":"1990-12-31T23:59:60Z"
+            "eventDate":"1990-12-31T23:59:10Z"
+        },
+        {
+            "eventAction":"expiration",
+            "eventDate":"1997-11-30T23:59:10Z"
+        },
+        {
+            "eventAction":"last changed",
+            "eventDate":"1995-11-30T23:59:10Z"
         }
     ],
     "entities":[
