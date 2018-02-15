@@ -32,7 +32,7 @@ module NicInfo
 
       self_link = NicInfo.get_self_link( NicInfo.get_links( object_class, appctx ) )
       if self_link
-        @meta_data[ SERVICE_OPERATOR ] = /(http|https):\/\/.*\.([^.]+)\.([^.]+)\/.*/.match( self_link )[2].upcase
+        @meta_data[ SERVICE_OPERATOR ] = /(http|https):\/\/.*\.([^.]+\.[^\/]+)\/.*/.match( self_link )[2].downcase
       end
 
       if entities

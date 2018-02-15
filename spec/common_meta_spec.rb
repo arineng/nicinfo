@@ -50,7 +50,7 @@ describe 'common_meta' do
     json_data = JSON.load( File.read( "spec/other_resources/common_meta_ex1.json" ) )
 
     c = NicInfo::CommonMeta.new( json_data, nil, appctx )
-    expect( c.meta_data[ NicInfo::CommonMeta::SERVICE_OPERATOR ] ).to eq( "APNIC" )
+    expect( c.meta_data[ NicInfo::CommonMeta::SERVICE_OPERATOR ] ).to eq( "apnic.net" )
   end
 
 end
