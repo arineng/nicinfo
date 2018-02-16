@@ -36,15 +36,20 @@ module NicInfo
 
       self_link = NicInfo.get_self_link( NicInfo.get_links( object_class, appctx ) )
       if self_link
-        @meta_data[ SERVICE_OPERATOR ] = /(http|https):\/\/.*\.([^.]+\.[^\/]+)\/.*/.match( self_link )[2].downcase
+        @meta_data[ SERVICE_OPERATOR ] = /(http|https):\/\/.*\.([^.]+\.[^\/]+)\/[^\/]*\/.*/.match( self_link )[2].downcase
       end
 
+      # TODO if registrant not found, go after adminstrative and technical
       registrant = find_entity_by_role( entities, "registrant" )
       if registrant
         @meta_data[ REGISTRANT_NAME ] = registrant.get_cn
         if registrant.jcard.adrs.length > 0
           c = registrant.jcard.adrs[0].country
-          @meta_data[ REGISTRANT_COUNTRY ] = c if c
+          if c
+            @meta_data[ REGISTRANT_COUNTRY ] = c
+          elsif registrant.jcard.adrs[0].label.length > 0 && !(registrant.jcard.adrs[0].label[-1] =~ /\d/)
+            @meta_data[ REGISTRANT_COUNTRY ] = registrant.jcard.adrs[0].label[-1]
+          end
         end
       end
 

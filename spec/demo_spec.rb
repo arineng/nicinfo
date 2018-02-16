@@ -135,6 +135,8 @@ describe 'demos' do
   # TODO tell RIPE they are doing IP addresses wrong
   # TODO tell APNIC that they are escaping newlines in unstructured addresses
   # TODO look into jcr strict checking for roles
+  # TODO ask RIPE about spaces in addresses nicinfo -V --json --pretty 109.1.1.1
+  # TODO ask LACNIC why 201.127.1.1 info shows in Whois but now RDAP
 
   it 'domain-rir.json' do
 

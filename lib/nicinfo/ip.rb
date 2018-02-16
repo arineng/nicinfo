@@ -50,6 +50,7 @@ module NicInfo
       @objectclass = json_data
       @entities = @common.process_entities @objectclass
       common_meta = CommonMeta.new( @objectclass, @entities, @appctx )
+      # TODO check to see if registrant country is found and if not, get it from ip country
       common_meta.inject
       return self
     end
