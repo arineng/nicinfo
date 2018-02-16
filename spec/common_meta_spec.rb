@@ -54,8 +54,8 @@ describe 'common_meta' do
     c = NicInfo::CommonMeta.new( json_data, entities, appctx )
     expect( c.meta_data[ NicInfo::CommonMeta::SERVICE_OPERATOR ] ).to eq( "apnic.net" )
 
-    expect( c.meta_data[ NicInfo::CommonMeta::REGISTRANT_NAME ] ).to eq( "ARIN Operations ( ARIN-OPS )" )
-    expect( c.meta_data[ NicInfo::CommonMeta::REGISTRANT_COUNTRY ] ).to eq( "United States" )
+    expect( c.meta_data[ NicInfo::CommonMeta::LISTED_NAME ] ).to eq("ARIN Operations ( ARIN-OPS )" )
+    expect( c.meta_data[ NicInfo::CommonMeta::LISTED_COUNTRY ] ).to eq("United States" )
     expect( c.meta_data[ NicInfo::CommonMeta::ABUSE_EMAIL ] ).to eq( "info@arin.net" )
     expect( c.meta_data[ NicInfo::CommonMeta::REGISTRATION_DATE ] ).to eq( "Mon, 31 Dec 1990 23:59:10 -0000" )
     expect( c.meta_data[ NicInfo::CommonMeta::EXPIRATION_DATE ] ).to eq( "Sun, 30 Nov 1997 23:59:10 -0000" )
@@ -79,8 +79,8 @@ describe 'common_meta' do
     c = NicInfo::CommonMeta.new( json_data, entities, appctx )
     expect( c.meta_data[ NicInfo::CommonMeta::SERVICE_OPERATOR ] ).to eq( "registro.br" )
 
-    expect( c.meta_data[ NicInfo::CommonMeta::REGISTRANT_NAME ] ).to eq( "TELEFÔNICA BRASIL S.A ( 02558157000162 )" )
-    expect( c.meta_data[ NicInfo::CommonMeta::REGISTRANT_COUNTRY ] ).to eq( "BR" )
+    expect( c.meta_data[ NicInfo::CommonMeta::LISTED_NAME ] ).to eq("TELEFÔNICA BRASIL S.A ( 02558157000162 )" )
+    expect( c.meta_data[ NicInfo::CommonMeta::LISTED_COUNTRY ] ).to eq("BR" )
     expect( c.meta_data[ NicInfo::CommonMeta::ABUSE_EMAIL ] ).to eq( "security@telesp.net.br" )
     expect( c.meta_data[ NicInfo::CommonMeta::REGISTRATION_DATE ] ).to eq( "Mon, 08 Dec 2003 12:00:00 -0000" )
     expect( c.meta_data[ NicInfo::CommonMeta::EXPIRATION_DATE ] ).to be_nil
@@ -104,8 +104,8 @@ describe 'common_meta' do
     c = NicInfo::CommonMeta.new( json_data, entities, appctx )
     expect( c.meta_data[ NicInfo::CommonMeta::SERVICE_OPERATOR ] ).to eq( "ripe.net" )
 
-    expect( c.meta_data[ NicInfo::CommonMeta::REGISTRANT_NAME ] ).to eq( "POLKOMTEL-MNT" )
-    expect( c.meta_data[ NicInfo::CommonMeta::REGISTRANT_COUNTRY ] ).to be_nil
+    expect( c.meta_data[ NicInfo::CommonMeta::LISTED_NAME ] ).to eq("POLKOMTEL-MNT" )
+    expect( c.meta_data[ NicInfo::CommonMeta::LISTED_COUNTRY ] ).to be_nil
     expect( c.meta_data[ NicInfo::CommonMeta::ABUSE_EMAIL ] ).to eq( "noc.ip@plus.pl" )
     expect( c.meta_data[ NicInfo::CommonMeta::REGISTRATION_DATE ] ).to be_nil
     expect( c.meta_data[ NicInfo::CommonMeta::EXPIRATION_DATE ] ).to be_nil
@@ -129,8 +129,8 @@ describe 'common_meta' do
     c = NicInfo::CommonMeta.new( json_data, entities, appctx )
     expect( c.meta_data[ NicInfo::CommonMeta::SERVICE_OPERATOR ] ).to eq( "arin.net" )
 
-    expect( c.meta_data[ NicInfo::CommonMeta::REGISTRANT_NAME ] ).to eq( "Comcast Cable Communications, LLC ( CCCS )" )
-    expect( c.meta_data[ NicInfo::CommonMeta::REGISTRANT_COUNTRY ] ).to eq( "United States" )
+    expect( c.meta_data[ NicInfo::CommonMeta::LISTED_NAME ] ).to eq("Comcast Cable Communications, LLC ( CCCS )" )
+    expect( c.meta_data[ NicInfo::CommonMeta::LISTED_COUNTRY ] ).to eq("United States" )
     expect( c.meta_data[ NicInfo::CommonMeta::ABUSE_EMAIL ] ).to eq( "abuse@comcast.net" )
     expect( c.meta_data[ NicInfo::CommonMeta::REGISTRATION_DATE ] ).to eq( "Tue, 29 Jun 2010 11:36:51 -0400" )
     expect( c.meta_data[ NicInfo::CommonMeta::EXPIRATION_DATE ] ).to be_nil
@@ -154,8 +154,8 @@ describe 'common_meta' do
     c = NicInfo::CommonMeta.new( json_data, entities, appctx )
     expect( c.meta_data[ NicInfo::CommonMeta::SERVICE_OPERATOR ] ).to eq( "apnic.net" )
 
-    expect( c.meta_data[ NicInfo::CommonMeta::REGISTRANT_NAME ] ).to eq( "Jinxia Sun ( JS686-AP )" )
-    expect( c.meta_data[ NicInfo::CommonMeta::REGISTRANT_COUNTRY ] ).to be_nil
+    expect( c.meta_data[ NicInfo::CommonMeta::LISTED_NAME ] ).to eq("Jinxia Sun ( JS686-AP )" )
+    expect( c.meta_data[ NicInfo::CommonMeta::LISTED_COUNTRY ] ).to be_nil
     expect( c.meta_data[ NicInfo::CommonMeta::ABUSE_EMAIL ] ).to eq( "abuse@chinamobile.com" )
     expect( c.meta_data[ NicInfo::CommonMeta::REGISTRATION_DATE ] ).to be_nil
     expect( c.meta_data[ NicInfo::CommonMeta::EXPIRATION_DATE ] ).to be_nil

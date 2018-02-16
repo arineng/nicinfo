@@ -19,8 +19,8 @@ module NicInfo
     META_DATA_NAME = "nicinfo_metadata"
 
     SERVICE_OPERATOR = "service_operator"
-    REGISTRANT_NAME = "registrant_name"
-    REGISTRANT_COUNTRY = "registrant_country"
+    LISTED_NAME = "listed_name"
+    LISTED_COUNTRY = "listed_country"
     ABUSE_EMAIL = "abuse_email"
     REGISTRATION_DATE = "registration_date"
     EXPIRATION_DATE = "expiration_date"
@@ -103,13 +103,13 @@ module NicInfo
     end
 
     def extract_registrant_data( entity )
-      @meta_data[ REGISTRANT_NAME ] = entity.get_cn
+      @meta_data[LISTED_NAME ] = entity.get_cn
       if entity.jcard.adrs.length > 0
         c = entity.jcard.adrs[0].country
         if c
-          @meta_data[ REGISTRANT_COUNTRY ] = c
+          @meta_data[LISTED_COUNTRY ] = c
         elsif entity.jcard.adrs[0].label.length > 0 && !(entity.jcard.adrs[0].label[-1] =~ /\d/)
-          @meta_data[ REGISTRANT_COUNTRY ] = entity.jcard.adrs[0].label[-1]
+          @meta_data[LISTED_COUNTRY ] = entity.jcard.adrs[0].label[-1]
         end
       end
     end
