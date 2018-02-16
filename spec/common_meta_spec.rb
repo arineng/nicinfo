@@ -87,4 +87,54 @@ describe 'common_meta' do
     expect( c.meta_data[ NicInfo::CommonMeta::LAST_CHANGED_DATE ] ).to eq( "Wed, 23 Apr 2008 17:17:59 -0000" )
   end
 
+  it 'should handle ex3' do
+
+    dir = File.join( @work_dir, "test_common_meta_ex3" )
+
+    logger = NicInfo::Logger.new
+    logger.message_out = StringIO.new
+    logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
+    appctx = NicInfo::AppContext.new( dir )
+    appctx.logger=logger
+
+    json_data = JSON.load( File.read( "spec/other_resources/common_meta_ex3.json" ) )
+    cj = NicInfo::CommonJson.new( appctx )
+    entities = cj.process_entities( json_data )
+
+    c = NicInfo::CommonMeta.new( json_data, entities, appctx )
+    expect( c.meta_data[ NicInfo::CommonMeta::SERVICE_OPERATOR ] ).to eq( "ripe.net" )
+
+    expect( c.meta_data[ NicInfo::CommonMeta::REGISTRANT_NAME ] ).to eq( "POLKOMTEL-MNT" )
+    expect( c.meta_data[ NicInfo::CommonMeta::REGISTRANT_COUNTRY ] ).to be_nil
+    expect( c.meta_data[ NicInfo::CommonMeta::ABUSE_EMAIL ] ).to eq( "noc.ip@plus.pl" )
+    expect( c.meta_data[ NicInfo::CommonMeta::REGISTRATION_DATE ] ).to be_nil
+    expect( c.meta_data[ NicInfo::CommonMeta::EXPIRATION_DATE ] ).to be_nil
+    expect( c.meta_data[ NicInfo::CommonMeta::LAST_CHANGED_DATE ] ).to eq( "Wed, 17 Apr 2013 09:03:21 -0000" )
+  end
+
+  it 'should handle ex4' do
+
+    dir = File.join( @work_dir, "test_common_meta_ex4" )
+
+    logger = NicInfo::Logger.new
+    logger.message_out = StringIO.new
+    logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
+    appctx = NicInfo::AppContext.new( dir )
+    appctx.logger=logger
+
+    json_data = JSON.load( File.read( "spec/other_resources/common_meta_ex4.json" ) )
+    cj = NicInfo::CommonJson.new( appctx )
+    entities = cj.process_entities( json_data )
+
+    c = NicInfo::CommonMeta.new( json_data, entities, appctx )
+    expect( c.meta_data[ NicInfo::CommonMeta::SERVICE_OPERATOR ] ).to eq( "arin.net" )
+
+    expect( c.meta_data[ NicInfo::CommonMeta::REGISTRANT_NAME ] ).to eq( "Comcast Cable Communications, LLC ( CCCS )" )
+    expect( c.meta_data[ NicInfo::CommonMeta::REGISTRANT_COUNTRY ] ).to eq( "United States" )
+    expect( c.meta_data[ NicInfo::CommonMeta::ABUSE_EMAIL ] ).to eq( "abuse@comcast.net" )
+    expect( c.meta_data[ NicInfo::CommonMeta::REGISTRATION_DATE ] ).to eq( "Tue, 29 Jun 2010 11:36:51 -0400" )
+    expect( c.meta_data[ NicInfo::CommonMeta::EXPIRATION_DATE ] ).to be_nil
+    expect( c.meta_data[ NicInfo::CommonMeta::LAST_CHANGED_DATE ] ).to eq( "Wed, 31 Aug 2016 12:25:04 -0400" )
+  end
+
 end
