@@ -190,6 +190,11 @@ module NicInfo
             end
             if (label = element[ 1 ][ "label" ]) != nil
               adr.label = label.split( "\n" )
+              esplit = label.split( '\n' )
+              if esplit.length > adr.label.length
+                adr.label = esplit
+                @appctx.conf_msgs << "newline escaping issue detected in jCard address"
+              end
             else
               adr.pobox=element[ 3 ][ 0 ]
               adr.extended=element[ 3 ][ 1 ]

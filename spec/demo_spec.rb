@@ -133,6 +133,7 @@ describe 'demos' do
   # TODO look at JCR checking status values properly
   # TODO tell LACNIC they are doing status values wrong
   # TODO tell RIPE they are doing IP addresses wrong
+  # TODO tell APNIC that they are escaping newlines in unstructured addresses
   # TODO look into jcr strict checking for roles
 
   it 'domain-rir.json' do
