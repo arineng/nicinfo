@@ -42,14 +42,14 @@ module NicInfo
       # TODO if registrant not found, go after adminstrative and technical
       registrant = find_entity_by_role( entities, "registrant" )
       if registrant
-        @meta_data[ REGISTRANT_NAME ] = registrant.get_cn
-        if registrant.jcard.adrs.length > 0
-          c = registrant.jcard.adrs[0].country
-          if c
-            @meta_data[ REGISTRANT_COUNTRY ] = c
-          elsif registrant.jcard.adrs[0].label.length > 0 && !(registrant.jcard.adrs[0].label[-1] =~ /\d/)
-            @meta_data[ REGISTRANT_COUNTRY ] = registrant.jcard.adrs[0].label[-1]
-          end
+        extract_registrant_data( registrant )
+      else
+        adminstrative = find_entity_by_role( entities, "administrative" )
+        if adminstrative
+          extract_registrant_data( adminstrative )
+        else
+          technical = find_entity_by_role( entities, "technical" )
+          extract_registrant_data( technical )
         end
       end
 
@@ -100,6 +100,18 @@ module NicInfo
         end
       end if events
       return retval
+    end
+
+    def extract_registrant_data( entity )
+      @meta_data[ REGISTRANT_NAME ] = entity.get_cn
+      if entity.jcard.adrs.length > 0
+        c = entity.jcard.adrs[0].country
+        if c
+          @meta_data[ REGISTRANT_COUNTRY ] = c
+        elsif entity.jcard.adrs[0].label.length > 0 && !(entity.jcard.adrs[0].label[-1] =~ /\d/)
+          @meta_data[ REGISTRANT_COUNTRY ] = entity.jcard.adrs[0].label[-1]
+        end
+      end
     end
 
   end
