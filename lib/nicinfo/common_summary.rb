@@ -29,6 +29,8 @@ module NicInfo
 
     # property names that other classes may inject
     CIDRS = "CIDRs"
+    NAMESERVERS = "nameservers"
+    REGISTRAR = "registrar"
 
     attr_accessor :meta_data
 
@@ -52,7 +54,7 @@ module NicInfo
           extract_registrant_data( adminstrative )
         else
           technical = find_entity_by_role( entities, "technical" )
-          extract_registrant_data( technical )
+          extract_registrant_data( technical ) if technical
         end
       end
 

@@ -716,8 +716,7 @@ HELP_SUMMARY
           NicInfo::process_autnum( json_data, @appctx )
           do_jcr( json_data, NicInfo::JCR_ROOT_AUTNUM )
         when QueryType::BY_DOMAIN
-          #NicInfo::display_domain( json_data, @appctx, data_tree )
-          # TODO change to process
+          NicInfo::process_domain( json_data, @appctx )
           do_jcr( json_data, NicInfo::JCR_ROOT_DOMAIN )
         when QueryType::BY_NAMESERVER
           #NicInfo::display_ns( json_data, @appctx, data_tree )

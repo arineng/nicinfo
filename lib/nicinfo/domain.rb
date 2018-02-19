@@ -16,6 +16,7 @@ require 'nicinfo/appctx'
 require 'nicinfo/nicinfo_logger'
 require 'nicinfo/utils'
 require 'nicinfo/common_json'
+require 'nicinfo/common_summary'
 require 'nicinfo/entity'
 require 'nicinfo/ns'
 require 'nicinfo/ds_data'
@@ -92,6 +93,10 @@ module NicInfo
     end
   end
 
+  def NicInfo.process_domain( json_data, appctx )
+    return appctx.factory.new_domain.process( json_data )
+  end
+
   # deals with RDAP nameserver structures
   class Domain
 
@@ -134,6 +139,15 @@ module NicInfo
         keyData.process( json_key )
         @key_data_objs << keyData
       end if json_key_data_objs
+      common_summary = CommonSummary.new(@objectclass, @entities, @appctx )
+      nsldh = []
+      @nameservers.each do |ns|
+        nsldh << NicInfo::get_ldhName( ns.objectclass )
+      end
+      common_summary.meta_data[ NicInfo::CommonSummary::NAMESERVERS ] = nsldh
+      registrar = common_summary.find_entity_by_role( @entities, "registrar" )
+      common_summary.meta_data[ NicInfo::CommonSummary::REGISTRAR ] = registrar.get_cn if registrar
+      common_summary.inject
       return self
     end
 
