@@ -102,8 +102,9 @@ module NicInfo
       events = object_class[ "events" ]
       events.each do |event|
         if event[ "eventAction" ] == event_action
-          # TODO check spec to see if eventDate is optional for meaning "never expires"
-          retval = Time.parse( event[ "eventDate" ] ).rfc2822
+          event_date = event[ "eventDate" ]
+          retval = Time.parse( event_date ).rfc2822 if event_date
+          @appctx.conf_msgs << "event date is not given in event" unless event_date
         end
       end if events
       return retval
