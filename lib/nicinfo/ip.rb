@@ -49,12 +49,14 @@ module NicInfo
     def process json_data
       @objectclass = json_data
       @entities = @common.process_entities @objectclass
-      common_meta = CommonSummary.new(@objectclass, @entities, @appctx )
-      unless common_meta.get_listed_country
+      common_summary = CommonSummary.new(@objectclass, @entities, @appctx )
+      unless common_summary.get_listed_country
         country = @objectclass[ "country" ]
-        common_meta.set_listed_country( country ) if country
+        common_summary.set_listed_country( country ) if country
       end
-      common_meta.inject
+      @cidr_array = get_cidr_array
+      common_summary.meta_data[ NicInfo::CommonSummary::CIDRS ] = @cidr_array
+      common_summary.inject
       return self
     end
 
@@ -73,7 +75,7 @@ module NicInfo
         @appctx.conf_msgs << "end IP #{end_addr} is not an IP address (possibly a CIDR)"
       end
       @appctx.logger.terse "End Address", end_addr, NicInfo::AttentionType::SUCCESS
-      @appctx.logger.terse "CIDRs", get_CIDRs
+      @appctx.logger.terse "CIDRs", @cidr_array.join( "," ) if @cidr_array.length > 0
       @appctx.logger.datum "IP Version", @objectclass[ "ipVersion" ]
       @appctx.logger.extra "Name", NicInfo.get_name( @objectclass )
       @appctx.logger.terse "Country", NicInfo.get_country( @objectclass )
@@ -100,19 +102,18 @@ module NicInfo
       return "(unidentifiable network #{object_id})"
     end
 
-    def get_CIDRs
+    def get_cidr_array
+      cidr_array = []
       startAddress = NicInfo.get_startAddress @objectclass
       endAddress = NicInfo.get_endAddress @objectclass
       if startAddress and endAddress
-        cidrs = find_cidrs(startAddress, endAddress)
-        return cidrs.join(', ')
+        cidr_array = find_cidrs(startAddress, endAddress)
       elsif startAddress
-        return NetAddr::CIDR.create(startAddress).to_s
+        cidr_array << NetAddr::CIDR.create(startAddress).to_s
       elsif endAddress
-        return NetAddr::CIDR.create(endAddress).to_s
-      else
-        return ""
+        cidr_array << NetAddr::CIDR.create(endAddress).to_s
       end
+      return cidr_array
     end
 
     def to_node

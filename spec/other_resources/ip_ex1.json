@@ -315,13 +315,6 @@
       ]
     }
   ],
-  "port43": "whois.apnic.net",
-  "nicinfo_metadata": {
-    "service_operator": "apnic.net",
-    "listed_name": "Jinxia Sun ( JS686-AP )",
-    "abuse_email": "abuse@chinamobile.com",
-    "last_changed_date": "Wed, 30 Aug 2017 07:22:04 -0000",
-    "listed_country": "CN"
-  }
+  "port43": "whois.apnic.net"
 }
 

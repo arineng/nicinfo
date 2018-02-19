@@ -18,6 +18,7 @@ module NicInfo
 
     SUMMARY_DATA_NAME = "nicinfo_summary_data"
 
+    # property names
     SERVICE_OPERATOR = "service_operator"
     LISTED_NAME = "listed_name"
     LISTED_COUNTRY = "listed_country"
@@ -25,6 +26,9 @@ module NicInfo
     REGISTRATION_DATE = "registration_date"
     EXPIRATION_DATE = "expiration_date"
     LAST_CHANGED_DATE = "last_changed_date"
+
+    # property names that other classes may inject
+    CIDRS = "CIDRs"
 
     attr_accessor :meta_data
 

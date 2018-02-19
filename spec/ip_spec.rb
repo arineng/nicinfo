@@ -61,6 +61,9 @@ describe 'ip spec' do
     expect( meta_data[ NicInfo::CommonSummary::REGISTRATION_DATE ] ).to be_nil
     expect( meta_data[ NicInfo::CommonSummary::EXPIRATION_DATE ] ).to be_nil
     expect( meta_data[ NicInfo::CommonSummary::LAST_CHANGED_DATE ] ).to eq("Wed, 30 Aug 2017 07:22:04 -0000" )
+
+    expect( meta_data[ NicInfo::CommonSummary::CIDRS ].length ).to eq( 1 )
+    expect( meta_data[ NicInfo::CommonSummary::CIDRS ][0] ).to eq( "111.0.0.0/10" )
   end
 
 end
