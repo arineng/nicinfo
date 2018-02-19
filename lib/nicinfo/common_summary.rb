@@ -39,7 +39,6 @@ module NicInfo
         @meta_data[ SERVICE_OPERATOR ] = /(http|https):\/\/.*\.([^.]+\.[^\/]+)\/[^\/]*\/.*/.match( self_link )[2].downcase
       end
 
-      # TODO if registrant not found, go after adminstrative and technical
       registrant = find_entity_by_role( entities, "registrant" )
       if registrant
         extract_registrant_data( registrant )
