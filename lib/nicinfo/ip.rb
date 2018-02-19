@@ -18,7 +18,7 @@ require 'nicinfo/appctx'
 require 'nicinfo/nicinfo_logger'
 require 'nicinfo/utils'
 require 'nicinfo/common_json'
-require 'nicinfo/common_meta'
+require 'nicinfo/common_summary'
 require 'nicinfo/entity'
 require 'nicinfo/data_tree'
 require 'nicinfo/cidrs'
@@ -49,7 +49,7 @@ module NicInfo
     def process json_data
       @objectclass = json_data
       @entities = @common.process_entities @objectclass
-      common_meta = CommonMeta.new( @objectclass, @entities, @appctx )
+      common_meta = CommonSummary.new(@objectclass, @entities, @appctx )
       unless common_meta.get_listed_country
         country = @objectclass[ "country" ]
         common_meta.set_listed_country( country ) if country

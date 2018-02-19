@@ -51,16 +51,16 @@ describe 'ip spec' do
     ip = NicInfo::Ip.new( appctx )
     ip.process( json_data )
 
-    meta_data = ip.objectclass[ NicInfo::CommonMeta::META_DATA_NAME ]
+    meta_data = ip.objectclass[ NicInfo::CommonSummary::SUMMARY_DATA_NAME ]
 
-    expect( meta_data[ NicInfo::CommonMeta::SERVICE_OPERATOR ] ).to eq( "apnic.net" )
+    expect( meta_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ] ).to eq("apnic.net" )
 
-    expect( meta_data[ NicInfo::CommonMeta::LISTED_NAME ] ).to eq("Jinxia Sun ( JS686-AP )" )
-    expect( meta_data[ NicInfo::CommonMeta::LISTED_COUNTRY ] ).to eq( "CN" )
-    expect( meta_data[ NicInfo::CommonMeta::ABUSE_EMAIL ] ).to eq( "abuse@chinamobile.com" )
-    expect( meta_data[ NicInfo::CommonMeta::REGISTRATION_DATE ] ).to be_nil
-    expect( meta_data[ NicInfo::CommonMeta::EXPIRATION_DATE ] ).to be_nil
-    expect( meta_data[ NicInfo::CommonMeta::LAST_CHANGED_DATE ] ).to eq( "Wed, 30 Aug 2017 07:22:04 -0000" )
+    expect( meta_data[ NicInfo::CommonSummary::LISTED_NAME ] ).to eq("Jinxia Sun ( JS686-AP )" )
+    expect( meta_data[ NicInfo::CommonSummary::LISTED_COUNTRY ] ).to eq("CN" )
+    expect( meta_data[ NicInfo::CommonSummary::ABUSE_EMAIL ] ).to eq("abuse@chinamobile.com" )
+    expect( meta_data[ NicInfo::CommonSummary::REGISTRATION_DATE ] ).to be_nil
+    expect( meta_data[ NicInfo::CommonSummary::EXPIRATION_DATE ] ).to be_nil
+    expect( meta_data[ NicInfo::CommonSummary::LAST_CHANGED_DATE ] ).to eq("Wed, 30 Aug 2017 07:22:04 -0000" )
   end
 
 end

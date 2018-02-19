@@ -14,9 +14,9 @@
 
 module NicInfo
 
-  class CommonMeta
+  class CommonSummary
 
-    META_DATA_NAME = "nicinfo_metadata"
+    SUMMARY_DATA_NAME = "nicinfo_summary_data"
 
     SERVICE_OPERATOR = "service_operator"
     LISTED_NAME = "listed_name"
@@ -78,7 +78,7 @@ module NicInfo
     end
 
     def inject
-      @object_class[ META_DATA_NAME ] = @meta_data
+      @object_class[SUMMARY_DATA_NAME ] = @meta_data
     end
 
     def find_entity_by_role( entities, role )
