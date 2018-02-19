@@ -79,7 +79,7 @@ describe 'common_meta' do
     c = NicInfo::CommonMeta.new( json_data, entities, appctx )
     expect( c.meta_data[ NicInfo::CommonMeta::SERVICE_OPERATOR ] ).to eq( "registro.br" )
 
-    expect( c.meta_data[ NicInfo::CommonMeta::LISTED_NAME ] ).to eq("TELEFÔNICA BRASIL S.A ( 02558157000162 )" )
+    expect( c.meta_data[ NicInfo::CommonMeta::LISTED_NAME ] ).to eq("TELEFONICA BRASIL S.A ( 02558157000162 )" )
     expect( c.meta_data[ NicInfo::CommonMeta::LISTED_COUNTRY ] ).to eq("BR" )
     expect( c.meta_data[ NicInfo::CommonMeta::ABUSE_EMAIL ] ).to eq( "security@telesp.net.br" )
     expect( c.meta_data[ NicInfo::CommonMeta::REGISTRATION_DATE ] ).to eq( "Mon, 08 Dec 2003 12:00:00 -0000" )
@@ -132,9 +132,11 @@ describe 'common_meta' do
     expect( c.meta_data[ NicInfo::CommonMeta::LISTED_NAME ] ).to eq("Comcast Cable Communications, LLC ( CCCS )" )
     expect( c.meta_data[ NicInfo::CommonMeta::LISTED_COUNTRY ] ).to eq("United States" )
     expect( c.meta_data[ NicInfo::CommonMeta::ABUSE_EMAIL ] ).to eq( "abuse@comcast.net" )
-    expect( c.meta_data[ NicInfo::CommonMeta::REGISTRATION_DATE ] ).to eq( "Tue, 29 Jun 2010 11:36:51 -0400" )
+    # differences in ruby version Time module means we should not compare exact times
+    expect( c.meta_data[ NicInfo::CommonMeta::REGISTRATION_DATE ] ).to start_with( "Tue, 29 Jun 2010" )
     expect( c.meta_data[ NicInfo::CommonMeta::EXPIRATION_DATE ] ).to be_nil
-    expect( c.meta_data[ NicInfo::CommonMeta::LAST_CHANGED_DATE ] ).to eq( "Wed, 31 Aug 2016 12:25:04 -0400" )
+    # differences in ruby version Time module means we should not compare exact times
+    expect( c.meta_data[ NicInfo::CommonMeta::LAST_CHANGED_DATE ] ).to start_with( "Wed, 31 Aug 2016" )
   end
 
   it 'should handle ex5' do
