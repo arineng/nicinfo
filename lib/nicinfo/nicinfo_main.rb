@@ -719,8 +719,7 @@ HELP_SUMMARY
           NicInfo::process_domain( json_data, @appctx )
           do_jcr( json_data, NicInfo::JCR_ROOT_DOMAIN )
         when QueryType::BY_NAMESERVER
-          #NicInfo::display_ns( json_data, @appctx, data_tree )
-          # TODO change to process
+          NicInfo::process_ns( json_data, @appctx )
           do_jcr( json_data, NicInfo::JCR_ROOT_NAMESERVER )
         when QueryType::BY_ENTITY_HANDLE
           #NicInfo::display_entity( json_data, @appctx, data_tree )

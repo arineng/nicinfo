@@ -1,4 +1,4 @@
-# Copyright (C) 2011,2012,2013,2014 American Registry for Internet Numbers
+# Copyright (C) 2011-2018 American Registry for Internet Numbers
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -16,6 +16,7 @@ require 'nicinfo/appctx'
 require 'nicinfo/nicinfo_logger'
 require 'nicinfo/utils'
 require 'nicinfo/common_json'
+require 'nicinfo/common_summary'
 require 'nicinfo/entity'
 require 'nicinfo/data_tree'
 
@@ -44,6 +45,10 @@ module NicInfo
     end
   end
 
+  def NicInfo.process_ns( json_data, appctx )
+    return appctx.factory.new_ns.process( json_data )
+  end
+
   # deals with RDAP nameserver structures
   class Ns
 
@@ -59,6 +64,8 @@ module NicInfo
     def process json_data
       @objectclass = json_data
       @entities = @common.process_entities @objectclass
+      common_summary = CommonSummary.new(@objectclass, @entities, @appctx )
+      common_summary.inject
       return self
     end
 

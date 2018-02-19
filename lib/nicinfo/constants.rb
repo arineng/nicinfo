@@ -33,7 +33,7 @@ module NicInfo
   DATA_TREE_ADDR_REGEX = /\d=$/
   DOMAIN_REGEX = /^([\S\-]+\.?)+\.([a-z][a-z0\-]+)\.?$/i
   DOMAIN_SRCH_REGEX = /^([\S\-]+\.?)+\.([a-z][a-z0\-\*]+)\.?$/i
-  NS_REGEX = /^ns[0-9]\.([\S\-]+\.?)+\.([a-z][a-z0\-]+)\.?$/i
+  NS_REGEX = /^ns[0-9]?\.([\S\-]+\.?)+\.([a-z][a-z0\-]+)\.?$/i
   URL_REGEX = /^(http|https):\/\/.*/
   ENTITY_REGEX = /^.*\-.*/
 
