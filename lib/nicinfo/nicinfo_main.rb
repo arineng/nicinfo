@@ -722,16 +722,11 @@ HELP_SUMMARY
           NicInfo::process_ns( json_data, @appctx )
           do_jcr( json_data, NicInfo::JCR_ROOT_NAMESERVER )
         when QueryType::BY_ENTITY_HANDLE
-          #NicInfo::display_entity( json_data, @appctx, data_tree )
-          # TODO change to process
+          NicInfo::process_entity( json_data, @appctx )
           do_jcr( json_data, NicInfo::JCR_ROOT_ENTITY )
         when QueryType::SRCH_DOMAINS
-          #NicInfo::display_domains( json_data, @appctx, data_tree )
-          # TODO change to process
           do_jcr( json_data, NicInfo::JCR_ROOT_DOMAIN_SEARCH )
         when QueryType::SRCH_NS
-          #NicInfo::display_nameservers( json_data, @appctx, data_tree )
-          # TODO change to process
           do_jcr( json_data, NicInfo::JCR_ROOT_NAMESERVER_SEARCH )
       end
       return success

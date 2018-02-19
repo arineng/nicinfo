@@ -16,6 +16,7 @@ require 'nicinfo/appctx'
 require 'nicinfo/nicinfo_logger'
 require 'nicinfo/utils'
 require 'nicinfo/common_json'
+require 'nicinfo/common_summary'
 require 'nicinfo/data_tree'
 
 module NicInfo
@@ -74,6 +75,10 @@ module NicInfo
     else
       appctx.conf_msgs << "'entitySearchResults' is not present"
     end
+  end
+
+  def NicInfo.process_entity( json_data, appctx )
+    return appctx.factory.new_entity.process( json_data )
   end
 
   class Org
@@ -290,6 +295,9 @@ module NicInfo
           @appctx.conf_msgs << "'autnums' contains a string and not an object"
         end
       end if json_autnums
+      common_summary = CommonSummary.new(@objectclass, @entities, @appctx )
+      common_summary.extract_registrant_data( self )
+      common_summary.inject
       return self
     end
 
