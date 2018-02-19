@@ -16,6 +16,7 @@ require 'nicinfo/appctx'
 require 'nicinfo/nicinfo_logger'
 require 'nicinfo/utils'
 require 'nicinfo/common_json'
+require 'nicinfo/common_summary'
 require 'nicinfo/entity'
 require 'nicinfo/data_tree'
 
@@ -24,6 +25,10 @@ module NicInfo
   def NicInfo.display_autnum json_data, appctx, data_tree
     autnum = appctx.factory.new_autnum.process( json_data )
     NicInfo::display_object_with_entities( autnum, appctx, data_tree )
+  end
+
+  def NicInfo.process_autnum( json_data, appctx )
+    return appctx.factory.new_autnum.process( json_data )
   end
 
   # deals with RDAP autonomous number structures
@@ -41,6 +46,12 @@ module NicInfo
     def process json_data
       @objectclass = json_data
       @entities = @common.process_entities @objectclass
+      common_summary = CommonSummary.new(@objectclass, @entities, @appctx )
+      unless common_summary.get_listed_country
+        country = @objectclass[ "country" ]
+        common_summary.set_listed_country( country ) if country
+      end
+      common_summary.inject
       return self
     end
 

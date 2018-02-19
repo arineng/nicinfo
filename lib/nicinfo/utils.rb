@@ -13,6 +13,7 @@
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 
+require 'ipaddr'
 require 'stringio'
 require 'uri'
 require 'nicinfo/appctx'
