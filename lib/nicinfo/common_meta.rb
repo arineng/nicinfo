@@ -69,6 +69,14 @@ module NicInfo
 
     end
 
+    def set_listed_country( country )
+      @meta_data[ LISTED_COUNTRY ] = country
+    end
+
+    def get_listed_country
+      return @meta_data[ LISTED_COUNTRY ]
+    end
+
     def inject
       @object_class[ META_DATA_NAME ] = @meta_data
     end
