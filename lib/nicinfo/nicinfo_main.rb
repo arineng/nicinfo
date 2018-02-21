@@ -302,6 +302,16 @@ module NicInfo
           @appctx.options.require_query = false
         end
 
+        opts.on( "--bulkip-out-csv FILE",
+                 "Bulk IP CSV output" ) do |file|
+          @appctx.options.bulkip_out_csv = file
+        end
+
+        opts.on( "--bulkip-out-tsv FILE",
+                 "Bulk IP TSV output" ) do |file|
+          @appctx.options.bulkip_out_tsv = file
+        end
+
       end
 
       begin
@@ -791,7 +801,7 @@ HELP_SUMMARY
 
     def show_tracked_urls
       @appctx.tracked_urls.each_value do |tracker|
-        qps = ( tracker.last_query_time.to_i - tracker.first_query_time.to_i ).fdiv( tracker.total_queries )
+        qps = tracker.total_queries.fdiv( tracker.last_query_time.to_i - tracker.first_query_time.to_i )
         @appctx.logger.trace( "#{tracker.total_queries} queries to #{tracker.url} rated at #{qps} queries per second")
       end
     end
@@ -879,6 +889,13 @@ HELP_SUMMARY
             end
           end
         end
+      end
+      bulkip_data.review_errors
+      if @appctx.options.bulkip_out_csv
+        bulkip_data.output_csv( @appctx.options.bulkip_out_csv )
+      end
+      if @appctx.options.bulkip_out_tsv
+        bulkip_data.output_tsv( @appctx.options.bulkip_out_tsv )
       end
       show_tracked_urls
     end

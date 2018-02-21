@@ -97,6 +97,66 @@ module NicInfo
       end
     end
 
+    def output_tsv( file_name )
+      output_column_sv( file_name, "\t" )
+    end
+
+    def output_csv( file_name )
+      output_column_sv( file_name, "," )
+    end
+
+    def output_column_sv( file_name, seperator )
+      f = File.open( file_name, "w" );
+      f.puts( output_column_headers( seperator ) )
+      @data.each do |datum_net, datum|
+        f.puts( output_columns( datum_net, datum, seperator ) )
+      end
+      @fetch_errors.each do |fetch_error|
+        f.puts( output_column_error( fetch_error, seperator ) )
+      end
+      f.close
+    end
+
+    def output_column_headers( seperator )
+      columns = [ "Network", "Queries", "QPS Rate", "Listed Name", "Listed Country", "Abuse" ]
+      return columns.join( seperator )
+    end
+
+    def output_columns( datum_net, datum, seperator )
+      columns = Array.new
+      columns << datum_net.to_s
+      columns << datum.total_queries.to_s
+      t = datum.last_query_time.to_i - datum.first_query_time.to_i
+      if t > 0
+        columns << datum.total_queries.fdiv( t ).to_s
+      else
+        columns << "N/A"
+      end
+      columns << to_columnar_string( datum.ipnetwork.summary_data[ NicInfo::CommonSummary::LISTED_NAME ], seperator )
+      columns << to_columnar_string( datum.ipnetwork.summary_data[ NicInfo::CommonSummary::LISTED_COUNTRY ], seperator )
+      columns << to_columnar_string( datum.ipnetwork.summary_data[ NicInfo::CommonSummary::ABUSE_EMAIL ], seperator )
+      return columns.join( seperator )
+    end
+
+    def to_columnar_string( string, seperator )
+      retval = "N/A"
+      if string
+        retval = string.gsub( seperator, "\\" + seperator )
+      end
+      return retval
+    end
+
+    def output_column_error( fetch_error, seperator )
+      columns = Array.new
+      columns << fetch_error.ipaddr.to_s
+      columns << "N/A"
+      columns << "N/A"
+      columns << "FETCH ERROR"
+      columns << "N/A"
+      columns << "N/A"
+      return columns.join( seperator )
+    end
+
   end
 
 end
