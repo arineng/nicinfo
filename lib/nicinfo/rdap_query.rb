@@ -264,7 +264,12 @@ module NicInfo
 
         case res
           when Net::HTTPSuccess
-            content_type = res[ "content-type" ].downcase
+            content_type_header = res[ "content-type" ]
+            if content_type_header
+              content_type = content_type_header.downcase
+            else
+              content_type = ""
+            end
             if expect_rdap
               unless content_type.include?(NicInfo::RDAP_CONTENT_TYPE) or content_type.include?(NicInfo::JSON_CONTENT_TYPE)
                 raise Net::HTTPServerException.new("Bad Content Type", res)

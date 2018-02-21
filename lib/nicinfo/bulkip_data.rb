@@ -59,7 +59,7 @@ module NicInfo
 
     def initialize
       @data = Hash.new
-      @fetch_errors = Hash.new
+      @fetch_errors = Array.new
     end
 
     def hit_ipaddr( ipaddr, time )

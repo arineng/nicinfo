@@ -874,6 +874,8 @@ HELP_SUMMARY
               else
                 bulkip_data.fetch_error( ipaddr, time )
               end
+            else
+              @appctx.logger.trace( "skipping #{ip} because network has already been retreived")
             end
           end
         end
