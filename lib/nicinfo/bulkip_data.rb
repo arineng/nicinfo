@@ -13,6 +13,7 @@
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 require 'ipaddr'
+require 'nicinfo/appctx'
 require 'nicinfo/ip'
 require 'nicinfo/utils'
 require 'nicinfo/common_summary'
@@ -26,8 +27,6 @@ module NicInfo
     def initialize( ipnetwork )
       @ipnetwork = ipnetwork
       @total_queries = 1
-      @first_query_time = Time.now
-      @last_query_time = @first_query_time
     end
 
     def hit( time )
@@ -55,9 +54,10 @@ module NicInfo
 
   class BulkIPData
 
-    attr_accessor :data, :fetch_errors
+    attr_accessor :data, :fetch_errors, :appctx
 
-    def initialize
+    def initialize( appctx )
+      @appctx = appctx
       @data = Hash.new
       @fetch_errors = Array.new
     end
@@ -98,10 +98,12 @@ module NicInfo
     end
 
     def output_tsv( file_name )
+      @appctx.logger.trace( "writing TSV file #{file_name}")
       output_column_sv( file_name, "\t" )
     end
 
     def output_csv( file_name )
+      @appctx.logger.trace( "writing CSV file #{file_name}")
       output_column_sv( file_name, "," )
     end
 
@@ -118,7 +120,7 @@ module NicInfo
     end
 
     def output_column_headers( seperator )
-      columns = [ "Network", "Queries", "QPS Rate", "Listed Name", "Listed Country", "Abuse" ]
+      columns = [ "Network", "Queries", "Averaged QPS", "Listed Name", "Listed Country", "Abuse" ]
       return columns.join( seperator )
     end
 
@@ -126,11 +128,15 @@ module NicInfo
       columns = Array.new
       columns << datum_net.to_s
       columns << datum.total_queries.to_s
-      t = datum.last_query_time.to_i - datum.first_query_time.to_i
-      if t > 0
-        columns << datum.total_queries.fdiv( t ).to_s
-      else
+      if datum.last_query_time == nil or datum.first_query_time == nil
         columns << "N/A"
+      else
+        t = datum.last_query_time.to_i - datum.first_query_time.to_i
+        if t > 0
+          columns << datum.total_queries.fdiv( t ).to_s
+        else
+          columns << "N/A"
+        end
       end
       columns << to_columnar_string( datum.ipnetwork.summary_data[ NicInfo::CommonSummary::LISTED_NAME ], seperator )
       columns << to_columnar_string( datum.ipnetwork.summary_data[ NicInfo::CommonSummary::LISTED_COUNTRY ], seperator )

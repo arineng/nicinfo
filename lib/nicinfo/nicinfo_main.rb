@@ -858,7 +858,7 @@ HELP_SUMMARY
         @appctx.logger.trace( "file #{file} strategry is #{b.strategy}")
       end
       rdap_query = NicInfo::RDAPQuery.new( @appctx )
-      bulkip_data = NicInfo::BulkIPData.new
+      bulkip_data = NicInfo::BulkIPData.new( @appctx )
       Dir.glob( file_list ).each do |file|
         @appctx.logger.mesg( "Processing #{file}")
         b = BulkIPInFile.new( file )
