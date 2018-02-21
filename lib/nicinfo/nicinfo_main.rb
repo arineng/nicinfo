@@ -36,6 +36,7 @@ require 'nicinfo/data_tree'
 require 'nicinfo/traceroute'
 require 'nicinfo/rdap_query'
 require 'nicinfo/bulkip_infile'
+require 'nicinfo/bulkip_data'
 begin
   require 'json'
 rescue LoadError
@@ -847,6 +848,7 @@ HELP_SUMMARY
         @appctx.logger.trace( "file #{file} strategry is #{b.strategy}")
       end
       rdap_query = NicInfo::RDAPQuery.new( @appctx )
+      bulkip_data = NicInfo::BulkIPData.new
       Dir.glob( file_list ).each do |file|
         @appctx.logger.mesg( "Processing #{file}")
         b = BulkIPInFile.new( file )
@@ -856,10 +858,23 @@ HELP_SUMMARY
           unless NicInfo.is_global_unicast?( ipaddr )
             @appctx.logger.trace( "skipping non-global-unicast address #{ip}")
           else
-            query_value = [ ip ]
-            qtype = QueryType::BY_IP4_ADDR
-            qtype = QueryType::BY_IP6_ADDR if ipaddr.ipv6?
-            rdap_query.do_rdap_query( query_value, qtype, nil )
+            if !bulkip_data.hit_ipaddr( ipaddr, time )
+              query_value = [ ip ]
+              qtype = QueryType::BY_IP4_ADDR
+              qtype = QueryType::BY_IP6_ADDR if ipaddr.ipv6?
+              rdap_response = rdap_query.do_rdap_query( query_value, qtype, nil )
+              unless rdap_response.error_state
+                rtype = get_query_type_from_result( rdap_response.json_data )
+                if rtype == QueryType::BY_IP
+                  ipnetwork = NicInfo::process_ip( rdap_response.json_data, @appctx )
+                  bulkip_data.hit_network( ipnetwork )
+                else
+                  bulkip_data.fetch_error( ipaddr, time )
+                end
+              else
+                bulkip_data.fetch_error( ipaddr, time )
+              end
+            end
           end
         end
       end

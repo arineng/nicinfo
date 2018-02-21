@@ -32,18 +32,18 @@ module NicInfo
     NAMESERVERS = "nameservers"
     REGISTRAR = "registrar"
 
-    attr_accessor :meta_data
+    attr_accessor :summary_data
 
     def initialize( object_class, entities, appctx )
 
       @appctx = appctx
       @object_class = object_class
-      @meta_data = Hash.new
+      @summary_data = Hash.new
 
       self_link = NicInfo.get_self_link( NicInfo.get_links( object_class, appctx ) )
       if self_link
         m =  /(http|https):\/\/.*\.([^.]+\.[^\/]+)\/[^\/]*\/.*/.match( self_link )
-        @meta_data[ SERVICE_OPERATOR ] = m[2].downcase if m
+        @summary_data[SERVICE_OPERATOR ] = m[2].downcase if m
       end
 
       registrant = find_entity_by_role( entities, "registrant" )
@@ -61,30 +61,30 @@ module NicInfo
 
       abuse = find_entity_by_role( entities, "abuse" )
       if abuse && abuse.jcard.emails.length > 0
-        @meta_data[ ABUSE_EMAIL ] = abuse.jcard.emails[0].addr
+        @summary_data[ABUSE_EMAIL ] = abuse.jcard.emails[0].addr
       end
 
       registration_date = find_event_date_by_action( object_class, "registration" )
-      @meta_data[ REGISTRATION_DATE ] = registration_date if registration_date
+      @summary_data[REGISTRATION_DATE ] = registration_date if registration_date
 
       expiration_date = find_event_date_by_action( object_class, "expiration" )
-      @meta_data[ EXPIRATION_DATE ] = expiration_date if expiration_date
+      @summary_data[EXPIRATION_DATE ] = expiration_date if expiration_date
 
       last_changed_date = find_event_date_by_action( object_class, "last changed" )
-      @meta_data[ LAST_CHANGED_DATE ] = last_changed_date if last_changed_date
+      @summary_data[LAST_CHANGED_DATE ] = last_changed_date if last_changed_date
 
     end
 
     def set_listed_country( country )
-      @meta_data[ LISTED_COUNTRY ] = country
+      @summary_data[LISTED_COUNTRY ] = country
     end
 
     def get_listed_country
-      return @meta_data[ LISTED_COUNTRY ]
+      return @summary_data[LISTED_COUNTRY ]
     end
 
     def inject
-      @object_class[SUMMARY_DATA_NAME ] = @meta_data
+      @object_class[SUMMARY_DATA_NAME ] = @summary_data
     end
 
     def find_entity_by_role( entities, role )
@@ -118,13 +118,13 @@ module NicInfo
     end
 
     def extract_registrant_data( entity )
-      @meta_data[LISTED_NAME ] = entity.get_cn
+      @summary_data[LISTED_NAME ] = entity.get_cn
       if entity.jcard.adrs.length > 0
         c = entity.jcard.adrs[0].country
         if c
-          @meta_data[LISTED_COUNTRY ] = c
+          @summary_data[LISTED_COUNTRY ] = c
         elsif entity.jcard.adrs[0].label.length > 0 && !(entity.jcard.adrs[0].label[-1] =~ /\d/)
-          @meta_data[LISTED_COUNTRY ] = entity.jcard.adrs[0].label[-1]
+          @summary_data[LISTED_COUNTRY ] = entity.jcard.adrs[0].label[-1]
         end
       end
     end

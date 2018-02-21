@@ -37,7 +37,7 @@ module NicInfo
   # deals with RDAP IP network structures
   class Ip
 
-    attr_accessor :entities, :objectclass, :asEventActors
+    attr_accessor :entities, :objectclass, :asEventActors, :summary_data
 
     def initialize appctx
       @appctx = appctx
@@ -55,8 +55,9 @@ module NicInfo
         common_summary.set_listed_country( country ) if country
       end
       @cidr_array = get_cidr_array
-      common_summary.meta_data[ NicInfo::CommonSummary::CIDRS ] = @cidr_array
+      common_summary.summary_data[NicInfo::CommonSummary::CIDRS ] = @cidr_array
       common_summary.inject
+      @summary_data = common_summary.summary_data
       return self
     end
 

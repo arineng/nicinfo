@@ -144,9 +144,9 @@ module NicInfo
       @nameservers.each do |ns|
         nsldh << NicInfo::get_ldhName( ns.objectclass )
       end
-      common_summary.meta_data[ NicInfo::CommonSummary::NAMESERVERS ] = nsldh
+      common_summary.summary_data[NicInfo::CommonSummary::NAMESERVERS ] = nsldh
       registrar = common_summary.find_entity_by_role( @entities, "registrar" )
-      common_summary.meta_data[ NicInfo::CommonSummary::REGISTRAR ] = registrar.get_cn if registrar
+      common_summary.summary_data[NicInfo::CommonSummary::REGISTRAR ] = registrar.get_cn if registrar
       common_summary.inject
       return self
     end

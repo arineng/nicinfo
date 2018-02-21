@@ -52,14 +52,14 @@ describe 'common_meta' do
     entities = cj.process_entities( json_data )
 
     c = NicInfo::CommonSummary.new(json_data, entities, appctx )
-    expect( c.meta_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ] ).to eq("apnic.net" )
+    expect( c.summary_data[NicInfo::CommonSummary::SERVICE_OPERATOR ] ).to eq("apnic.net" )
 
-    expect( c.meta_data[ NicInfo::CommonSummary::LISTED_NAME ] ).to eq("ARIN Operations ( ARIN-OPS )" )
-    expect( c.meta_data[ NicInfo::CommonSummary::LISTED_COUNTRY ] ).to eq("United States" )
-    expect( c.meta_data[ NicInfo::CommonSummary::ABUSE_EMAIL ] ).to eq("info@arin.net" )
-    expect( c.meta_data[ NicInfo::CommonSummary::REGISTRATION_DATE ] ).to eq("Mon, 31 Dec 1990 23:59:10 -0000" )
-    expect( c.meta_data[ NicInfo::CommonSummary::EXPIRATION_DATE ] ).to eq("Sun, 30 Nov 1997 23:59:10 -0000" )
-    expect( c.meta_data[ NicInfo::CommonSummary::LAST_CHANGED_DATE ] ).to eq("Thu, 30 Nov 1995 23:59:10 -0000" )
+    expect( c.summary_data[NicInfo::CommonSummary::LISTED_NAME ] ).to eq("ARIN Operations ( ARIN-OPS )" )
+    expect( c.summary_data[NicInfo::CommonSummary::LISTED_COUNTRY ] ).to eq("United States" )
+    expect( c.summary_data[NicInfo::CommonSummary::ABUSE_EMAIL ] ).to eq("info@arin.net" )
+    expect( c.summary_data[NicInfo::CommonSummary::REGISTRATION_DATE ] ).to eq("Mon, 31 Dec 1990 23:59:10 -0000" )
+    expect( c.summary_data[NicInfo::CommonSummary::EXPIRATION_DATE ] ).to eq("Sun, 30 Nov 1997 23:59:10 -0000" )
+    expect( c.summary_data[NicInfo::CommonSummary::LAST_CHANGED_DATE ] ).to eq("Thu, 30 Nov 1995 23:59:10 -0000" )
   end
 
   it 'should handle ex2' do
@@ -77,14 +77,14 @@ describe 'common_meta' do
     entities = cj.process_entities( json_data )
 
     c = NicInfo::CommonSummary.new(json_data, entities, appctx )
-    expect( c.meta_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ] ).to eq("registro.br" )
+    expect( c.summary_data[NicInfo::CommonSummary::SERVICE_OPERATOR ] ).to eq("registro.br" )
 
-    expect( c.meta_data[ NicInfo::CommonSummary::LISTED_NAME ] ).to eq("TELEFONICA BRASIL S.A ( 02558157000162 )" )
-    expect( c.meta_data[ NicInfo::CommonSummary::LISTED_COUNTRY ] ).to eq("BR" )
-    expect( c.meta_data[ NicInfo::CommonSummary::ABUSE_EMAIL ] ).to eq("security@telesp.net.br" )
-    expect( c.meta_data[ NicInfo::CommonSummary::REGISTRATION_DATE ] ).to eq("Mon, 08 Dec 2003 12:00:00 -0000" )
-    expect( c.meta_data[ NicInfo::CommonSummary::EXPIRATION_DATE ] ).to be_nil
-    expect( c.meta_data[ NicInfo::CommonSummary::LAST_CHANGED_DATE ] ).to eq("Wed, 23 Apr 2008 17:17:59 -0000" )
+    expect( c.summary_data[NicInfo::CommonSummary::LISTED_NAME ] ).to eq("TELEFONICA BRASIL S.A ( 02558157000162 )" )
+    expect( c.summary_data[NicInfo::CommonSummary::LISTED_COUNTRY ] ).to eq("BR" )
+    expect( c.summary_data[NicInfo::CommonSummary::ABUSE_EMAIL ] ).to eq("security@telesp.net.br" )
+    expect( c.summary_data[NicInfo::CommonSummary::REGISTRATION_DATE ] ).to eq("Mon, 08 Dec 2003 12:00:00 -0000" )
+    expect( c.summary_data[NicInfo::CommonSummary::EXPIRATION_DATE ] ).to be_nil
+    expect( c.summary_data[NicInfo::CommonSummary::LAST_CHANGED_DATE ] ).to eq("Wed, 23 Apr 2008 17:17:59 -0000" )
   end
 
   it 'should handle ex3' do
@@ -102,14 +102,14 @@ describe 'common_meta' do
     entities = cj.process_entities( json_data )
 
     c = NicInfo::CommonSummary.new(json_data, entities, appctx )
-    expect( c.meta_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ] ).to eq("ripe.net" )
+    expect( c.summary_data[NicInfo::CommonSummary::SERVICE_OPERATOR ] ).to eq("ripe.net" )
 
-    expect( c.meta_data[ NicInfo::CommonSummary::LISTED_NAME ] ).to eq("POLKOMTEL-MNT" )
-    expect( c.meta_data[ NicInfo::CommonSummary::LISTED_COUNTRY ] ).to be_nil
-    expect( c.meta_data[ NicInfo::CommonSummary::ABUSE_EMAIL ] ).to eq("noc.ip@plus.pl" )
-    expect( c.meta_data[ NicInfo::CommonSummary::REGISTRATION_DATE ] ).to be_nil
-    expect( c.meta_data[ NicInfo::CommonSummary::EXPIRATION_DATE ] ).to be_nil
-    expect( c.meta_data[ NicInfo::CommonSummary::LAST_CHANGED_DATE ] ).to eq("Wed, 17 Apr 2013 09:03:21 -0000" )
+    expect( c.summary_data[NicInfo::CommonSummary::LISTED_NAME ] ).to eq("POLKOMTEL-MNT" )
+    expect( c.summary_data[NicInfo::CommonSummary::LISTED_COUNTRY ] ).to be_nil
+    expect( c.summary_data[NicInfo::CommonSummary::ABUSE_EMAIL ] ).to eq("noc.ip@plus.pl" )
+    expect( c.summary_data[NicInfo::CommonSummary::REGISTRATION_DATE ] ).to be_nil
+    expect( c.summary_data[NicInfo::CommonSummary::EXPIRATION_DATE ] ).to be_nil
+    expect( c.summary_data[NicInfo::CommonSummary::LAST_CHANGED_DATE ] ).to eq("Wed, 17 Apr 2013 09:03:21 -0000" )
   end
 
   it 'should handle ex4' do
@@ -127,16 +127,16 @@ describe 'common_meta' do
     entities = cj.process_entities( json_data )
 
     c = NicInfo::CommonSummary.new(json_data, entities, appctx )
-    expect( c.meta_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ] ).to eq("arin.net" )
+    expect( c.summary_data[NicInfo::CommonSummary::SERVICE_OPERATOR ] ).to eq("arin.net" )
 
-    expect( c.meta_data[ NicInfo::CommonSummary::LISTED_NAME ] ).to eq("Comcast Cable Communications, LLC ( CCCS )" )
-    expect( c.meta_data[ NicInfo::CommonSummary::LISTED_COUNTRY ] ).to eq("United States" )
-    expect( c.meta_data[ NicInfo::CommonSummary::ABUSE_EMAIL ] ).to eq("abuse@comcast.net" )
+    expect( c.summary_data[NicInfo::CommonSummary::LISTED_NAME ] ).to eq("Comcast Cable Communications, LLC ( CCCS )" )
+    expect( c.summary_data[NicInfo::CommonSummary::LISTED_COUNTRY ] ).to eq("United States" )
+    expect( c.summary_data[NicInfo::CommonSummary::ABUSE_EMAIL ] ).to eq("abuse@comcast.net" )
     # differences in ruby version Time module means we should not compare exact times
-    expect( c.meta_data[ NicInfo::CommonSummary::REGISTRATION_DATE ] ).to start_with("Tue, 29 Jun 2010" )
-    expect( c.meta_data[ NicInfo::CommonSummary::EXPIRATION_DATE ] ).to be_nil
+    expect( c.summary_data[NicInfo::CommonSummary::REGISTRATION_DATE ] ).to start_with("Tue, 29 Jun 2010" )
+    expect( c.summary_data[NicInfo::CommonSummary::EXPIRATION_DATE ] ).to be_nil
     # differences in ruby version Time module means we should not compare exact times
-    expect( c.meta_data[ NicInfo::CommonSummary::LAST_CHANGED_DATE ] ).to start_with("Wed, 31 Aug 2016" )
+    expect( c.summary_data[NicInfo::CommonSummary::LAST_CHANGED_DATE ] ).to start_with("Wed, 31 Aug 2016" )
   end
 
   it 'should handle ex5' do
@@ -154,14 +154,14 @@ describe 'common_meta' do
     entities = cj.process_entities( json_data )
 
     c = NicInfo::CommonSummary.new(json_data, entities, appctx )
-    expect( c.meta_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ] ).to eq("apnic.net" )
+    expect( c.summary_data[NicInfo::CommonSummary::SERVICE_OPERATOR ] ).to eq("apnic.net" )
 
-    expect( c.meta_data[ NicInfo::CommonSummary::LISTED_NAME ] ).to eq("Jinxia Sun ( JS686-AP )" )
-    expect( c.meta_data[ NicInfo::CommonSummary::LISTED_COUNTRY ] ).to be_nil
-    expect( c.meta_data[ NicInfo::CommonSummary::ABUSE_EMAIL ] ).to eq("abuse@chinamobile.com" )
-    expect( c.meta_data[ NicInfo::CommonSummary::REGISTRATION_DATE ] ).to be_nil
-    expect( c.meta_data[ NicInfo::CommonSummary::EXPIRATION_DATE ] ).to be_nil
-    expect( c.meta_data[ NicInfo::CommonSummary::LAST_CHANGED_DATE ] ).to eq("Wed, 30 Aug 2017 07:22:04 -0000" )
+    expect( c.summary_data[NicInfo::CommonSummary::LISTED_NAME ] ).to eq("Jinxia Sun ( JS686-AP )" )
+    expect( c.summary_data[NicInfo::CommonSummary::LISTED_COUNTRY ] ).to be_nil
+    expect( c.summary_data[NicInfo::CommonSummary::ABUSE_EMAIL ] ).to eq("abuse@chinamobile.com" )
+    expect( c.summary_data[NicInfo::CommonSummary::REGISTRATION_DATE ] ).to be_nil
+    expect( c.summary_data[NicInfo::CommonSummary::EXPIRATION_DATE ] ).to be_nil
+    expect( c.summary_data[NicInfo::CommonSummary::LAST_CHANGED_DATE ] ).to eq("Wed, 30 Aug 2017 07:22:04 -0000" )
   end
 
 end

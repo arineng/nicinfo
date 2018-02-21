@@ -13,79 +13,61 @@
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 require 'ipaddr'
-require 'ip'
-require 'utils'
+require 'nicinfo/ip'
+require 'nicinfo/utils'
+require 'nicinfo/common_summary'
 
 module NicInfo
 
-  class BulkIPNetMeta
+  class BulkIPDatum
 
-    attr_accessor :name, :region, :country, :fetch_error
+    attr_accessor :ipnetwork, :total_queries, :first_query_time, :last_query_time
 
-    def initialize( rdap_ip, appctx )
+    def initialize( ipnetwork )
+      @ipnetwork = ipnetwork
+      @total_queries = 1
+      @first_query_time = Time.now
+      @last_query_time = @first_query_time
+    end
 
-      if rdap_ip != nil
-
-        self_link = NicInfo.get_self_link( NicInfo.get_links( rdap_ip.object_class, appctx ) )
-        @region = /.*(arin|ripe|apnic|lacnic|afrinic)\.net/.match( self_link )[1].to_upper
-
-        registrant = nil
-        rdap_ip.entities.each do |e|
-          roles = e.object_class[ "roles" ]
-          if roles && roles[ "registrant" ]
-            registrant = e
-            break;
-          end
-        end
-        if registrant && registrant.jcard
-          jcard
-        end
-
-        @fetch_error = false
-
-      else
-
-        @fetch_error = true
-
+    def hit( time )
+      @total_queries = @total_queries + 1
+      if time
+        @first_query_time = time unless @first_query_time
+        @first_query_time = time if time < @first_query_time
+        @last_query_time = time unless @last_query_time
+        @last_query_time = time if time > @last_query_time
       end
-
     end
 
   end
 
-  class BulkIPDatum
+  class BulkIPFetchError
 
-    attr_accessor :network, :total_queries, :first_query_time, :last_query_time, :meta
+    attr_accessor :ipaddr, :time
 
-    def initialize( network, meta )
-      @network = network
-      @meta = meta
-      @total_queries = 1
-      @first_query_time = Time.now
-      @last_query_time = Time.now
-    end
-
-    def hit
-      @total_queries = @total_queries + 1
-      @last_query_time = Time.now
+    def initialize( ipaddr, time )
+      @ipaddr = ipaddr
+      @time = time
     end
 
   end
 
   class BulkIPData
 
-    attr_accessor :data
+    attr_accessor :data, :fetch_errors
 
     def initialize
       @data = Hash.new
+      @fetch_errors = Hash.new
     end
 
-    def hit_ipaddr( ipaddr )
+    def hit_ipaddr( ipaddr, time )
 
       retval = false
       @data.each do |datum_net, datum|
         if datum_net.include?( ipaddr )
-          datum.hit
+          datum.hit( time )
           retval = true
           break;
         end
@@ -95,30 +77,26 @@ module NicInfo
 
     end
 
-    def hit_network( network, meta )
+    def hit_network( ipnetwork )
 
-      unless network.is_a?( Array )
-        network = [ network ]
-      end
-
-      network.each do |n|
-        found = false
-        @data.each do |datum_net,datum|
-          if datum_net.include?( n )
-            datum.hit
-            found = true
-            break;
-          end
-        end
-        unless found
-          d = BulkIPDatum.new( n, meta )
-          @data[ n ] = d
-        end
+      cidrs = ipnetwork.summary_data[ NicInfo::CommonSummary::CIDRS ]
+      cidrs.each do |cidr|
+        d = BulkIPDatum.new( ipnetwork )
+        @data[ IPAddr.new( cidr ) ] = d
       end
 
     end
 
-  end
+    def fetch_error( ipaddr, time )
+      @fetch_errors << BulkIPFetchError.new( ipaddr, time )
+    end
 
+    def review_errors
+      @fetch_errors.delete_if do |fetch_error|
+        hit_ipaddr( fetch_error.ipaddr, fetch_error.time )
+      end
+    end
+
+  end
 
 end
