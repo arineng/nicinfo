@@ -865,7 +865,7 @@ HELP_SUMMARY
         b.foreach do |ip,time|
           @appctx.logger.trace( "bulk ip: #{ip} time: #{time}")
           ipaddr = IPAddr.new( ip )
-          unless NicInfo.is_global_unicast?( ipaddr )
+          unless bulkip_data.valid_to_query?( ipaddr )
             @appctx.logger.trace( "skipping non-global-unicast address #{ip}")
           else
             if !bulkip_data.hit_ipaddr( ipaddr, time )

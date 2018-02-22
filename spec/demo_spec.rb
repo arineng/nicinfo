@@ -137,6 +137,7 @@ describe 'demos' do
   # TODO look into jcr strict checking for roles
   # TODO ask RIPE about spaces in addresses nicinfo -V --json --pretty 109.1.1.1
   # TODO ask LACNIC why 201.127.1.1 info shows in Whois but now RDAP
+  # TODO ask AFRINIC about self links
 
   it 'domain-rir.json' do
 
