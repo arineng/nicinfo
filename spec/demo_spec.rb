@@ -138,6 +138,8 @@ describe 'demos' do
   # TODO ask RIPE about spaces in addresses nicinfo -V --json --pretty 109.1.1.1
   # TODO ask LACNIC why 201.127.1.1 info shows in Whois but now RDAP
   # TODO ask AFRINIC about self links
+  # TODO ask RIPE about 400 for 94.142.200.20
+  # TODO ask LACNIC about redirect for 148.0.86.4
 
   it 'domain-rir.json' do
 

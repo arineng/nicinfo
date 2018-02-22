@@ -292,6 +292,7 @@ module NicInfo
         end #end case
 
       elsif data.start_with?( NicInfo::REDIRECT_TO )
+        # TODO need to handle redirect loops somehow
         location = data.sub( NicInfo::REDIRECT_TO, "" ).strip
         return get( location, try + 1, expect_rdap, tracking_url)
       end #end if
