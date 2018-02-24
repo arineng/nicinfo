@@ -40,6 +40,8 @@ module NicInfo
 
   class RDAPQuery
 
+    MaxRedirects = 5
+
     attr_accessor :appctx
 
     def initialize( appctx )
@@ -283,7 +285,7 @@ module NicInfo
             @appctx.cache.create_or_update(url, data)
           else
             if res.code == "301" or res.code == "302" or res.code == "303" or res.code == "307" or res.code == "308"
-              res.error! if try >= 5
+              res.error! if try >= MaxRedirects
               location = res["location"]
               @appctx.cache.create_or_update( url, NicInfo::REDIRECT_TO + location )
               return get( location, try + 1, expect_rdap, tracking_url )
@@ -292,7 +294,7 @@ module NicInfo
         end #end case
 
       elsif data.start_with?( NicInfo::REDIRECT_TO )
-        # TODO need to handle redirect loops somehow
+        raise Net::HTTPRetriableError.new( nil, nil ) if try >= MaxRedirects
         location = data.sub( NicInfo::REDIRECT_TO, "" ).strip
         return get( location, try + 1, expect_rdap, tracking_url)
       end #end if
