@@ -859,6 +859,7 @@ HELP_SUMMARY
       end
       rdap_query = NicInfo::RDAPQuery.new( @appctx )
       bulkip_data = NicInfo::BulkIPData.new( @appctx )
+      bulkip_data.note_start_time
       Dir.glob( file_list ).each do |file|
         @appctx.logger.mesg( "Processing #{file}")
         b = BulkIPInFile.new( file )
@@ -880,10 +881,10 @@ HELP_SUMMARY
                     ipnetwork = NicInfo::process_ip( rdap_response.json_data, @appctx )
                     bulkip_data.hit_network( ipnetwork )
                   else
-                    bulkip_data.fetch_error( ipaddr, time )
+                    bulkip_data.fetch_error( ipaddr, time, rdap_response.code, "RDAP IP network type not returned" )
                   end
                 else
-                  bulkip_data.fetch_error( ipaddr, time )
+                  bulkip_data.fetch_error( ipaddr, time, rdap_response.code, rdap_response.exception.message )
                 end
               else
                 @appctx.logger.trace( "skipping #{ip} because network has already been retreived")
@@ -896,6 +897,7 @@ HELP_SUMMARY
         end
       end
       bulkip_data.review_fetch_errors
+      bulkip_data.note_end_time
       if @appctx.options.bulkip_out_csv
         bulkip_data.output_csv( @appctx.options.bulkip_out_csv )
       end

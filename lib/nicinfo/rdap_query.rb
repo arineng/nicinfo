@@ -156,6 +156,7 @@ module NicInfo
       rescue Net::HTTPRetriableError => e
         retval.error_state = true
         retval.exception = e
+        retval.code = 302
         @appctx.logger.mesg("Too many redirections, retries, or a redirect loop has been detected." )
       end
 
@@ -294,7 +295,7 @@ module NicInfo
         end #end case
 
       elsif data.start_with?( NicInfo::REDIRECT_TO )
-        raise Net::HTTPRetriableError.new( nil, nil ) if try >= MaxRedirects
+        raise Net::HTTPRetriableError.new( "Too many redirects", nil ) if try >= MaxRedirects
         location = data.sub( NicInfo::REDIRECT_TO, "" ).strip
         return get( location, try + 1, expect_rdap, tracking_url)
       end #end if
