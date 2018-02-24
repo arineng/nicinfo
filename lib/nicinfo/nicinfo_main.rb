@@ -863,8 +863,11 @@ HELP_SUMMARY
       Dir.glob( file_list ).each do |file|
         @appctx.logger.mesg( "Processing #{file}")
         b = BulkIPInFile.new( file )
-        b.foreach do |ip,time|
-          @appctx.logger.trace( "bulk ip: #{ip} time: #{time}")
+        b.foreach do |ip,time,lineno|
+          @appctx.logger.trace( "bulk ip: #{ip} time: #{time} line no: #{lineno}")
+          if lineno % 1000 == 0
+            @appctx.logger.mesg( "Processing line #{lineno} of #{file}")
+          end
           begin
             ipaddr = IPAddr.new( ip )
             unless bulkip_data.valid_to_query?( ipaddr )

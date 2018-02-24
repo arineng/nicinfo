@@ -222,11 +222,13 @@ module NicInfo
       if @strategy == nil
         raise RuntimeError unless has_strategy
       end
+      i = 0
       File.foreach( @file_name ) do |line|
         fields = line.split( /\s/ )
         ip = get_ip( fields )
         time = get_time( fields )
-        yield( ip, time )
+        yield( ip, time, i )
+        i = i + 1
       end
     end
 
