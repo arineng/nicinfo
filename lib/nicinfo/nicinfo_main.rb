@@ -184,7 +184,7 @@ module NicInfo
 
         opts.on( "--messages-out FILE",
                  "FILE where messages will be written." ) do |f|
-          @appctx.logger.messages_out = File.open( f, "w+" )
+          @appctx.logger.message_out = File.open( f, "w+" )
         end
 
         opts.on( "--data DATA_AMOUNT",
@@ -324,8 +324,9 @@ module NicInfo
         puts e.message
         puts "use -h for help"
         exit
-      rescue
-        puts "Unable to parse command line options"
+      rescue => e
+        puts "Problem with option"
+        puts e.message
         puts "use -h for help"
         exit
       end
