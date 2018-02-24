@@ -54,7 +54,7 @@ module NicInfo
 
   class BulkIPData
 
-    attr_accessor :data, :fetch_errors, :appctx
+    attr_accessor :data, :fetch_errors, :ip_errors, :appctx
 
     ColumnHeaders = [ "Network", "Hits", "Avgd Hits/S", "Time Span", "Registry", "Listed Name", "Listed Country", "Abuse Email" ]
     UrlColumnHeaders = [ "Total Queries", "Averaged QPS", "URL" ]
@@ -64,6 +64,7 @@ module NicInfo
       @appctx = appctx
       @data = Hash.new
       @fetch_errors = Array.new
+      @ip_errors = Array.new
       @non_global_unicast = 0
       @network_lookups = 0
       @total_hits = 0
@@ -110,10 +111,14 @@ module NicInfo
       @total_fetch_errors = @total_fetch_errors + 1
     end
 
-    def review_errors
+    def review_fetch_errors
       @fetch_errors.delete_if do |fetch_error|
         hit_ipaddr( fetch_error.ipaddr, fetch_error.time )
       end
+    end
+
+    def ip_error( ip )
+      @ip_errors << ip
     end
 
     def output_tsv( file_name )
@@ -138,6 +143,14 @@ module NicInfo
         f.puts( "Unresolved Fetch Errors" )
         @fetch_errors.each do |fetch_error|
           f.puts( fetch_error.ipaddr.to_s )
+        end
+      end
+
+      unless @ip_errors.empty?
+        f.puts
+        f.puts( "Unrecognized IP Addresses" )
+        @ip_errors.each do |ip|
+          f.puts( ip )
         end
       end
 

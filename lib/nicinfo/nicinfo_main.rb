@@ -890,11 +890,12 @@ HELP_SUMMARY
               end
             end
           rescue IPAddr::InvalidAddressError
+            bulkip_data.ip_error( ip )
             @appctx.logger.mesg( "Invalid IP address #{ip}", NicInfo::AttentionType::ERROR )
           end
         end
       end
-      bulkip_data.review_errors
+      bulkip_data.review_fetch_errors
       if @appctx.options.bulkip_out_csv
         bulkip_data.output_csv( @appctx.options.bulkip_out_csv )
       end
