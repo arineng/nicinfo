@@ -140,6 +140,7 @@ describe 'demos' do
   # TODO ask AFRINIC about self links
   # TODO ask RIPE about 400 for 94.142.200.20
   # TODO ask LACNIC about redirect for 148.0.86.4
+  # TODO ask APNIC about producing a 404
 
   it 'domain-rir.json' do
 
