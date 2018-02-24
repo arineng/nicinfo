@@ -117,6 +117,10 @@ module NicInfo
         @appctx.logger.mesg(a.message, NicInfo::AttentionType::ERROR )
         retval.error_state = true
         retval.exception = a
+      rescue SystemCallError => e
+        @appctx.logger.mesg(a.message, NicInfo::AttentionType::ERROR )
+        retval.error_state = true
+        retval.exception = e
       rescue ArgumentError => a
         @appctx.logger.mesg(a.message, NicInfo::AttentionType::ERROR )
         retval.error_state = true
