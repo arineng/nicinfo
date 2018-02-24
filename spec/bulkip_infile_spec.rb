@@ -19,6 +19,8 @@ require_relative '../lib/nicinfo/bulkip_infile'
 
 describe 'bulk_infile test' do
 
+  # TODO test when the strategy can't find ip or date column
+
   it 'should guess ips' do
     b = NicInfo::BulkIPInFile.new( nil )
 
