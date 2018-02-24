@@ -42,7 +42,7 @@ module NicInfo
       description.each do |line|
         @appctx.logger.prose NicInfo::DataAmount::NORMAL_DATA, i.to_s, line
         i = i + 1
-      end
+      end if description
       links = ec[ "links" ]
       @common.display_simple_links( links )
       @appctx.logger.end_data_item
