@@ -76,7 +76,7 @@ module NicInfo
         @appctx.conf_msgs << "end IP #{end_addr} is not an IP address (possibly a CIDR)"
       end
       @appctx.logger.terse "End Address", end_addr, NicInfo::AttentionType::SUCCESS
-      @appctx.logger.terse "CIDRs", @cidr_array.join( "," ) if @cidr_array.length > 0
+      @appctx.logger.terse "CIDRs", @cidr_array.join( ", " ) if @cidr_array.length > 0
       @appctx.logger.datum "IP Version", @objectclass[ "ipVersion" ]
       @appctx.logger.extra "Name", NicInfo.get_name( @objectclass )
       @appctx.logger.terse "Country", NicInfo.get_country( @objectclass )
