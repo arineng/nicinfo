@@ -55,7 +55,11 @@ module NicInfo
           extract_registrant_data( adminstrative )
         else
           technical = find_entity_by_role( entities, "technical" )
-          extract_registrant_data( technical ) if technical
+          if technical
+            extract_registrant_data( technical )
+          elsif entities.length > 0
+            extract_registrant_data( entities[ 0 ])
+          end
         end
       end
 
