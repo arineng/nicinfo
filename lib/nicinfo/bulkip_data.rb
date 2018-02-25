@@ -196,18 +196,18 @@ module NicInfo
     end
 
     def output_tsv( file_name )
-      @appctx.logger.trace( "writing TSV file #{file_name}")
       output_column_sv( file_name, ".tsv", "\t" )
     end
 
     def output_csv( file_name )
-      @appctx.logger.trace( "writing CSV file #{file_name}")
       output_column_sv( file_name, ".csv", "," )
     end
 
     def output_column_sv( file_name, extension, seperator )
 
-      f = File.open( file_name+"-blocks"+extension, "w" );
+      n = file_name+"-blocks"+extension
+      @appctx.logger.trace( "writing file #{n}")
+      f = File.open( n, "w" );
       f.puts( output_block_column_headers(seperator ) )
       @block_data.values.each do |datum|
         f.puts( output_block_columns(datum, seperator ) )
@@ -217,7 +217,9 @@ module NicInfo
       f.puts( "https://github.com/arineng/nicinfo" )
       f.close
 
-      f = File.open( file_name+"-networks"+extension, "w" );
+      n = file_name+"-networks"+extension
+      @appctx.logger.trace( "writing file #{n}")
+      f = File.open( n, "w" );
       f.puts( output_network_column_headers( seperator ) )
       @net_data.each do |datum|
         f.puts( output_network_columns( datum, seperator ) )
@@ -227,7 +229,9 @@ module NicInfo
       f.puts( "https://github.com/arineng/nicinfo" )
       f.close
 
-      f = File.open( file_name+"-listedname"+extension, "w" );
+      n = file_name+"-listedname"+extension
+      @appctx.logger.trace( "writing file #{n}")
+      f = File.open( n, "w" );
       f.puts( output_listed_column_headers( seperator ) )
       @listed_data.values.each do |datum |
         f.puts( output_listed_columns( datum, seperator ) )
@@ -237,7 +241,9 @@ module NicInfo
       f.puts( "https://github.com/arineng/nicinfo" )
       f.close
 
-      f = File.open( file_name+"-meta"+extension, "w" );
+      n = file_name+"-meta"+extension
+      @appctx.logger.trace( "writing file #{n}")
+      f = File.open( n, "w" );
       unless @fetch_errors.empty?
         f.puts
         f.puts( "Unresolved Fetch Errors" )
@@ -299,7 +305,7 @@ module NicInfo
       else
         t = datum.last_query_time.to_i - datum.first_query_time.to_i
         if t > 0
-          columns << datum.total_queries.fdiv( t ).to_s
+          columns << datum.total_queries.fdiv( t+1 ).to_s
         else
           columns << datum.total_queries.fdiv( 1 ).to_s
         end
@@ -323,7 +329,7 @@ module NicInfo
       else
         t = datum.last_query_time.to_i - datum.first_query_time.to_i
         if t > 0
-          columns << datum.total_queries.fdiv( t ).to_s
+          columns << datum.total_queries.fdiv( t+1 ).to_s
         else
           columns << datum.total_queries.fdiv( 1 ).to_s
         end
@@ -348,7 +354,7 @@ module NicInfo
       else
         t = datum.last_query_time.to_i - datum.first_query_time.to_i
         if t > 0
-          columns << datum.total_queries.fdiv( t ).to_s
+          columns << datum.total_queries.fdiv( t+1 ).to_s
         else
           columns << datum.total_queries.fdiv( 1 ).to_s
         end
