@@ -206,13 +206,17 @@ module NicInfo
         if @strategy[StripDateTime]
           time_field = DateTimeStripRegex.match( time_field )[2]
         end
-        case @strategy[DateTimeType]
-          when DateTimeRubyType
-            retval = Time.parse( time_field )
-          when DateTimeApacheType
-            retval = Time.strptime( time_field, ApacheTimeFormat )
-          when DateTimeApacheNoTZType
-            retval = Time.strptime( time_field, ApacheNoTZTimeFormat )
+        begin
+          case @strategy[DateTimeType]
+            when DateTimeRubyType
+              retval = Time.parse( time_field )
+            when DateTimeApacheType
+              retval = Time.strptime( time_field, ApacheTimeFormat )
+            when DateTimeApacheNoTZType
+              retval = Time.strptime( time_field, ApacheNoTZTimeFormat )
+          end
+        rescue => e
+          retval = nil
         end
       end
       return retval

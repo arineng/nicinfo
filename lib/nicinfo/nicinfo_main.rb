@@ -861,44 +861,52 @@ HELP_SUMMARY
       rdap_query = NicInfo::RDAPQuery.new( @appctx )
       bulkip_data = NicInfo::BulkIPData.new( @appctx )
       bulkip_data.note_start_time
-      Dir.glob( file_list ).each do |file|
-        @appctx.logger.mesg( "Processing #{file}")
-        b = BulkIPInFile.new( file )
-        b.foreach do |ip,time,lineno|
-          @appctx.logger.trace( "bulk ip: #{ip} time: #{time} line no: #{lineno}")
-          if lineno % 1000 == 0
-            @appctx.logger.mesg( "Processing line #{lineno} of #{file}")
-          end
-          begin
-            ipaddr = IPAddr.new( ip )
-            unless bulkip_data.valid_to_query?( ipaddr )
-              @appctx.logger.trace( "skipping non-global-unicast address #{ip}")
-            else
-              if !bulkip_data.hit_ipaddr( ipaddr, time )
-                query_value = [ ip ]
-                qtype = QueryType::BY_IP4_ADDR
-                qtype = QueryType::BY_IP6_ADDR if ipaddr.ipv6?
-                rdap_response = rdap_query.do_rdap_query( query_value, qtype, nil )
-                unless rdap_response.error_state
-                  rtype = get_query_type_from_result( rdap_response.json_data )
-                  if rtype == QueryType::BY_IP
-                    ipnetwork = NicInfo::process_ip( rdap_response.json_data, @appctx )
-                    bulkip_data.hit_network( ipnetwork, time )
+      current_file = nil
+      current_lineno = nil
+      begin
+        Dir.glob( file_list ).each do |file|
+          @appctx.logger.mesg( "Processing #{file}")
+          current_file = file
+          b = BulkIPInFile.new( file )
+          b.foreach do |ip,time,lineno|
+            @appctx.logger.trace( "bulk ip: #{ip} time: #{time} line no: #{lineno}")
+            current_lineno = lineno
+            if lineno % 1000 == 0
+              @appctx.logger.mesg( "Processing line #{lineno} of #{file}")
+            end
+            begin
+              ipaddr = IPAddr.new( ip )
+              unless bulkip_data.valid_to_query?( ipaddr )
+                @appctx.logger.trace( "skipping non-global-unicast address #{ip}")
+              else
+                if !bulkip_data.hit_ipaddr( ipaddr, time )
+                  query_value = [ ip ]
+                  qtype = QueryType::BY_IP4_ADDR
+                  qtype = QueryType::BY_IP6_ADDR if ipaddr.ipv6?
+                  rdap_response = rdap_query.do_rdap_query( query_value, qtype, nil )
+                  unless rdap_response.error_state
+                    rtype = get_query_type_from_result( rdap_response.json_data )
+                    if rtype == QueryType::BY_IP
+                      ipnetwork = NicInfo::process_ip( rdap_response.json_data, @appctx )
+                      bulkip_data.hit_network( ipnetwork, time )
+                    else
+                      bulkip_data.fetch_error( ipaddr, time, rdap_response.code, "RDAP IP network type not returned" )
+                    end
                   else
-                    bulkip_data.fetch_error( ipaddr, time, rdap_response.code, "RDAP IP network type not returned" )
+                    bulkip_data.fetch_error( ipaddr, time, rdap_response.code, rdap_response.exception.message )
                   end
                 else
-                  bulkip_data.fetch_error( ipaddr, time, rdap_response.code, rdap_response.exception.message )
+                  @appctx.logger.trace( "skipping #{ip} because network has already been retreived")
                 end
-              else
-                @appctx.logger.trace( "skipping #{ip} because network has already been retreived")
               end
+            rescue IPAddr::Error
+              bulkip_data.ip_error( ip )
+              @appctx.logger.mesg( "Invalid IP address #{ip}", NicInfo::AttentionType::ERROR )
             end
-          rescue IPAddr::InvalidAddressError
-            bulkip_data.ip_error( ip )
-            @appctx.logger.mesg( "Invalid IP address #{ip}", NicInfo::AttentionType::ERROR )
           end
         end
+      rescue Interrupt
+        @appctx.logger.mesg( "Processing interrupted at #{current_lineno} in #{current_file}")
       end
       bulkip_data.review_fetch_errors
       bulkip_data.note_end_time
