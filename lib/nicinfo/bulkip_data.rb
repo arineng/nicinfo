@@ -20,7 +20,53 @@ require 'nicinfo/common_summary'
 
 module NicInfo
 
-  class BulkIPDatum
+  class BulkIPNetwork
+
+    attr_accessor :ipnetwork, :total_queries, :first_query_time, :last_query_time
+
+    def initialize( ipnetwork )
+      @ipnetwork = ipnetwork
+      @total_queries = 1
+    end
+
+    def hit( time )
+      @total_queries = @total_queries + 1
+      if time
+        @first_query_time = time unless @first_query_time
+        @first_query_time = time if time < @first_query_time
+        @last_query_time = time unless @last_query_time
+        @last_query_time = time if time > @last_query_time
+      end
+    end
+
+  end
+
+  class BulkIPBlock
+
+    attr_accessor :cidrstring, :bulkipnetwork, :bulkiplisted, :total_queries, :first_query_time, :last_query_time
+
+    def initialize( cidrstring, bulkipnetwork, bulkiplisted )
+      @bulkiplisted = bulkiplisted
+      @bulkipnetwork = bulkipnetwork
+      @cidrstring = cidrstring
+      @total_queries = 1
+    end
+
+    def hit( time )
+      @total_queries = @total_queries + 1
+      if time
+        @first_query_time = time unless @first_query_time
+        @first_query_time = time if time < @first_query_time
+        @last_query_time = time unless @last_query_time
+        @last_query_time = time if time > @last_query_time
+      end
+      bulkipnetwork.hit( time )
+      bulkiplisted.hit( time )
+    end
+
+  end
+
+  class BulkIPListed
 
     attr_accessor :ipnetwork, :total_queries, :first_query_time, :last_query_time
 
@@ -56,15 +102,19 @@ module NicInfo
 
   class BulkIPData
 
-    attr_accessor :data, :fetch_errors, :ip_errors, :appctx
+    attr_accessor :net_data, :listed_data, :block_data, :fetch_errors, :ip_errors, :appctx
 
-    ColumnHeaders = [ "Network", "Hits", "Avgd Hits/S", "Time Span", "Registry", "Listed Name", "Listed Country", "Abuse Email" ]
+    BlockColumnHeaders = [ "Block", "Hits", "Avgd Hits/S", "Time Span", "Registry", "Listed Name", "Listed Country", "Abuse Email" ]
+    NetworkColumnHeaders = [ "Network", "Hits", "Avgd Hits/S", "Time Span", "Registry", "Listed Name", "Listed Country", "Abuse Email" ]
+    ListedColumnHeaders = [ "Listed Name", "Hits", "Avgd Hits/S", "Time Span", "Registry", "Listed Country", "Abuse Email" ]
     UrlColumnHeaders = [ "Total Queries", "Averaged QPS", "URL" ]
     NotApplicable = "N/A"
 
     def initialize( appctx )
       @appctx = appctx
-      @data = Hash.new
+      @block_data = Hash.new
+      @listed_data = Hash.new
+      @net_data = Array.new
       @fetch_errors = Array.new
       @ip_errors = Array.new
       @non_global_unicast = 0
@@ -90,7 +140,7 @@ module NicInfo
     def hit_ipaddr( ipaddr, time )
 
       retval = false
-      @data.each do |datum_net, datum|
+      @block_data.each do |datum_net, datum|
         if datum_net.include?( ipaddr )
           datum.hit( time )
           retval = true
@@ -105,10 +155,21 @@ module NicInfo
 
     def hit_network( ipnetwork )
 
+      bulkipnetwork = BulkIPNetwork.new( ipnetwork )
+      @net_data << bulkipnetwork
+
+      listed_name = ipnetwork.summary_data[ NicInfo::CommonSummary::LISTED_NAME ]
+      listed_name = NotApplicable unless listed_name
+      bulkiplisted = @listed_data[ listed_name ]
+      unless bulkiplisted
+        bulkiplisted = BulkIPListed.new( ipnetwork )
+        @listed_data[ listed_name ] = bulkiplisted
+      end
+
       cidrs = ipnetwork.summary_data[ NicInfo::CommonSummary::CIDRS ]
       cidrs.each do |cidr|
-        d = BulkIPDatum.new( ipnetwork )
-        @data[ IPAddr.new( cidr ) ] = d
+        b = BulkIPBlock.new( cidr, bulkipnetwork, bulkiplisted )
+        @block_data[IPAddr.new( cidr ) ] = b
       end
 
       @total_hits = @total_hits + 1
@@ -143,9 +204,23 @@ module NicInfo
 
     def output_column_sv( file_name, seperator )
       f = File.open( file_name, "w" );
-      f.puts( output_column_headers( seperator ) )
-      @data.each do |datum_net, datum|
-        f.puts( output_columns( datum_net, datum, seperator ) )
+
+      f.puts( "Hits by Network Blocks" )
+      f.puts( output_block_column_headers(seperator ) )
+      @block_data.values do |datum|
+        f.puts( output_block_columns(datum, seperator ) )
+      end
+
+      f.puts( "Hits by Network Registrations" )
+      f.puts( output_network_column_headers( seperator ) )
+      @net_data.each do |datum|
+        f.puts( output_network_columns( datum, seperator ) )
+      end
+
+      f.puts( "Hits by Listed Name" )
+      f.puts( output_listed_column_headers( seperator ) )
+      @listed_data.values do |datum |
+        f.puts( output_listed_columns( datum, seperator ) )
       end
 
       unless @fetch_errors.empty?
@@ -187,13 +262,21 @@ module NicInfo
       f.close
     end
 
-    def output_column_headers( seperator )
-      return ColumnHeaders.join( seperator )
+    def output_block_column_headers(seperator )
+      return BlockColumnHeaders.join(seperator )
     end
 
-    def output_columns( datum_net, datum, seperator )
+    def output_network_column_headers( seperator )
+      return NetworkColumnHeaders.join( seperator )
+    end
+
+    def output_listed_column_headers( seperator )
+      return ListedColumnHeaders.join( seperator )
+    end
+
+    def output_block_columns(datum, seperator )
       columns = Array.new
-      columns << datum_net.to_s
+      columns << datum.cidrstring
       columns << datum.total_queries.to_s
       if datum.last_query_time == nil or datum.first_query_time == nil
         columns << NotApplicable #hits/s
@@ -207,10 +290,58 @@ module NicInfo
         end
         columns << "#{datum.first_query_time.strftime('%d %b %Y %H:%M:%S')} - #{datum.last_query_time.strftime('%d %b %Y %H:%M:%S')}"
       end
-      columns << to_columnar_string( datum.ipnetwork.summary_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ], seperator )
-      columns << to_columnar_string( datum.ipnetwork.summary_data[ NicInfo::CommonSummary::LISTED_NAME ], seperator )
-      columns << to_columnar_string( datum.ipnetwork.summary_data[ NicInfo::CommonSummary::LISTED_COUNTRY ], seperator )
-      columns << to_columnar_string( datum.ipnetwork.summary_data[ NicInfo::CommonSummary::ABUSE_EMAIL ], seperator )
+      summary_data = datum.bulkipnetwork.ipnetwork.summary_data
+      columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ], seperator )
+      columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::LISTED_NAME ], seperator )
+      columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::LISTED_COUNTRY ], seperator )
+      columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::ABUSE_EMAIL ], seperator )
+      return columns.join( seperator )
+    end
+
+    def output_network_columns( datum, seperator )
+      columns = Array.new
+      columns << datum.ipnetwork.get_cn
+      columns << datum.total_queries.to_s
+      if datum.last_query_time == nil or datum.first_query_time == nil
+        columns << NotApplicable #hits/s
+        columns << NotApplicable #timespan
+      else
+        t = datum.last_query_time.to_i - datum.first_query_time.to_i
+        if t > 0
+          columns << datum.total_queries.fdiv( t ).to_s
+        else
+          columns << NotApplicable
+        end
+        columns << "#{datum.first_query_time.strftime('%d %b %Y %H:%M:%S')} - #{datum.last_query_time.strftime('%d %b %Y %H:%M:%S')}"
+      end
+      summary_data = datum.ipnetwork.summary_data
+      columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ], seperator )
+      columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::LISTED_NAME ], seperator )
+      columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::LISTED_COUNTRY ], seperator )
+      columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::ABUSE_EMAIL ], seperator )
+      return columns.join( seperator )
+    end
+
+    def output_listed_columns( datum, seperator )
+      columns = Array.new
+      summary_data = datum.ipnetwork.summary_data
+      columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ], seperator )
+      columns << datum.total_queries.to_s
+      if datum.last_query_time == nil or datum.first_query_time == nil
+        columns << NotApplicable #hits/s
+        columns << NotApplicable #timespan
+      else
+        t = datum.last_query_time.to_i - datum.first_query_time.to_i
+        if t > 0
+          columns << datum.total_queries.fdiv( t ).to_s
+        else
+          columns << NotApplicable
+        end
+        columns << "#{datum.first_query_time.strftime('%d %b %Y %H:%M:%S')} - #{datum.last_query_time.strftime('%d %b %Y %H:%M:%S')}"
+      end
+      columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ], seperator )
+      columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::LISTED_COUNTRY ], seperator )
+      columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::ABUSE_EMAIL ], seperator )
       return columns.join( seperator )
     end
 

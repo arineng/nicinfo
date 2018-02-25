@@ -97,8 +97,8 @@ module NicInfo
         else
           rdap_url = query[0]
         end
-        retval.data = get( rdap_url, 0, true, bootstrap_url )
-        retval.json_data = JSON.load retval.data
+        retval.data = get(rdap_url, 0, true, bootstrap_url )
+        retval.json_data = JSON.load(retval.data)
         if (ec = retval.json_data[ NicInfo::NICINFO_DEMO_ERROR ]) != nil
           res = MyHTTPResponse.new( "1.1", ec, "Demo Exception" )
           res["content-type"] = NicInfo::RDAP_CONTENT_TYPE
