@@ -883,7 +883,7 @@ HELP_SUMMARY
                   rtype = get_query_type_from_result( rdap_response.json_data )
                   if rtype == QueryType::BY_IP
                     ipnetwork = NicInfo::process_ip( rdap_response.json_data, @appctx )
-                    bulkip_data.hit_network( ipnetwork )
+                    bulkip_data.hit_network( ipnetwork, time )
                   else
                     bulkip_data.fetch_error( ipaddr, time, rdap_response.code, "RDAP IP network type not returned" )
                   end
