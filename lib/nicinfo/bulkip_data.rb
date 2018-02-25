@@ -207,19 +207,21 @@ module NicInfo
 
       f.puts( "Hits by Network Blocks" )
       f.puts( output_block_column_headers(seperator ) )
-      @block_data.values do |datum|
+      @block_data.values.each do |datum|
         f.puts( output_block_columns(datum, seperator ) )
       end
 
+      f.puts
       f.puts( "Hits by Network Registrations" )
       f.puts( output_network_column_headers( seperator ) )
       @net_data.each do |datum|
         f.puts( output_network_columns( datum, seperator ) )
       end
 
+      f.puts
       f.puts( "Hits by Listed Name" )
       f.puts( output_listed_column_headers( seperator ) )
-      @listed_data.values do |datum |
+      @listed_data.values.each do |datum |
         f.puts( output_listed_columns( datum, seperator ) )
       end
 
@@ -325,7 +327,7 @@ module NicInfo
     def output_listed_columns( datum, seperator )
       columns = Array.new
       summary_data = datum.ipnetwork.summary_data
-      columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ], seperator )
+      columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::LISTED_NAME ], seperator )
       columns << datum.total_queries.to_s
       if datum.last_query_time == nil or datum.first_query_time == nil
         columns << NotApplicable #hits/s
