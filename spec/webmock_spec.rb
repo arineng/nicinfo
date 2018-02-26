@@ -355,7 +355,8 @@ describe 'web mocks' do
     config.logger=logger
     config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
-    args = [ "--bulkip-in", "spec/bulkip/ex5.log" ]
+    file_out = File.join( dir, "bulkip_out" )
+    args = [ "--bulkip-in", "spec/bulkip/ex5.log", "--bulkip-out-tsv", file_out, "--bulkip-out-csv", file_out ]
 
     expect{ NicInfo::Main.new( args, config ).run }.to_not output.to_stdout
 
