@@ -917,6 +917,7 @@ HELP_SUMMARY
         bulkip_data.output_tsv( @appctx.options.bulkip_out_tsv )
       end
       show_tracked_urls
+      @appctx.logger.mesg( "Bulk IP Lookups Finished.")
     end
 
   end
