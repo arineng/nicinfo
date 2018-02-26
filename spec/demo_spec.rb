@@ -17,7 +17,7 @@ require 'fileutils'
 require 'pp'
 require 'spec_helper'
 require 'rspec'
-require_relative '../lib/nicinfo/config'
+require_relative '../lib/nicinfo/appctx'
 require_relative '../lib/nicinfo/nicinfo_main'
 require_relative '../lib/nicinfo/nicinfo_logger'
 
@@ -44,7 +44,7 @@ describe 'demos' do
     logger.data_out = StringIO.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
     config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
@@ -52,7 +52,7 @@ describe 'demos' do
 
     main = NicInfo::Main.new( args, config )
     main.run
-    expect( main.cache.count).to eq( 16 )
+    expect( main.appctx.cache.count).to eq( 16 )
 
   end
 
@@ -63,14 +63,14 @@ describe 'demos' do
     logger.data_out = StringIO.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
     config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
     args = [ "--demo" ]
     main = NicInfo::Main.new( args, config )
     main.run
-    expect( main.cache.count).to eq( 16 )
+    expect( main.appctx.cache.count).to eq( 16 )
 
     args = [ "as10" ]
     main = NicInfo::Main.new( args, config )
@@ -87,14 +87,14 @@ describe 'demos' do
     logger.data_out = StringIO.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
     config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
     args = [ "--demo" ]
     main = NicInfo::Main.new( args, config )
     main.run
-    expect( main.cache.count).to eq( 16 )
+    expect( main.appctx.cache.count).to eq( 16 )
 
     args = [ "--type", "entityhandle", "restricted" ]
     main = NicInfo::Main.new( args, config )
@@ -111,14 +111,14 @@ describe 'demos' do
     logger.data_out = StringIO.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
     config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
     args = [ "--demo" ]
     main = NicInfo::Main.new( args, config )
     main.run
-    expect( main.cache.count).to eq( 16 )
+    expect( main.appctx.cache.count).to eq( 16 )
 
     args = [ "--jcr", "standard", "xn--fo-5ja.example" ]
     main = NicInfo::Main.new( args, config )
@@ -130,6 +130,18 @@ describe 'demos' do
 
   end
 
+  # TODO look at JCR checking status values properly
+  # TODO tell LACNIC they are doing status values wrong
+  # TODO tell RIPE they are doing IP addresses wrong
+  # TODO tell APNIC that they are escaping newlines in unstructured addresses
+  # TODO look into jcr strict checking for roles
+  # TODO ask RIPE about spaces in addresses nicinfo -V --json --pretty 109.1.1.1
+  # TODO ask LACNIC why 201.127.1.1 info shows in Whois but now RDAP
+  # TODO ask AFRINIC about self links
+  # TODO ask RIPE about 400 for 94.142.200.20
+  # TODO ask LACNIC about redirect for 148.0.86.4
+  # TODO ask APNIC about producing a 404
+
   it 'domain-rir.json' do
 
     dir = File.join( @work_dir, "domain-rir_json" )
@@ -137,14 +149,14 @@ describe 'demos' do
     logger.data_out = StringIO.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
     config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
     args = [ "--demo" ]
     main = NicInfo::Main.new( args, config )
     main.run
-    expect( main.cache.count).to eq( 16 )
+    expect( main.appctx.cache.count).to eq( 16 )
 
     args = [ "--jcr", "strict", "192.in-addr.arpa" ]
     main = NicInfo::Main.new( args, config )

@@ -18,7 +18,7 @@ require 'net/http'
 require 'net/https'
 require 'uri'
 require 'jcr'
-require 'nicinfo/config'
+require 'nicinfo/appctx'
 require 'nicinfo/constants'
 require 'nicinfo/cache'
 require 'nicinfo/enum'
@@ -34,6 +34,9 @@ require 'nicinfo/error_code'
 require 'ipaddr'
 require 'nicinfo/data_tree'
 require 'nicinfo/traceroute'
+require 'nicinfo/rdap_query'
+require 'nicinfo/bulkip_infile'
+require 'nicinfo/bulkip_data'
 begin
   require 'json'
 rescue LoadError
@@ -78,18 +81,18 @@ module NicInfo
   # The main class for the nicinfo command.
   class Main
 
-    attr_accessor :config, :cache, :jcr_context, :jcr_strict_context
+    attr_accessor :appctx, :jcr_context, :jcr_strict_context
 
-    def initialize args, config = nil
+    def initialize args, appctx = nil
 
-      if config
-        @config = config
+      if appctx
+        @appctx = appctx
       else
-        @config = NicInfo::Config.new(NicInfo::Config::formulate_app_data_dir())
+        @appctx = NicInfo::AppContext.new(NicInfo::AppContext::formulate_app_data_dir())
       end
 
-      @config.options.require_query = true
-      @config.options.jcr = JcrMode::NO_VALIDATION
+      @appctx.options.require_query = true
+      @appctx.options.jcr = JcrMode::NO_VALIDATION
 
       @opts = OptionParser.new do |opts|
 
@@ -121,19 +124,19 @@ module NicInfo
                 "  help         - server help") do |type|
           uptype = type.upcase
           raise OptionParser::InvalidArgument, type.to_s unless QueryType.has_value?(uptype)
-          @config.options.query_type = uptype
-          @config.options.require_query = false if uptype == "HELP"
+          @appctx.options.query_type = uptype
+          @appctx.options.require_query = false if uptype == "HELP"
         end
 
         opts.on("-r", "--reverse",
                 "Creates a reverse DNS name from an IP address. ") do |reverse|
-          @config.options.reverse_ip = true
+          @appctx.options.reverse_ip = true
         end
 
         opts.on("-b", "--base (or bootstrap) URL",
                 "The base URL of the RDAP Service.",
                 "When set, the internal bootstrap is bypassed.") do |url|
-          @config.config[ NicInfo::BOOTSTRAP][ NicInfo::BOOTSTRAP_URL ] = url
+          @appctx.config[ NicInfo::BOOTSTRAP][ NicInfo::BOOTSTRAP_URL ] = url
         end
 
         opts.separator ""
@@ -141,26 +144,26 @@ module NicInfo
 
         opts.on("--cache-expiry SECONDS",
                 "Age in seconds of items in the cache to be considered expired.") do |s|
-          @config.config[ NicInfo::CACHE ][ NicInfo::CACHE_EXPIRY ] = s
+          @appctx.config[ NicInfo::CACHE ][ NicInfo::CACHE_EXPIRY ] = s
         end
 
         opts.on("--cache YES|NO|TRUE|FALSE",
                 "Controls if the cache is used or not.") do |cc|
-          @config.config[ NicInfo::CACHE ][ NicInfo::USE_CACHE ] = false if cc =~ /no|false/i
-          @config.config[ NicInfo::CACHE ][ NicInfo::USE_CACHE ] = true if cc =~ /yes|true/i
+          @appctx.config[ NicInfo::CACHE ][ NicInfo::USE_CACHE ] = false if cc =~ /no|false/i
+          @appctx.config[ NicInfo::CACHE ][ NicInfo::USE_CACHE ] = true if cc =~ /yes|true/i
           raise OptionParser::InvalidArgument, cc.to_s unless cc =~ /yes|no|true|false/i
         end
 
         opts.on("--empty-cache",
                 "Empties the cache of all files regardless of eviction policy.") do |cc|
-          @config.options.empty_cache = true
-          @config.options.require_query = false
+          @appctx.options.empty_cache = true
+          @appctx.options.require_query = false
         end
 
         opts.on("--demo",
                 "Populates the cache with demonstration results.") do |cc|
-          @config.options.demo = true
-          @config.options.require_query = false
+          @appctx.options.demo = true
+          @appctx.options.require_query = false
         end
 
         opts.separator ""
@@ -171,9 +174,9 @@ module NicInfo
                  "  none - no messages are to be output",
                  "  some - some messages but not all",
                  "  all  - all messages to be outupt" ) do |m|
-          @config.logger.message_level = m.to_s.upcase
+          @appctx.logger.message_level = m.to_s.upcase
           begin
-            @config.logger.validate_message_level
+            @appctx.logger.validate_message_level
           rescue
             raise OptionParser::InvalidArgument, m.to_s
           end
@@ -181,7 +184,7 @@ module NicInfo
 
         opts.on( "--messages-out FILE",
                  "FILE where messages will be written." ) do |f|
-          @config.logger.messages_out = File.open( f, "w+" )
+          @appctx.logger.message_out = File.open( f, "w+" )
         end
 
         opts.on( "--data DATA_AMOUNT",
@@ -189,9 +192,9 @@ module NicInfo
                  "  terse  - enough data to identify the object",
                  "  normal - normal view of data on objects",
                  "  extra  - all data about the object" ) do |d|
-          @config.logger.data_amount = d.to_s.upcase
+          @appctx.logger.data_amount = d.to_s.upcase
           begin
-            @config.logger.validate_data_amount
+            @appctx.logger.validate_data_amount
           rescue
             raise OptionParser::InvalidArgument, d.to_s
           end
@@ -199,13 +202,13 @@ module NicInfo
 
         opts.on( "--data-out FILE",
                  "FILE where data will be written." ) do |f|
-          @config.logger.data_out = File.open( f, "w+" )
+          @appctx.logger.data_out = File.open( f, "w+" )
         end
 
         opts.on( "--pager YES|NO|TRUE|FALSE",
                  "Turns the pager on and off." ) do |pager|
-          @config.logger.pager = false if pager =~ /no|false/i
-          @config.logger.pager = true if pager =~ /yes|true/i
+          @appctx.logger.pager = false if pager =~ /no|false/i
+          @appctx.logger.pager = true if pager =~ /yes|true/i
           raise OptionParser::InvalidArgument, pager.to_s unless pager =~ /yes|no|true|false/i
         end
 
@@ -214,34 +217,39 @@ module NicInfo
                  "  dark  - for terminals with dark backgrounds",
                  "  light - for terminals with light backgrounds",
                  "  none  - turn off colors" ) do |cs|
-          @config.logger.color_scheme = cs.to_s.upcase
+          @appctx.logger.color_scheme = cs.to_s.upcase
           raise OptionParser::InvalidArgument, cs.to_s unless cs =~ /dark|light|none/i
         end
 
         opts.on( "-V",
                  "Equivalent to --messages all and --data extra" ) do |v|
-          @config.logger.data_amount = NicInfo::DataAmount::EXTRA_DATA
-          @config.logger.message_level = NicInfo::MessageLevel::ALL_MESSAGES
+          @appctx.logger.data_amount = NicInfo::DataAmount::EXTRA_DATA
+          @appctx.logger.message_level = NicInfo::MessageLevel::ALL_MESSAGES
         end
 
         opts.on( "-Q",
                  "Equivalent to --messages none and --data extra and --pager false" ) do |q|
-          @config.logger.data_amount = NicInfo::DataAmount::EXTRA_DATA
-          @config.logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
-          @config.logger.pager = false
+          @appctx.logger.data_amount = NicInfo::DataAmount::EXTRA_DATA
+          @appctx.logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
+          @appctx.logger.pager = false
         end
 
         opts.on( "--json",
                  "Output raw JSON response." ) do |json|
-          @config.options.output_json = true
+          @appctx.options.output_json = true
         end
 
         opts.on( "--jv VALUE",
                  "Outputs a specific JSON value." ) do |value|
-          unless @config.options.json_values
-            @config.options.json_values = Array.new
+          unless @appctx.options.json_values
+            @appctx.options.json_values = Array.new
           end
-          @config.options.json_values << value
+          @appctx.options.json_values << value
+        end
+
+        opts.on( "--pretty",
+                 "Output JSON in a pretty format" ) do |pretty|
+          @appctx.options.pretty = true
         end
 
         opts.separator ""
@@ -249,8 +257,8 @@ module NicInfo
 
         opts.on( "--try-insecure YES|NO|TRUE|FALSE",
                  "Try HTTP if HTTPS fails" ) do |try_insecure|
-          @config.config[ NicInfo::SECURITY ][ NicInfo::TRY_INSECURE ] = false if try_insecure =~ /no|false/i
-          @config.config[ NicInfo::SECURITY ][ NicInfo::TRY_INSECURE ] = true if try_insecure =~ /yes|true/i
+          @appctx.config[ NicInfo::SECURITY ][ NicInfo::TRY_INSECURE ] = false if try_insecure =~ /no|false/i
+          @appctx.config[NicInfo::SECURITY ][NicInfo::TRY_INSECURE ] = true if try_insecure =~ /yes|true/i
           raise OptionsParser::InvalidArgument, try_insecure.to_s unless try_insecure =~/yes|no|true|false/i
         end
 
@@ -259,29 +267,49 @@ module NicInfo
 
         opts.on( "-h", "--help",
                  "Show this message" ) do
-          @config.options.help = true
-          @config.options.require_query = false
+          @appctx.options.help = true
+          @appctx.options.require_query = false
         end
 
         opts.on( "--reset",
                  "Reset configuration to defaults" ) do
-          @config.options.reset_config = true
-          @config.options.require_query = false
+          @appctx.options.reset_config = true
+          @appctx.options.require_query = false
         end
 
         opts.on( "--iana",
                  "Download RDAP bootstrap files from IANA" ) do
-          @config.options.get_iana_files = true
-          @config.options.require_query = false
+          @appctx.options.get_iana_files = true
+          @appctx.options.require_query = false
         end
 
         opts.on( "--jcr STANDARD|STRICT",
                  "Validate RDAP response with JCR") do |mode|
           upmode = mode.upcase
           raise OptionParser::InvalidArgument, type.to_s unless JcrMode.has_value?(upmode)
-          @config.options.jcr = upmode
+          @appctx.options.jcr = upmode
           get_jcr_context if upmode == JcrMode::STANDARD_VALIDATION
           get_jcr_strict_context if upmode == JcrMode::STRICT_VALIDATION
+        end
+
+        opts.separator ""
+        opts.separator "Bulk IP Options:"
+
+        opts.on( "--bulkip-in FILES",
+                 "Bulk IP input files" ) do |files|
+          @appctx.options.bulkip_in = files
+          @appctx.options.do_bulkip = true
+          @appctx.options.require_query = false
+        end
+
+        opts.on( "--bulkip-out-csv FILE",
+                 "Bulk IP CSV output" ) do |file|
+          @appctx.options.bulkip_out_csv = file
+        end
+
+        opts.on( "--bulkip-out-tsv FILE",
+                 "Bulk IP TSV output" ) do |file|
+          @appctx.options.bulkip_out_tsv = file
         end
 
       end
@@ -296,86 +324,20 @@ module NicInfo
         puts e.message
         puts "use -h for help"
         exit
-      rescue
-        puts "Unable to parse command line options"
+      rescue => e
+        puts "Problem with option"
+        puts e.message
         puts "use -h for help"
         exit
       end
-      @config.options.argv = args
+      @appctx.options.argv = args
 
     end
-
-    def make_rdap_url( base_url, resource_path )
-      unless base_url.end_with?("/")
-        base_url << "/"
-      end
-      base_url << resource_path
-    end
-
-    # Do an HTTP GET with the path.
-    def get url, try, expect_rdap = true
-
-      data = @cache.get(url)
-      if data == nil
-
-        @config.logger.trace("Issuing GET for " + url)
-        uri = URI.parse( URI::encode( url ) )
-        req = Net::HTTP::Get.new(uri.request_uri)
-        req["User-Agent"] = NicInfo::VERSION_LABEL
-        req["Accept"] = NicInfo::RDAP_CONTENT_TYPE + ", " + NicInfo::JSON_CONTENT_TYPE
-        req["Connection"] = "close"
-        http = Net::HTTP.new( uri.host, uri.port )
-        if uri.scheme == "https"
-          http.use_ssl=true
-          http.verify_mode=OpenSSL::SSL::VERIFY_NONE
-        end
-
-        begin
-          res = http.start do |http_req|
-            http_req.request(req)
-          end
-        rescue OpenSSL::SSL::SSLError => e
-          if @config.config[ NicInfo::SECURITY ][ NicInfo::TRY_INSECURE ]
-            @config.logger.mesg( "Secure connection failed. Trying insecure connection." )
-            uri.scheme = "http"
-            return get( uri.to_s, try, expect_rdap )
-          else
-            raise e
-          end
-        end
-
-        case res
-          when Net::HTTPSuccess
-            content_type = res[ "content-type" ].downcase
-            if expect_rdap
-              unless content_type.include?(NicInfo::RDAP_CONTENT_TYPE) or content_type.include?(NicInfo::JSON_CONTENT_TYPE)
-                raise Net::HTTPServerException.new("Bad Content Type", res)
-              end
-              if content_type.include? NicInfo::JSON_CONTENT_TYPE
-                @config.conf_msgs << "Server responded with non-RDAP content type but it is JSON"
-              end
-            end
-            data = res.body
-            @cache.create_or_update(url, data)
-          else
-            if res.code == "301" or res.code == "302" or res.code == "303" or res.code == "307" or res.code == "308"
-              res.error! if try >= 5
-              location = res["location"]
-              return get( location, try + 1, expect_rdap)
-            end
-            res.error!
-        end #end case
-
-      end #end if
-
-      return data
-
-    end #end def
 
     # Do an HTTP GET of a file
     def get_file_via_http url, file_name, try
 
-      @config.logger.trace("Downloading " + url + " to " + file_name )
+      @appctx.logger.trace("Downloading " + url + " to " + file_name )
       uri = URI.parse( URI::encode( url ) )
       req = Net::HTTP::Get.new(uri.request_uri)
       req["User-Agent"] = NicInfo::VERSION_LABEL
@@ -406,33 +368,32 @@ module NicInfo
 
     def run
 
-      @config.logger.run_pager
-      @config.logger.mesg(NicInfo::VERSION_LABEL, NicInfo::AttentionType::PRIMARY )
-      @config.setup_workspace
-      @config.check_config_version
-      @cache = Cache.new(@config)
-      @cache.clean if @config.config[ NicInfo::CACHE ][ NicInfo::CLEAN_CACHE ]
+      @appctx.logger.run_pager
+      @appctx.logger.mesg(NicInfo::VERSION_LABEL, NicInfo::AttentionType::PRIMARY )
+      @appctx.setup_workspace
+      @appctx.check_config_version
+      @appctx.configure_cache
 
-      if @config.options.empty_cache
-        @cache.empty
+      if @appctx.options.empty_cache
+        @appctx.cache.empty
       end
 
-      if @config.options.get_iana_files
+      if @appctx.options.get_iana_files
         get_iana_files
       else
-        check_bsfiles_age = @config.check_bsfiles_age?
-        update_bsfiles = @config.update_bsfiles?( check_bsfiles_age )
+        check_bsfiles_age = @appctx.check_bsfiles_age?
+        update_bsfiles = @appctx.update_bsfiles?( check_bsfiles_age )
         if update_bsfiles
-          @config.logger.mesg( "IANA RDAP bootstrap files are old and need to be updated.", NicInfo::AttentionType::ERROR )
+          @appctx.logger.mesg( "IANA RDAP bootstrap files are old and need to be updated.", NicInfo::AttentionType::ERROR )
           get_iana_files
         elsif check_bsfiles_age
-          @config.logger.mesg( "IANA RDAP bootstrap files are old. Update them with --iana option", NicInfo::AttentionType::ERROR )
+          @appctx.logger.mesg( "IANA RDAP bootstrap files are old. Update them with --iana option", NicInfo::AttentionType::ERROR )
         end
       end
 
-      if @config.options.demo
-        @config.logger.mesg( "Populating cache with demonstration results", NicInfo::AttentionType::INFO )
-        @config.logger.mesg( "Try the following demonstration queries:", NicInfo::AttentionType::INFO )
+      if @appctx.options.demo
+        @appctx.logger.mesg( "Populating cache with demonstration results", NicInfo::AttentionType::INFO )
+        @appctx.logger.mesg( "Try the following demonstration queries:", NicInfo::AttentionType::INFO )
         demo_dir = File.join( File.dirname( __FILE__ ), NicInfo::DEMO_DIR )
         demo_files = Dir::entries( demo_dir )
         demo_files.each do |file|
@@ -442,321 +403,242 @@ module NicInfo
             json_data = JSON.load demo_data
             demo_url = json_data[ NicInfo::NICINFO_DEMO_URL ]
             demo_hint = json_data[ NicInfo::NICINFO_DEMO_HINT ]
-            @cache.create( demo_url, demo_data )
-            @config.logger.mesg( "  " + demo_hint, NicInfo::AttentionType::INFO )
+            @appctx.cache.create( demo_url, demo_data )
+            @appctx.logger.mesg( "  " + demo_hint, NicInfo::AttentionType::INFO )
           end
         end
       end
 
-      if @config.options.help
+      if @appctx.options.help
         help()
       end
 
-      if @config.options.argv == nil || @config.options.argv == [] && !@config.options.query_type
-        unless @config.options.require_query
+      if @appctx.options.do_bulkip
+        do_bulkip()
+      end
+
+      if @appctx.options.argv == nil || @appctx.options.argv == [] && !@appctx.options.query_type
+        unless @appctx.options.require_query
           return
         else
           help
         end
       end
 
-      if @config.options.argv[0] == '.'
-        @config.logger.mesg( "Obtaining current IP Address...")
-        data = get("https://stat.ripe.net/data/whats-my-ip/data.json", 0, false )
+      rdap_query = NicInfo::RDAPQuery.new( @appctx )
+      guess = NicInfo::RDAPQueryGuess.new( @appctx )
+
+      if @appctx.options.argv[0] == '.'
+        @appctx.logger.mesg( "Obtaining current IP Address...")
+        data = rdap_query.get("https://stat.ripe.net/data/whats-my-ip/data.json", 0, false )
         json_data = JSON.load(data)
 
         if json_data["data"] == nil || json_data["data"]["ip"] == nil
-          @config.logger.mesg("Server repsonded with unknown JSON")
-          @config.logger.mesg("Unable to determine your IP Address. You must specify it.")
+          @appctx.logger.mesg("Server repsonded with unknown JSON")
+          @appctx.logger.mesg("Unable to determine your IP Address. You must specify it.")
           return
         elsif
-          @config.logger.mesg("Your IP address is " + json_data["data"]["ip"], NicInfo::AttentionType::SUCCESS )
-          @config.options.argv[0] = json_data["data"]["ip"]
+          @appctx.logger.mesg("Your IP address is " + json_data["data"]["ip"], NicInfo::AttentionType::SUCCESS )
+          @appctx.options.argv[0] = json_data["data"]["ip"]
         end
       end
 
-      if @config.options.query_type == nil
-        @config.options.query_type = guess_query_value_type(@config.options.argv)
-        if (@config.options.query_type == QueryType::BY_IP4_ADDR ||
-              @config.options.query_type == QueryType::BY_IP6_ADDR ) && @config.options.reverse_ip == true
-          ip = IPAddr.new( @config.options.argv[ 0 ] )
-          @config.options.argv[ 0 ] = ip.reverse.split( "\." )[ 1..-1 ].join( "." ) if ip.ipv4?
-          @config.options.argv[ 0 ] = ip.reverse.split( "\." )[ 24..-1 ].join( "." ) if ip.ipv6?
-          @config.logger.mesg( "Query value changed to " + @config.options.argv[ 0 ] )
-          @config.options.query_type = QueryType::BY_DOMAIN
-          @config.options.externally_queriable = true
-        elsif @config.options.query_type == QueryType::BY_RESULT
-          data_tree = @config.load_as_yaml( NicInfo::LASTTREE_YAML )
-          node = data_tree.find_node( @config.options.argv[ 0 ] )
+      if @appctx.options.query_type == nil
+        @appctx.options.query_type = guess.guess_query_value_type(@appctx.options.argv)
+        if (@appctx.options.query_type == QueryType::BY_IP4_ADDR ||
+              @appctx.options.query_type == QueryType::BY_IP6_ADDR ) && @appctx.options.reverse_ip == true
+          ip = IPAddr.new( @appctx.options.argv[ 0 ] )
+          @appctx.options.argv[ 0 ] = ip.reverse.split( "\." )[ 1..-1 ].join( "." ) if ip.ipv4?
+          @appctx.options.argv[ 0 ] = ip.reverse.split( "\." )[ 24..-1 ].join( "." ) if ip.ipv6?
+          @appctx.logger.mesg( "Query value changed to " + @appctx.options.argv[ 0 ] )
+          @appctx.options.query_type = QueryType::BY_DOMAIN
+          @appctx.options.externally_queriable = true
+        elsif @appctx.options.query_type == QueryType::BY_RESULT
+          data_tree = @appctx.load_as_yaml( NicInfo::LASTTREE_YAML )
+          node = data_tree.find_node( @appctx.options.argv[ 0 ] )
           if node and node.rest_ref
-            @config.options.argv[ 0 ] = node.rest_ref
-            @config.options.url = true
+            @appctx.options.argv[ 0 ] = node.rest_ref
+            @appctx.options.url = true
             if node.data_type
-              @config.options.query_type = node.data_type
-              @config.options.externally_queriable = false
+              @appctx.options.query_type = node.data_type
+              @appctx.options.externally_queriable = false
             elsif node.rest_ref
-              @config.options.query_type = get_query_type_from_url( node.rest_ref )
-              @config.options.externally_queriable = true
+              @appctx.options.query_type = guess.get_query_type_from_url(node.rest_ref )
+              @appctx.options.externally_queriable = true
             end
           else
-            @config.logger.mesg( "#{@config.options.argv[0]} is not retrievable.")
+            @appctx.logger.mesg( "#{@appctx.options.argv[0]} is not retrievable.")
             return
           end
-        elsif @config.options.query_type == QueryType::BY_URL
-          @config.options.url = @config.options.argv[0]
-          @config.options.query_type = get_query_type_from_url( @config.options.url )
+        elsif @appctx.options.query_type == QueryType::BY_URL
+          @appctx.options.url = @appctx.options.argv[0]
+          @appctx.options.query_type = guess.get_query_type_from_url( @appctx.options.url )
         else
-          @config.options.externally_queriable = true
+          @appctx.options.externally_queriable = true
         end
-        if @config.options.query_type == nil
-          @config.logger.mesg("Unable to guess type of query. You must specify it.")
+        if @appctx.options.query_type == nil
+          @appctx.logger.mesg("Unable to guess type of query. You must specify it.")
           return
         else
-          @config.logger.trace("Assuming query value is " + @config.options.query_type)
+          @appctx.logger.trace("Assuming query value is " + @appctx.options.query_type)
         end
       end
 
       #determine if this will be a single query or multiple
-      qtype = @config.options.query_type
+      qtype = @appctx.options.query_type
       case qtype
         when QueryType::TRACE
-          ips = NicInfo.traceroute @config.options.argv[ 0 ], @config
+          ips = NicInfo.traceroute @appctx.options.argv[ 0 ], @appctx
           if ips.empty?
-            @config.logger.mesg "Trace route yeilded no data"
+            @appctx.logger.mesg "Trace route yeilded no data"
           else
             ips.each do |ip|
-              @config.options.query_type = QueryType::BY_IP4_ADDR
-              @config.options.argv[ 0 ] = ip
-              @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = nil
-              json_data = do_rdap_query
-              display_rdap_query( json_data, false )
+              @appctx.options.query_type = QueryType::BY_IP4_ADDR
+              @appctx.options.argv[ 0 ] = ip
+              @appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = nil
+              rdap_response = rdap_query.do_rdap_query( @appctx.options.argv, @appctx.options.query_type, @appctx.options.url )
+              if rdap_response.error_state
+                show_error_response( rdap_response.json_data )
+              else
+                display_rdap_query( rdap_response.json_data, false ) if rdap_response.json_data
+              end
             end
           end
         else
-          json_data = do_rdap_query
-          display_rdap_query( json_data, true ) if json_data
+          rdap_response = rdap_query.do_rdap_query( @appctx.options.argv, @appctx.options.query_type, @appctx.options.url )
+          if rdap_response.error_state
+            show_error_response( rdap_response.json_data )
+          else
+            display_rdap_query( rdap_response.json_data, true ) if rdap_response.json_data
+          end
       end
 
 
     end
 
     def get_iana_files
-      get_file_via_http("http://data.iana.org/rdap/asn.json", File.join(@config.rdap_bootstrap_dir, "asn.json"), 0)
-      get_file_via_http("http://data.iana.org/rdap/ipv4.json", File.join(@config.rdap_bootstrap_dir, "ipv4.json"), 0)
-      get_file_via_http("http://data.iana.org/rdap/ipv6.json", File.join(@config.rdap_bootstrap_dir, "ipv6.json"), 0)
-      get_file_via_http("http://data.iana.org/rdap/dns.json", File.join(@config.rdap_bootstrap_dir, "dns.json"), 0)
-      @config.set_bsfiles_last_update_time
+      get_file_via_http("http://data.iana.org/rdap/asn.json", File.join(@appctx.rdap_bootstrap_dir, "asn.json"), 0)
+      get_file_via_http("http://data.iana.org/rdap/ipv4.json", File.join(@appctx.rdap_bootstrap_dir, "ipv4.json"), 0)
+      get_file_via_http("http://data.iana.org/rdap/ipv6.json", File.join(@appctx.rdap_bootstrap_dir, "ipv6.json"), 0)
+      get_file_via_http("http://data.iana.org/rdap/dns.json", File.join(@appctx.rdap_bootstrap_dir, "dns.json"), 0)
+      @appctx.set_bsfiles_last_update_time
     end
 
-    def do_rdap_query
-      retval = nil
-      if @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] == nil && !@config.options.url
-        bootstrap = Bootstrap.new( @config )
-        qtype = @config.options.query_type
-        if qtype == QueryType::BY_SERVER_HELP
-          qtype = guess_query_value_type( @config.options.argv )
-        end
-        case qtype
-          when QueryType::BY_IP4_ADDR
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @config.options.argv[ 0 ] )
-          when QueryType::BY_IP6_ADDR
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @config.options.argv[ 0 ] )
-          when QueryType::BY_IP4_CIDR
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @config.options.argv[ 0 ] )
-          when QueryType::BY_IP6_CIDR
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @config.options.argv[ 0 ] )
-          when QueryType::BY_AS_NUMBER
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_as( @config.options.argv[ 0 ] )
-          when QueryType::BY_DOMAIN
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
-          when QueryType::BY_NAMESERVER
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
-          when QueryType::BY_ENTITY_HANDLE
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_entity( @config.options.argv[ 0 ] )
-          when QueryType::SRCH_ENTITY_BY_NAME
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::ENTITY_ROOT_URL ]
-          when QueryType::SRCH_DOMAIN_BY_NAME
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
-          when QueryType::SRCH_DOMAIN_BY_NSNAME
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
-          when QueryType::SRCH_DOMAIN_BY_NSIP
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::DOMAIN_ROOT_URL ]
-          when QueryType::SRCH_NS_BY_NAME
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_domain( @config.options.argv[ 0 ] )
-          when QueryType::SRCH_NS_BY_IP
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = bootstrap.find_url_by_ip( @config.options.argv[ 0 ] )
-          else
-            @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::BOOTSTRAP_URL ] = @config.config[ NicInfo::BOOTSTRAP ][ NicInfo::HELP_ROOT_URL ]
-        end
-      end
-      begin
-        rdap_url = nil
-        unless @config.options.url
-          path = create_resource_url(@config.options.argv, @config.options.query_type)
-          rdap_url = make_rdap_url(@config.config[NicInfo::BOOTSTRAP][NicInfo::BOOTSTRAP_URL], path)
-        else
-          rdap_url = @config.options.argv[0]
-        end
-        data = get( rdap_url, 0 )
-        json_data = JSON.load data
-        if (ec = json_data[ NicInfo::NICINFO_DEMO_ERROR ]) != nil
-          res = MyHTTPResponse.new( "1.1", ec, "Demo Exception" )
-          res["content-type"] = NicInfo::RDAP_CONTENT_TYPE
-          res.body=data
-          raise Net::HTTPServerException.new( "Demo Exception", res )
-        end
-        inspect_rdap_compliance json_data
-        cache_self_references json_data
-        retval = json_data
-      rescue JSON::ParserError => a
-        @config.logger.mesg( "Server returned invalid JSON!", NicInfo::AttentionType::ERROR )
-      rescue SocketError => a
-        @config.logger.mesg(a.message, NicInfo::AttentionType::ERROR )
-      rescue ArgumentError => a
-        @config.logger.mesg(a.message, NicInfo::AttentionType::ERROR )
-      rescue Net::HTTPServerException => e
-        case e.response.code
-          when "200"
-            @config.logger.mesg( e.message, NicInfo::AttentionType::SUCCESS )
-          when "401"
-            @config.logger.mesg("Authorization is required.", NicInfo::AttentionType::ERROR )
-            handle_error_response e.response
-          when "404"
-            @config.logger.mesg("Query yielded no results.", NicInfo::AttentionType::INFO )
-            handle_error_response e.response
-          else
-            @config.logger.mesg("Error #{e.response.code}.", NicInfo::AttentionType::ERROR )
-            handle_error_response e.response
-        end
-        @config.logger.trace("Server response code was " + e.response.code)
-      rescue Net::HTTPFatalError => e
-        case e.response.code
-          when "500"
-            @config.logger.mesg("RDAP server is reporting an internal error.", NicInfo::AttentionType::ERROR )
-            handle_error_response e.response
-          when "501"
-            @config.logger.mesg("RDAP server does not implement the query.", NicInfo::AttentionType::ERROR )
-            handle_error_response e.response
-          when "503"
-            @config.logger.mesg("RDAP server is reporting that it is unavailable.", NicInfo::AttentionType::ERROR )
-            handle_error_response e.response
-          else
-            @config.logger.mesg("Error #{e.response.code}.", NicInfo::AttentionType::ERROR )
-            handle_error_response e.response
-        end
-        @config.logger.trace("Server response code was " + e.response.code)
-      rescue Net::HTTPRetriableError => e
-        @config.logger.mesg("Too many redirections, retries, or a redirect loop has been detected." )
-      end
-
-      return retval
-    end
 
     def display_rdap_query json_data, show_help = true
-      if @config.options.output_json
-        @config.logger.raw( DataAmount::TERSE_DATA, JSON.generate( json_data ), false )
-      elsif @config.options.json_values
-        @config.options.json_values.each do |value|
-          @config.logger.raw( DataAmount::TERSE_DATA, JSON.generate( eval_json_value( value, json_data) ), false )
-        end
-      else
-        @config.factory.new_notices.display_notices json_data, @config.options.query_type == QueryType::BY_SERVER_HELP
-        if @config.options.query_type != QueryType::BY_SERVER_HELP
+      unless do_json_output( json_data )
+        @appctx.factory.new_notices.display_notices json_data, @appctx.options.query_type == QueryType::BY_SERVER_HELP
+        if @appctx.options.query_type != QueryType::BY_SERVER_HELP
           result_type = get_query_type_from_result( json_data )
           if result_type != nil
-            if result_type != @config.options.query_type
-              @config.logger.mesg( "Query type is " + @config.options.query_type + ". Result type is " + result_type + "." )
+            if result_type != @appctx.options.query_type
+              @appctx.logger.mesg( "Query type is " + @appctx.options.query_type + ". Result type is " + result_type + "." )
             else
-              @config.logger.mesg( "Result type is " + result_type + "." )
+              @appctx.logger.mesg( "Result type is " + result_type + "." )
             end
-            @config.options.query_type = result_type
+            @appctx.options.query_type = result_type
           elsif json_data[ "errorCode" ] == nil
-            @config.conf_msgs << "Response has no result type."
+            @appctx.conf_msgs << "Response has no result type."
           end
           data_tree = DataTree.new( )
-          case @config.options.query_type
+          case @appctx.options.query_type
             when QueryType::BY_IP4_ADDR
-              NicInfo::display_ip( json_data, @config, data_tree )
+              NicInfo::display_ip(json_data, @appctx, data_tree )
               do_jcr( json_data, NicInfo::JCR_ROOT_NETWORK )
             when QueryType::BY_IP6_ADDR
-              NicInfo::display_ip( json_data, @config, data_tree )
+              NicInfo::display_ip( json_data, @appctx, data_tree )
               do_jcr( json_data, NicInfo::JCR_ROOT_NETWORK )
             when QueryType::BY_IP4_CIDR
-              NicInfo::display_ip( json_data, @config, data_tree )
+              NicInfo::display_ip( json_data, @appctx, data_tree )
               do_jcr( json_data, NicInfo::JCR_ROOT_NETWORK )
             when QueryType::BY_IP6_CIDR
-              NicInfo::display_ip( json_data, @config, data_tree )
+              NicInfo::display_ip(json_data, @appctx, data_tree )
               do_jcr( json_data, NicInfo::JCR_ROOT_NETWORK )
             when QueryType::BY_IP
-              NicInfo::display_ip( json_data, @config, data_tree )
+              NicInfo::display_ip(json_data, @appctx, data_tree )
               do_jcr( json_data, NicInfo::JCR_ROOT_NETWORK )
             when QueryType::BY_AS_NUMBER
-              NicInfo::display_autnum( json_data, @config, data_tree )
+              NicInfo::display_autnum( json_data, @appctx, data_tree )
               do_jcr( json_data, NicInfo::JCR_ROOT_AUTNUM )
             when "NicInfo::DsData"
-              NicInfo::display_ds_data( json_data, @config, data_tree )
+              NicInfo::display_ds_data( json_data, @appctx, data_tree )
             when "NicInfo::KeyData"
-              NicInfo::display_key_data( json_data, @config, data_tree )
+              NicInfo::display_key_data( json_data, @appctx, data_tree )
             when QueryType::BY_DOMAIN
-              NicInfo::display_domain( json_data, @config, data_tree )
+              NicInfo::display_domain( json_data, @appctx, data_tree )
               do_jcr( json_data, NicInfo::JCR_ROOT_DOMAIN )
             when QueryType::BY_NAMESERVER
-              NicInfo::display_ns( json_data, @config, data_tree )
+              NicInfo::display_ns( json_data, @appctx, data_tree )
               do_jcr( json_data, NicInfo::JCR_ROOT_NAMESERVER )
             when QueryType::BY_ENTITY_HANDLE
-              NicInfo::display_entity( json_data, @config, data_tree )
+              NicInfo::display_entity( json_data, @appctx, data_tree )
               do_jcr( json_data, NicInfo::JCR_ROOT_ENTITY )
             when QueryType::SRCH_DOMAINS
-              NicInfo::display_domains( json_data, @config, data_tree )
+              NicInfo::display_domains( json_data, @appctx, data_tree )
               do_jcr( json_data, NicInfo::JCR_ROOT_DOMAIN_SEARCH )
             when QueryType::SRCH_DOMAIN_BY_NAME
-              NicInfo::display_domains( json_data, @config, data_tree )
+              NicInfo::display_domains( json_data, @appctx, data_tree )
               do_jcr( json_data, NicInfo::JCR_ROOT_DOMAIN_SEARCH )
             when QueryType::SRCH_DOMAIN_BY_NSNAME
-              NicInfo::display_domains( json_data, @config, data_tree )
+              NicInfo::display_domains( json_data, @appctx, data_tree )
               do_jcr( json_data, NicInfo::JCR_ROOT_DOMAIN_SEARCH )
             when QueryType::SRCH_DOMAIN_BY_NSIP
-              NicInfo::display_domains( json_data, @config, data_tree )
+              NicInfo::display_domains( json_data, @appctx, data_tree )
               do_jcr( json_data, NicInfo::JCR_ROOT_DOMAIN_SEARCH )
             when QueryType::SRCH_ENTITY_BY_NAME
-              NicInfo::display_entities( json_data, @config, data_tree )
+              NicInfo::display_entities( json_data, @appctx, data_tree )
               do_jcr( json_data, NicInfo::JCR_ROOT_ENTITY_SEARCH )
             when QueryType::SRCH_NS
-              NicInfo::display_nameservers( json_data, @config, data_tree )
+              NicInfo::display_nameservers( json_data, @appctx, data_tree )
               do_jcr( json_data, NicInfo::JCR_ROOT_NAMESERVER_SEARCH )
             when QueryType::SRCH_NS_BY_NAME
-              NicInfo::display_nameservers( json_data, @config, data_tree )
+              NicInfo::display_nameservers( json_data, @appctx, data_tree )
               do_jcr( json_data, NicInfo::JCR_ROOT_NAMESERVER_SEARCH )
             when QueryType::SRCH_NS_BY_IP
-              NicInfo::display_nameservers( json_data, @config, data_tree )
+              NicInfo::display_nameservers( json_data, @appctx, data_tree )
               do_jcr( json_data, NicInfo::JCR_ROOT_NAMESERVER_SEARCH )
           end
-          @config.save_as_yaml( NicInfo::LASTTREE_YAML, data_tree ) if !data_tree.empty?
+          @appctx.save_as_yaml( NicInfo::LASTTREE_YAML, data_tree ) if !data_tree.empty?
           show_search_results_truncated json_data
           show_conformance_messages
+          show_tracked_urls
           show_helpful_messages json_data, data_tree if show_help
         end
       end
-      @config.logger.end_run
+      @appctx.logger.end_run
     end
 
-    def handle_error_response (res)
-    if res["content-type"] == NicInfo::RDAP_CONTENT_TYPE && res.body && res.body.to_s.size > 0
-        json_data = JSON.load( res.body )
-        inspect_rdap_compliance json_data
-        @config.factory.new_notices.display_notices json_data, true
-        @config.factory.new_error_code.display_error_code( json_data )
-      end
-    end
+    def do_json_output( json_data )
+      retval = false
 
-    def inspect_rdap_compliance json
-      rdap_conformance = json[ "rdapConformance" ]
-      if rdap_conformance
-        rdap_conformance.each do |conformance|
-          @config.logger.trace( "Server conforms to #{conformance}", NicInfo::AttentionType::SECONDARY )
+      if @appctx.options.output_json
+        process_result( json_data )
+        if @appctx.options.pretty
+          o = JSON.pretty_generate( json_data )
+        else
+          o = JSON.generate( json_data )
         end
-      else
-        @config.conf_msgs << "Response has no RDAP Conformance level specified."
+        @appctx.logger.raw( DataAmount::TERSE_DATA, o, false )
+        retval = true
+      elsif @appctx.options.json_values
+        process_result( json_data )
+        @appctx.options.json_values.each do |value|
+          if @appctx.options.pretty
+            o = JSON.pretty_generate( eval_json_value( value, json_data ) )
+          else
+            o = JSON.generate( eval_json_value( value, json_data ) )
+          end
+          @appctx.logger.raw( DataAmount::TERSE_DATA, o, false )
+        end
+        retval = true
+      end
+      return retval
+    end
+
+    def show_error_response( json_data )
+      if json_data
+        @appctx.factory.new_notices.display_notices json_data, true
+        @appctx.factory.new_error_code.display_error_code( json_data )
       end
     end
 
@@ -786,11 +668,11 @@ module NicInfo
     def do_jcr( json_data, root_name )
 
       jcr_context = nil
-      if config.options.jcr == JcrMode::STANDARD_VALIDATION
-        config.logger.trace( "Standard JSON Content Rules validation mode enabled.")
+      if @appctx.options.jcr == JcrMode::STANDARD_VALIDATION
+        @appctx.logger.trace( "Standard JSON Content Rules validation mode enabled.")
         jcr_context = get_jcr_context()
-      elsif config.options.jcr == JcrMode::STRICT_VALIDATION
-        config.logger.trace( "Strict JSON Content Rules validation mode enabled.")
+      elsif @appctx.options.jcr == JcrMode::STRICT_VALIDATION
+        @appctx.logger.trace( "Strict JSON Content Rules validation mode enabled.")
         jcr_context = get_jcr_strict_context()
       else
         return
@@ -800,10 +682,10 @@ module NicInfo
 
       unless e1.success
         jcr_context.failure_report.each do |line|
-          config.conf_msgs << line
+          @appctx.conf_msgs << line
         end
       else
-        config.logger.trace( "JSON Content Rules validation was successful." )
+        @appctx.logger.trace( "JSON Content Rules validation was successful." )
       end
     end
 
@@ -835,6 +717,33 @@ HELP_SUMMARY
 
     end
 
+    def process_result( json_data )
+      success = false
+      type = get_query_type_from_result( json_data )
+      case type
+        when QueryType::BY_IP
+          NicInfo::process_ip(json_data, @appctx )
+          do_jcr( json_data, NicInfo::JCR_ROOT_NETWORK )
+        when QueryType::BY_AS_NUMBER
+          NicInfo::process_autnum( json_data, @appctx )
+          do_jcr( json_data, NicInfo::JCR_ROOT_AUTNUM )
+        when QueryType::BY_DOMAIN
+          NicInfo::process_domain( json_data, @appctx )
+          do_jcr( json_data, NicInfo::JCR_ROOT_DOMAIN )
+        when QueryType::BY_NAMESERVER
+          NicInfo::process_ns( json_data, @appctx )
+          do_jcr( json_data, NicInfo::JCR_ROOT_NAMESERVER )
+        when QueryType::BY_ENTITY_HANDLE
+          NicInfo::process_entity( json_data, @appctx )
+          do_jcr( json_data, NicInfo::JCR_ROOT_ENTITY )
+        when QueryType::SRCH_DOMAINS
+          do_jcr( json_data, NicInfo::JCR_ROOT_DOMAIN_SEARCH )
+        when QueryType::SRCH_NS
+          do_jcr( json_data, NicInfo::JCR_ROOT_NAMESERVER_SEARCH )
+      end
+      return success
+    end
+
     # Looks at the returned JSON and attempts to match that
     # to a query type.
     def get_query_type_from_result( json_data )
@@ -864,160 +773,6 @@ HELP_SUMMARY
       return retval
     end
 
-    # Evaluates the args and guesses at the type of query.
-    # Args is an array of strings, most likely what is left
-    # over after parsing ARGV
-    def guess_query_value_type(args)
-      retval = nil
-
-      if args.length() == 1
-
-        case args[0]
-          when NicInfo::URL_REGEX
-            retval = QueryType::BY_URL
-          when NicInfo::IPV4_REGEX
-            retval = QueryType::BY_IP4_ADDR
-          when NicInfo::IPV6_REGEX
-            retval = QueryType::BY_IP6_ADDR
-          when NicInfo::IPV6_HEXCOMPRESS_REGEX
-            retval = QueryType::BY_IP6_ADDR
-          when NicInfo::AS_REGEX
-            retval = QueryType::BY_AS_NUMBER
-          when NicInfo::ASN_REGEX
-            old = args[0]
-            args[0] = args[0].sub(/^AS/i, "")
-            @config.logger.trace("Interpretting " + old + " as autonomous system number " + args[0])
-            retval = QueryType::BY_AS_NUMBER
-          when NicInfo::IP4_ARPA
-            retval = QueryType::BY_DOMAIN
-          when NicInfo::IP6_ARPA
-            retval = QueryType::BY_DOMAIN
-          when /(.*)\/\d/
-            ip = $+
-            if ip =~ NicInfo::IPV4_REGEX
-              retval = QueryType::BY_IP4_CIDR
-            elsif ip =~ NicInfo::IPV6_REGEX || ip =~ NicInfo::IPV6_HEXCOMPRESS_REGEX
-              retval = QueryType::BY_IP6_CIDR
-            end
-          when NicInfo::DATA_TREE_ADDR_REGEX
-            retval = QueryType::BY_RESULT
-          when NicInfo::NS_REGEX
-            retval = QueryType::BY_NAMESERVER
-          when NicInfo::DOMAIN_REGEX
-            retval = QueryType::BY_DOMAIN
-          when NicInfo::ENTITY_REGEX
-            retval = QueryType::BY_ENTITY_HANDLE
-          else
-            last_name = args[ 0 ].sub( /\*/, '' ).upcase
-            if NicInfo::is_last_name( last_name )
-              retval = QueryType::SRCH_ENTITY_BY_NAME
-            end
-        end
-
-      elsif args.length() == 2
-
-        last_name = args[ 1 ].sub( /\*/, '' ).upcase
-        first_name = args[ 0 ].sub( /\*/, '' ).upcase
-        if NicInfo::is_last_name(last_name) && (NicInfo::is_male_name(first_name) || NicInfo::is_female_name(first_name))
-          retval = QueryType::SRCH_ENTITY_BY_NAME
-        end
-
-      elsif args.length() == 3
-
-        last_name = args[ 2 ].sub( /\*/, '' ).upcase
-        first_name = args[ 0 ].sub( /\*/, '' ).upcase
-        if NicInfo::is_last_name(last_name) && (NicInfo::is_male_name(first_name) || NicInfo::is_female_name(first_name))
-          retval = QueryType::SRCH_ENTITY_BY_NAME
-        end
-
-      end
-
-      return retval
-    end
-
-    # Creates a query type
-    def create_resource_url(args, queryType)
-
-      path = ""
-      case queryType
-        when QueryType::BY_IP4_ADDR
-          path << "ip/" << args[0]
-        when QueryType::BY_IP6_ADDR
-          path << "ip/" << args[0]
-        when QueryType::BY_IP4_CIDR
-          path << "ip/" << args[0]
-        when QueryType::BY_IP6_CIDR
-          path << "ip/" << args[0]
-        when QueryType::BY_AS_NUMBER
-          path << "autnum/" << args[0]
-        when QueryType::BY_NAMESERVER
-          path << "nameserver/" << args[0]
-        when QueryType::BY_DOMAIN
-          path << "domain/" << args[0]
-        when QueryType::BY_RESULT
-          tree = @config.load_as_yaml(NicInfo::ARININFO_LASTTREE_YAML)
-          path = tree.find_rest_ref(args[0])
-          raise ArgumentError.new("Unable to find result for " + args[0]) unless path
-        when QueryType::BY_ENTITY_HANDLE
-          path << "entity/" << URI.escape( args[ 0 ] )
-        when QueryType::SRCH_ENTITY_BY_NAME
-          case args.length
-            when 1
-              path << "entities?fn=" << URI.escape( args[ 0 ] )
-            when 2
-              path << "entities?fn=" << URI.escape( args[ 0 ] + " " + args[ 1 ] )
-            when 3
-              path << "entities?fn=" << URI.escape( args[ 0 ] + " " + args[ 1 ] + " " + args[ 2 ] )
-          end
-        when QueryType::SRCH_DOMAIN_BY_NAME
-          path << "domains?name=" << args[ 0 ]
-        when QueryType::SRCH_DOMAIN_BY_NSNAME
-          path << "domains?nsLdhName=" << args[ 0 ]
-        when QueryType::SRCH_DOMAIN_BY_NSIP
-          path << "domains?nsIp=" << args[ 0 ]
-        when QueryType::SRCH_NS_BY_NAME
-          path << "nameservers?name=" << args[ 0 ]
-        when QueryType::SRCH_NS_BY_IP
-          path << "nameservers?ip=" << args[ 0 ]
-        when QueryType::BY_SERVER_HELP
-          path << "help"
-        else
-          raise ArgumentError.new("Unable to create a resource URL for " + queryType)
-      end
-
-      return path
-    end
-
-    def get_query_type_from_url url
-      queryType = nil
-      case url
-        when /.*\/ip\/.*/
-          # covers all IP cases
-          queryType = QueryType::BY_IP
-        when /.*\/autnum\/.*/
-          queryType = QueryType::BY_AS_NUMBER
-        when /.*\/nameserver\/.*/
-          queryType = QueryType::BY_NAMESERVER
-        when /.*\/domain\/.*/
-          queryType = QueryType::BY_DOMAIN
-        when /.*\/entity\/.*/
-          queryType = QueryType::BY_ENTITY_HANDLE
-        when /.*\/entities.*/
-          queryType = QueryType::SRCH_ENTITY_BY_NAME
-        when /.*\/domains.*/
-          # covers all domain searches
-          queryType = QueryType::SRCH_DOMAIN
-        when /.*\/nameservers.*/
-          # covers all nameserver searches
-          queryType = QueryType::SRCH_NS
-        when /.*\/help.*/
-          queryType = QueryType::BY_SERVER_HELP
-        else
-          raise ArgumentError.new( "Unable to determine query type from url '#{url}'" )
-      end
-      return queryType
-    end
-
     def eval_json_value json_value, json_data
       appended_code = String.new
       values = json_value.split( "." )
@@ -1033,41 +788,22 @@ HELP_SUMMARY
       return eval( code )
     end
 
-    def cache_self_references json_data
-      links = NicInfo::get_links json_data, @config
-      if links
-        self_link = NicInfo.get_self_link links
-        if self_link
-          pretty = JSON::pretty_generate( json_data )
-          @cache.create( self_link, pretty )
-        end
-      end
-      entities = NicInfo::get_entitites json_data
-      entities.each do |entity|
-        cache_self_references( entity )
-      end if entities
-      nameservers = NicInfo::get_nameservers json_data
-      nameservers.each do |ns|
-        cache_self_references( ns )
-      end if nameservers
-      ds_data_objs = NicInfo::get_ds_data_objs json_data
-      ds_data_objs.each do |ds|
-        cache_self_references( ds )
-      end if ds_data_objs
-      key_data_objs = NicInfo::get_key_data_objs json_data
-      key_data_objs.each do |key|
-        cache_self_references( key )
-      end if key_data_objs
-    end
 
     def show_conformance_messages
-      return if @config.conf_msgs.size == 0
-      @config.logger.mesg( "** WARNING: There are problems in the response that might cause some data to discarded. **", NicInfo::AttentionType::ERROR )
+      return if @appctx.conf_msgs.size == 0
+      @appctx.logger.mesg( "** WARNING: There are problems in the response that might cause some data to discarded. **", NicInfo::AttentionType::ERROR )
       i = 1
-      pad = @config.conf_msgs.length.to_s.length
-      @config.conf_msgs.each do |msg|
-        @config.logger.trace( "#{i.to_s.rjust(pad," ")} : #{msg}", NicInfo::AttentionType::ERROR )
+      pad = @appctx.conf_msgs.length.to_s.length
+      @appctx.conf_msgs.each do |msg|
+        @appctx.logger.trace( "#{i.to_s.rjust(pad," ")} : #{msg}", NicInfo::AttentionType::ERROR )
         i = i + 1
+      end
+    end
+
+    def show_tracked_urls
+      @appctx.tracked_urls.each_value do |tracker|
+        qps = tracker.total_queries.fdiv( tracker.last_query_time.to_i - tracker.first_query_time.to_i )
+        @appctx.logger.trace( "#{tracker.total_queries} queries to #{tracker.url} rated at #{qps} queries per second")
       end
     end
 
@@ -1075,38 +811,113 @@ HELP_SUMMARY
       truncated = json_data[ "searchResultsTruncated" ]
       if truncated.instance_of?(TrueClass) || truncated.instance_of?(FalseClass)
         if truncated
-          @config.logger.mesg( "Results have been truncated by the server.", NicInfo::AttentionType::INFO )
+          @appctx.logger.mesg( "Results have been truncated by the server.", NicInfo::AttentionType::INFO )
         end
       end
       if truncated != nil
-        @config.conf_msgs << "'searchResultsTruncated' is not part of the RDAP specification and was removed before standardization."
+        @appctx.conf_msgs << "'searchResultsTruncated' is not part of the RDAP specification and was removed before standardization."
       end
     end
 
     def show_helpful_messages json_data, data_tree
-      arg = @config.options.argv[0]
-      case @config.options.query_type
+      arg = @appctx.options.argv[0]
+      case @appctx.options.query_type
         when QueryType::BY_IP4_ADDR
-          @config.logger.mesg("Use \"nicinfo -r #{arg}\" to see reverse DNS information.");
+          @appctx.logger.mesg("Use \"nicinfo -r #{arg}\" to see reverse DNS information.");
         when QueryType::BY_IP6_ADDR
-          @config.logger.mesg("Use \"nicinfo -r #{arg}\" to see reverse DNS information.");
+          @appctx.logger.mesg("Use \"nicinfo -r #{arg}\" to see reverse DNS information.");
         when QueryType::BY_AS_NUMBER
-          @config.logger.mesg("Use \"nicinfo #{arg}\" or \"nicinfo as#{arg}\" for autnums.");
+          @appctx.logger.mesg("Use \"nicinfo #{arg}\" or \"nicinfo as#{arg}\" for autnums.");
       end
       unless data_tree.empty?
-        @config.logger.mesg("Use \"nicinfo 1=\" to show #{data_tree.roots.first}")
+        @appctx.logger.mesg("Use \"nicinfo 1=\" to show #{data_tree.roots.first}")
         unless data_tree.roots.first.empty?
           children = data_tree.roots.first.children
-          @config.logger.mesg("Use \"nicinfo 1.1=\" to show #{children.first}") if children.first.rest_ref
+          @appctx.logger.mesg("Use \"nicinfo 1.1=\" to show #{children.first}") if children.first.rest_ref
           if children.first != children.last
             len = children.length
-            @config.logger.mesg("Use \"nicinfo 1.#{len}=\" to show #{children.last}") if children.last.rest_ref
+            @appctx.logger.mesg("Use \"nicinfo 1.#{len}=\" to show #{children.last}") if children.last.rest_ref
           end
         end
       end
-      self_link = NicInfo.get_self_link( NicInfo.get_links( json_data, @config ) )
-      @config.logger.mesg("Use \"nicinfo #{self_link}\" to directly query this resource in the future.") if self_link and @config.options.externally_queriable
-      @config.logger.mesg('Use "nicinfo -h" for help.')
+      self_link = NicInfo.get_self_link( NicInfo.get_links( json_data, @appctx ) )
+      @appctx.logger.mesg("Use \"nicinfo #{self_link}\" to directly query this resource in the future.") if self_link and @appctx.options.externally_queriable
+      @appctx.logger.mesg('Use "nicinfo -h" for help.')
+    end
+
+    def do_bulkip
+      file_list = @appctx.options.bulkip_in
+      if File.directory?( file_list )
+        file_list = file_list + File::SEPARATOR unless file_list.end_with?( File::SEPARATOR )
+        file_list = file_list + "*"
+      end
+      Dir.glob( file_list ).each do |file|
+        b = BulkIPInFile.new( file )
+        if !b.has_strategy
+          raise ArgumentError.new( "cannot determine parsing strategy for #{file}")
+        end
+        @appctx.logger.trace( "file #{file} strategry is #{b.strategy}")
+      end
+      rdap_query = NicInfo::RDAPQuery.new( @appctx )
+      bulkip_data = NicInfo::BulkIPData.new( @appctx )
+      bulkip_data.note_start_time
+      current_file = nil
+      current_lineno = nil
+      begin
+        Dir.glob( file_list ).each do |file|
+          @appctx.logger.mesg( "Processing #{file}")
+          current_file = file
+          b = BulkIPInFile.new( file )
+          b.foreach do |ip,time,lineno|
+            @appctx.logger.trace( "bulk ip: #{ip} time: #{time} line no: #{lineno}")
+            current_lineno = lineno
+            if lineno % 1000 == 0
+              @appctx.logger.mesg( "Processing line #{lineno} of #{file}")
+            end
+            begin
+              ipaddr = IPAddr.new( ip )
+              unless bulkip_data.valid_to_query?( ipaddr )
+                @appctx.logger.trace( "skipping non-global-unicast address #{ip}")
+              else
+                if !bulkip_data.hit_ipaddr( ipaddr, time )
+                  query_value = [ ip ]
+                  qtype = QueryType::BY_IP4_ADDR
+                  qtype = QueryType::BY_IP6_ADDR if ipaddr.ipv6?
+                  rdap_response = rdap_query.do_rdap_query( query_value, qtype, nil )
+                  unless rdap_response.error_state
+                    rtype = get_query_type_from_result( rdap_response.json_data )
+                    if rtype == QueryType::BY_IP
+                      ipnetwork = NicInfo::process_ip( rdap_response.json_data, @appctx )
+                      bulkip_data.hit_network( ipnetwork, time )
+                    else
+                      bulkip_data.fetch_error( ipaddr, time, rdap_response.code, "RDAP IP network type not returned" )
+                    end
+                  else
+                    bulkip_data.fetch_error( ipaddr, time, rdap_response.code, rdap_response.exception.message )
+                  end
+                else
+                  @appctx.logger.trace( "skipping #{ip} because network has already been retreived")
+                end
+              end
+            rescue IPAddr::Error
+              bulkip_data.ip_error( ip )
+              @appctx.logger.mesg( "Invalid IP address #{ip}", NicInfo::AttentionType::ERROR )
+            end
+          end
+        end
+      rescue Interrupt
+        @appctx.logger.mesg( "Processing interrupted at #{current_lineno} in #{current_file}")
+      end
+      bulkip_data.review_fetch_errors
+      bulkip_data.note_end_time
+      if @appctx.options.bulkip_out_csv
+        bulkip_data.output_csv( @appctx.options.bulkip_out_csv )
+      end
+      if @appctx.options.bulkip_out_tsv
+        bulkip_data.output_tsv( @appctx.options.bulkip_out_tsv )
+      end
+      show_tracked_urls
+      @appctx.logger.mesg( "Bulk IP Lookups Finished.")
     end
 
   end

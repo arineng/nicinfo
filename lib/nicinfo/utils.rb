@@ -13,9 +13,10 @@
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 
+require 'ipaddr'
 require 'stringio'
 require 'uri'
-require 'nicinfo/config'
+require 'nicinfo/appctx'
 
 module NicInfo
 
@@ -55,12 +56,12 @@ module NicInfo
     return json_data[ "handle" ]
   end
 
-  def NicInfo.get_object_class_name json_data, expected, config
+  def NicInfo.get_object_class_name json_data, expected, appctx
     objectClassName =  json_data[ "objectClassName" ]
     if objectClassName == nil
-      config.conf_msgs << "Expected 'objectClassName' is not present."
+      appctx.conf_msgs << "Expected 'objectClassName' is not present."
     elsif objectClassName != expected
-      config.conf_msgs << "Expected 'objectClassName' to be '#{expected}' but it is '#{objectClassName}'."
+      appctx.conf_msgs << "Expected 'objectClassName' to be '#{expected}' but it is '#{objectClassName}'."
     end
     return objectClassName
   end
@@ -73,16 +74,16 @@ module NicInfo
     return json_data[ "unicodeName" ]
   end
 
-  def NicInfo.get_descriptions json_data, config
+  def NicInfo.get_descriptions json_data, appctx
     return if !json_data
     if json_data.instance_of?( Hash )
       retval = json_data[ "description" ]
       unless retval.instance_of?( Array )
-        config.conf_msgs << "'description' is not an array."
+        appctx.conf_msgs << "'description' is not an array."
         retval = nil
       end
     else
-      config.conf_msgs << "expected object for 'remarks' or 'notices'."
+      appctx.conf_msgs << "expected object for 'remarks' or 'notices'."
       retval = nil
     end
     return retval
@@ -136,11 +137,11 @@ module NicInfo
     return json_data[ "country" ]
   end
 
-  def NicInfo.get_links json_data, config
+  def NicInfo.get_links json_data, appctx
     retval = json_data[ "links" ]
     return nil unless retval
     if !retval.instance_of?( Array )
-      config.conf_msgs << "'links' is not an array."
+      appctx.conf_msgs << "'links' is not an array."
       retval = nil
     end
     return retval
@@ -190,6 +191,32 @@ module NicInfo
       word.capitalize!
     end
     return words.join( " " )
+  end
+
+  #v4 non global unicast space
+  V4_MULTICAST_RESERVED = IPAddr.new( "224.0.0.0/3" )
+  V4_PRIVATE_10 = IPAddr.new( "10.0.0.0/8" )
+  V4_PRIVATE_192 = IPAddr.new( "192.168.0.0/16" )
+  V4_LOOPBACK = IPAddr.new( "127.0.0.0/8" )
+  V4_PRIVATE_172 = IPAddr.new( "172.16.0.0/12" )
+  V4_LINK_LOCAL = IPAddr.new( "169.254.0.0/16" )
+
+  #v6 global unicast space
+  V6_GLOBAL_UNICAST = IPAddr.new( "2000::/3" )
+
+  def NicInfo.is_global_unicast?( ipaddr )
+    retval = true
+    if NicInfo::V4_MULTICAST_RESERVED.include?( ipaddr ) ||
+       NicInfo::V4_PRIVATE_10.include?( ipaddr ) ||
+       NicInfo::V4_PRIVATE_172.include?( ipaddr ) ||
+       NicInfo::V4_PRIVATE_192.include?( ipaddr ) ||
+       NicInfo::V4_LOOPBACK.include?( ipaddr ) ||
+       NicInfo::V4_LINK_LOCAL.include?( ipaddr )
+      retval = false
+    elsif ipaddr.ipv6? && !NicInfo::V6_GLOBAL_UNICAST.include?( ipaddr )
+      retval = false
+    end
+    return retval
   end
 
 end

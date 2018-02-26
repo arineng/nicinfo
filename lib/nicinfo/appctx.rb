@@ -24,9 +24,10 @@ require 'nicinfo/constants'
 module NicInfo
 
   # Handles configuration of the application
-  class Config
+  class AppContext
 
     attr_accessor :logger, :config, :rdap_cache_dir, :options, :conf_msgs, :rdap_bootstrap_dir, :factory
+    attr_accessor :cache, :tracked_urls
 
     # Intializes the configuration with a place to look for the config file
     # If the file doesn't exist, a default is used.
@@ -37,9 +38,10 @@ module NicInfo
       @app_data = app_data
       @logger = NicInfo::Logger.new
       @conf_msgs = Array.new
+      @tracked_urls = Hash.new
       @factory = NicInfo::Factory.new( self )
 
-      config_file_name = Config.formulate_config_file_name( @app_data )
+      config_file_name = AppContext.formulate_config_file_name(@app_data )
       if File.exist?( config_file_name )
         @config = load_config( config_file_name )
       else
@@ -59,7 +61,7 @@ module NicInfo
 
         @logger.trace "Creating configuration in " + @app_data
         Dir.mkdir( @app_data )
-        f = File.open( Config.formulate_config_file_name( @app_data ), "w" )
+        f = File.open(AppContext.formulate_config_file_name(@app_data ), "w" )
         f.puts @@yaml_config
         f.close
 
@@ -71,7 +73,7 @@ module NicInfo
       else
 
         if @options.reset_config
-          config_file_name = Config.formulate_config_file_name( @app_data )
+          config_file_name = AppContext.formulate_config_file_name(@app_data )
           @logger.trace "Resetting configuration in " + config_file_name
           f = File.open( config_file_name, "w" )
           f.puts @@yaml_config
@@ -227,6 +229,11 @@ module NicInfo
 
       @logger.color_scheme = output[ NicInfo::COLOR_SCHEME ]
       @logger.validate_color_scheme
+    end
+
+    def configure_cache
+      @cache = Cache.new(self)
+      @cache.clean if @config[NicInfo::CACHE ][NicInfo::CLEAN_CACHE ]
     end
 
     def self.clean

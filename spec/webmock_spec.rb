@@ -18,9 +18,15 @@ require 'pp'
 require 'spec_helper'
 require 'rspec'
 require 'webmock/rspec'
-require_relative '../lib/nicinfo/config'
+require_relative '../lib/nicinfo/appctx'
 require_relative '../lib/nicinfo/nicinfo_main'
 require_relative '../lib/nicinfo/nicinfo_logger'
+
+
+# getting recorded responses according to webmock docs:
+#    curl -is www.example.com > /tmp/example_curl_-is_output.txt
+# for our purposes that would be
+#    curl -is http://.... > spec/recorded_responses
 
 describe 'web mocks' do
 
@@ -47,7 +53,7 @@ describe 'web mocks' do
     logger.data_out = StringIO.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
     config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
@@ -70,7 +76,7 @@ describe 'web mocks' do
     logger.data_out = StringIO.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
     config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
@@ -95,7 +101,7 @@ describe 'web mocks' do
     logger.data_out = StringIO.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
     config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
@@ -122,7 +128,7 @@ describe 'web mocks' do
     logger.data_out = StringIO.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
     config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
@@ -149,7 +155,7 @@ describe 'web mocks' do
     logger.data_out = StringIO.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
     config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
@@ -176,7 +182,7 @@ describe 'web mocks' do
     logger.data_out = StringIO.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
     config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
@@ -211,7 +217,7 @@ describe 'web mocks' do
     logger.data_out = StringIO.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new(dir )
     config.logger=logger
     config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
@@ -233,11 +239,33 @@ describe 'web mocks' do
     logger.data_out = StringIO.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new( dir )
     config.logger=logger
     config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
     args = [ "--json", "108.45.128.208" ]
+
+    expect{ NicInfo::Main.new( args, config ).run }.to_not output.to_stdout
+    expect(a_request(:get, "https://rdap.arin.net/registry/ip/108.45.128.208")).to have_been_made.once
+
+    json = JSON.load( logger.data_out.string )
+    expect( json[ "objectClassName" ] ).to eq( "ip network" )
+  end
+
+  it 'IP lookup should generate json pretty' do
+    response = File.new( "spec/recorded_responses/ip_108_45_128_208.txt")
+    stub_request(:get, "https://rdap.arin.net/registry/ip/108.45.128.208").to_return(response)
+
+    dir = File.join( @work_dir, "test_lookup_ip_108_45_128_208_200_for_pretty_json" )
+    logger = NicInfo::Logger.new
+    logger.data_out = StringIO.new
+    logger.message_out = StringIO.new
+    logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
+    config = NicInfo::AppContext.new( dir )
+    config.logger=logger
+    config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
+
+    args = [ "--json", "--pretty", "108.45.128.208" ]
 
     expect{ NicInfo::Main.new( args, config ).run }.to_not output.to_stdout
     expect(a_request(:get, "https://rdap.arin.net/registry/ip/108.45.128.208")).to have_been_made.once
@@ -255,7 +283,7 @@ describe 'web mocks' do
     logger.data_out = StringIO.new
     logger.message_out = StringIO.new
     logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
-    config = NicInfo::Config.new( dir )
+    config = NicInfo::AppContext.new( dir )
     config.logger=logger
     config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
@@ -268,6 +296,76 @@ describe 'web mocks' do
     expect( json.length ).to eq( 2 )
     expect( json[0]["rel"] ).to eq( "self" )
     expect( json[1]["rel"] ).to eq( "alternate" )
+  end
+
+  it 'IP lookup should generate jv pretty' do
+    response = File.new( "spec/recorded_responses/ip_108_45_128_208.txt")
+    stub_request(:get, "https://rdap.arin.net/registry/ip/108.45.128.208").to_return(response)
+
+    dir = File.join( @work_dir, "test_lookup_ip_108_45_128_208_200_for_pretty_jv" )
+    logger = NicInfo::Logger.new
+    logger.data_out = StringIO.new
+    logger.message_out = StringIO.new
+    logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
+    config = NicInfo::AppContext.new( dir )
+    config.logger=logger
+    config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
+
+    args = [ "--jv", "links", "--pretty", "108.45.128.208" ]
+
+    expect{ NicInfo::Main.new( args, config ).run }.to_not output.to_stdout
+    expect(a_request(:get, "https://rdap.arin.net/registry/ip/108.45.128.208")).to have_been_made.once
+
+    json = JSON.load( logger.data_out.string )
+    expect( json.length ).to eq( 2 )
+    expect( json[0]["rel"] ).to eq( "self" )
+    expect( json[1]["rel"] ).to eq( "alternate" )
+  end
+
+  it 'should do bulkip lookups' do
+    r1 = File.new( "spec/recorded_responses/ip_61_181_2_38.txt")
+    stub_request(:get, "https://rdap.apnic.net/ip/61.181.2.38").to_return(r1)
+
+    r2 = File.new( "spec/recorded_responses/ip_187_36_192_120.txt")
+    stub_request(:get, "https://rdap.registro.br/ip/187.36.192.120").to_return(r2)
+
+    stub_request(:get, "https://rdap.lacnic.net/rdap/ip/187.36.192.120").
+        to_return(status: 302, body: "", headers: { 'Location' => 'https://rdap.registro.br/ip/187.36.192.120'})
+
+    r3 = File.new( "spec/recorded_responses/ip_194_85_61_205.txt")
+    stub_request(:get, "https://rdap.db.ripe.net/ip/194.85.61.205").to_return(r3)
+
+    # yes, this is a mismatch intended to trigger a fetch error
+    r4 = File.new( "spec/recorded_responses/ns1_arin_net.txt")
+    stub_request(:get, "https://rdap.arin.net/registry/ip/108.45.128.208").to_return(r4)
+
+    # yes, this is a mismatch intended to trigger a fetch error
+    r5 = File.new( "spec/recorded_responses/ns1_arin_net.txt")
+    stub_request(:get, "https://rdap.afrinic.net/rdap/ip/196.216.2.21").to_return(r5)
+
+    r6 = File.new( "spec/recorded_responses/ip_196_216_2_20.txt")
+    stub_request(:get, "https://rdap.afrinic.net/rdap/ip/196.216.2.20").to_return(r6)
+
+    dir = File.join( @work_dir, "test_bulkip_lookups" )
+    logger = NicInfo::Logger.new
+    logger.data_out = StringIO.new
+    logger.message_out = StringIO.new
+    logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
+    config = NicInfo::AppContext.new( dir )
+    config.logger=logger
+    config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
+
+    file_out = File.join( dir, "bulkip_out" )
+    args = [ "--bulkip-in", "spec/bulkip/ex5.log", "--bulkip-out-tsv", file_out, "--bulkip-out-csv", file_out ]
+
+    expect{ NicInfo::Main.new( args, config ).run }.to_not output.to_stdout
+
+    expect(a_request(:get, "https://rdap.apnic.net/ip/61.181.2.38")).to have_been_made.once
+    expect(a_request(:get, "https://rdap.registro.br/ip/187.36.192.120")).to have_been_made.once
+    expect(a_request(:get, "https://rdap.db.ripe.net/ip/194.85.61.205")).to have_been_made.once
+    expect(a_request(:get, "https://rdap.arin.net/registry/ip/108.45.128.208")).to have_been_made.once
+    expect(a_request(:get, "https://rdap.afrinic.net/rdap/ip/196.216.2.21")).to have_been_made.once
+    expect(a_request(:get, "https://rdap.afrinic.net/rdap/ip/196.216.2.20")).to have_been_made.once
   end
 
 end

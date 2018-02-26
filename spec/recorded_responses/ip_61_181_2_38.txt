@@ -1,0 +1,104 @@
+HTTP/1.1 200 OK
+Content-Length: 4001
+Content-Type: application/rdap+json
+Access-Control-Allow-Origin: *
+Server: Jetty(8.y.z-SNAPSHOT)
+
+{
+  "handle" : "61.181.0.0 - 61.181.255.255",
+  "startAddress" : "61.181.0.0",
+  "endAddress" : "61.181.255.255",
+  "ipVersion" : "v4",
+  "name" : "UNICOM-TJ",
+  "type" : "ALLOCATED PORTABLE",
+  "country" : "CN",
+  "parentHandle" : "61.160.0.0 - 61.191.255.255",
+  "objectClassName" : "ip network",
+  "entities" : [ {
+    "handle" : "IRT-CU-CN",
+    "vcardArray" : [ "vcard", [ [ "version", { }, "text", "4.0" ], [ "fn", { }, "text", "IRT-CU-CN" ], [ "kind", { }, "text", "group" ], [ "email", {
+      "pref" : "1"
+    }, "text", "hqs-ipabuse@chinaunicom.cn" ], [ "adr", {
+      "label" : "No.21,Financial Street\\nBeijing,100033\\nP.R.China"
+    }, "text", [ "", "", "", "", "", "", "" ] ], [ "email", { }, "text", "hqs-ipabuse@chinaunicom.cn" ] ] ],
+    "roles" : [ "abuse" ],
+    "objectClassName" : "entity",
+    "links" : [ {
+      "value" : "https://rdap.apnic.net/ip/61.181.0.0/16",
+      "rel" : "self",
+      "href" : "https://rdap.apnic.net/entity/IRT-CU-CN",
+      "type" : "application/rdap+json"
+    } ]
+  }, {
+    "handle" : "CH1302-AP",
+    "vcardArray" : [ "vcard", [ [ "version", { }, "text", "4.0" ], [ "fn", { }, "text", "ChinaUnicom Hostmaster" ], [ "kind", { }, "text", "individual" ], [ "adr", {
+      "label" : "No.21,Jin-Rong Street\\nBeijing,100033\\nP.R.China"
+    }, "text", [ "", "", "", "", "", "", "" ] ], [ "tel", {
+      "type" : "voice"
+    }, "text", "+86-10-66259764" ], [ "tel", {
+      "type" : "fax"
+    }, "text", "+86-10-66259764" ], [ "email", { }, "text", "hqs-ipabuse@chinaunicom.cn" ] ] ],
+    "roles" : [ "administrative" ],
+    "objectClassName" : "entity",
+    "links" : [ {
+      "value" : "https://rdap.apnic.net/ip/61.181.0.0/16",
+      "rel" : "self",
+      "href" : "https://rdap.apnic.net/entity/CH1302-AP",
+      "type" : "application/rdap+json"
+    } ]
+  }, {
+    "handle" : "HZ19-AP",
+    "vcardArray" : [ "vcard", [ [ "version", { }, "text", "4.0" ], [ "fn", { }, "text", "huang zheng" ], [ "kind", { }, "text", "individual" ], [ "adr", {
+      "label" : "76 NO, ShiZiLin Street ,HeBei district of Tianjin,China"
+    }, "text", [ "", "", "", "", "", "", "" ] ], [ "tel", {
+      "type" : "voice"
+    }, "text", "+86-22-24459190" ], [ "tel", {
+      "type" : "fax"
+    }, "text", "+86-22-24454499" ], [ "email", { }, "text", "tj-ipaddr3@chinaunicom.cn" ] ] ],
+    "roles" : [ "technical" ],
+    "objectClassName" : "entity",
+    "links" : [ {
+      "value" : "https://rdap.apnic.net/ip/61.181.0.0/16",
+      "rel" : "self",
+      "href" : "https://rdap.apnic.net/entity/HZ19-AP",
+      "type" : "application/rdap+json"
+    } ]
+  } ],
+  "remarks" : [ {
+    "title" : "description",
+    "description" : [ "China Unicom Tianjin province network", "China Unicom" ]
+  }, {
+    "title" : "remarks",
+    "description" : [ "This object can only be modified by APNIC hostmaster", "If you wish to modify this object details please", "send email to hostmaster@apnic.net with your organisation", "account name in the subject line." ]
+  } ],
+  "links" : [ {
+    "value" : "https://rdap.apnic.net/ip/61.181.0.0/16",
+    "rel" : "up",
+    "href" : "https://rdap.apnic.net/ip/61.160.0.0/11",
+    "type" : "application/rdap+json"
+  }, {
+    "value" : "https://rdap.apnic.net/ip/61.181.0.0/16",
+    "rel" : "self",
+    "href" : "https://rdap.apnic.net/ip/61.181.0.0/16",
+    "type" : "application/rdap+json"
+  } ],
+  "events" : [ {
+    "eventAction" : "last changed",
+    "eventDate" : "2013-08-08T23:08:24Z"
+  } ],
+  "rdapConformance" : [ "rdap_level_0" ],
+  "notices" : [ {
+    "title" : "Source",
+    "description" : [ "Objects returned came from source", "APNIC" ]
+  }, {
+    "title" : "Terms and Conditions",
+    "description" : [ "This is the APNIC WHOIS Database query service. The objects are in RDAP format." ],
+    "links" : [ {
+      "value" : "https://rdap.apnic.net/ip/61.181.2.38",
+      "rel" : "terms-of-service",
+      "href" : "http://www.apnic.net/db/dbcopyright.html",
+      "type" : "text/html"
+    } ]
+  } ],
+  "port43" : "whois.apnic.net"
+}

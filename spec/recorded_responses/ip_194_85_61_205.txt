@@ -1,0 +1,80 @@
+HTTP/1.1 200 OK
+Date: Tue, 13 Feb 2018 23:23:22 GMT
+Server: Jetty(9.3.z-SNAPSHOT)
+Content-Type: application/rdap+json
+Content-Length: 2646
+
+{
+  "handle" : "194.85.61.0 - 194.85.61.255",
+  "startAddress" : "194.85.61.0/32",
+  "endAddress" : "194.85.61.255/32",
+  "ipVersion" : "v4",
+  "name" : "RU-NCC-NET",
+  "type" : "ASSIGNED PA",
+  "country" : "RU",
+  "parentHandle" : "RU-ROSNIIROS-194-85",
+  "entities" : [ {
+    "handle" : "RR-ORG",
+    "vcardArray" : [ "vcard", [ [ "version", { }, "text", "4.0" ], [ "fn", { }, "text", "ROSNIIROS Registry" ], [ "kind", { }, "text", "group" ], [ "adr", {
+      "label" : "Russian Institute for Public Networks\n1, Kurchatov sq\nMoscow"
+    }, "text", null ], [ "tel", {
+      "type" : "voice"
+    }, "text", "+7 495 737 0604" ], [ "tel", {
+      "type" : "fax"
+    }, "text", "+7 495 737 0684" ], [ "email", { }, "text", "ip-reg@ripn.net" ], [ "email", { }, "text", "ip-dbm-request@ripn.net" ], [ "email", { }, "text", "rtip-reg@ripn.net" ] ] ],
+    "roles" : [ "abuse" ],
+    "entities" : [ {
+      "handle" : "EVK10-RIPE",
+      "roles" : [ "technical" ],
+      "objectClassName" : "entity"
+    }, {
+      "handle" : "LY10-RIPE",
+      "roles" : [ "administrative" ],
+      "objectClassName" : "entity"
+    }, {
+      "handle" : "OBS10-RIPE",
+      "roles" : [ "technical" ],
+      "objectClassName" : "entity"
+    }, {
+      "handle" : "ROSNIIROS-MNT",
+      "roles" : [ "registrant" ],
+      "objectClassName" : "entity"
+    } ],
+    "objectClassName" : "entity"
+  } ],
+  "remarks" : [ {
+    "description" : [ "RU NCC Network", "Regional Network Information Center", "Kurchatov sq, 1", "123182 Moscow" ]
+  } ],
+  "links" : [ {
+    "value" : "https://rdap.db.ripe.net/ip/194.85.61.205",
+    "rel" : "self",
+    "href" : "https://rdap.db.ripe.net/ip/194.85.61.205"
+  }, {
+    "value" : "http://www.ripe.net/data-tools/support/documentation/terms",
+    "rel" : "copyright",
+    "href" : "http://www.ripe.net/data-tools/support/documentation/terms"
+  } ],
+  "events" : [ {
+    "eventAction" : "last changed",
+    "eventDate" : "2015-08-04T08:50:07Z"
+  } ],
+  "rdapConformance" : [ "rdap_level_0" ],
+  "notices" : [ {
+    "title" : "Filtered",
+    "description" : [ "This output has been filtered." ]
+  }, {
+    "title" : "Source",
+    "description" : [ "Objects returned came from source", "RIPE" ]
+  }, {
+    "title" : "Terms and Conditions",
+    "description" : [ "This is the RIPE Database query service. The objects are in RDAP format." ],
+    "links" : [ {
+      "value" : "https://rdap.db.ripe.net/ip/194.85.61.205",
+      "rel" : "terms-of-service",
+      "href" : "http://www.ripe.net/db/support/db-terms-conditions.pdf",
+      "type" : "application/pdf"
+    } ]
+  } ],
+  "port43" : "whois.ripe.net",
+  "objectClassName" : "ip network"
+}

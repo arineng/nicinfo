@@ -1,4 +1,4 @@
-# Copyright (C) 2011,2012,2013,2014 American Registry for Internet Numbers
+# Copyright (C) 2011-2018 American Registry for Internet Numbers
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -12,10 +12,11 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-require 'nicinfo/config'
+require 'nicinfo/appctx'
 require 'nicinfo/nicinfo_logger'
 require 'nicinfo/utils'
 require 'nicinfo/common_json'
+require 'nicinfo/common_summary'
 require 'nicinfo/entity'
 require 'nicinfo/ns'
 require 'nicinfo/ds_data'
@@ -24,15 +25,15 @@ require 'nicinfo/data_tree'
 
 module NicInfo
 
-  def NicInfo.display_domain json_data, config, data_node
+  def NicInfo.display_domain json_data, appctx, data_node
     obj_array = json_data
     unless json_data.instance_of? Array
       obj_array = Array.new
       obj_array << json_data
     end
-    respObjs = ResponseObjSet.new config
+    respObjs = ResponseObjSet.new appctx
     obj_array.each do |array_object|
-      domain = config.factory.new_domain.process( array_object )
+      domain = appctx.factory.new_domain.process( array_object )
       root = domain.to_node
       data_node.add_root( root )
       if !domain.entities.empty? or !domain.nameservers.empty?
@@ -75,21 +76,25 @@ module NicInfo
         NicInfo::add_entity_respobjs( domain.network.entities, respObjs )
       end
     end
-    data_node.to_normal_log( config.logger, true )
+    data_node.to_normal_log( appctx.logger, true )
     respObjs.display
   end
 
-  def NicInfo.display_domains json_data, config, data_tree
+  def NicInfo.display_domains json_data, appctx, data_tree
     domain_array = json_data[ "domainSearchResults" ]
     if domain_array != nil
       if domain_array.instance_of? Array
-        NicInfo.display_domain( domain_array, config, data_tree )
+        NicInfo.display_domain( domain_array, appctx, data_tree )
       else
-        config.conf_msgs << "'domainSearchResults' is not an array"
+        appctx.conf_msgs << "'domainSearchResults' is not an array"
       end
     else
-      config.conf_msgs << "'domainSearchResults' is not present"
+      appctx.conf_msgs << "'domainSearchResults' is not present"
     end
+  end
+
+  def NicInfo.process_domain( json_data, appctx )
+    return appctx.factory.new_domain.process( json_data )
   end
 
   # deals with RDAP nameserver structures
@@ -97,9 +102,9 @@ module NicInfo
 
     attr_accessor :entities, :nameservers, :ds_data_objs, :key_data_objs, :objectclass, :asEventActors, :network
 
-    def initialize config
-      @config = config
-      @common = CommonJson.new config
+    def initialize appctx
+      @appctx = appctx
+      @common = CommonJson.new appctx
       @entities = Array.new
       @asEventActors = Array.new
       @nameservers = Array.new
@@ -112,38 +117,47 @@ module NicInfo
       @entities = @common.process_entities @objectclass
       json_nses = NicInfo::get_nameservers json_data
       json_nses.each do |json_ns|
-        ns = @config.factory.new_ns
+        ns = @appctx.factory.new_ns
         ns.process( json_ns )
         @nameservers << ns
       end if json_nses
       json_net = NicInfo::get_network json_data
       if json_net
-        ip = @config.factory.new_ip
+        ip = @appctx.factory.new_ip
         ip.process json_net
         @network = ip
       end
       json_ds_data_objs = NicInfo::get_ds_data_objs @objectclass
       json_ds_data_objs.each do |json_ds|
-        dsData = DsData.new( @config )
+        dsData = DsData.new( @appctx )
         dsData.process( json_ds )
         @ds_data_objs << dsData
       end if json_ds_data_objs
       json_key_data_objs = NicInfo::get_key_data_objs @objectclass
       json_key_data_objs.each do |json_key|
-        keyData = KeyData.new( @config )
+        keyData = KeyData.new( @appctx )
         keyData.process( json_key )
         @key_data_objs << keyData
       end if json_key_data_objs
+      common_summary = CommonSummary.new(@objectclass, @entities, @appctx )
+      nsldh = []
+      @nameservers.each do |ns|
+        nsldh << NicInfo::get_ldhName( ns.objectclass )
+      end
+      common_summary.summary_data[NicInfo::CommonSummary::NAMESERVERS ] = nsldh
+      registrar = common_summary.find_entity_by_role( @entities, "registrar" )
+      common_summary.summary_data[NicInfo::CommonSummary::REGISTRAR ] = registrar.get_cn if registrar
+      common_summary.inject
       return self
     end
 
     def display
-      @config.logger.start_data_item
-      @config.logger.data_title "[ DOMAIN ]"
-      @config.logger.terse "Handle", NicInfo::get_handle( @objectclass ), NicInfo::AttentionType::SUCCESS
-      @config.logger.extra "Object Class Name", NicInfo::get_object_class_name( @objectclass, "domain", @config )
-      @config.logger.terse "Domain Name", NicInfo::get_ldhName( @objectclass ), NicInfo::AttentionType::SUCCESS
-      @config.logger.datum "I18N Domain Name", NicInfo::get_unicodeName( @objectclass ), NicInfo::AttentionType::SUCCESS
+      @appctx.logger.start_data_item
+      @appctx.logger.data_title "[ DOMAIN ]"
+      @appctx.logger.terse "Handle", NicInfo::get_handle( @objectclass ), NicInfo::AttentionType::SUCCESS
+      @appctx.logger.extra "Object Class Name", NicInfo::get_object_class_name( @objectclass, "domain", @appctx )
+      @appctx.logger.terse "Domain Name", NicInfo::get_ldhName( @objectclass ), NicInfo::AttentionType::SUCCESS
+      @appctx.logger.datum "I18N Domain Name", NicInfo::get_unicodeName( @objectclass ), NicInfo::AttentionType::SUCCESS
       variants = @objectclass[ "variants" ]
       variant_no = 1
       variants.each do |variant|
@@ -156,12 +170,12 @@ module NicInfo
           end
           item_value = arr.join( ", " )
         end
-        @config.logger.extra "Variant #{variant_no}", item_value
-        @config.logger.extra "IDN Table", variant[ "idnTable" ]
+        @appctx.logger.extra "Variant #{variant_no}", item_value
+        @appctx.logger.extra "IDN Table", variant[ "idnTable" ]
         variant_names = variant[ "variantNames" ]
         variant_names.each do |variant_name|
-          @config.logger.extra "Variant Domain", NicInfo::get_ldhName( variant_name )
-          @config.logger.extra "Variant IDN", NicInfo::get_unicodeName( variant_name )
+          @appctx.logger.extra "Variant Domain", NicInfo::get_ldhName( variant_name )
+          @appctx.logger.extra "Variant IDN", NicInfo::get_unicodeName( variant_name )
         end if variant_names
         variant_no = variant_no + 1
       end if variants
@@ -177,11 +191,11 @@ module NicInfo
         secure_dns = secure_dns[ 0 ]
       end
       if secure_dns
-        @config.logger.terse "Zone Signed", secure_dns[ "zoneSigned" ]
-        @config.logger.terse "Delegation Signed", secure_dns[ "delegationSigned" ]
-        @config.logger.terse "Max Signature Life", secure_dns[ "maxSigLife" ]
+        @appctx.logger.terse "Zone Signed", secure_dns[ "zoneSigned" ]
+        @appctx.logger.terse "Delegation Signed", secure_dns[ "delegationSigned" ]
+        @appctx.logger.terse "Max Signature Life", secure_dns[ "maxSigLife" ]
       end
-      @config.logger.end_data_item
+      @appctx.logger.end_data_item
     end
 
     def get_cn
@@ -195,7 +209,7 @@ module NicInfo
     end
 
     def to_node
-      DataNode.new( get_cn, nil, NicInfo::get_self_link( NicInfo::get_links( @objectclass, @config ) ) )
+      DataNode.new( get_cn, nil, NicInfo::get_self_link( NicInfo::get_links( @objectclass, @appctx ) ) )
     end
 
   end

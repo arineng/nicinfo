@@ -12,7 +12,7 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-require 'nicinfo/config'
+require 'nicinfo/appctx'
 require 'nicinfo/nicinfo_logger'
 require 'nicinfo/utils'
 require 'nicinfo/common_json'
@@ -22,30 +22,30 @@ module NicInfo
   # deals with RDAP error code structures
   class ErrorCode
 
-    attr_accessor :config
+    attr_accessor :appctx
 
-    def initialize( config )
-      @config = config
-      @common = CommonJson.new( config )
+    def initialize( appctx )
+      @appctx = appctx
+      @common = CommonJson.new( appctx )
     end
 
     def display_error_code ec
-      @config.logger.start_data_item
+      @appctx.logger.start_data_item
       title = ec[ "title" ]
       if title == nil
         title = ""
       end
-      @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "[ ERROR ]", title, NicInfo::AttentionType::ERROR
-      @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "Code", ec[ "errorCode" ]
+      @appctx.logger.prose NicInfo::DataAmount::NORMAL_DATA, "[ ERROR ]", title, NicInfo::AttentionType::ERROR
+      @appctx.logger.prose NicInfo::DataAmount::NORMAL_DATA, "Code", ec[ "errorCode" ]
       description = ec[ "description" ]
       i = 1
       description.each do |line|
-        @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, i.to_s, line
+        @appctx.logger.prose NicInfo::DataAmount::NORMAL_DATA, i.to_s, line
         i = i + 1
-      end
+      end if description
       links = ec[ "links" ]
       @common.display_simple_links( links )
-      @config.logger.end_data_item
+      @appctx.logger.end_data_item
     end
 
   end

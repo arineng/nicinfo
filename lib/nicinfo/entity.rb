@@ -12,18 +12,19 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-require 'nicinfo/config'
+require 'nicinfo/appctx'
 require 'nicinfo/nicinfo_logger'
 require 'nicinfo/utils'
 require 'nicinfo/common_json'
+require 'nicinfo/common_summary'
 require 'nicinfo/data_tree'
 
 module NicInfo
 
-  def NicInfo.display_entity json_data, config, data_tree
-    entity = config.factory.new_entity.process( json_data )
+  def NicInfo.display_entity json_data, appctx, data_tree
+    entity = appctx.factory.new_entity.process( json_data )
 
-    respobjs = ResponseObjSet.new config
+    respobjs = ResponseObjSet.new appctx
     root = entity.to_node
     data_tree.add_root( root )
     if !entity.entities.empty?
@@ -54,26 +55,30 @@ module NicInfo
       respobjs.associateEntities autnum.entities
     end
 
-    data_tree.to_normal_log( config.logger, true )
+    data_tree.to_normal_log( appctx.logger, true )
     respobjs.display
   end
 
-  def NicInfo.display_entities json_data, config, data_tree
+  def NicInfo.display_entities json_data, appctx, data_tree
     entity_array = json_data[ "entitySearchResults" ]
     if entity_array != nil
       if entity_array.instance_of? Array
         display_array = Array.new
         entity_array.each do |ea|
-          entity = config.factory.new_entity.process( ea )
+          entity = appctx.factory.new_entity.process( ea )
           display_array << entity
         end
-        NicInfo.display_object_with_entities( display_array, config, data_tree )
+        NicInfo.display_object_with_entities( display_array, appctx, data_tree )
       else
-        config.conf_msgs << "'entitySearchResults' is not an array"
+        appctx.conf_msgs << "'entitySearchResults' is not an array"
       end
     else
-      config.conf_msgs << "'entitySearchResults' is not present"
+      appctx.conf_msgs << "'entitySearchResults' is not present"
     end
+  end
+
+  def NicInfo.process_entity( json_data, appctx )
+    return appctx.factory.new_entity.process( json_data )
   end
 
   class Org
@@ -112,8 +117,8 @@ module NicInfo
 
     attr_accessor :fns, :names, :phones, :emails, :adrs, :kind, :titles, :roles, :orgs
 
-    def initialize( config )
-      @config = config
+    def initialize( appctx )
+      @appctx = appctx
       @fns = Array.new
       @names = Array.new
       @phones = Array.new
@@ -132,9 +137,9 @@ module NicInfo
       if ( vcard = get_vcard( entity ) ) != nil
         vcardElements = vcard[ 1 ]
         if vcardElements.size == 0
-          @config.conf_msgs << "jCard (vCard) is empty."
+          @appctx.conf_msgs << "jCard (vCard) is empty."
         elsif vcardElements[ 0 ][ 0 ] != "version"
-          @config.conf_msgs << "jCard (vCard) does not have required version first element."
+          @appctx.conf_msgs << "jCard (vCard) does not have required version first element."
         end
         vcardElements.each do |element|
           if element[ 0 ] == "fn"
@@ -190,6 +195,11 @@ module NicInfo
             end
             if (label = element[ 1 ][ "label" ]) != nil
               adr.label = label.split( "\n" )
+              esplit = label.split( '\n' )
+              if esplit.length > adr.label.length
+                adr.label = esplit
+                @appctx.conf_msgs << "newline escaping issue detected in jCard address"
+              end
             else
               adr.pobox=element[ 3 ][ 0 ]
               adr.extended=element[ 3 ][ 1 ]
@@ -224,7 +234,7 @@ module NicInfo
           end
         end
         if @fns.empty?
-          @config.conf_msgs << "jCard (vCard) has no required 'fn' property."
+          @appctx.conf_msgs << "jCard (vCard) has no required 'fn' property."
         end
       end
       return self
@@ -237,12 +247,12 @@ module NicInfo
 
     attr_accessor :asEvents, :selfhref
     attr_accessor :entities, :objectclass, :asEventActors
-    attr_accessor :networks, :autnums
+    attr_accessor :networks, :autnums, :jcard
 
-    def initialize config
-      @config = config
-      @jcard = JCard.new( config )
-      @common = CommonJson.new config
+    def initialize appctx
+      @appctx = appctx
+      @jcard = JCard.new( appctx )
+      @common = CommonJson.new appctx
       @entity = nil
       @asEvents = Array.new
       @asEventActors = Array.new
@@ -258,66 +268,69 @@ module NicInfo
         eventActor = EventActor.new
         eventActor.eventAction=event[ "eventAction" ]
         eventActor.eventDate=event[ "eventDate" ]
-        eventActor.related=NicInfo.get_related_link( NicInfo.get_links( event, @config ) )
+        eventActor.related=NicInfo.get_related_link( NicInfo.get_links( event, @appctx ) )
         @asEvents << eventActor
       end if events
-      @selfhref = NicInfo::get_self_link( NicInfo::get_links( @objectclass, @config ) )
+      @selfhref = NicInfo::get_self_link( NicInfo::get_links( @objectclass, @appctx ) )
       @entities = @common.process_entities @objectclass
       @networks = Array.new
       json_networks = NicInfo::get_networks( @objectclass )
       json_networks.each do |json_network|
         if json_network.is_a?( Hash )
-          network = @config.factory.new_ip
+          network = @appctx.factory.new_ip
           network.process( json_network )
           @networks << network
         else
-          @config.conf_msgs << "'networks' contains a string and not an object"
+          @appctx.conf_msgs << "'networks' contains a string and not an object"
         end
       end if json_networks
       @autnums = Array.new
       json_autnums = NicInfo::get_autnums( @objectclass )
       json_autnums.each do |json_autnum|
         if json_autnum.is_a?( Hash )
-          autnum = @config.factory.new_autnum
+          autnum = @appctx.factory.new_autnum
           autnum.process( json_autnum )
           @autnums << autnum
         else
-          @config.conf_msgs << "'autnums' contains a string and not an object"
+          @appctx.conf_msgs << "'autnums' contains a string and not an object"
         end
       end if json_autnums
+      common_summary = CommonSummary.new(@objectclass, @entities, @appctx )
+      common_summary.extract_registrant_data( self )
+      common_summary.inject
       return self
     end
 
     def display
-      @config.logger.start_data_item
-      @config.logger.data_title "[ ENTITY ]"
-      @config.logger.terse "Handle", NicInfo::get_handle( @objectclass ), NicInfo::AttentionType::SUCCESS
-      @config.logger.extra "Object Class Name", NicInfo::get_object_class_name( @objectclass, "entity", @config )
+      @appctx.logger.start_data_item
+      @appctx.logger.data_title "[ ENTITY ]"
+      @appctx.logger.terse "Handle", NicInfo::get_handle( @objectclass ), NicInfo::AttentionType::SUCCESS
+      @appctx.logger.extra "Object Class Name", NicInfo::get_object_class_name( @objectclass, "entity", @appctx )
       @jcard.fns.each do |fn|
-        @config.logger.terse "Common Name", fn, NicInfo::AttentionType::SUCCESS
+        @appctx.logger.terse "Common Name", fn, NicInfo::AttentionType::SUCCESS
       end
       @jcard.names.each do |n|
-        @config.logger.extra "Formal Name", n, NicInfo::AttentionType::SUCCESS
+        @appctx.logger.extra "Formal Name", n, NicInfo::AttentionType::SUCCESS
       end
       @jcard.orgs.each do |org|
         item_value = org.names.join( ", " )
         if !org.type.empty?
           item_value << " ( #{org.type.join( ", " )} )"
         end
-        @config.logger.terse "Organization", item_value, NicInfo::AttentionType::SUCCESS
+        @appctx.logger.terse "Organization", item_value, NicInfo::AttentionType::SUCCESS
       end
       @jcard.titles.each do |title|
-        @config.logger.extra "Title", title
+        @appctx.logger.extra "Title", title
       end
       @jcard.roles.each do |role|
-        @config.logger.extra "Organizational Role", role
+        @appctx.logger.extra "Organizational Role", role
       end
       @jcard.emails.each do |email|
         item_value = email.addr
         if !email.type.empty?
           item_value << " ( #{email.type.join( ", " )} )"
         end
-        @config.logger.terse "Email", item_value
+        @appctx.logger.terse "Email", item_value
       end
       @jcard.phones.each do |phone|
         item_value = phone.number
@@ -327,7 +340,7 @@ module NicInfo
         if !phone.type.empty?
           item_value << " ( #{phone.type.join( ", " )} )"
         end
-        @config.logger.terse "Phone", item_value
+        @appctx.logger.terse "Phone", item_value
       end
       @common.display_string_array "roles", "Roles", @objectclass, DataAmount::TERSE_DATA
       @common.display_public_ids @objectclass
@@ -336,31 +349,31 @@ module NicInfo
       @common.display_events @objectclass
       @jcard.adrs.each do |adr|
         if adr.type.empty?
-          @config.logger.extra "Address", "-- for #{get_cn} --"
+          @appctx.logger.extra "Address", "-- for #{get_cn} --"
         else
-          @config.logger.extra "Address", "( #{adr.type.join( ", " )} )"
+          @appctx.logger.extra "Address", "( #{adr.type.join( ", " )} )"
         end
         if adr.structured
-          @config.logger.extra "P.O. Box", adr.pobox
-          @config.logger.extra "Apt/Suite", adr.extended
-          @config.logger.extra "Street", adr.street
-          @config.logger.extra "City", adr.locality
-          @config.logger.extra "Region", adr.region
-          @config.logger.extra "Postal Code", adr.postal
-          @config.logger.extra "Country", adr.country
+          @appctx.logger.extra "P.O. Box", adr.pobox
+          @appctx.logger.extra "Apt/Suite", adr.extended
+          @appctx.logger.extra "Street", adr.street
+          @appctx.logger.extra "City", adr.locality
+          @appctx.logger.extra "Region", adr.region
+          @appctx.logger.extra "Postal Code", adr.postal
+          @appctx.logger.extra "Country", adr.country
         else
           i = 1
           adr.label.each do |line|
-            @config.logger.extra i.to_s, line
+            @appctx.logger.extra i.to_s, line
             i = i + 1
           end
         end
       end
-      @config.logger.extra "Kind", @jcard.kind
+      @appctx.logger.extra "Kind", @jcard.kind
       @common.display_as_events_actors @asEventActors
       @common.display_remarks @objectclass
       @common.display_links( get_cn, @objectclass )
-      @config.logger.end_data_item
+      @appctx.logger.end_data_item
     end
 
     def get_cn

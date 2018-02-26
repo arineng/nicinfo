@@ -1,0 +1,362 @@
+{
+  "rdapConformance": [
+    "rdap_level_0"
+  ],
+  "notices": [
+    {
+      "title": "Terms of Service",
+      "description": [
+        "By using the ARIN RDAP/Whois service, you are agreeing to the RDAP/Whois Terms of Use"
+      ],
+      "links": [
+        {
+          "value": "https://rdap.arin.net/registry/ip/107.1.1.1",
+          "rel": "about",
+          "type": "text/html",
+          "href": "https://www.arin.net/whois_tou.html"
+        }
+      ]
+    }
+  ],
+  "handle": "NET-107-0-0-0-1",
+  "startAddress": "107.0.0.0",
+  "endAddress": "107.5.255.255",
+  "ipVersion": "v4",
+  "name": "JUMPSTART-5",
+  "parentHandle": "NET-107-0-0-0-0",
+  "events": [
+    {
+      "eventAction": "last changed",
+      "eventDate": "2016-08-31T12:25:04-04:00"
+    },
+    {
+      "eventAction": "registration",
+      "eventDate": "2010-06-29T11:36:51-04:00"
+    }
+  ],
+  "links": [
+    {
+      "value": "https://rdap.arin.net/registry/ip/107.1.1.1",
+      "rel": "self",
+      "type": "application/rdap+json",
+      "href": "https://rdap.arin.net/registry/ip/107.0.0.0"
+    },
+    {
+      "value": "https://rdap.arin.net/registry/ip/107.1.1.1",
+      "rel": "alternate",
+      "type": "application/xml",
+      "href": "https://whois.arin.net/rest/net/NET-107-0-0-0-1"
+    }
+  ],
+  "entities": [
+    {
+      "handle": "CCCS",
+      "vcardArray": [
+        "vcard",
+        [
+          [
+            "version",
+            {
+            },
+            "text",
+            "4.0"
+          ],
+          [
+            "fn",
+            {
+            },
+            "text",
+            "Comcast Cable Communications, LLC"
+          ],
+          [
+            "adr",
+            {
+              "label": "1800 Bishops Gate Blvd\nMt Laurel\nNJ\n08054\nUnited States"
+            },
+            "text",
+            [
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          ],
+          [
+            "kind",
+            {
+            },
+            "text",
+            "org"
+          ]
+        ]
+      ],
+      "roles": [
+        "registrant"
+      ],
+      "links": [
+        {
+          "value": "https://rdap.arin.net/registry/ip/107.1.1.1",
+          "rel": "self",
+          "type": "application/rdap+json",
+          "href": "https://rdap.arin.net/registry/entity/CCCS"
+        },
+        {
+          "value": "https://rdap.arin.net/registry/ip/107.1.1.1",
+          "rel": "alternate",
+          "type": "application/xml",
+          "href": "https://whois.arin.net/rest/org/CCCS"
+        }
+      ],
+      "events": [
+        {
+          "eventAction": "last changed",
+          "eventDate": "2017-01-28T08:32:29-05:00"
+        },
+        {
+          "eventAction": "registration",
+          "eventDate": "2001-09-17T23:00:00-04:00"
+        }
+      ],
+      "entities": [
+        {
+          "handle": "NAPO-ARIN",
+          "vcardArray": [
+            "vcard",
+            [
+              [
+                "version",
+                {
+                },
+                "text",
+                "4.0"
+              ],
+              [
+                "adr",
+                {
+                  "label": "1800 Bishops Gate Blvd\nMount Laurel\nNJ\n08054\nUnited States"
+                },
+                "text",
+                [
+                  "",
+                  "",
+                  "",
+                  "",
+                  "",
+                  "",
+                  ""
+                ]
+              ],
+              [
+                "fn",
+                {
+                },
+                "text",
+                "Network Abuse and Policy Observance"
+              ],
+              [
+                "org",
+                {
+                },
+                "text",
+                "Network Abuse and Policy Observance"
+              ],
+              [
+                "kind",
+                {
+                },
+                "text",
+                "group"
+              ],
+              [
+                "email",
+                {
+                },
+                "text",
+                "abuse@comcast.net"
+              ],
+              [
+                "tel",
+                {
+                  "type": [
+                    "work",
+                    "voice"
+                  ]
+                },
+                "text",
+                "+1-888-565-4329"
+              ]
+            ]
+          ],
+          "roles": [
+            "abuse"
+          ],
+          "remarks": [
+            {
+              "title": "Registration Comments",
+              "description": [
+                "This contact is to be used for network abuse, spam/phishing, and legally constituted requests for information or action. It is not for any other purpose."
+              ]
+            }
+          ],
+          "links": [
+            {
+              "value": "https://rdap.arin.net/registry/ip/107.1.1.1",
+              "rel": "self",
+              "type": "application/rdap+json",
+              "href": "https://rdap.arin.net/registry/entity/NAPO-ARIN"
+            },
+            {
+              "value": "https://rdap.arin.net/registry/ip/107.1.1.1",
+              "rel": "alternate",
+              "type": "application/xml",
+              "href": "https://whois.arin.net/rest/poc/NAPO-ARIN"
+            }
+          ],
+          "events": [
+            {
+              "eventAction": "last changed",
+              "eventDate": "2018-02-01T09:18:11-05:00"
+            },
+            {
+              "eventAction": "registration",
+              "eventDate": "2002-09-30T16:45:14-04:00"
+            }
+          ],
+          "status": [
+            "validated"
+          ],
+          "port43": "whois.arin.net",
+          "objectClassName": "entity"
+        },
+        {
+          "handle": "IC161-ARIN",
+          "vcardArray": [
+            "vcard",
+            [
+              [
+                "version",
+                {
+                },
+                "text",
+                "4.0"
+              ],
+              [
+                "adr",
+                {
+                  "label": "1800 Bishops Gate Blvd\nMount Laurel\nNJ\n08054\nUnited States"
+                },
+                "text",
+                [
+                  "",
+                  "",
+                  "",
+                  "",
+                  "",
+                  "",
+                  ""
+                ]
+              ],
+              [
+                "fn",
+                {
+                },
+                "text",
+                "Comcast Cable Communications Inc"
+              ],
+              [
+                "org",
+                {
+                },
+                "text",
+                "Comcast Cable Communications Inc"
+              ],
+              [
+                "kind",
+                {
+                },
+                "text",
+                "group"
+              ],
+              [
+                "email",
+                {
+                },
+                "text",
+                "CNIPEO-Ip-registration@cable.comcast.com"
+              ],
+              [
+                "tel",
+                {
+                  "type": [
+                    "work",
+                    "voice"
+                  ]
+                },
+                "text",
+                "+1-856-317-7200"
+              ]
+            ]
+          ],
+          "roles": [
+            "technical",
+            "administrative"
+          ],
+          "remarks": [
+            {
+              "title": "Registration Comments",
+              "description": [
+                "This is not an Abuse, Spam, or Legal notification POC.\r",
+                "Please use Abuse@comcast.net for all security, takedown, and emergency issues. This IP Registration address cannot address those issues."
+              ]
+            }
+          ],
+          "links": [
+            {
+              "value": "https://rdap.arin.net/registry/ip/107.1.1.1",
+              "rel": "self",
+              "type": "application/rdap+json",
+              "href": "https://rdap.arin.net/registry/entity/IC161-ARIN"
+            },
+            {
+              "value": "https://rdap.arin.net/registry/ip/107.1.1.1",
+              "rel": "alternate",
+              "type": "application/xml",
+              "href": "https://whois.arin.net/rest/poc/IC161-ARIN"
+            }
+          ],
+          "events": [
+            {
+              "eventAction": "last changed",
+              "eventDate": "2018-02-06T09:23:33-05:00"
+            },
+            {
+              "eventAction": "registration",
+              "eventDate": "2002-06-12T10:30:41-04:00"
+            }
+          ],
+          "status": [
+            "validated"
+          ],
+          "port43": "whois.arin.net",
+          "objectClassName": "entity"
+        }
+      ],
+      "port43": "whois.arin.net",
+      "objectClassName": "entity"
+    }
+  ],
+  "port43": "whois.arin.net",
+  "objectClassName": "ip network",
+  "nicinfo_metadata": {
+    "service_operator": "arin.net",
+    "registrant_name": "Comcast Cable Communications, LLC ( CCCS )",
+    "registrant_country": "United States",
+    "abuse_email": "abuse@comcast.net",
+    "registration_date": "Tue, 29 Jun 2010 11:36:51 -0400",
+    "last_changed_date": "Wed, 31 Aug 2016 12:25:04 -0400"
+  }
+}
+
