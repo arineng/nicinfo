@@ -205,8 +205,8 @@ module NicInfo
 
       # now lets put these into blocks as unknown
       @fetch_errors.each do |fetch_error|
-        no_block = hit_ipaddr( fetch_error.ipaddr, fetch_error.time )
-        if no_block
+        block_found = hit_ipaddr( fetch_error.ipaddr, fetch_error.time )
+        unless block_found
           if fetch_error.ipaddr.ipv6?
             cidr = "#{fetch_error.ipaddr.mask(56).to_s}/56"
           else
@@ -375,8 +375,8 @@ module NicInfo
         columns << NotApplicable #last query time
       else
         t = datum.last_query_time.to_i - datum.first_query_time.to_i + 1
-        columns << t.to_s
         columns << datum.total_queries.fdiv( t ).to_s
+        columns << t.to_s
         columns << datum.first_query_time.strftime('%d %b %Y %H:%M:%S')
         columns << datum.last_query_time.strftime('%d %b %Y %H:%M:%S')
       end
