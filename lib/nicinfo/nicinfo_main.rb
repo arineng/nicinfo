@@ -302,14 +302,24 @@ module NicInfo
           @appctx.options.require_query = false
         end
 
-        opts.on( "--bulkip-out-csv FILE",
-                 "Bulk IP CSV output" ) do |file|
+        opts.on( "--bulkip-out-csv NAME",
+                 "Bulk IP CSV output file base name" ) do |file|
           @appctx.options.bulkip_out_csv = file
         end
 
-        opts.on( "--bulkip-out-tsv FILE",
-                 "Bulk IP TSV output" ) do |file|
+        opts.on( "--bulkip-out-tsv NAME",
+                 "Bulk IP TSV output file base name" ) do |file|
           @appctx.options.bulkip_out_tsv = file
+        end
+
+        opts.on( "--bulkip-top-hits NUMBER",
+                "Output top NUMBER of hits" ) do |n|
+          @appctx.options.bulkip_top_hits = n.to_i
+        end
+
+        opts.on( "--bulkip-top-hps NUMBER",
+                "Output top NUMBER of hits-per-second" ) do |n|
+          @appctx.options.bulkip_top_hps = n.to_i
         end
 
       end
@@ -860,6 +870,8 @@ HELP_SUMMARY
       end
       rdap_query = NicInfo::RDAPQuery.new( @appctx )
       bulkip_data = NicInfo::BulkIPData.new( @appctx )
+      bulkip_data.set_top_hits_number( @appctx.options.bulkip_top_hits )
+      bulkip_data.set_top_hps_number( @appctx.options.bulkip_top_hps )
       bulkip_data.note_start_time
       current_file = nil
       current_lineno = nil
