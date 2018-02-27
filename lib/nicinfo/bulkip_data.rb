@@ -90,69 +90,6 @@ module NicInfo
 
   end
 
-  class BulkIPSecondsSample
-
-    class Network
-
-      attr_accessor :ipnetwork, :hits
-
-      def initialize( ipnetwork )
-        @ipnetwork = ipnetwork
-        @hits = 1
-      end
-
-      def hit
-        @hits = @hits + 1
-      end
-
-    end
-
-    class Block
-
-      attr_accessor :cidrstring, :bulkipnetwork, :bulkiplisted, :hits
-
-      def initialize( cidrstring, bulkipnetwork, bulkiplisted )
-        @bulkiplisted = bulkiplisted
-        @bulkipnetwork = bulkipnetwork
-        @cidrstring = cidrstring
-        @hits = 1
-      end
-
-      def hit
-        @hits = @hits + 1
-        @bulkipnetwork.hit if @bulkipnetwork
-        @bulkiplisted.hit if @bulkiplisted
-      end
-
-    end
-
-    class Listed
-
-      attr_accessor :ipnetwork, :hits
-
-      def initialize( ipnetwork )
-        @ipnetwork = ipnetwork
-        @hits = 1
-      end
-
-      def hit
-        @hits = @hits + 1
-      end
-
-    end
-
-    attr_accessor :second, :hits, :networks, :listeds, :blocks
-
-    def initialize( second )
-      @second = second
-      @hits = 0
-      @networks = Array.new
-      @listeds = Array.new
-      @blocks = Array.new
-    end
-
-  end
-
   class BulkIPFetchError
 
     attr_accessor :ipaddr, :time, :code, :reason
@@ -227,8 +164,8 @@ module NicInfo
       @interval = 0
     end
 
-    def set_interval_seconds( seconds )
-      @interval_seconds = seconds
+    def set_interval_seconds_to_increment( seconds )
+      @interval_seconds_to_increment = seconds
     end
 
     def hit_time( time )
@@ -248,7 +185,17 @@ module NicInfo
 
     def hit_ipaddr( ipaddr, time )
 
-      @first_file_time = time unless @first_file_time
+      if @first_file_time
+        if time > @second_to_sample
+          @second_to_sample = time + ( @interval * @interval_seconds_to_increment ) + rand( @interval_seconds_to_increment )
+          @interval = @interval + 1
+          @appctx.logger.trace( "calculating next sample time to be #{@second_to_sample}" )
+        end
+      else
+        @first_file_time = time
+        @second_to_sample = @first_file_time
+        @appctx.logger.trace( "first time sample is #{@second_to_sample}")
+      end
 
       retval = false
       @block_data.each do |datum_net, datum|
@@ -261,6 +208,13 @@ module NicInfo
 
       @total_hits = @total_hits + 1 if retval
       hit_time( time )
+
+      # if doing sampling, then return true when not in the sample second
+      # this will avoid a call to hit_network
+      # if sampling is being done can be detected with @interval_seconds_to_increment
+      if @interval_seconds_to_increment && time.to_i != @second_to_sample.to_i
+        retval = true
+      end
       return retval
 
     end
