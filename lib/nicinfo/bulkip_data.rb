@@ -22,7 +22,7 @@ module NicInfo
 
   class BulkIPNetwork
 
-    attr_accessor :ipnetwork, :total_queries, :first_query_time, :last_query_time
+    attr_accessor :ipnetwork, :total_queries, :first_hit_time, :last_hit_time
 
     def initialize( ipnetwork, time )
       @ipnetwork = ipnetwork
@@ -33,10 +33,10 @@ module NicInfo
     def hit( time )
       @total_queries = @total_queries + 1
       if time
-        @first_query_time = time unless @first_query_time
-        @first_query_time = time if time < @first_query_time
-        @last_query_time = time unless @last_query_time
-        @last_query_time = time if time > @last_query_time
+        @first_hit_time = time unless @first_hit_time
+        @first_hit_time = time if time < @first_hit_time
+        @last_hit_time = time unless @last_hit_time
+        @last_hit_time = time if time > @last_hit_time
       end
     end
 
@@ -44,7 +44,7 @@ module NicInfo
 
   class BulkIPBlock
 
-    attr_accessor :cidrstring, :bulkipnetwork, :bulkiplisted, :total_queries, :first_query_time, :last_query_time
+    attr_accessor :cidrstring, :bulkipnetwork, :bulkiplisted, :total_queries, :first_hit_time, :last_hit_time
 
     def initialize( cidrstring, time, bulkipnetwork, bulkiplisted )
       @bulkiplisted = bulkiplisted
@@ -57,10 +57,10 @@ module NicInfo
     def hit( time )
       @total_queries = @total_queries + 1
       if time
-        @first_query_time = time unless @first_query_time
-        @first_query_time = time if time < @first_query_time
-        @last_query_time = time unless @last_query_time
-        @last_query_time = time if time > @last_query_time
+        @first_hit_time = time unless @first_hit_time
+        @first_hit_time = time if time < @first_hit_time
+        @last_hit_time = time unless @last_hit_time
+        @last_hit_time = time if time > @last_hit_time
       end
       bulkipnetwork.hit( time ) if bulkipnetwork
       bulkiplisted.hit( time ) if bulkiplisted
@@ -70,7 +70,7 @@ module NicInfo
 
   class BulkIPListed
 
-    attr_accessor :ipnetwork, :total_queries, :first_query_time, :last_query_time
+    attr_accessor :ipnetwork, :total_queries, :first_hit_time, :last_hit_time
 
     def initialize( ipnetwork, time )
       @ipnetwork = ipnetwork
@@ -81,10 +81,10 @@ module NicInfo
     def hit( time )
       @total_queries = @total_queries + 1
       if time
-        @first_query_time = time unless @first_query_time
-        @first_query_time = time if time < @first_query_time
-        @last_query_time = time unless @last_query_time
-        @last_query_time = time if time > @last_query_time
+        @first_hit_time = time unless @first_hit_time
+        @first_hit_time = time if time < @first_hit_time
+        @last_hit_time = time unless @last_hit_time
+        @last_hit_time = time if time > @last_hit_time
       end
     end
 
@@ -107,9 +107,9 @@ module NicInfo
 
     attr_accessor :net_data, :listed_data, :block_data, :fetch_errors, :ip_errors, :appctx
 
-    BlockColumnHeaders = [ "Block", "Hits", "Avgd Hits/s", "Duration (s)", "First Query Time", "Last Query Time", "Registry", "Listed Name", "Listed Country", "Abuse Email" ]
-    NetworkColumnHeaders = [ "Network", "Hits", "Avgd Hits/s", "Duration (s)", "First Query Time", "Last Query Time", "Registry", "Listed Name", "Listed Country", "Abuse Email" ]
-    ListedColumnHeaders = [ "Listed Name", "Hits", "Avgd Hits/s", "Duration (s)", "First Query Time", "Last Query Time", "Registry", "Listed Country", "Abuse Email" ]
+    BlockColumnHeaders = [ "Block", "Hits", "Avgd Hits/s", "Duration (s)", "First Hit Time", "Last Hit Time", "Registry", "Listed Name", "Listed Country", "Abuse Email" ]
+    NetworkColumnHeaders = [ "Network", "Hits", "Avgd Hits/s", "Duration (s)", "First Hit Time", "Last Hit Time", "Registry", "Listed Name", "Listed Country", "Abuse Email" ]
+    ListedColumnHeaders = [ "Listed Name", "Hits", "Avgd Hits/s", "Duration (s)", "First Hit Time", "Last Hit Time", "Registry", "Listed Country", "Abuse Email" ]
     UrlColumnHeaders = [ "Total Queries", "Averaged QPS", "URL" ]
     NotApplicable = "N/A"
 
@@ -161,10 +161,10 @@ module NicInfo
 
     def hit_time( time )
       if time
-        @first_query_time = time unless @first_query_time
-        @first_query_time = time if time < @first_query_time
-        @last_query_time = time unless @last_query_time
-        @last_query_time = time if time > @last_query_time
+        @first_hit_time = time unless @first_hit_time
+        @first_hit_time = time if time < @first_hit_time
+        @last_hit_time = time unless @last_hit_time
+        @last_hit_time = time if time > @last_hit_time
       end
     end
 
@@ -444,8 +444,8 @@ module NicInfo
       end
 
       f.puts
-      f.puts( output_total_row( "First Query Time", @first_query_time.strftime('%d %b %Y %H:%M:%S'), seperator ) ) if @first_query_time
-      f.puts( output_total_row( "Last Query Time", @last_query_time.strftime('%d %b %Y %H:%M:%S'), seperator ) ) if @last_query_time
+      f.puts( output_total_row( "First Hit Time", @first_hit_time.strftime('%d %b %Y %H:%M:%S'), seperator ) ) if @first_hit_time
+      f.puts( output_total_row( "Last Hit Time", @last_hit_time.strftime('%d %b %Y %H:%M:%S'), seperator ) ) if @last_hit_time
       f.puts( output_total_row( "Non-Global Unicast IPs", @non_global_unicast, seperator ) )
       f.puts( output_total_row( "Network Lookups", @network_lookups, seperator ) )
       f.puts( output_total_row( "Total Hits", @total_hits, seperator ) )
@@ -516,19 +516,19 @@ module NicInfo
     def gather_query_and_timing_values( columns, datum, top_hits = nil, top_hps = nil )
       columns << datum.total_queries.to_s
       top_hits << [ datum.total_queries, datum ] if top_hits
-      if datum.last_query_time == nil or datum.first_query_time == nil
+      if datum.last_hit_time == nil or datum.first_hit_time == nil
         columns << NotApplicable #hits/s
         columns << NotApplicable #duration
         columns << NotApplicable #first query time
         columns << NotApplicable #last query time
       else
-        t = datum.last_query_time.to_i - datum.first_query_time.to_i + 1
+        t = datum.last_hit_time.to_i - datum.first_hit_time.to_i + 1
         hps = datum.total_queries.fdiv( t )
         columns << hps.to_s
         top_hps << [ hps, datum ] if top_hps
         columns << t.to_s
-        columns << datum.first_query_time.strftime('%d %b %Y %H:%M:%S')
-        columns << datum.last_query_time.strftime('%d %b %Y %H:%M:%S')
+        columns << datum.first_hit_time.strftime('%d %b %Y %H:%M:%S')
+        columns << datum.last_hit_time.strftime('%d %b %Y %H:%M:%S')
       end
     end
 
