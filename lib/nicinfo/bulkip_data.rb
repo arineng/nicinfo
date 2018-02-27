@@ -22,16 +22,16 @@ module NicInfo
 
   class BulkIPNetwork
 
-    attr_accessor :ipnetwork, :total_queries, :first_hit_time, :last_hit_time
+    attr_accessor :ipnetwork, :total_hits, :first_hit_time, :last_hit_time
 
     def initialize( ipnetwork, time )
       @ipnetwork = ipnetwork
-      @total_queries = 0
+      @total_hits = 0
       hit( time )
     end
 
     def hit( time )
-      @total_queries = @total_queries + 1
+      @total_hits = @total_hits + 1
       if time
         @first_hit_time = time unless @first_hit_time
         @first_hit_time = time if time < @first_hit_time
@@ -44,18 +44,18 @@ module NicInfo
 
   class BulkIPBlock
 
-    attr_accessor :cidrstring, :bulkipnetwork, :bulkiplisted, :total_queries, :first_hit_time, :last_hit_time
+    attr_accessor :cidrstring, :bulkipnetwork, :bulkiplisted, :total_hits, :first_hit_time, :last_hit_time
 
     def initialize( cidrstring, time, bulkipnetwork, bulkiplisted )
       @bulkiplisted = bulkiplisted
       @bulkipnetwork = bulkipnetwork
       @cidrstring = cidrstring
-      @total_queries = 0
+      @total_hits = 0
       hit( time )
     end
 
     def hit( time )
-      @total_queries = @total_queries + 1
+      @total_hits = @total_hits + 1
       if time
         @first_hit_time = time unless @first_hit_time
         @first_hit_time = time if time < @first_hit_time
@@ -70,16 +70,16 @@ module NicInfo
 
   class BulkIPListed
 
-    attr_accessor :ipnetwork, :total_queries, :first_hit_time, :last_hit_time
+    attr_accessor :ipnetwork, :total_hits, :first_hit_time, :last_hit_time
 
     def initialize( ipnetwork, time )
       @ipnetwork = ipnetwork
-      @total_queries = 0
+      @total_hits = 0
       hit( time )
     end
 
     def hit( time )
-      @total_queries = @total_queries + 1
+      @total_hits = @total_hits + 1
       if time
         @first_hit_time = time unless @first_hit_time
         @first_hit_time = time if time < @first_hit_time
@@ -514,8 +514,8 @@ module NicInfo
     end
 
     def gather_query_and_timing_values( columns, datum, top_hits = nil, top_hps = nil )
-      columns << datum.total_queries.to_s
-      top_hits << [ datum.total_queries, datum ] if top_hits
+      columns << datum.total_hits.to_s
+      top_hits << [ datum.total_hits, datum ] if top_hits
       if datum.last_hit_time == nil or datum.first_hit_time == nil
         columns << NotApplicable #hits/s
         columns << NotApplicable #duration
@@ -523,7 +523,7 @@ module NicInfo
         columns << NotApplicable #last query time
       else
         t = datum.last_hit_time.to_i - datum.first_hit_time.to_i + 1
-        hps = datum.total_queries.fdiv( t )
+        hps = datum.total_hits.fdiv( t )
         columns << hps.to_s
         top_hps << [ hps, datum ] if top_hps
         columns << t.to_s
