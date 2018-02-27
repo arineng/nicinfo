@@ -881,6 +881,7 @@ HELP_SUMMARY
           current_file = file
           b = BulkIPInFile.new( file )
           b.foreach do |ip,time,lineno|
+            bulkip_data.note_new_file
             @appctx.logger.trace( "bulk ip: #{ip} time: #{time} line no: #{lineno}")
             current_lineno = lineno
             if lineno % 1000 == 0

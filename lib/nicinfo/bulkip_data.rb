@@ -62,8 +62,8 @@ module NicInfo
         @last_hit_time = time unless @last_hit_time
         @last_hit_time = time if time > @last_hit_time
       end
-      bulkipnetwork.hit( time ) if bulkipnetwork
-      bulkiplisted.hit( time ) if bulkiplisted
+      @bulkipnetwork.hit( time ) if @bulkipnetwork
+      @bulkiplisted.hit( time ) if @bulkiplisted
     end
 
   end
@@ -86,6 +86,69 @@ module NicInfo
         @last_hit_time = time unless @last_hit_time
         @last_hit_time = time if time > @last_hit_time
       end
+    end
+
+  end
+
+  class BulkIPSecondsSample
+
+    class Network
+
+      attr_accessor :ipnetwork, :hits
+
+      def initialize( ipnetwork )
+        @ipnetwork = ipnetwork
+        @hits = 1
+      end
+
+      def hit
+        @hits = @hits + 1
+      end
+
+    end
+
+    class Block
+
+      attr_accessor :cidrstring, :bulkipnetwork, :bulkiplisted, :hits
+
+      def initialize( cidrstring, bulkipnetwork, bulkiplisted )
+        @bulkiplisted = bulkiplisted
+        @bulkipnetwork = bulkipnetwork
+        @cidrstring = cidrstring
+        @hits = 1
+      end
+
+      def hit
+        @hits = @hits + 1
+        @bulkipnetwork.hit if @bulkipnetwork
+        @bulkiplisted.hit if @bulkiplisted
+      end
+
+    end
+
+    class Listed
+
+      attr_accessor :ipnetwork, :hits
+
+      def initialize( ipnetwork )
+        @ipnetwork = ipnetwork
+        @hits = 1
+      end
+
+      def hit
+        @hits = @hits + 1
+      end
+
+    end
+
+    attr_accessor :second, :hits, :networks, :listeds, :blocks
+
+    def initialize( second )
+      @second = second
+      @hits = 0
+      @networks = Array.new
+      @listeds = Array.new
+      @blocks = Array.new
     end
 
   end
@@ -159,6 +222,15 @@ module NicInfo
       @end_time = Time.now
     end
 
+    def note_new_file
+      @first_file_time = nil
+      @interval = 0
+    end
+
+    def set_interval_seconds( seconds )
+      @interval_seconds = seconds
+    end
+
     def hit_time( time )
       if time
         @first_hit_time = time unless @first_hit_time
@@ -175,6 +247,8 @@ module NicInfo
     end
 
     def hit_ipaddr( ipaddr, time )
+
+      @first_file_time = time unless @first_file_time
 
       retval = false
       @block_data.each do |datum_net, datum|
