@@ -106,6 +106,7 @@ module NicInfo
   class BulkIPData
 
     attr_accessor :net_data, :listed_data, :block_data, :fetch_errors, :ip_errors, :appctx
+    attr_accessor :interval, :interval_seconds_to_increment, :second_to_sample
 
     BlockColumnHeaders = [ "Block", "Hits", "Avgd Hits/s", "Duration (s)", "First Hit Time", "Last Hit Time", "Registry", "Listed Name", "Listed Country", "Abuse Email" ]
     NetworkColumnHeaders = [ "Network", "Hits", "Avgd Hits/s", "Duration (s)", "First Hit Time", "Last Hit Time", "Registry", "Listed Name", "Listed Country", "Abuse Email" ]
@@ -185,16 +186,18 @@ module NicInfo
 
     def hit_ipaddr( ipaddr, time )
 
-      if @first_file_time
-        if time > @second_to_sample
-          @second_to_sample = time + ( @interval * @interval_seconds_to_increment ) + rand( @interval_seconds_to_increment )
-          @interval = @interval + 1
-          @appctx.logger.trace( "calculating next sample time to be #{@second_to_sample}" )
+      if @interval_seconds_to_increment
+        if @first_file_time
+          if time > @second_to_sample
+            @second_to_sample = time + @interval_seconds_to_increment + rand( @interval_seconds_to_increment )
+            @interval = @interval + 1
+            @appctx.logger.trace( "calculating next sample time to be #{@second_to_sample}" )
+          end
+        else
+          @first_file_time = time
+          @second_to_sample = @first_file_time
+          @appctx.logger.trace( "first time sample is #{@second_to_sample}")
         end
-      else
-        @first_file_time = time
-        @second_to_sample = @first_file_time
-        @appctx.logger.trace( "first time sample is #{@second_to_sample}")
       end
 
       retval = false
