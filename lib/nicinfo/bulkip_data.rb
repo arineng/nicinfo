@@ -274,6 +274,7 @@ module NicInfo
           end
           b = BulkIPBlock.new( cidr, fetch_error.time, nil, nil )
           @block_data[IPAddr.new( cidr ) ] = b
+          @total_hits = @total_hits + 1
         end
       end
     end
