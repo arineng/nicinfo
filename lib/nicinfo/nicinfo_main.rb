@@ -322,6 +322,11 @@ module NicInfo
           @appctx.options.bulkip_top_hps = n.to_i
         end
 
+        opts.on( "--bulkip-interval SECONDS",
+                 "Sampling interval in seconds" ) do |n|
+          @appctx.options.bulkip_interval_seconds = n.to_i
+        end
+
       end
 
       begin
@@ -872,6 +877,9 @@ HELP_SUMMARY
       bulkip_data = NicInfo::BulkIPData.new( @appctx )
       bulkip_data.set_top_hits_number( @appctx.options.bulkip_top_hits )
       bulkip_data.set_top_hps_number( @appctx.options.bulkip_top_hps )
+      if @appctx.options.bulkip_interval_seconds
+        bulkip_data.set_interval_seconds_to_increment( @appctx.options.bulkip_interval_seconds )
+      end
       bulkip_data.note_start_time
       current_file = nil
       current_lineno = nil
@@ -879,9 +887,9 @@ HELP_SUMMARY
         Dir.glob( file_list ).each do |file|
           @appctx.logger.mesg( "Processing #{file}")
           current_file = file
+          bulkip_data.note_new_file
           b = BulkIPInFile.new( file )
           b.foreach do |ip,time,lineno|
-            bulkip_data.note_new_file
             @appctx.logger.trace( "bulk ip: #{ip} time: #{time} line no: #{lineno}")
             current_lineno = lineno
             if lineno % 1000 == 0
