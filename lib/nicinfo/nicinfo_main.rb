@@ -916,8 +916,6 @@ HELP_SUMMARY
                   else
                     bulkip_data.fetch_error( ipaddr, time, rdap_response.code, rdap_response.exception.message )
                   end
-                else
-                  @appctx.logger.trace( "skipping lookup on #{ip}")
                 end
               end
             rescue IPAddr::Error

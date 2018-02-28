@@ -209,6 +209,7 @@ module NicInfo
         if datum_net.include?( ipaddr )
           datum.hit( time )
           retval = true
+          @appctx.logger.trace( "observed network already retreived" )
           break;
         end
       end
@@ -220,6 +221,7 @@ module NicInfo
       # this will avoid a call to hit_network
       # if sampling is being done can be detected with @interval_seconds_to_increment
       if @interval_seconds_to_increment && time.to_i != @second_to_sample.to_i
+        @appctx.logger.trace( "retreival unnecessary outside of sampling time" )
         retval = true
       end
       return retval
