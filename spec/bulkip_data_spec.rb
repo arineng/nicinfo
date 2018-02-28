@@ -92,26 +92,17 @@ describe 'bulk_data test' do
     t = Time.at( 100 )
     expect( b.hit_ipaddr( IPAddr.new( "192.168.0.1" ), t ) ).to be_falsey
     expect( b.second_to_sample.to_i ).to eq( t.to_i )
-    expect( b.interval ).to eq( 0 )
     b.hit_network( ip192, t )
     t = t + 1
     expect( b.hit_ipaddr( IPAddr.new( "192.0.0.1" ), t ) ).to be_truthy
-    expect( b.second_to_sample.to_i ).to be >= (t.to_i + 100 )
-    expect( b.second_to_sample.to_i ).to be < (t.to_i + 200 )
-    expect( b.interval ).to eq( 1 )
+    expect( b.second_to_sample.to_i ).to be >= (t.to_i )
+    expect( b.second_to_sample.to_i ).to be < (t.to_i + 100 )
     expect( b.hit_ipaddr( IPAddr.new( "192.0.0.1" ), Time.at( b.second_to_sample ) ) ).to be_falsey
     expect( b.hit_ipaddr( IPAddr.new( "192.168.0.1" ), Time.at( b.second_to_sample ) ) ).to be_truthy
     t = t + 200
-    expect( b.hit_ipaddr( IPAddr.new( "192.0.0.1" ), t ) ).to be_truthy
-    expect( b.interval ).to eq( 2 )
-    expect( b.second_to_sample.to_i ).to be >= (t.to_i + 100 )
-    expect( b.second_to_sample.to_i ).to be < (t.to_i + 200 )
-    t = t + 1
-    expect( b.hit_ipaddr( IPAddr.new( "192.0.0.1" ), t ) ).to be_truthy
-    expect( b.second_to_sample.to_i ).to be >= (t.to_i + 100 )
-    expect( b.second_to_sample.to_i ).to be < (t.to_i + 200 )
-    expect( b.hit_ipaddr( IPAddr.new( "192.0.0.1" ), Time.at( b.second_to_sample ) ) ).to be_falsey
-    expect( b.hit_ipaddr( IPAddr.new( "192.168.0.1" ), Time.at( b.second_to_sample ) ) ).to be_truthy
+    expect( b.hit_ipaddr( IPAddr.new( "192.0.0.1" ), t ) ).to be_falsey
+    expect( b.second_to_sample.to_i ).to be >= (t.to_i )
+    expect( b.second_to_sample.to_i ).to be < (t.to_i + 100 )
 
   end
 
