@@ -20,6 +20,16 @@ require 'nicinfo/common_summary'
 
 module NicInfo
 
+  # things to think about
+  # TODO second pass feature that does not query network
+  # TODO percentage of total observations
+  # TODO mean, std dev, and cv of both period and frequency
+  # TODO refactor using statistical terms
+  # TODO hit_ipaddr should be query_for_net? and return a reason code
+  # TODO remove invalid IP address strings and just produce a count
+  # TODO track redirect URLs too
+  # TODO feature to turn off deep object caching
+
   class BulkIPNetwork
 
     attr_accessor :ipnetwork, :total_hits, :first_hit_time, :last_hit_time
