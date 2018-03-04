@@ -360,8 +360,8 @@ describe 'web mocks' do
     args << "--bulkip-in" << "spec/bulkip/ex5.log"
     args << "--bulkip-out-tsv" << file_out
     args << "--bulkip-out-csv" << file_out
-    args << "--bulkip-top-observations" << 2
-    args << "--bulkip-top-ops" << 2
+    args << "--bulkip-top-observations" << "2"
+    args << "--bulkip-top-ops" << "2"
 
     expect{ NicInfo::Main.new( args, config ).run }.to_not output.to_stdout
 
@@ -372,27 +372,27 @@ describe 'web mocks' do
     expect(a_request(:get, "https://rdap.afrinic.net/rdap/ip/196.216.2.21")).to have_been_made.once
     expect(a_request(:get, "https://rdap.afrinic.net/rdap/ip/196.216.2.20")).to have_been_made.once
 
-    expect( File.exist( "#{file_out}-blocks.tsv" ) ).to be_truthy
-    expect( File.exist( "#{file_out}-networks.tsv" ) ).to be_truthy
-    expect( File.exist( "#{file_out}-listednames.tsv" ) ).to be_truthy
-    expect( File.exist( "#{file_out}-blocks-top2-observations.tsv" ) ).to be_truthy
-    expect( File.exist( "#{file_out}-networks-top2-observations.tsv" ) ).to be_truthy
-    expect( File.exist( "#{file_out}-listednames-top2-observations.tsv" ) ).to be_truthy
-    expect( File.exist( "#{file_out}-blocks-top2-ops.tsv" ) ).to be_truthy
-    expect( File.exist( "#{file_out}-networks-top2-ops.tsv" ) ).to be_truthy
-    expect( File.exist( "#{file_out}-listednames-top2-ops.tsv" ) ).to be_truthy
-    expect( File.exist( "#{file_out}-meta.tsv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-blocks.tsv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-networks.tsv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-listednames.tsv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-blocks-top2-observations.tsv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-networks-top2-observations.tsv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-listednames-top2-observations.tsv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-blocks-top2-ops.tsv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-networks-top2-ops.tsv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-listednames-top2-ops.tsv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-meta.tsv" ) ).to be_truthy
 
-    expect( File.exist( "#{file_out}-blocks.csv" ) ).to be_truthy
-    expect( File.exist( "#{file_out}-networks.csv" ) ).to be_truthy
-    expect( File.exist( "#{file_out}-listednames.csv" ) ).to be_truthy
-    expect( File.exist( "#{file_out}-blocks-top2-observations.csv" ) ).to be_truthy
-    expect( File.exist( "#{file_out}-networks-top2-observations.csv" ) ).to be_truthy
-    expect( File.exist( "#{file_out}-listednames-top2-observations.csv" ) ).to be_truthy
-    expect( File.exist( "#{file_out}-blocks-top2-ops.csv" ) ).to be_truthy
-    expect( File.exist( "#{file_out}-networks-top2-ops.csv" ) ).to be_truthy
-    expect( File.exist( "#{file_out}-listednames-top2-ops.csv" ) ).to be_truthy
-    expect( File.exist( "#{file_out}-meta.csv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-blocks.csv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-networks.csv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-listednames.csv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-blocks-top2-observations.csv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-networks-top2-observations.csv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-listednames-top2-observations.csv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-blocks-top2-ops.csv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-networks-top2-ops.csv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-listednames-top2-ops.csv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-meta.csv" ) ).to be_truthy
   end
 
 end
