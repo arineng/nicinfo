@@ -111,9 +111,6 @@ module NicInfo
     attr_accessor :net_data, :listed_data, :block_data, :fetch_errors, :appctx
     attr_accessor :interval_seconds_to_increment, :second_to_sample, :total_intervals
 
-    BlockColumnHeaders = [ "Block", "Observations", "% of Total Observations", "Avgd Obsvns / Obsvn Period", "Avgd Obsvns / Observed Period", "Observed Period (s)", "First Observation Time", "Last Observation Time", "Registry", "Listed Name", "Listed Country", "Abuse Email" ]
-    NetworkColumnHeaders = [ "Network", "Observations", "% of Total Observations", "Avgd Obsvns / Obsvn Period", "Avgd Obsvns / Observed Period", "Observed Period (s)", "First Observation Time", "Last Observation Time", "Registry", "Listed Name", "Listed Country", "Abuse Email" ]
-    ListedColumnHeaders = [ "Listed Name", "Observations", "% of Total Observations", "Avgd Obsvns / Obsvn Period", "Avgd Obsvns / Observed Period", "Observed Period (s)", "First Observation Time", "Last Observation Time", "Registry", "Listed Country", "Abuse Email" ]
     UrlColumnHeaders = [ "Total Queries", "Averaged QPS", "URL" ]
     NotApplicable = "N/A"
 
