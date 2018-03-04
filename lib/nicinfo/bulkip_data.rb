@@ -36,6 +36,7 @@ module NicInfo
     attr_accessor :total_observations, :first_observed_time, :last_observed_time
     attr_accessor :this_second, :observations_this_second
     attr_accessor :highest_observations_in_a_second, :highest_observed_second
+    attr_accessor :shortest_interval
 
     def initialize( time )
       @total_observations = 0
@@ -53,7 +54,7 @@ module NicInfo
         if @this_second == nil
           @this_second = time.to_i
           @observations_this_second = 1
-          @highest_observations_in_a_second = 0
+          @highest_observations_in_a_second = 1
           @highest_observed_second = time.to_i
         elsif time.to_i == @this_second
           @observations_this_second = @observations_this_second + 1
@@ -64,6 +65,12 @@ module NicInfo
           if @observations_this_second > @highest_observations_in_a_second
             @highest_observations_in_a_second = @observations_this_second
             @highest_observed_second = @this_second
+          end
+          interval = time.to_i - @this_second
+          if interval > 0 && @shortest_interval == nil
+            @shortest_interval = interval
+          elsif interval > 0 && interval < @shortest_interval
+            @shortest_interval = interval
           end
           @this_second = time.to_i
           if @this_second == @highest_observed_second
@@ -600,6 +607,13 @@ module NicInfo
 
         # max observations in a second
         columns << datum.highest_observations_in_a_second.to_s
+
+        # shortest interval
+        if datum.shortest_interval
+          columns << datum.shortest_interval.to_s
+        else
+          columns << NotApplicable
+        end
       end
     end
 
@@ -613,6 +627,7 @@ module NicInfo
         headers << "First Observation Time"
         headers << "Last Observation Time"
         headers << "Max Obsvns in a Second"
+        headers << "Shortest Non-zero Interval (s)"
       end
     end
 
