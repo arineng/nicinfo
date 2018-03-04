@@ -23,11 +23,14 @@ module NicInfo
   # things to think about
   # TODO second pass feature that does not query network
   # TODO percentage of total observations
+  # TODO percentage of total observations by registry
   # TODO mean, std dev, and cv of both period and frequency
   # TODO refactor using statistical terms
   # TODO hit_ipaddr should be query_for_net? and return a reason code
   # TODO remove invalid IP address strings and just produce a count
   # TODO track redirect URLs too
+  # TODO track error count per URL
+  # TODO track avg response time per URL
   # TODO feature to turn off deep object caching
   # TODO unique nets by fixed size
 
