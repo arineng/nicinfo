@@ -27,7 +27,6 @@ module NicInfo
   # TODO mean, std dev, and cv of both period and frequency
   # TODO refactor using statistical terms
   # TODO hit_ipaddr should be query_for_net? and return a reason code
-  # TODO remove invalid IP address strings and just produce a count
   # TODO track redirect URLs too
   # TODO track error count per URL
   # TODO track avg response time per URL
@@ -119,7 +118,7 @@ module NicInfo
 
   class BulkIPData
 
-    attr_accessor :net_data, :listed_data, :block_data, :fetch_errors, :ip_errors, :appctx
+    attr_accessor :net_data, :listed_data, :block_data, :fetch_errors, :appctx
     attr_accessor :interval_seconds_to_increment, :second_to_sample, :total_intervals
 
     BlockColumnHeaders = [ "Block", "Hits", "Avgd Hits/s", "Duration (s)", "First Hit Time", "Last Hit Time", "Registry", "Listed Name", "Listed Country", "Abuse Email" ]
@@ -134,11 +133,11 @@ module NicInfo
       @listed_data = Hash.new
       @net_data = Array.new
       @fetch_errors = Array.new
-      @ip_errors = Array.new
       @non_global_unicast = 0
       @network_lookups = 0
       @total_hits = 0
       @total_fetch_errors = 0
+      @total_ip_errors = 0
     end
 
     def set_top_hits_number( top_hits_number )
@@ -296,7 +295,7 @@ module NicInfo
     end
 
     def ip_error( ip )
-      @ip_errors << ip
+      @total_ip_errors = @total_ip_errors + 1
     end
 
     def output_tsv( file_name )
@@ -478,14 +477,6 @@ module NicInfo
         end
       end
 
-      unless @ip_errors.empty?
-        f.puts
-        f.puts( "Unrecognized IP Addresses" )
-        @ip_errors.each do |ip|
-          f.puts( ip )
-        end
-      end
-
       unless @appctx.tracked_urls.empty?
         f.puts
         f.puts( UrlColumnHeaders.join( seperator ) )
@@ -502,6 +493,7 @@ module NicInfo
       f.puts( output_total_row( "Network Lookups", @network_lookups, seperator ) )
       f.puts( output_total_row( "Total Hits", @total_hits, seperator ) )
       f.puts( output_total_row( "Total Fetch Errors", @total_fetch_errors, seperator ) )
+      f.puts( output_total_row( "Total IP Address Parse Errors", @total_ip_errors, seperator ) )
       f.puts( output_total_row( "Analysis Start Time", @start_time.strftime('%d %b %Y %H:%M:%S'), seperator ) )
       f.puts( output_total_row( "Analysis End Time", @end_time.strftime('%d %b %Y %H:%M:%S'), seperator ) )
       f.puts( output_total_row( "Total Intervals", @total_intervals, seperator ) ) if @interval_seconds_to_increment
