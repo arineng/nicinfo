@@ -32,12 +32,11 @@ module NicInfo
   # TODO unique nets by fixed size
   # TODO get rid of explicit exits
 
-  class BulkIPNetwork
+  class BulkIPObservation
 
-    attr_accessor :ipnetwork, :total_observations, :first_observed_time, :last_observed_time
+    attr_accessor :total_observations, :first_observed_time, :last_observed_time
 
-    def initialize( ipnetwork, time )
-      @ipnetwork = ipnetwork
+    def initialize( time )
       @total_observations = 0
       observed( time )
     end
@@ -54,50 +53,43 @@ module NicInfo
 
   end
 
-  class BulkIPBlock
+  class BulkIPNetwork < BulkIPObservation
 
-    attr_accessor :cidrstring, :bulkipnetwork, :bulkiplisted, :total_observations, :first_observed_time, :last_observed_time
+    attr_accessor :ipnetwork
+
+    def initialize( ipnetwork, time )
+      @ipnetwork = ipnetwork
+      super( time )
+    end
+
+  end
+
+  class BulkIPBlock < BulkIPObservation
+
+    attr_accessor :cidrstring, :bulkipnetwork, :bulkiplisted
 
     def initialize( cidrstring, time, bulkipnetwork, bulkiplisted )
       @bulkiplisted = bulkiplisted
       @bulkipnetwork = bulkipnetwork
       @cidrstring = cidrstring
-      @total_observations = 0
-      observed( time )
+      super( time )
     end
 
     def observed( time )
-      @total_observations = @total_observations + 1
-      if time
-        @first_observed_time = time unless @first_observed_time
-        @first_observed_time = time if time < @first_observed_time
-        @last_observed_time = time unless @last_observed_time
-        @last_observed_time = time if time > @last_observed_time
-      end
+      super( time )
       @bulkipnetwork.observed( time ) if @bulkipnetwork
       @bulkiplisted.observed( time ) if @bulkiplisted
     end
 
   end
 
-  class BulkIPListed
+  class BulkIPListed < BulkIPObservation
 
-    attr_accessor :ipnetwork, :total_observations, :first_observed_time, :last_observed_time
+    attr_accessor :ipnetwork
 
     def initialize( ipnetwork, time )
       @ipnetwork = ipnetwork
-      @total_observations = 0
-      observed( time )
-    end
-
-    def observed( time )
-      @total_observations = @total_observations + 1
-      if time
-        @first_observed_time = time unless @first_observed_time
-        @first_observed_time = time if time < @first_observed_time
-        @last_observed_time = time unless @last_observed_time
-        @last_observed_time = time if time > @last_observed_time
-      end
+      super( time )
     end
 
   end
