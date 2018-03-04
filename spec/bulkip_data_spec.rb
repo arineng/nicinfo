@@ -60,12 +60,12 @@ describe 'bulk_data test' do
     b.note_new_file
     t = Time.new
     expect( b.query_for_net?(IPAddr.new("192.168.0.1" ), t ) ).to eq( NicInfo::BulkIPData::NetNotFound )
-    b.hit_network( ip192, t )
+    b.observe_network( ip192, t )
     expect( b.query_for_net?(IPAddr.new("192.0.0.1" ), t ) ).to eq( NicInfo::BulkIPData::NetNotFound )
     expect( b.query_for_net?(IPAddr.new("192.168.0.1" ), t ) ).to eq( NicInfo::BulkIPData::NetAlreadyRetreived )
     t = t + 300
     expect( b.query_for_net?(IPAddr.new("10.0.0.1" ), t ) ).to eq( NicInfo::BulkIPData::NetNotFound )
-    b.hit_network( ip10, t )
+    b.observe_network( ip10, t )
     expect( b.query_for_net?(IPAddr.new("10.0.0.1" ), t ) ).to eq( NicInfo::BulkIPData::NetAlreadyRetreived )
     expect( b.query_for_net?(IPAddr.new("192.0.0.1" ), t ) ).to eq( NicInfo::BulkIPData::NetNotFound )
 
@@ -92,7 +92,7 @@ describe 'bulk_data test' do
     t = Time.at( 100 )
     expect( b.query_for_net?(IPAddr.new("192.168.0.1" ), t ) ).to eq( NicInfo::BulkIPData::NetNotFound )
     expect( b.second_to_sample.to_i ).to eq( t.to_i )
-    b.hit_network( ip192, t )
+    b.observe_network( ip192, t )
     t = t + 1
     expect( b.query_for_net?(IPAddr.new("192.0.0.1" ), t ) ).to eq( NicInfo::BulkIPData::NetNotFoundBetweenIntervals )
     expect( b.second_to_sample.to_i ).to be >= (t.to_i )

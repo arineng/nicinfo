@@ -25,7 +25,6 @@ module NicInfo
   # TODO percentage of total observations
   # TODO percentage of total observations by registry
   # TODO mean, std dev, and cv of both period and frequency
-  # TODO refactor using statistical terms
   # TODO track redirect URLs too
   # TODO track error count per URL
   # TODO track avg response time per URL
@@ -34,21 +33,21 @@ module NicInfo
 
   class BulkIPNetwork
 
-    attr_accessor :ipnetwork, :total_hits, :first_hit_time, :last_hit_time
+    attr_accessor :ipnetwork, :total_observations, :first_observed_time, :last_observed_time
 
     def initialize( ipnetwork, time )
       @ipnetwork = ipnetwork
-      @total_hits = 0
-      hit( time )
+      @total_observations = 0
+      observed( time )
     end
 
-    def hit( time )
-      @total_hits = @total_hits + 1
+    def observed( time )
+      @total_observations = @total_observations + 1
       if time
-        @first_hit_time = time unless @first_hit_time
-        @first_hit_time = time if time < @first_hit_time
-        @last_hit_time = time unless @last_hit_time
-        @last_hit_time = time if time > @last_hit_time
+        @first_observed_time = time unless @first_observed_time
+        @first_observed_time = time if time < @first_observed_time
+        @last_observed_time = time unless @last_observed_time
+        @last_observed_time = time if time > @last_observed_time
       end
     end
 
@@ -56,47 +55,47 @@ module NicInfo
 
   class BulkIPBlock
 
-    attr_accessor :cidrstring, :bulkipnetwork, :bulkiplisted, :total_hits, :first_hit_time, :last_hit_time
+    attr_accessor :cidrstring, :bulkipnetwork, :bulkiplisted, :total_observations, :first_observed_time, :last_observed_time
 
     def initialize( cidrstring, time, bulkipnetwork, bulkiplisted )
       @bulkiplisted = bulkiplisted
       @bulkipnetwork = bulkipnetwork
       @cidrstring = cidrstring
-      @total_hits = 0
-      hit( time )
+      @total_observations = 0
+      observed( time )
     end
 
-    def hit( time )
-      @total_hits = @total_hits + 1
+    def observed( time )
+      @total_observations = @total_observations + 1
       if time
-        @first_hit_time = time unless @first_hit_time
-        @first_hit_time = time if time < @first_hit_time
-        @last_hit_time = time unless @last_hit_time
-        @last_hit_time = time if time > @last_hit_time
+        @first_observed_time = time unless @first_observed_time
+        @first_observed_time = time if time < @first_observed_time
+        @last_observed_time = time unless @last_observed_time
+        @last_observed_time = time if time > @last_observed_time
       end
-      @bulkipnetwork.hit( time ) if @bulkipnetwork
-      @bulkiplisted.hit( time ) if @bulkiplisted
+      @bulkipnetwork.observed( time ) if @bulkipnetwork
+      @bulkiplisted.observed( time ) if @bulkiplisted
     end
 
   end
 
   class BulkIPListed
 
-    attr_accessor :ipnetwork, :total_hits, :first_hit_time, :last_hit_time
+    attr_accessor :ipnetwork, :total_observations, :first_observed_time, :last_observed_time
 
     def initialize( ipnetwork, time )
       @ipnetwork = ipnetwork
-      @total_hits = 0
-      hit( time )
+      @total_observations = 0
+      observed( time )
     end
 
-    def hit( time )
-      @total_hits = @total_hits + 1
+    def observed( time )
+      @total_observations = @total_observations + 1
       if time
-        @first_hit_time = time unless @first_hit_time
-        @first_hit_time = time if time < @first_hit_time
-        @last_hit_time = time unless @last_hit_time
-        @last_hit_time = time if time > @last_hit_time
+        @first_observed_time = time unless @first_observed_time
+        @first_observed_time = time if time < @first_observed_time
+        @last_observed_time = time unless @last_observed_time
+        @last_observed_time = time if time > @last_observed_time
       end
     end
 
@@ -120,9 +119,9 @@ module NicInfo
     attr_accessor :net_data, :listed_data, :block_data, :fetch_errors, :appctx
     attr_accessor :interval_seconds_to_increment, :second_to_sample, :total_intervals
 
-    BlockColumnHeaders = [ "Block", "Hits", "Avgd Hits/s", "Duration (s)", "First Hit Time", "Last Hit Time", "Registry", "Listed Name", "Listed Country", "Abuse Email" ]
-    NetworkColumnHeaders = [ "Network", "Hits", "Avgd Hits/s", "Duration (s)", "First Hit Time", "Last Hit Time", "Registry", "Listed Name", "Listed Country", "Abuse Email" ]
-    ListedColumnHeaders = [ "Listed Name", "Hits", "Avgd Hits/s", "Duration (s)", "First Hit Time", "Last Hit Time", "Registry", "Listed Country", "Abuse Email" ]
+    BlockColumnHeaders = [ "Block", "Observations", "Avgd Observations/s", "Duration (s)", "First Observation Time", "Last Observation Time", "Registry", "Listed Name", "Listed Country", "Abuse Email" ]
+    NetworkColumnHeaders = [ "Network", "Observations", "Avgd Observations/s", "Duration (s)", "First Observation Time", "Last Observation Time", "Registry", "Listed Name", "Listed Country", "Abuse Email" ]
+    ListedColumnHeaders = [ "Listed Name", "Observations", "Avgd Observations/s", "Duration (s)", "First Observation Time", "Last Observation Time", "Registry", "Listed Country", "Abuse Email" ]
     UrlColumnHeaders = [ "Total Queries", "Averaged QPS", "URL" ]
     NotApplicable = "N/A"
 
@@ -140,26 +139,26 @@ module NicInfo
       @fetch_errors = Array.new
       @non_global_unicast = 0
       @network_lookups = 0
-      @total_hits = 0
+      @total_observations = 0
       @total_fetch_errors = 0
       @total_ip_errors = 0
     end
 
-    def set_top_hits_number( top_hits_number )
-      if top_hits_number
-        @top_hits_number = top_hits_number
-        @top_block_hits = Array.new
-        @top_network_hits = Array.new
-        @top_listedname_hits = Array.new
+    def set_top_observations_number( top_observations_number )
+      if top_observations_number
+        @top_observations_number = top_observations_number
+        @top_block_observations = Array.new
+        @top_network_observations = Array.new
+        @top_listedname_observations = Array.new
       end
     end
 
-    def set_top_hps_number( top_hps_number )
-      if top_hps_number
-        @top_hps_number = top_hps_number
-        @top_block_hps = Array.new
-        @top_network_hps = Array.new
-        @top_listedname_hps = Array.new
+    def set_top_ops_number( top_ops_number )
+      if top_ops_number
+        @top_ops_number = top_ops_number
+        @top_block_ops = Array.new
+        @top_network_ops = Array.new
+        @top_listedname_ops = Array.new
       end
     end
 
@@ -187,12 +186,12 @@ module NicInfo
       @total_intervals = 0
     end
 
-    def hit_time( time )
+    def observed_time( time )
       if time
-        @first_hit_time = time unless @first_hit_time
-        @first_hit_time = time if time < @first_hit_time
-        @last_hit_time = time unless @last_hit_time
-        @last_hit_time = time if time > @last_hit_time
+        @first_observed_time = time unless @first_observed_time
+        @first_observed_time = time if time < @first_observed_time
+        @last_observed_time = time unless @last_observed_time
+        @last_observed_time = time if time > @last_observed_time
       end
     end
 
@@ -225,15 +224,15 @@ module NicInfo
       retval = NetNotFound
       @block_data.each do |datum_net, datum|
         if datum_net.include?( ipaddr )
-          datum.hit( time )
+          datum.observed( time )
           retval = NetAlreadyRetreived
           @appctx.logger.trace( "observed network already retreived" )
           break;
         end
       end
 
-      @total_hits = @total_hits + 1 if retval
-      hit_time( time )
+      @total_observations = @total_observations + 1 if retval
+      observed_time( time )
 
       # if doing sampling, note that
       if retval == NetNotFound && @interval_seconds_to_increment && time.to_i != @second_to_sample.to_i
@@ -244,7 +243,7 @@ module NicInfo
 
     end
 
-    def hit_network( ipnetwork, time )
+    def observe_network( ipnetwork, time )
 
       bulkipnetwork = BulkIPNetwork.new( ipnetwork, time )
       @net_data << bulkipnetwork
@@ -263,9 +262,9 @@ module NicInfo
         @block_data[IPAddr.new( cidr ) ] = b
       end
 
-      @total_hits = @total_hits + 1
+      @total_observations = @total_observations + 1
       @network_lookups = @network_lookups + 1
-      hit_time( time )
+      observed_time( time )
 
     end
 
@@ -292,7 +291,7 @@ module NicInfo
           end
           b = BulkIPBlock.new( cidr, fetch_error.time, nil, nil )
           @block_data[IPAddr.new( cidr ) ] = b
-          @total_hits = @total_hits + 1
+          @total_observations = @total_observations + 1
         end
       end
     end
@@ -313,25 +312,25 @@ module NicInfo
 
       n = file_name+"-blocks"+extension
       @appctx.logger.trace( "writing file #{n}")
-      if @top_hits_number
-        top_hits = @top_block_hits
+      if @top_observations_number
+        top_observations = @top_block_observations
       else
-        top_hits = nil
+        top_observations = nil
       end
-      if @top_hps_number
-        top_hps = @top_block_hps
+      if @top_ops_number
+        top_ops = @top_block_ops
       else
-        top_hps = nil
+        top_ops = nil
       end
       f = File.open( n, "w" );
       f.puts( output_block_column_headers(seperator ) )
       @block_data.values.each do |datum|
-        f.puts( output_block_columns(datum, seperator, top_hits, top_hps ) )
-        top_hits = sort_array_by_top( top_hits, @top_hits_number ) if top_hits
-        top_hps = sort_array_by_top( top_hps, @top_hps_number ) if top_hps
+        f.puts( output_block_columns(datum, seperator, top_observations, top_ops ) )
+        top_observations = sort_array_by_top( top_observations, @top_observations_number ) if top_observations
+        top_ops = sort_array_by_top( top_ops, @top_ops_number ) if top_ops
       end
-      @top_block_hits = top_hits if top_hits
-      @top_block_hps = top_hps if top_hps
+      @top_block_observations = top_observations if top_observations
+      @top_block_ops = top_ops if top_ops
       f.puts
       f.puts( "Generated by NicInfo v.#{ NicInfo::VERSION }")
       f.puts( "https://github.com/arineng/nicinfo" )
@@ -339,63 +338,63 @@ module NicInfo
 
       n = file_name+"-networks"+extension
       @appctx.logger.trace( "writing file #{n}")
-      if @top_hits_number
-        top_hits = @top_network_hits
+      if @top_observations_number
+        top_observations = @top_network_observations
       else
-        top_hits = nil
+        top_observations = nil
       end
-      if @top_hps_number
-        top_hps = @top_network_hps
+      if @top_ops_number
+        top_ops = @top_network_ops
       else
-        top_hps = nil
+        top_ops = nil
       end
       f = File.open( n, "w" );
       f.puts( output_network_column_headers( seperator ) )
       @net_data.each do |datum|
-        f.puts( output_network_columns( datum, seperator, top_hits, top_hps ) )
-        top_hits = sort_array_by_top( top_hits, @top_hits_number ) if top_hits
-        top_hps = sort_array_by_top( top_hps, @top_hps_number ) if top_hps
+        f.puts( output_network_columns( datum, seperator, top_observations, top_ops ) )
+        top_observations = sort_array_by_top( top_observations, @top_observations_number ) if top_observations
+        top_ops = sort_array_by_top( top_ops, @top_ops_number ) if top_ops
       end
-      @top_network_hits = top_hits if top_hits
-      @top_network_hps = top_hps if top_hps
+      @top_network_observations = top_observations if top_observations
+      @top_network_ops = top_ops if top_ops
       f.puts
       f.puts( "Generated by NicInfo v.#{ NicInfo::VERSION }")
       f.puts( "https://github.com/arineng/nicinfo" )
       f.close
 
-      n = file_name+"-listedname"+extension
+      n = file_name+"-listednames"+extension
       @appctx.logger.trace( "writing file #{n}")
-      if @top_hits_number
-        top_hits = @top_listedname_hits
+      if @top_observations_number
+        top_observations = @top_listedname_observations
       else
-        top_hits = nil
+        top_observations = nil
       end
-      if @top_hps_number
-        top_hps = @top_listedname_hps
+      if @top_ops_number
+        top_ops = @top_listedname_ops
       else
-        top_hps = nil
+        top_ops = nil
       end
       f = File.open( n, "w" );
       f.puts( output_listed_column_headers( seperator ) )
       @listed_data.values.each do |datum |
-        f.puts( output_listed_columns( datum, seperator, top_hits, top_hps ) )
-        top_hits = sort_array_by_top( top_hits, @top_hits_number ) if top_hits
-        top_hps = sort_array_by_top( top_hps, @top_hps_number ) if top_hps
+        f.puts( output_listed_columns( datum, seperator, top_observations, top_ops ) )
+        top_observations = sort_array_by_top( top_observations, @top_observations_number ) if top_observations
+        top_ops = sort_array_by_top( top_ops, @top_ops_number ) if top_ops
       end
-      @top_listedname_hits = top_hits if top_hits
-      @top_listedname_hps = top_hps if top_hps
+      @top_listedname_observations = top_observations if top_observations
+      @top_listedname_ops = top_ops if top_ops
       f.puts
       f.puts( "Generated by NicInfo v.#{ NicInfo::VERSION }")
       f.puts( "https://github.com/arineng/nicinfo" )
       f.close
 
-      if @top_hits_number
+      if @top_observations_number
 
-        n = "#{file_name}-blocks-top#{@top_hits_number}-hits#{extension}"
+        n = "#{file_name}-blocks-top#{@top_observations_number}-observations#{extension}"
         @appctx.logger.trace( "writing file #{n}")
         f = File.open( n, "w" );
         f.puts( output_block_column_headers(seperator ) )
-        @top_block_hits.each do |item|
+        @top_block_observations.each do |item|
           f.puts( output_block_columns(item[1], seperator, nil, nil ) )
         end
         f.puts
@@ -403,11 +402,11 @@ module NicInfo
         f.puts( "https://github.com/arineng/nicinfo" )
         f.close
 
-        n = "#{file_name}-networks-top#{@top_hits_number}-hits#{extension}"
+        n = "#{file_name}-networks-top#{@top_observations_number}-observations#{extension}"
         @appctx.logger.trace( "writing file #{n}")
         f = File.open( n, "w" );
         f.puts( output_network_column_headers( seperator ) )
-        @top_network_hits.each do |item|
+        @top_network_observations.each do |item|
           f.puts( output_network_columns( item[1], seperator, nil, nil ) )
         end
         f.puts
@@ -415,11 +414,11 @@ module NicInfo
         f.puts( "https://github.com/arineng/nicinfo" )
         f.close
 
-        n = "#{file_name}-listedname-top#{@top_hits_number}-hits#{extension}"
+        n = "#{file_name}-listednames-top#{@top_observations_number}-observations#{extension}"
         @appctx.logger.trace( "writing file #{n}")
         f = File.open( n, "w" );
         f.puts( output_listed_column_headers( seperator ) )
-        @top_listedname_hits.each do |item |
+        @top_listedname_observations.each do |item |
           f.puts( output_listed_columns( item[1], seperator, nil, nil ) )
         end
         f.puts
@@ -429,13 +428,13 @@ module NicInfo
 
       end
 
-      if @top_hps_number
+      if @top_ops_number
 
-        n = "#{file_name}-blocks-top#{@top_hits_number}-hps#{extension}"
+        n = "#{file_name}-blocks-top#{@top_ops_number}-ops#{extension}"
         @appctx.logger.trace( "writing file #{n}")
         f = File.open( n, "w" );
         f.puts( output_block_column_headers(seperator ) )
-        @top_block_hps.each do |item|
+        @top_block_ops.each do |item|
           f.puts( output_block_columns(item[1], seperator, nil, nil ) )
         end
         f.puts
@@ -443,11 +442,11 @@ module NicInfo
         f.puts( "https://github.com/arineng/nicinfo" )
         f.close
 
-        n = "#{file_name}-networks-top#{@top_hits_number}-hps#{extension}"
+        n = "#{file_name}-networks-top#{@top_ops_number}-ops#{extension}"
         @appctx.logger.trace( "writing file #{n}")
         f = File.open( n, "w" );
         f.puts( output_network_column_headers( seperator ) )
-        @top_network_hps.each do |item|
+        @top_network_ops.each do |item|
           f.puts( output_network_columns( item[1], seperator, nil, nil ) )
         end
         f.puts
@@ -455,11 +454,11 @@ module NicInfo
         f.puts( "https://github.com/arineng/nicinfo" )
         f.close
 
-        n = "#{file_name}-listedname-top#{@top_hits_number}-hps#{extension}"
+        n = "#{file_name}-listednames-top#{@top_ops_number}-ops#{extension}"
         @appctx.logger.trace( "writing file #{n}")
         f = File.open( n, "w" );
         f.puts( output_listed_column_headers( seperator ) )
-        @top_listedname_hps.each do |item |
+        @top_listedname_ops.each do |item |
           f.puts( output_listed_columns( item[1], seperator, nil, nil ) )
         end
         f.puts
@@ -490,11 +489,11 @@ module NicInfo
       end
 
       f.puts
-      f.puts( output_total_row( "First Hit Time", @first_hit_time.strftime('%d %b %Y %H:%M:%S'), seperator ) ) if @first_hit_time
-      f.puts( output_total_row( "Last Hit Time", @last_hit_time.strftime('%d %b %Y %H:%M:%S'), seperator ) ) if @last_hit_time
+      f.puts( output_total_row( "First Observation Time", @first_observed_time.strftime('%d %b %Y %H:%M:%S'), seperator ) ) if @first_observed_time
+      f.puts( output_total_row( "Last Observation Time", @last_observed_time.strftime('%d %b %Y %H:%M:%S'), seperator ) ) if @last_observed_time
       f.puts( output_total_row( "Non-Global Unicast IPs", @non_global_unicast, seperator ) )
       f.puts( output_total_row( "Network Lookups", @network_lookups, seperator ) )
-      f.puts( output_total_row( "Total Hits", @total_hits, seperator ) )
+      f.puts( output_total_row( "Total Observations", @total_observations, seperator ) )
       f.puts( output_total_row( "Total Fetch Errors", @total_fetch_errors, seperator ) )
       f.puts( output_total_row( "Total IP Address Parse Errors", @total_ip_errors, seperator ) )
       f.puts( output_total_row( "Analysis Start Time", @start_time.strftime('%d %b %Y %H:%M:%S'), seperator ) )
@@ -519,10 +518,10 @@ module NicInfo
       return ListedColumnHeaders.join( seperator )
     end
 
-    def output_block_columns(datum, seperator, top_hits, top_hps )
+    def output_block_columns(datum, seperator, top_observations, top_ops )
       columns = Array.new
       columns << datum.cidrstring
-      gather_query_and_timing_values( columns, datum, top_hits, top_hps )
+      gather_query_and_timing_values( columns, datum, top_observations, top_ops )
       if datum.bulkipnetwork
         summary_data = datum.bulkipnetwork.ipnetwork.summary_data
         columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ], seperator )
@@ -538,10 +537,10 @@ module NicInfo
       return columns.join( seperator )
     end
 
-    def output_network_columns( datum, seperator, top_hits, top_hps )
+    def output_network_columns( datum, seperator, top_observations, top_ops )
       columns = Array.new
       columns << datum.ipnetwork.get_cn
-      gather_query_and_timing_values( columns, datum, top_hits, top_hps )
+      gather_query_and_timing_values( columns, datum, top_observations, top_ops )
       summary_data = datum.ipnetwork.summary_data
       columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ], seperator )
       columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::LISTED_NAME ], seperator )
@@ -550,33 +549,33 @@ module NicInfo
       return columns.join( seperator )
     end
 
-    def output_listed_columns( datum, seperator, top_hits, top_hps )
+    def output_listed_columns( datum, seperator, top_observations, top_ops )
       columns = Array.new
       summary_data = datum.ipnetwork.summary_data
       columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::LISTED_NAME ], seperator )
-      gather_query_and_timing_values( columns, datum, top_hits, top_hps )
+      gather_query_and_timing_values( columns, datum, top_observations, top_ops )
       columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ], seperator )
       columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::LISTED_COUNTRY ], seperator )
       columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::ABUSE_EMAIL ], seperator )
       return columns.join( seperator )
     end
 
-    def gather_query_and_timing_values( columns, datum, top_hits = nil, top_hps = nil )
-      columns << datum.total_hits.to_s
-      top_hits << [ datum.total_hits, datum ] if top_hits
-      if datum.last_hit_time == nil or datum.first_hit_time == nil
-        columns << NotApplicable #hits/s
+    def gather_query_and_timing_values( columns, datum, top_observations = nil, top_ops = nil )
+      columns << datum.total_observations.to_s
+      top_observations << [ datum.total_observations, datum ] if top_observations
+      if datum.last_observed_time == nil or datum.first_observed_time == nil
+        columns << NotApplicable #observations/s
         columns << NotApplicable #duration
         columns << NotApplicable #first query time
         columns << NotApplicable #last query time
       else
-        t = datum.last_hit_time.to_i - datum.first_hit_time.to_i + 1
-        hps = datum.total_hits.fdiv( t )
-        columns << hps.to_s
-        top_hps << [ hps, datum ] if top_hps
+        t = datum.last_observed_time.to_i - datum.first_observed_time.to_i + 1
+        ops = datum.total_observations.fdiv( t )
+        columns << ops.to_s
+        top_ops << [ ops, datum ] if top_ops
         columns << t.to_s
-        columns << datum.first_hit_time.strftime('%d %b %Y %H:%M:%S')
-        columns << datum.last_hit_time.strftime('%d %b %Y %H:%M:%S')
+        columns << datum.first_observed_time.strftime('%d %b %Y %H:%M:%S')
+        columns << datum.last_observed_time.strftime('%d %b %Y %H:%M:%S')
       end
     end
 

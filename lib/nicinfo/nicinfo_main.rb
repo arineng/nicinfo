@@ -312,14 +312,14 @@ module NicInfo
           @appctx.options.bulkip_out_tsv = file
         end
 
-        opts.on( "--bulkip-top-hits NUMBER",
-                "Output top NUMBER of hits" ) do |n|
-          @appctx.options.bulkip_top_hits = n.to_i
+        opts.on( "--bulkip-top-observations NUMBER",
+                "Output top NUMBER of observations" ) do |n|
+          @appctx.options.bulkip_top_observations = n.to_i
         end
 
-        opts.on( "--bulkip-top-hps NUMBER",
-                "Output top NUMBER of hits-per-second" ) do |n|
-          @appctx.options.bulkip_top_hps = n.to_i
+        opts.on( "--bulkip-top-ops NUMBER",
+                "Output top NUMBER of observations-per-second" ) do |n|
+          @appctx.options.bulkip_top_ops = n.to_i
         end
 
         opts.on( "--bulkip-interval SECONDS",
@@ -875,8 +875,8 @@ HELP_SUMMARY
       end
       rdap_query = NicInfo::RDAPQuery.new( @appctx )
       bulkip_data = NicInfo::BulkIPData.new( @appctx )
-      bulkip_data.set_top_hits_number( @appctx.options.bulkip_top_hits )
-      bulkip_data.set_top_hps_number( @appctx.options.bulkip_top_hps )
+      bulkip_data.set_top_observations_number( @appctx.options.bulkip_top_observations )
+      bulkip_data.set_top_ops_number( @appctx.options.bulkip_top_ops )
       if @appctx.options.bulkip_interval_seconds
         bulkip_data.set_interval_seconds_to_increment( @appctx.options.bulkip_interval_seconds )
       end
@@ -909,7 +909,7 @@ HELP_SUMMARY
                     rtype = get_query_type_from_result( rdap_response.json_data )
                     if rtype == QueryType::BY_IP
                       ipnetwork = NicInfo::process_ip( rdap_response.json_data, @appctx )
-                      bulkip_data.hit_network( ipnetwork, time )
+                      bulkip_data.observe_network( ipnetwork, time )
                     else
                       bulkip_data.fetch_error( ipaddr, time, rdap_response.code, "RDAP IP network type not returned" )
                     end
