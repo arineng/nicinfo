@@ -112,9 +112,9 @@ module NicInfo
     attr_accessor :net_data, :listed_data, :block_data, :fetch_errors, :appctx
     attr_accessor :interval_seconds_to_increment, :second_to_sample, :total_intervals
 
-    BlockColumnHeaders = [ "Block", "Observations", "Avgd Observations/s", "Observed Period (s)", "First Observation Time", "Last Observation Time", "Registry", "Listed Name", "Listed Country", "Abuse Email" ]
-    NetworkColumnHeaders = [ "Network", "Observations", "Avgd Observations/s", "Observed Period (s)", "First Observation Time", "Last Observation Time", "Registry", "Listed Name", "Listed Country", "Abuse Email" ]
-    ListedColumnHeaders = [ "Listed Name", "Observations", "Avgd Observations/s", "Observed Period (s)", "First Observation Time", "Last Observation Time", "Registry", "Listed Country", "Abuse Email" ]
+    BlockColumnHeaders = [ "Block", "Observations", "% of Total Observations", "Avgd Obsvns / Obsvn Period", "Avgd Obsvns / Observed Period", "Observed Period (s)", "First Observation Time", "Last Observation Time", "Registry", "Listed Name", "Listed Country", "Abuse Email" ]
+    NetworkColumnHeaders = [ "Network", "Observations", "% of Total Observations", "Avgd Obsvns / Obsvn Period", "Avgd Obsvns / Observed Period", "Observed Period (s)", "First Observation Time", "Last Observation Time", "Registry", "Listed Name", "Listed Country", "Abuse Email" ]
+    ListedColumnHeaders = [ "Listed Name", "Observations", "% of Total Observations", "Avgd Obsvns / Obsvn Period", "Avgd Obsvns / Observed Period", "Observed Period (s)", "First Observation Time", "Last Observation Time", "Registry", "Listed Country", "Abuse Email" ]
     UrlColumnHeaders = [ "Total Queries", "Averaged QPS", "URL" ]
     NotApplicable = "N/A"
 
@@ -313,6 +313,13 @@ module NicInfo
 
     def output_column_sv( file_name, extension, seperator )
 
+      # prelim values
+      if @first_observed_time != nil && @last_observed_time != nil
+        @observation_period_seconds = @last_observed_time.to_i - @first_observed_time.to_i
+      else
+        @observation_period_seconds = nil
+      end
+
       n = file_name+"-blocks"+extension
       @appctx.logger.trace( "writing file #{n}")
       top_observations = get_top_observations( @top_block_observations )
@@ -452,9 +459,9 @@ module NicInfo
       f.puts
       f.puts( output_total_row( "First Observation Time", @first_observed_time.strftime('%d %b %Y %H:%M:%S'), seperator ) ) if @first_observed_time
       f.puts( output_total_row( "Last Observation Time", @last_observed_time.strftime('%d %b %Y %H:%M:%S'), seperator ) ) if @last_observed_time
+      f.puts( output_total_row( "Total Observations", @total_observations, seperator ) )
       f.puts( output_total_row( "Non-Global Unicast IPs", @non_global_unicast, seperator ) )
       f.puts( output_total_row( "Network Lookups", @network_lookups, seperator ) )
-      f.puts( output_total_row( "Total Observations", @total_observations, seperator ) )
       f.puts( output_total_row( "Total Fetch Errors", @total_fetch_errors, seperator ) )
       f.puts( output_total_row( "Total IP Address Parse Errors", @total_ip_errors, seperator ) )
       f.puts( output_total_row( "Analysis Start Time", @start_time.strftime('%d %b %Y %H:%M:%S'), seperator ) )
@@ -528,6 +535,12 @@ module NicInfo
     def gather_query_and_timing_values( columns, datum, top_observations = nil, top_ops = nil )
       columns << datum.total_observations.to_s
       top_observations << [ datum.total_observations, datum ] if top_observations
+      columns << datum.total_observations.fdiv( @total_observations ) * 100.0
+      if ! @observation_period_seconds
+        columns << NotApplicable
+      else
+        columns << datum.total_observations.fdiv( @observation_period_seconds )
+      end
       if datum.last_observed_time == nil or datum.first_observed_time == nil
         columns << NotApplicable #observations/s
         columns << NotApplicable #observed period
