@@ -112,9 +112,9 @@ module NicInfo
     attr_accessor :net_data, :listed_data, :block_data, :fetch_errors, :appctx
     attr_accessor :interval_seconds_to_increment, :second_to_sample, :total_intervals
 
-    BlockColumnHeaders = [ "Block", "Observations", "Avgd Observations/s", "Duration (s)", "First Observation Time", "Last Observation Time", "Registry", "Listed Name", "Listed Country", "Abuse Email" ]
-    NetworkColumnHeaders = [ "Network", "Observations", "Avgd Observations/s", "Duration (s)", "First Observation Time", "Last Observation Time", "Registry", "Listed Name", "Listed Country", "Abuse Email" ]
-    ListedColumnHeaders = [ "Listed Name", "Observations", "Avgd Observations/s", "Duration (s)", "First Observation Time", "Last Observation Time", "Registry", "Listed Country", "Abuse Email" ]
+    BlockColumnHeaders = [ "Block", "Observations", "Avgd Observations/s", "Observed Period (s)", "First Observation Time", "Last Observation Time", "Registry", "Listed Name", "Listed Country", "Abuse Email" ]
+    NetworkColumnHeaders = [ "Network", "Observations", "Avgd Observations/s", "Observed Period (s)", "First Observation Time", "Last Observation Time", "Registry", "Listed Name", "Listed Country", "Abuse Email" ]
+    ListedColumnHeaders = [ "Listed Name", "Observations", "Avgd Observations/s", "Observed Period (s)", "First Observation Time", "Last Observation Time", "Registry", "Listed Country", "Abuse Email" ]
     UrlColumnHeaders = [ "Total Queries", "Averaged QPS", "URL" ]
     NotApplicable = "N/A"
 
@@ -530,7 +530,7 @@ module NicInfo
       top_observations << [ datum.total_observations, datum ] if top_observations
       if datum.last_observed_time == nil or datum.first_observed_time == nil
         columns << NotApplicable #observations/s
-        columns << NotApplicable #duration
+        columns << NotApplicable #observed period
         columns << NotApplicable #first query time
         columns << NotApplicable #last query time
       else
