@@ -34,6 +34,8 @@ module NicInfo
   class BulkIPObservation
 
     attr_accessor :total_observations, :first_observed_time, :last_observed_time
+    attr_accessor :this_second, :observations_this_second
+    attr_accessor :highest_observations_in_a_second, :highest_observed_second
 
     def initialize( time )
       @total_observations = 0
@@ -47,6 +49,29 @@ module NicInfo
         @first_observed_time = time if time < @first_observed_time
         @last_observed_time = time unless @last_observed_time
         @last_observed_time = time if time > @last_observed_time
+
+        if @this_second == nil
+          @this_second = time.to_i
+          @observations_this_second = 1
+          @highest_observations_in_a_second = 0
+          @highest_observed_second = time.to_i
+        elsif time.to_i == @this_second
+          @observations_this_second = @observations_this_second + 1
+          if @highest_observed_second == @this_second
+            @highest_observations_in_a_second = @observations_this_second
+          end
+        elsif time.to_i != @this_second
+          if @observations_this_second > @highest_observations_in_a_second
+            @highest_observations_in_a_second = @observations_this_second
+            @highest_observed_second = @this_second
+          end
+          @this_second = time.to_i
+          if @this_second == @highest_observed_second
+            @observations_this_second = @highest_observations_in_a_second
+          else
+            @observations_this_second = 1
+          end
+        end
       end
     end
 
@@ -319,7 +344,7 @@ module NicInfo
 
       # prelim values
       if @first_observed_time != nil && @last_observed_time != nil
-        @observation_period_seconds = @last_observed_time.to_i - @first_observed_time.to_i
+        @observation_period_seconds = @last_observed_time.to_i - @first_observed_time.to_i + 1
       else
         @observation_period_seconds = nil
       end
@@ -572,6 +597,9 @@ module NicInfo
 
         # last observation time
         columns << datum.last_observed_time.strftime('%d %b %Y %H:%M:%S')
+
+        # max observations in a second
+        columns << datum.highest_observations_in_a_second.to_s
       end
     end
 
@@ -584,6 +612,7 @@ module NicInfo
         headers << "Observed Period (s)"
         headers << "First Observation Time"
         headers << "Last Observation Time"
+        headers << "Max Obsvns in a Second"
       end
     end
 
