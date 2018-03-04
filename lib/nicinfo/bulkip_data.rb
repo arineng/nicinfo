@@ -29,6 +29,7 @@ module NicInfo
   # TODO remove invalid IP address strings and just produce a count
   # TODO track redirect URLs too
   # TODO feature to turn off deep object caching
+  # TODO unique nets by fixed size
 
   class BulkIPNetwork
 
