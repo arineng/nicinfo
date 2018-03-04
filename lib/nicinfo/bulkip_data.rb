@@ -26,7 +26,6 @@ module NicInfo
   # TODO percentage of total observations by registry
   # TODO mean, std dev, and cv of both period and frequency
   # TODO refactor using statistical terms
-  # TODO hit_ipaddr should be query_for_net? and return a reason code
   # TODO track redirect URLs too
   # TODO track error count per URL
   # TODO track avg response time per URL
@@ -127,6 +126,12 @@ module NicInfo
     UrlColumnHeaders = [ "Total Queries", "Averaged QPS", "URL" ]
     NotApplicable = "N/A"
 
+    # result codes from query_for_net?
+    NetNotFound = 0
+    NetAlreadyRetreived = 1
+    NetNotFoundBetweenIntervals = 2
+
+
     def initialize( appctx )
       @appctx = appctx
       @block_data = Hash.new
@@ -197,7 +202,7 @@ module NicInfo
       return retval
     end
 
-    def hit_ipaddr( ipaddr, time )
+    def query_for_net?(ipaddr, time )
 
       if @interval_seconds_to_increment
         if @first_file_time
@@ -217,11 +222,11 @@ module NicInfo
         end
       end
 
-      retval = false
+      retval = NetNotFound
       @block_data.each do |datum_net, datum|
         if datum_net.include?( ipaddr )
           datum.hit( time )
-          retval = true
+          retval = NetAlreadyRetreived
           @appctx.logger.trace( "observed network already retreived" )
           break;
         end
@@ -230,12 +235,10 @@ module NicInfo
       @total_hits = @total_hits + 1 if retval
       hit_time( time )
 
-      # if doing sampling, then return true when not in the sample second
-      # this will avoid a call to hit_network
-      # if sampling is being done can be detected with @interval_seconds_to_increment
-      if @interval_seconds_to_increment && time.to_i != @second_to_sample.to_i
+      # if doing sampling, note that
+      if retval == NetNotFound && @interval_seconds_to_increment && time.to_i != @second_to_sample.to_i
         @appctx.logger.trace( "retreival unnecessary outside of sampling time" )
-        retval = true
+        retval = NetNotFoundBetweenIntervals
       end
       return retval
 
@@ -275,12 +278,12 @@ module NicInfo
       # run back through and figure out which can be processed again
       # and delete them
       @fetch_errors.delete_if do |fetch_error|
-        hit_ipaddr( fetch_error.ipaddr, fetch_error.time )
+        query_for_net?(fetch_error.ipaddr, fetch_error.time )
       end
 
       # now lets put these into blocks as unknown
       @fetch_errors.each do |fetch_error|
-        block_found = hit_ipaddr( fetch_error.ipaddr, fetch_error.time )
+        block_found = query_for_net?(fetch_error.ipaddr, fetch_error.time )
         unless block_found
           if fetch_error.ipaddr.ipv6?
             cidr = "#{fetch_error.ipaddr.mask(56).to_s}/56"

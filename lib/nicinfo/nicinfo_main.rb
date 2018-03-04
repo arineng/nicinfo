@@ -897,15 +897,15 @@ HELP_SUMMARY
             end
             begin
               ipaddr = IPAddr.new( ip )
-              unless bulkip_data.valid_to_query?( ipaddr )
+              if !bulkip_data.valid_to_query?( ipaddr )
                 @appctx.logger.trace( "skipping non-global-unicast address #{ip}")
               else
-                if !bulkip_data.hit_ipaddr( ipaddr, time )
+                if bulkip_data.query_for_net?(ipaddr, time ) == NicInfo::BulkIPData::NetNotFound
                   query_value = [ ip ]
                   qtype = QueryType::BY_IP4_ADDR
                   qtype = QueryType::BY_IP6_ADDR if ipaddr.ipv6?
                   rdap_response = rdap_query.do_rdap_query( query_value, qtype, nil )
-                  unless rdap_response.error_state
+                  if ! rdap_response.error_state
                     rtype = get_query_type_from_result( rdap_response.json_data )
                     if rtype == QueryType::BY_IP
                       ipnetwork = NicInfo::process_ip( rdap_response.json_data, @appctx )
