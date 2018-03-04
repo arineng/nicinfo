@@ -30,6 +30,7 @@ module NicInfo
   # TODO track avg response time per URL
   # TODO feature to turn off deep object caching
   # TODO unique nets by fixed size
+  # TODO get rid of explicit exits
 
   class BulkIPNetwork
 
