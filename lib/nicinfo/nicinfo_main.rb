@@ -906,7 +906,7 @@ HELP_SUMMARY
             if lineno % 1000 == 0
               @appctx.logger.mesg( "Processing line #{lineno} of #{file}")
             end
-            if time != nil
+            if ( time != nil && files_with_time != 0 ) || files_without_time != 0
               begin
                 ipaddr = IPAddr.new( ip )
                 if !bulkip_data.valid_to_query?( ipaddr )

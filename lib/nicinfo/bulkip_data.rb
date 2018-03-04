@@ -22,7 +22,6 @@ module NicInfo
 
   # things to think about
   # TODO second pass feature that does not query network
-  # TODO percentage of total observations
   # TODO percentage of total observations by registry
   # TODO mean, std dev, and cv of both period and frequency
   # TODO track redirect URLs too
