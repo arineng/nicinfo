@@ -141,6 +141,8 @@ describe 'demos' do
   # TODO ask RIPE about 400 for 94.142.200.20
   # TODO ask LACNIC about redirect for 148.0.86.4
   # TODO ask APNIC about producing a 404
+  # TODO tell AFRINIC about remarks that are multiple lines
+  # TODO tell AFRINIC about countries in the wrong place in vcard
 
   it 'domain-rir.json' do
 

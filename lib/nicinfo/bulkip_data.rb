@@ -162,6 +162,10 @@ module NicInfo
       return retval.first( top_number )
     end
 
+    def note_times_in_data
+      @do_time_statistics = true
+    end
+
     def note_start_time
       @start_time = Time.now
     end
@@ -291,6 +295,10 @@ module NicInfo
 
     def ip_error( ip )
       @total_ip_errors = @total_ip_errors + 1
+    end
+
+    def time_error( time )
+      @total_time_errors = @total_time_errors + 1
     end
 
     def output_tsv( file_name )
@@ -464,6 +472,7 @@ module NicInfo
       f.puts( output_total_row( "Network Lookups", @network_lookups, seperator ) )
       f.puts( output_total_row( "Total Fetch Errors", @total_fetch_errors, seperator ) )
       f.puts( output_total_row( "Total IP Address Parse Errors", @total_ip_errors, seperator ) )
+      f.puts( output_total_row( "Total Time Parse Errors", @total_time_errors, seperator ) )
       f.puts( output_total_row( "Analysis Start Time", @start_time.strftime('%d %b %Y %H:%M:%S'), seperator ) )
       f.puts( output_total_row( "Analysis End Time", @end_time.strftime('%d %b %Y %H:%M:%S'), seperator ) )
       f.puts( output_total_row( "Total Intervals", @total_intervals, seperator ) ) if @interval_seconds_to_increment
@@ -472,16 +481,28 @@ module NicInfo
       f.close
     end
 
-    def output_block_column_headers(seperator )
-      return BlockColumnHeaders.join(seperator )
+    def output_block_column_headers( seperator )
+      headers = []
+      headers << "Block"
+      gather_query_and_timing_headers( headers )
+      headers << "Registry" << "Listed Name" << "Listed Country" << "Abuse Email"
+      return headers.join(seperator )
     end
 
     def output_network_column_headers( seperator )
-      return NetworkColumnHeaders.join( seperator )
+      headers = []
+      headers << "Network"
+      gather_query_and_timing_headers( headers )
+      headers << "Registry" << "Listed Name" << "Listed Country" << "Abuse Email"
+      return headers.join( seperator )
     end
 
     def output_listed_column_headers( seperator )
-      return ListedColumnHeaders.join( seperator )
+      headers = []
+      headers << "Listed Name"
+      gather_query_and_timing_headers( headers )
+      headers << "Registry" << "Listed Country" << "Abuse Email"
+      return headers.join( seperator )
     end
 
     def puts_signature( file )
@@ -536,24 +557,37 @@ module NicInfo
       columns << datum.total_observations.to_s
       top_observations << [ datum.total_observations, datum ] if top_observations
       columns << datum.total_observations.fdiv( @total_observations ) * 100.0
-      if ! @observation_period_seconds
-        columns << NotApplicable
-      else
+      if @do_time_statistics
+        # averaged obsvns / obsvn period
         columns << datum.total_observations.fdiv( @observation_period_seconds )
-      end
-      if datum.last_observed_time == nil or datum.first_observed_time == nil
-        columns << NotApplicable #observations/s
-        columns << NotApplicable #observed period
-        columns << NotApplicable #first query time
-        columns << NotApplicable #last query time
-      else
+
         t = datum.last_observed_time.to_i - datum.first_observed_time.to_i + 1
         ops = datum.total_observations.fdiv( t )
+
+        # averaged obsvns / observed period
         columns << ops.to_s
         top_ops << [ ops, datum ] if top_ops
+
+        # observed period
         columns << t.to_s
+
+        # first observation time
         columns << datum.first_observed_time.strftime('%d %b %Y %H:%M:%S')
+
+        # last observation time
         columns << datum.last_observed_time.strftime('%d %b %Y %H:%M:%S')
+      end
+    end
+
+    def gather_query_and_timing_headers( headers )
+      headers << "Observations"
+      headers << "% of Total Observations"
+      if @do_time_statistics
+        headers << "Avgd Obsvns / Obsvn Period"
+        headers << "Avgd Obsvns / Observed Period"
+        headers << "Observed Period (s)"
+        headers << "First Observation Time"
+        headers << "Last Observation Time"
       end
     end
 
