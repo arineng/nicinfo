@@ -374,6 +374,7 @@ describe 'bulk_infile test' do
       expect( file_name ).to end_with( values[ i ][ 3 ] )
       i = i + 1
     end
+    expect( i ).to eq( values.length )
 
   end
 

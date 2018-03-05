@@ -325,26 +325,29 @@ module NicInfo
       #iterate through until all done
       num_eol = 0
       while num_eol < @inlines.length do
-        @lowest_line = nil
-        @lowest_file = nil
+        lowest_line = nil
+        lowest_file = nil
+        num_eol = 0
         @inlines.each do |b,l|
           if b.eol || l == nil
             num_eol = num_eol + 1
           else
             if l[:time] == nil
-              @lowest_line = l
-              @lowest_file = b
-            elsif @lowest_line == nil || @lowest_line[:time] == nil
-              @lowest_line = l
-              @lowest_file = b
-            elsif l[:time] < @lowest_line[:time]
-              @lowest_line = l
-              @lowest_file = b
+              lowest_line = l
+              lowest_file = b
+            elsif lowest_line == nil || lowest_line[:time] == nil
+              lowest_line = l
+              lowest_file = b
+            elsif l[:time] < lowest_line[:time]
+              lowest_line = l
+              lowest_file = b
             end
           end
         end
-        yield( @lowest_line[ :ip ], @lowest_line[ :time ], @lowest_line[ :lineno ], @lowest_file.file_name )
-        @inlines[ @lowest_file ] = @lowest_file.next_line
+        if lowest_line
+          yield( lowest_line[ :ip ], lowest_line[ :time ], lowest_line[ :lineno ], lowest_file.file_name )
+          @inlines[ lowest_file ] = lowest_file.next_line
+        end
       end
 
       @inlines.keys.each do |b|
