@@ -106,4 +106,44 @@ describe 'bulk_data test' do
 
   end
 
+  it 'should calculate shortest interval' do
+
+    t = Time.at( 100 )
+    o = NicInfo::BulkIPObservation.new( t )
+    expect( o.shortest_interval ).to be_nil
+    o.observed( t )
+    expect( o.shortest_interval ).to be_nil
+    t = t + 1
+    o.observed( t )
+    expect( o.shortest_interval ).to eq( 1 )
+    t = t + 3
+    o.observed( t )
+    expect( o.shortest_interval ).to eq( 1 )
+
+  end
+
+  it 'should find highest observations' do
+
+    t = Time.at( 100 )
+    o = NicInfo::BulkIPObservation.new( t )
+    expect( o.highest_observations_in_a_second ).to eq( 1 )
+    o.observed( t )
+    expect( o.highest_observations_in_a_second ).to eq( 2 )
+    o.observed( t )
+    expect( o.highest_observations_in_a_second ).to eq( 3 )
+
+    t2 = Time.at( 200 )
+    o.observed( t2 )
+    expect( o.highest_observations_in_a_second ).to eq( 3 )
+    o.observed( t2 )
+    expect( o.highest_observations_in_a_second ).to eq( 3 )
+    o.observed( t2 )
+    expect( o.highest_observations_in_a_second ).to eq( 3 )
+    o.observed( t2 )
+    expect( o.highest_observations_in_a_second ).to eq( 4 )
+    o.observed( t2 )
+    expect( o.highest_observations_in_a_second ).to eq( 5 )
+
+  end
+
 end

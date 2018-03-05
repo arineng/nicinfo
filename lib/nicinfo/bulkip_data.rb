@@ -61,11 +61,11 @@ module NicInfo
           if @highest_observed_second == @this_second
             @highest_observations_in_a_second = @observations_this_second
           end
-        elsif time.to_i != @this_second
-          if @observations_this_second > @highest_observations_in_a_second
+          if @observations_this_second >= @highest_observations_in_a_second
             @highest_observations_in_a_second = @observations_this_second
             @highest_observed_second = @this_second
           end
+        elsif time.to_i != @this_second
           interval = time.to_i - @this_second
           if interval > 0 && @shortest_interval == nil
             @shortest_interval = interval
