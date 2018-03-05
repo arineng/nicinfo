@@ -21,6 +21,20 @@ describe 'bulk_infile test' do
 
   # TODO test when the strategy can't find ip or date column
 
+  @work_dir = nil
+
+  before( :all ) do
+
+    @work_dir = Dir.mktmpdir
+
+  end
+
+  after( :all ) do
+
+    FileUtils.rm_r( @work_dir )
+
+  end
+
   it 'should guess ips' do
     b = NicInfo::BulkIPInFile.new( nil )
 
@@ -324,6 +338,43 @@ describe 'bulk_infile test' do
       end
       i=i+1
     end
+  end
+
+  it 'should iterator by time' do
+
+    dir = File.join( @work_dir, "foreach_by_time" )
+    logger = NicInfo::Logger.new
+    logger.data_out = StringIO.new
+    logger.message_out = StringIO.new
+    logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
+    appctx = NicInfo::AppContext.new(dir )
+    appctx.logger=logger
+    appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
+
+    fs = NicInfo::BulkIPInFileSet.new( appctx )
+    fs.set_file_list( "spec/bulkip/fs*.log" )
+
+    values = [
+      [ "61.181.2.38", "2018-02-04 10:00:00,005", 1, "fs1.log" ],
+      [ "187.36.192.120", "2018-02-04 10:00:00,112", 1, "fs2.log" ],
+      [ "194.85.61.205", "2018-02-04 10:00:00,118", 1, "fs3.log" ],
+      [ "196.216.2.21", "2018-02-04 10:00:01,097", 2, "fs1.log" ],
+      [ "108.45.128.208", "2018-02-04 10:00:01,103", 3, "fs1.log" ],
+      [ "61.181.2.39", "2018-02-04 10:00:02,005", 2, "fs3.log" ],
+      [ "61.181.2.39", "2018-02-04 10:00:03,005", 4, "fs1.log" ],
+      [ "61.181.2.39", "2018-02-04 10:00:05,005", 3, "fs3.log" ],
+      [ "61.181.2.39", "2018-02-04 10:00:06,005", 2, "fs2.log" ],
+      [ "108.45.128.208", "2018-02-04 10:00:07,103", 5, "fs1.log" ]
+    ]
+    i = 0
+    fs.foreach_by_time do |ip,time,lineno,file_name|
+      expect( ip ).to eq( values[ i ][ 0 ] )
+      expect( time ).to eq( Time.parse( values[ i ][ 1 ] ) )
+      expect( lineno ).to eq( values[ i ][ 2 ] )
+      expect( file_name ).to end_with( values[ i ][ 3 ] )
+      i = i + 1
+    end
+
   end
 
 end

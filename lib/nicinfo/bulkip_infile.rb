@@ -35,7 +35,9 @@ module NicInfo
 
     OopsTime = Time.now.to_date.to_time
 
-    attr_accessor :file_name, :strategy
+    InLine = Struct.new( :ip, :time, :lineno )
+
+    attr_accessor :file_name, :strategy, :lineno, :eol
 
     def initialize file_name
       @file_name = file_name
@@ -234,6 +236,127 @@ module NicInfo
         yield( ip, time, i )
         i = i + 1
       end
+    end
+
+    def next_line
+      if @file == nil
+        @file = File.open( file_name, "r" )
+        @lineno = 0
+      end
+      retval = nil
+      if !@eol
+        line = @file.gets
+        if line
+          fields = line.split ( /\s/ )
+          ip = get_ip( fields )
+          time = get_time( fields )
+          @lineno = @lineno + 1
+          retval = InLine.new( ip, time, @lineno )
+        else
+          @eol = true
+        end
+      end
+      return retval
+    end
+
+    def done
+      if @file
+        @file.close
+        @file = nil
+      end
+    end
+
+  end
+
+  class BulkIPInFileSet
+
+    attr_accessor :appctx, :timing_provided, :file_list
+
+
+    def initialize( appctx )
+      @appctx = appctx
+    end
+
+    def set_file_list( file_list )
+
+      # if we have been given a directory, turn it into a glob pattern
+      if File.directory?( file_list )
+        file_list = file_list + File::SEPARATOR unless file_list.end_with?( File::SEPARATOR )
+        file_list = file_list + "*"
+      end
+      @file_list = file_list
+
+      # make sure all files have a strategy
+      # and make sure that all files either have timing information or don't, no mixtures
+      files_with_time = 0
+      files_without_time = 0
+      Dir.glob( file_list ).each do |file|
+        b = BulkIPInFile.new( file )
+        if !b.has_strategy
+          raise ArgumentError.new( "cannot determine parsing strategy for #{file}")
+        end
+        if b.strategy[ NicInfo::BulkIPInFile::DateTimeType ] == NicInfo::BulkIPInFile::DateTimeNoneType
+          files_without_time = files_without_time + 1
+        else
+          files_with_time = files_with_time + 1
+        end
+        @appctx.logger.trace( "file #{file} strategry is #{b.strategy}")
+      end
+      if files_with_time != 0 && files_without_time != 0
+        raise ArgumentError.new( "Some files have times and some do not. All files must either have time values or no time values.")
+      end
+      @timing_provided = false
+      @timing_provided = true if files_with_time != 0
+
+    end
+
+    def foreach_by_time
+      # setup all the files and get first line
+      @inlines = {}
+      Dir.glob( @file_list ).each do |file|
+        b = BulkIPInFile.new( file )
+        if b.strategy == nil
+          raise RuntimeError unless b.has_strategy
+        end
+        inline = b.next_line
+        @inlines[ b ] = inline
+      end
+
+      #iterate through until all done
+      num_eol = 0
+      while num_eol < @inlines.length do
+        @lowest_line = nil
+        @lowest_file = nil
+        @inlines.each do |b,l|
+          if b.eol || l == nil
+            num_eol = num_eol + 1
+          else
+            if l[:time] == nil
+              @lowest_line = l
+              @lowest_file = b
+            elsif @lowest_line == nil || @lowest_line[:time] == nil
+              @lowest_line = l
+              @lowest_file = b
+            elsif l[:time] < @lowest_line[:time]
+              @lowest_line = l
+              @lowest_file = b
+            end
+          end
+        end
+        yield( @lowest_line[ :ip ], @lowest_line[ :time ], @lowest_line[ :lineno ], @lowest_file.file_name )
+        @inlines[ @lowest_file ] = @lowest_file.next_line
+      end
+
+      @inlines.keys.each do |b|
+        b.done
+      end
+
+    end
+
+    def done
+      @inlines.keys.each do |b|
+        b.done
+      end if @inlines
     end
 
   end
