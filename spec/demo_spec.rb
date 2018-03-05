@@ -143,6 +143,7 @@ describe 'demos' do
   # TODO ask APNIC about producing a 404
   # TODO tell AFRINIC about remarks that are multiple lines
   # TODO tell AFRINIC about countries in the wrong place in vcard
+  # TODO it would seem LACNIC is not properly escaping quotation marks in JSON for https://rdap.lacnic.net/rdap/ip/200.9.4.4
 
   it 'domain-rir.json' do
 
