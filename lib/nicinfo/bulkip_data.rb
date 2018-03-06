@@ -30,6 +30,7 @@ module NicInfo
   # TODO feature to turn off deep object caching
   # TODO unique nets by fixed size
   # TODO get rid of explicit exits
+  # TODO make CSV/TSV output compliant with RFC4180
 
   class BulkIPObservation
 
