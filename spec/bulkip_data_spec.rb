@@ -106,7 +106,7 @@ describe 'bulk_data test' do
 
   end
 
-  it 'should calculate shortest and longest interval' do
+  it 'should do interval calculations' do
 
     t = Time.at( 100 )
     o = NicInfo::BulkIPObservation.new( t )
@@ -115,14 +115,23 @@ describe 'bulk_data test' do
     expect( o.shortest_interval ).to be_nil
     t = t + 1
     o.observed( t )
-    expect( o.shortest_interval ).to eq( 1 )
+    expect( o.shortest_interval ).to be_nil
     t = t + 3
     o.observed( t )
-    expect( o.shortest_interval ).to eq( 1 )
+    expect( o.shortest_interval ).to eq( 2 )
     t = t + 10
     o.observed( t )
+    t = t + 2
+    o.observed( t )
     expect( o.shortest_interval ).to eq( 1 )
-    expect( o.longest_interval ).to eq( 10 )
+    expect( o.longest_interval ).to eq( 9 )
+
+    o.finish_calculations
+    expect( o.interval_sum ).to eq( 12 )
+    expect( o.interval_count ).to eq( 3 )
+    expect( o.get_interval_average ).to eq( 4 )
+    expect( o.get_interval_standard_deviation( false ) ).to be_within( 0.0001 ).of( 3.5590 )
+    expect( o.get_interval_cv( false ) ).to be_within( 0.0001 ).of( 0.8897 )
 
   end
 

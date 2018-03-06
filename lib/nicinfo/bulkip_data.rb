@@ -39,8 +39,10 @@ module NicInfo
     # magnitude is defined as observations per second
     attr_accessor :magnitude, :greatest_magnitude, :least_magnitude
     attr_accessor :magnitude_sum, :magnitude_count, :magnitude_sum_squared
-    # interval is defined as the time between observations in seconds
+    # interval is defined as the time in seconds between seconds with an observation
+    # but definition, must greater than zero
     attr_accessor :shortest_interval, :longest_interval
+    attr_accessor :interval_sum, :interval_count, :interval_sum_squared
 
     def initialize( time )
       @observations = 0
@@ -62,13 +64,16 @@ module NicInfo
           @magnitude_sum = 0
           @magnitude_count = 1
           @magnitude_sum_squared = 0
+          @interval_sum = 0
+          @interval_sum_squared = 0
+          @interval_count = 0
         elsif time.to_i == @this_second
           @magnitude = @magnitude + 1
           if @magnitude > @greatest_magnitude
             @greatest_magnitude = @magnitude
           end
         elsif time.to_i != @this_second
-          interval = time.to_i - @this_second
+          interval = time.to_i - @this_second - 1
           if interval > 0 && @shortest_interval == nil
             @shortest_interval = interval
           elsif interval > 0 && interval < @shortest_interval
@@ -76,6 +81,11 @@ module NicInfo
           end
           if @longest_interval == nil || interval > @longest_interval
             @longest_interval = interval
+          end
+          if interval > 0
+            @interval_sum = @interval_sum + interval
+            @interval_sum_squared = @interval_sum_squared + interval**2
+            @interval_count = @interval_count + 1
           end
           if @least_magnitude == nil
             @least_magnitude = @magnitude
@@ -130,7 +140,23 @@ module NicInfo
     end
 
     def get_magnitude_cv_percentage( sample )
-      get_cv_percentage( sample, @magnitude_count, @magnitude_sum, @magnitude_sum_squared, get_magnitude_average )
+      get_cv_percentage( get_magnitude_cv( sample ) )
+    end
+
+    def get_interval_average
+      @interval_sum.fdiv( @interval_count )
+    end
+
+    def get_interval_standard_deviation( sample )
+      get_std_dev( sample, @interval_count, @interval_sum, @interval_sum_squared )
+    end
+
+    def get_interval_cv( sample )
+      get_cv( sample, @interval_count, @interval_sum, @interval_sum_squared, get_interval_average )
+    end
+
+    def get_interval_cv_percentage( sample )
+      get_cv_percentage( get_interval_cv( sample ) )
     end
 
     def get_std_dev( sample, count, sum, sum_squared )
@@ -155,9 +181,8 @@ module NicInfo
       return retval
     end
 
-    def get_cv_percentage( sample, count, sum, sum_squared, average )
+    def get_cv_percentage( cv )
       retval = nil
-      cv = get_cv( sample, count, sum, sum_squared, average )
       if cv
         retval = "#{cv * 100}%"
       end
@@ -712,6 +737,15 @@ module NicInfo
 
         # longest interval
         columns << to_columnar_data( datum.longest_interval )
+
+        # interval average
+        columns << datum.get_interval_average
+
+        # interval standard deviation
+        columns << to_columnar_data( datum.get_interval_standard_deviation( @interval_seconds_to_increment != nil ) )
+
+        # interval cv percentage
+        columns << to_columnar_data( datum.get_interval_cv_percentage( @interval_seconds_to_increment != nil ) )
       end
     end
 
@@ -729,8 +763,11 @@ module NicInfo
         headers << "Magnitude Average"
         headers << "Magnitude Std Deviation"
         headers << "Magnitude CV %"
-        headers << "Shortest N/Z Interval"
+        headers << "Shortest Interval"
         headers << "Longest Interval"
+        headers << "Interval Average"
+        headers << "Interval Std Deviation"
+        headers << "Interval CV %"
       end
     end
 
