@@ -171,7 +171,11 @@ module NicInfo
     end
 
     def get_interval_average
-      @interval_sum.fdiv( @interval_count )
+      retval = nil
+      if @interval_count > 0
+        retval = @interval_sum.fdiv( @interval_count )
+      end
+      return retval
     end
 
     def get_interval_standard_deviation( sample )
@@ -218,7 +222,7 @@ module NicInfo
     def get_cv( sample, count, sum, sum_squared, average )
       retval = nil
       std_dev = get_std_dev( sample, count, sum, sum_squared )
-      if std_dev
+      if std_dev && average
         retval = std_dev.fdiv( average )
       end
       return retval
@@ -783,7 +787,7 @@ module NicInfo
         columns << to_columnar_data( datum.longest_interval )
 
         # interval average
-        columns << datum.get_interval_average
+        columns << to_columnar_data( datum.get_interval_average )
 
         # interval standard deviation
         columns << to_columnar_data( datum.get_interval_standard_deviation( @interval_seconds_to_increment != nil ) )
