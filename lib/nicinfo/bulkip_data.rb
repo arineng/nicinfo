@@ -40,9 +40,13 @@ module NicInfo
     attr_accessor :magnitude, :greatest_magnitude, :least_magnitude
     attr_accessor :magnitude_sum, :magnitude_count, :magnitude_sum_squared
     # interval is defined as the time in seconds between seconds with an observation
-    # but definition, must greater than zero
+    # by definition, must be greater than zero
     attr_accessor :shortest_interval, :longest_interval
     attr_accessor :interval_sum, :interval_count, :interval_sum_squared
+    # run is defined as the consecutive seconds with an observation
+    # by definition, must be greater than zero
+    attr_accessor :run, :shortest_run, :longest_run
+    attr_accessor :run_count, :run_sum, :run_sum_squared
 
     def initialize( time )
       @observations = 0
@@ -67,6 +71,11 @@ module NicInfo
           @interval_sum = 0
           @interval_sum_squared = 0
           @interval_count = 0
+          @run = 1
+          @longest_run = 1
+          @run_count = 0
+          @run_sum = 0
+          @run_sum_squared = 0
         elsif time.to_i == @this_second
           @magnitude = @magnitude + 1
           if @magnitude > @greatest_magnitude
@@ -86,6 +95,17 @@ module NicInfo
             @interval_sum = @interval_sum + interval
             @interval_sum_squared = @interval_sum_squared + interval**2
             @interval_count = @interval_count + 1
+          end
+          if interval == 0
+            @run = @run + 1
+          else
+            @shortest_run = @run unless @shortest_run
+            @shortest_run = @run if @shortest_run > @run
+            @longest_run = @run if @longest_run < @run
+            @run_count = @run_count + 1
+            @run_sum = @run_sum + @run
+            @run_sum_squared = @run_sum_squared + @run**2
+            @run = 1
           end
           if @least_magnitude == nil
             @least_magnitude = @magnitude
@@ -109,6 +129,13 @@ module NicInfo
       end
       @magnitude_sum = @magnitude_sum + @magnitude
       @magnitude_sum_squared = @magnitude_sum_squared + @magnitude**2
+      if @this_second == @last_observed_time.to_i
+        @longest_run = @run if @longest_run < @run
+        @run_count = @run_count + 1
+        @run_sum = @run_sum + @run
+        @run_sum_squared = @run_sum_squared + @run**2
+      end
+      @shortest_run = 1 unless @shortest_run
     end
 
     def get_observed_period
@@ -157,6 +184,22 @@ module NicInfo
 
     def get_interval_cv_percentage( sample )
       get_cv_percentage( get_interval_cv( sample ) )
+    end
+
+    def get_run_average
+      @run_sum.fdiv( @run_count )
+    end
+
+    def get_run_standard_deviation( sample )
+      get_std_dev( sample, @run_count, @run_sum, @run_sum_squared )
+    end
+
+    def get_run_cv( sample )
+      get_cv( sample, @run_count, @run_sum, @run_sum_squared, get_run_average )
+    end
+
+    def get_run_cv_percentage( sample )
+      get_cv_percentage( get_run_cv( sample ) )
     end
 
     def get_std_dev( sample, count, sum, sum_squared )
@@ -747,6 +790,21 @@ module NicInfo
 
         # interval cv percentage
         columns << to_columnar_data( datum.get_interval_cv_percentage( @interval_seconds_to_increment != nil ) )
+
+        # shortest run
+        columns << datum.shortest_run
+
+        # longest run
+        columns << datum.longest_run
+
+        # run average
+        columns << datum.get_run_average
+
+        # run standard deviation
+        columns << to_columnar_data( datum.get_run_standard_deviation( @interval_seconds_to_increment != nil ) )
+
+        # run cv percentage
+        columns << to_columnar_data( datum.get_run_cv_percentage( @interval_seconds_to_increment != nil ) )
       end
     end
 
@@ -769,6 +827,11 @@ module NicInfo
         headers << "Interval Average"
         headers << "Interval Std Deviation"
         headers << "Interval CV %"
+        headers << "Shortest Run"
+        headers << "Longest Run"
+        headers << "Run Average"
+        headers << "Run Std Deviation"
+        headers << "Run CV %"
       end
     end
 

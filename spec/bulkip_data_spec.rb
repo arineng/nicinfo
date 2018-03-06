@@ -135,6 +135,48 @@ describe 'bulk_data test' do
 
   end
 
+  it 'should do run calculations' do
+
+    t = Time.at( 100 )
+    o = NicInfo::BulkIPObservation.new( t )
+    o.observed( t )
+    t = t + 1
+    o.observed( t )
+    t = t + 1
+    o.observed( t )
+
+    t = t + 5
+    o.observed( t )
+    t = t + 1
+    o.observed( t )
+    t = t + 1
+    o.observed( t )
+
+    t = t + 10
+    o.observed( t )
+    t = t + 1
+    o.observed( t )
+
+    t = t + 5
+    o.observed( t )
+    t = t + 1
+    o.observed( t )
+    t = t + 1
+    o.observed( t )
+    t = t + 1
+    o.observed( t )
+
+    o.finish_calculations
+    expect( o.shortest_run ).to eq( 2 )
+    expect( o.longest_run ).to eq( 4 )
+    expect( o.run_sum ).to eq( 12 )
+    expect( o.run_count ).to eq( 4 )
+    expect( o.get_run_average ).to eq( 3 )
+    expect( o.get_run_standard_deviation( false ) ).to be_within( 0.0001 ).of( 0.7071 )
+    expect( o.get_run_cv( false ) ).to be_within( 0.0001 ).of( 0.2357 )
+
+  end
+
   it 'should do magnitude calculations' do
 
     t = Time.at( 100 )
