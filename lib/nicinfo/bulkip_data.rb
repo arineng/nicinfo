@@ -652,6 +652,9 @@ module NicInfo
       f.puts( output_total_row( "Last Observation Time", @last_observed_time.strftime('%d %b %Y %H:%M:%S'), seperator ) ) if @last_observed_time
       f.puts( output_total_row( "Observation Period", @observation_period_seconds, seperator ) )
       f.puts( output_total_row( "Total Observations", @total_observations, seperator ) )
+      f.puts( output_total_row( "Total Networks", @net_data.length, seperator ) )
+      f.puts( output_total_row( "Total Network Blocks", @block_data.length, seperator ) )
+      f.puts( output_total_row( "Total Listed Names", @listed_data.length, seperator ) )
       f.puts( output_total_row( "Non-Global Unicast IPs", @non_global_unicast, seperator ) )
       f.puts( output_total_row( "Network Lookups", @network_lookups, seperator ) )
       f.puts( output_total_row( "Total Fetch Errors", @total_fetch_errors, seperator ) )
