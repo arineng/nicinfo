@@ -34,18 +34,18 @@ module NicInfo
 
   class BulkIPObservation
 
-    attr_accessor :total_observations, :first_observed_time, :last_observed_time
+    attr_accessor :observations, :first_observed_time, :last_observed_time
     attr_accessor :this_second, :observations_this_second
     attr_accessor :highest_observations_in_a_second, :highest_observed_second
     attr_accessor :shortest_interval
 
     def initialize( time )
-      @total_observations = 0
+      @observations = 0
       observed( time )
     end
 
     def observed( time )
-      @total_observations = @total_observations + 1
+      @observations = @observations + 1
       if time
         @first_observed_time = time unless @first_observed_time
         @first_observed_time = time if time < @first_observed_time
@@ -81,6 +81,22 @@ module NicInfo
           end
         end
       end
+    end
+
+    def get_observed_period
+      @last_observed_time.to_i - @first_observed_time.to_i + 1
+    end
+
+    def get_observations_per_observed_period
+      @observations.fdiv( get_observed_period )
+    end
+
+    def get_observations_per_observation_period( observation_period_seconds )
+      @observations.fdiv( observation_period_seconds )
+    end
+
+    def get_percentage_of_total_observations( total_observations )
+      @observations.fdiv( total_observations ) * 100.0
     end
 
   end
@@ -584,22 +600,26 @@ module NicInfo
     end
 
     def gather_query_and_timing_values( columns, datum, top_observations = nil, top_ops = nil )
-      columns << datum.total_observations.to_s
-      top_observations << [ datum.total_observations, datum ] if top_observations
-      columns << datum.total_observations.fdiv( @total_observations ) * 100.0
-      if @do_time_statistics
-        # averaged obsvns / obsvn period
-        columns << datum.total_observations.fdiv( @observation_period_seconds )
 
-        t = datum.last_observed_time.to_i - datum.first_observed_time.to_i + 1
-        ops = datum.total_observations.fdiv( t )
+      # observations
+      columns << datum.observations.to_s
+      top_observations << [ datum.observations, datum ] if top_observations
+
+      # percentage of total observations
+      columns << datum.get_percentage_of_total_observations( @total_observations )
+      if @do_time_statistics
+
+        # averaged obsvns / obsvn period
+        columns << datum.get_observations_per_observation_period( @observation_period_seconds )
+
 
         # averaged obsvns / observed period
-        columns << ops.to_s
+        ops = datum.get_observations_per_observed_period
+        columns << ops
         top_ops << [ ops, datum ] if top_ops
 
         # observed period
-        columns << t.to_s
+        columns << datum.get_observed_period
 
         # first observation time
         columns << datum.first_observed_time.strftime('%d %b %Y %H:%M:%S')
@@ -608,11 +628,11 @@ module NicInfo
         columns << datum.last_observed_time.strftime('%d %b %Y %H:%M:%S')
 
         # max observations in a second
-        columns << datum.highest_observations_in_a_second.to_s
+        columns << datum.highest_observations_in_a_second
 
         # shortest interval
         if datum.shortest_interval
-          columns << datum.shortest_interval.to_s
+          columns << datum.shortest_interval
         else
           columns << NotApplicable
         end
