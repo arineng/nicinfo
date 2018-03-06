@@ -38,7 +38,7 @@ module NicInfo
     attr_accessor :this_second
     # magnitude is defined as observations per second
     attr_accessor :magnitude, :greatest_magnitude, :least_magnitude
-    attr_accessor :magnitude_sum, :magnitude_count
+    attr_accessor :magnitude_sum, :magnitude_count, :magnitude_sum_squared
     # interval is defined as the time between observations in seconds
     attr_accessor :shortest_interval, :longest_interval
 
@@ -61,6 +61,7 @@ module NicInfo
           @greatest_magnitude = 1
           @magnitude_sum = 0
           @magnitude_count = 1
+          @magnitude_sum_squared = 0
         elsif time.to_i == @this_second
           @magnitude = @magnitude + 1
           if @magnitude > @greatest_magnitude
@@ -82,6 +83,7 @@ module NicInfo
             @least_magnitude = @magnitude
           end
           @magnitude_sum = @magnitude_sum + @magnitude
+          @magnitude_sum_squared = @magnitude_sum_squared + @magnitude**2
           @magnitude_count = @magnitude_count + 1
           @this_second = time.to_i
           @magnitude = 1
@@ -96,6 +98,7 @@ module NicInfo
         @least_magnitude = @magnitude
       end
       @magnitude_sum = @magnitude_sum + @magnitude
+      @magnitude_sum_squared = @magnitude_sum_squared + @magnitude**2
     end
 
     def get_observed_period
@@ -116,6 +119,49 @@ module NicInfo
 
     def get_magnitude_average
       @magnitude_sum.fdiv( @magnitude_count )
+    end
+
+    def get_magnitude_standard_deviation( sample )
+      get_std_dev( sample, @magnitude_count, @magnitude_sum, @magnitude_sum_squared )
+    end
+
+    def get_magnitude_cv( sample )
+      get_cv( sample, @magnitude_count, @magnitude_sum, @magnitude_sum_squared, get_magnitude_average )
+    end
+
+    def get_magnitude_cv_percentage( sample )
+      get_cv_percentage( sample, @magnitude_count, @magnitude_sum, @magnitude_sum_squared, get_magnitude_average )
+    end
+
+    def get_std_dev( sample, count, sum, sum_squared )
+      retval = nil
+      devisor = count
+      if sample
+        devisor = count - 1
+      end
+      variance = ( sum_squared - sum**2.0 / count )
+      if devisor > 0 && variance > 0
+        retval = Math.sqrt( variance / devisor )
+      end
+      return retval
+    end
+
+    def get_cv( sample, count, sum, sum_squared, average )
+      retval = nil
+      std_dev = get_std_dev( sample, count, sum, sum_squared )
+      if std_dev
+        retval = std_dev.fdiv( average )
+      end
+      return retval
+    end
+
+    def get_cv_percentage( sample, count, sum, sum_squared, average )
+      retval = nil
+      cv = get_cv( sample, count, sum, sum_squared, average )
+      if cv
+        retval = "#{cv * 100}%"
+      end
+      return retval
     end
 
   end
@@ -655,6 +701,12 @@ module NicInfo
         # magnitude average
         columns << datum.get_magnitude_average
 
+        # magnitude standard deviation
+        columns << to_columnar_data( datum.get_magnitude_standard_deviation( @interval_seconds_to_increment != nil ) )
+
+        # magnitude cv percentage
+        columns << to_columnar_data( datum.get_magnitude_cv_percentage( @interval_seconds_to_increment != nil ) )
+
         # shortest interval
         columns << to_columnar_data( datum.shortest_interval )
 
@@ -675,6 +727,8 @@ module NicInfo
         headers << "Greatest Magnitude"
         headers << "Least Magnitude"
         headers << "Magnitude Average"
+        headers << "Magnitude Std Deviation"
+        headers << "Magnitude CV %"
         headers << "Shortest N/Z Interval"
         headers << "Longest Interval"
       end

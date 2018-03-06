@@ -160,6 +160,8 @@ describe 'bulk_data test' do
     expect( o.magnitude_sum ).to eq( 12 )
     expect( o.magnitude_count ).to eq( 3 )
     expect( o.get_magnitude_average ).to eq( 4 )
+    expect( o.get_magnitude_standard_deviation( false ) ).to be_within(0.0001).of( 0.8164 )
+    expect( o.get_magnitude_cv( false ) ).to be_within( 0.0001 ).of( 0.2041 )
 
   end
 
