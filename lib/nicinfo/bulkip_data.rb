@@ -163,6 +163,7 @@ module NicInfo
       @total_observations = 0
       @total_fetch_errors = 0
       @total_ip_errors = 0
+      @total_time_errors = 0
     end
 
     def set_top_observations_number( top_observations_number )
