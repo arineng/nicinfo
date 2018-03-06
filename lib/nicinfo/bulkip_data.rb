@@ -603,6 +603,7 @@ module NicInfo
       f.puts
       f.puts( output_total_row( "First Observation Time", @first_observed_time.strftime('%d %b %Y %H:%M:%S'), seperator ) ) if @first_observed_time
       f.puts( output_total_row( "Last Observation Time", @last_observed_time.strftime('%d %b %Y %H:%M:%S'), seperator ) ) if @last_observed_time
+      f.puts( output_total_row( "Observation Period", @observation_period_seconds, seperator ) )
       f.puts( output_total_row( "Total Observations", @total_observations, seperator ) )
       f.puts( output_total_row( "Non-Global Unicast IPs", @non_global_unicast, seperator ) )
       f.puts( output_total_row( "Network Lookups", @network_lookups, seperator ) )
@@ -611,7 +612,7 @@ module NicInfo
       f.puts( output_total_row( "Total Time Parse Errors", @total_time_errors, seperator ) )
       f.puts( output_total_row( "Analysis Start Time", @start_time.strftime('%d %b %Y %H:%M:%S'), seperator ) )
       f.puts( output_total_row( "Analysis End Time", @end_time.strftime('%d %b %Y %H:%M:%S'), seperator ) )
-      f.puts( output_total_row( "Total Intervals", @total_intervals, seperator ) ) if @interval_seconds_to_increment
+      f.puts( output_total_row( "Total Sampling Intervals", @total_intervals, seperator ) ) if @interval_seconds_to_increment
 
       puts_signature( f )
       f.close
@@ -755,7 +756,7 @@ module NicInfo
       if @do_time_statistics
         headers << "Avgd Obsvns / Obsvn Period"
         headers << "Avgd Obsvns / Observed Period"
-        headers << "Observed Period (s)"
+        headers << "Observed Period"
         headers << "First Observation Time"
         headers << "Last Observation Time"
         headers << "Greatest Magnitude"
