@@ -35,9 +35,9 @@ module NicInfo
   class BulkIPObservation
 
     attr_accessor :observations, :first_observed_time, :last_observed_time
-    attr_accessor :this_second, :observations_this_second
+    attr_accessor :this_second
     # magnitude is defined as observations per second
-    attr_accessor :greatest_magnitude, :least_magnitude
+    attr_accessor :magnitude, :greatest_magnitude, :least_magnitude
     attr_accessor :shortest_interval, :longest_interval
 
     def initialize( time )
@@ -55,12 +55,12 @@ module NicInfo
 
         if @this_second == nil
           @this_second = time.to_i
-          @observations_this_second = 1
+          @magnitude = 1
           @greatest_magnitude = 1
         elsif time.to_i == @this_second
-          @observations_this_second = @observations_this_second + 1
-          if @observations_this_second >= @greatest_magnitude
-            @greatest_magnitude = @observations_this_second
+          @magnitude = @magnitude + 1
+          if @magnitude >= @greatest_magnitude
+            @greatest_magnitude = @magnitude
           end
         elsif time.to_i != @this_second
           interval = time.to_i - @this_second
@@ -73,12 +73,12 @@ module NicInfo
             @longest_interval = interval
           end
           if @least_magnitude == nil
-            @least_magnitude = @observations_this_second
-          elsif @observations_this_second < @least_magnitude
-            @least_magnitude = @observations_this_second
+            @least_magnitude = @magnitude
+          elsif @magnitude < @least_magnitude
+            @least_magnitude = @magnitude
           end
           @this_second = time.to_i
-          @observations_this_second = 1
+          @magnitude = 1
         end
       end
     end
@@ -86,8 +86,8 @@ module NicInfo
     def finish_calculations
       if @least_magnitude == nil
         @least_magnitude = @greatest_magnitude
-      elsif @observations_this_second < @least_magnitude
-        @least_magnitude = @observations_this_second
+      elsif @magnitude < @least_magnitude
+        @least_magnitude = @magnitude
       end
     end
 
