@@ -37,8 +37,8 @@ module NicInfo
     attr_accessor :observations, :first_observed_time, :last_observed_time
     attr_accessor :this_second, :observations_this_second
     # magnitude is defined as observations per second
-    attr_accessor :greatest_magnitude
-    attr_accessor :shortest_interval
+    attr_accessor :greatest_magnitude, :least_magnitude
+    attr_accessor :shortest_interval, :longest_interval
 
     def initialize( time )
       @observations = 0
@@ -69,9 +69,25 @@ module NicInfo
           elsif interval > 0 && interval < @shortest_interval
             @shortest_interval = interval
           end
+          if @longest_interval == nil || interval > @longest_interval
+            @longest_interval = interval
+          end
+          if @least_magnitude == nil
+            @least_magnitude = @observations_this_second
+          elsif @observations_this_second < @least_magnitude
+            @least_magnitude = @observations_this_second
+          end
           @this_second = time.to_i
           @observations_this_second = 1
         end
+      end
+    end
+
+    def finish_calculations
+      if @least_magnitude == nil
+        @least_magnitude = @greatest_magnitude
+      elsif @observations_this_second < @least_magnitude
+        @least_magnitude = @observations_this_second
       end
     end
 
@@ -592,6 +608,7 @@ module NicInfo
     end
 
     def gather_query_and_timing_values( columns, datum, top_observations = nil, top_ops = nil )
+      datum.finish_calculations
 
       # observations
       columns << datum.observations.to_s
@@ -603,7 +620,6 @@ module NicInfo
 
         # averaged obsvns / obsvn period
         columns << datum.get_observations_per_observation_period( @observation_period_seconds )
-
 
         # averaged obsvns / observed period
         ops = datum.get_observations_per_observed_period
@@ -619,15 +635,17 @@ module NicInfo
         # last observation time
         columns << datum.last_observed_time.strftime('%d %b %Y %H:%M:%S')
 
-        # max observations in a second
+        # greatest magnitude
         columns << datum.greatest_magnitude
 
+        # least magnitude
+        columns << datum.least_magnitude
+
         # shortest interval
-        if datum.shortest_interval
-          columns << datum.shortest_interval
-        else
-          columns << NotApplicable
-        end
+        columns << to_columnar_data( datum.shortest_interval )
+
+        # longest interval
+        columns << to_columnar_data( datum.longest_interval )
       end
     end
 
@@ -641,7 +659,9 @@ module NicInfo
         headers << "First Observation Time"
         headers << "Last Observation Time"
         headers << "Greatest Magnitude"
-        headers << "Shortest Non-zero Interval (s)"
+        headers << "Least Magnitude"
+        headers << "Shortest N/Z Interval"
+        headers << "Longest N/Z Interval"
       end
     end
 
@@ -661,6 +681,14 @@ module NicInfo
       retval = NotApplicable
       if string
         retval = string.gsub( seperator, "\\" + seperator )
+      end
+      return retval
+    end
+
+    def to_columnar_data( data )
+      retval = NotApplicable
+      if data
+        retval = data
       end
       return retval
     end
