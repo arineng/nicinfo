@@ -294,7 +294,7 @@ module NicInfo
 
   class BulkIPData
 
-    attr_accessor :net_data, :listed_data, :block_data, :fetch_errors, :appctx
+    attr_accessor :net_data, :listed_data, :block_data, :fetch_errors, :appctx, :network_lookups
     attr_accessor :interval_seconds_to_increment, :second_to_sample, :total_intervals
 
     UrlColumnHeaders = [ "Total Queries", "Averaged QPS", "URL" ]
