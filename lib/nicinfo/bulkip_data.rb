@@ -38,6 +38,7 @@ module NicInfo
     attr_accessor :this_second
     # magnitude is defined as observations per second
     attr_accessor :magnitude, :greatest_magnitude, :least_magnitude
+    attr_accessor :magnitude_sum, :magnitude_count
     # interval is defined as the time between observations in seconds
     attr_accessor :shortest_interval, :longest_interval
 
@@ -58,9 +59,11 @@ module NicInfo
           @this_second = time.to_i
           @magnitude = 1
           @greatest_magnitude = 1
+          @magnitude_sum = 0
+          @magnitude_count = 1
         elsif time.to_i == @this_second
           @magnitude = @magnitude + 1
-          if @magnitude >= @greatest_magnitude
+          if @magnitude > @greatest_magnitude
             @greatest_magnitude = @magnitude
           end
         elsif time.to_i != @this_second
@@ -78,6 +81,8 @@ module NicInfo
           elsif @magnitude < @least_magnitude
             @least_magnitude = @magnitude
           end
+          @magnitude_sum = @magnitude_sum + @magnitude
+          @magnitude_count = @magnitude_count + 1
           @this_second = time.to_i
           @magnitude = 1
         end
@@ -90,6 +95,7 @@ module NicInfo
       elsif @magnitude < @least_magnitude
         @least_magnitude = @magnitude
       end
+      @magnitude_sum = @magnitude_sum + @magnitude
     end
 
     def get_observed_period
@@ -105,7 +111,11 @@ module NicInfo
     end
 
     def get_percentage_of_total_observations( total_observations )
-      @observations.fdiv( total_observations ) * 100.0
+      "#{@observations.fdiv( total_observations ) * 100.0}%"
+    end
+
+    def get_magnitude_average
+      @magnitude_sum.fdiv( @magnitude_count )
     end
 
   end
@@ -642,6 +652,9 @@ module NicInfo
         # least magnitude
         columns << datum.least_magnitude
 
+        # magnitude average
+        columns << datum.get_magnitude_average
+
         # shortest interval
         columns << to_columnar_data( datum.shortest_interval )
 
@@ -661,8 +674,9 @@ module NicInfo
         headers << "Last Observation Time"
         headers << "Greatest Magnitude"
         headers << "Least Magnitude"
+        headers << "Magnitude Average"
         headers << "Shortest N/Z Interval"
-        headers << "Longest N/Z Interval"
+        headers << "Longest Interval"
       end
     end
 

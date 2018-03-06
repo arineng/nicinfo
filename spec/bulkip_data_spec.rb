@@ -126,7 +126,7 @@ describe 'bulk_data test' do
 
   end
 
-  it 'should find greatest and least magnitude' do
+  it 'should do magnitude calculations' do
 
     t = Time.at( 100 )
     o = NicInfo::BulkIPObservation.new( t )
@@ -148,9 +148,18 @@ describe 'bulk_data test' do
     o.observed( t2 )
     expect( o.greatest_magnitude ).to eq( 5 )
 
+    t3 = Time.at( 300 )
+    o.observed( t3 )
+    o.observed( t3 )
+    o.observed( t3 )
+    o.observed( t3 )
+
     o.finish_calculations
     expect( o.least_magnitude ).to eq( 3 )
     expect( o.greatest_magnitude ).to eq( 5 )
+    expect( o.magnitude_sum ).to eq( 12 )
+    expect( o.magnitude_count ).to eq( 3 )
+    expect( o.get_magnitude_average ).to eq( 4 )
 
   end
 
