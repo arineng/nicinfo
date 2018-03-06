@@ -38,6 +38,7 @@ module NicInfo
     attr_accessor :this_second
     # magnitude is defined as observations per second
     attr_accessor :magnitude, :greatest_magnitude, :least_magnitude
+    # interval is defined as the time between observations in seconds
     attr_accessor :shortest_interval, :longest_interval
 
     def initialize( time )
