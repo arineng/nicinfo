@@ -36,7 +36,8 @@ module NicInfo
 
     attr_accessor :observations, :first_observed_time, :last_observed_time
     attr_accessor :this_second, :observations_this_second
-    attr_accessor :highest_observations_in_a_second, :highest_observed_second
+    # magnitude is defined as observations per second
+    attr_accessor :greatest_magnitude
     attr_accessor :shortest_interval
 
     def initialize( time )
@@ -55,16 +56,11 @@ module NicInfo
         if @this_second == nil
           @this_second = time.to_i
           @observations_this_second = 1
-          @highest_observations_in_a_second = 1
-          @highest_observed_second = time.to_i
+          @greatest_magnitude = 1
         elsif time.to_i == @this_second
           @observations_this_second = @observations_this_second + 1
-          if @highest_observed_second == @this_second
-            @highest_observations_in_a_second = @observations_this_second
-          end
-          if @observations_this_second >= @highest_observations_in_a_second
-            @highest_observations_in_a_second = @observations_this_second
-            @highest_observed_second = @this_second
+          if @observations_this_second >= @greatest_magnitude
+            @greatest_magnitude = @observations_this_second
           end
         elsif time.to_i != @this_second
           interval = time.to_i - @this_second
@@ -74,11 +70,7 @@ module NicInfo
             @shortest_interval = interval
           end
           @this_second = time.to_i
-          if @this_second == @highest_observed_second
-            @observations_this_second = @highest_observations_in_a_second
-          else
-            @observations_this_second = 1
-          end
+          @observations_this_second = 1
         end
       end
     end
@@ -628,7 +620,7 @@ module NicInfo
         columns << datum.last_observed_time.strftime('%d %b %Y %H:%M:%S')
 
         # max observations in a second
-        columns << datum.highest_observations_in_a_second
+        columns << datum.greatest_magnitude
 
         # shortest interval
         if datum.shortest_interval
@@ -648,7 +640,7 @@ module NicInfo
         headers << "Observed Period (s)"
         headers << "First Observation Time"
         headers << "Last Observation Time"
-        headers << "Max Obsvns in a Second"
+        headers << "Greatest Magnitude"
         headers << "Shortest Non-zero Interval (s)"
       end
     end
