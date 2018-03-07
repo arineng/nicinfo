@@ -50,6 +50,14 @@ module NicInfo
 
     def initialize( time )
       @observations = 0
+      @interval_sum = 0
+      @interval_sum_squared = 0
+      @interval_count = 0
+      @run_count = 0
+      @run_sum = 0
+      @run_sum_squared = 0
+      @magnitude_sum = 0
+      @magnitude_sum_squared = 0
       observed( time )
     end
 
@@ -65,17 +73,9 @@ module NicInfo
           @this_second = time.to_i
           @magnitude = 1
           @greatest_magnitude = 1
-          @magnitude_sum = 0
           @magnitude_count = 1
-          @magnitude_sum_squared = 0
-          @interval_sum = 0
-          @interval_sum_squared = 0
-          @interval_count = 0
           @run = 1
           @longest_run = 1
-          @run_count = 0
-          @run_sum = 0
-          @run_sum_squared = 0
         elsif time.to_i == @this_second
           @magnitude = @magnitude + 1
           if @magnitude > @greatest_magnitude
@@ -129,13 +129,17 @@ module NicInfo
       end
       @magnitude_sum = @magnitude_sum + @magnitude
       @magnitude_sum_squared = @magnitude_sum_squared + @magnitude**2
-      if @this_second == @last_observed_time.to_i
+      if @run > 1
         @longest_run = @run if @longest_run < @run
         @run_count = @run_count + 1
         @run_sum = @run_sum + @run
         @run_sum_squared = @run_sum_squared + @run**2
+      elsif @run_count == 0
+        @run_count = 1
+        @run_sum = 1
+        @run_sum_squared = 1
       end
-      @shortest_run = 1 unless @shortest_run
+      @shortest_run = @run unless @shortest_run
     end
 
     def get_observed_period

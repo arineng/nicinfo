@@ -135,6 +135,36 @@ describe 'bulk_data test' do
 
   end
 
+  it 'should do interval calculations on no intervals 1 run of 1' do
+
+    t = Time.at( 100 )
+    o = NicInfo::BulkIPObservation.new( t )
+    o.observed( t )
+
+    o.finish_calculations
+    expect( o.shortest_interval ).to be_nil
+    expect( o.longest_interval ).to be_nil
+    expect( o.interval_sum ).to eq( 0 )
+    expect( o.interval_count ).to eq( 0 )
+
+  end
+
+  it 'should do interval calculations on no intervals 1 run of 2' do
+
+    t = Time.at( 100 )
+    o = NicInfo::BulkIPObservation.new( t )
+    o.observed( t )
+    t = t + 1
+    o.observed( t )
+
+    o.finish_calculations
+    expect( o.shortest_interval ).to be_nil
+    expect( o.longest_interval ).to be_nil
+    expect( o.interval_sum ).to eq( 0 )
+    expect( o.interval_count ).to eq( 0 )
+
+  end
+
   it 'should do run calculations' do
 
     t = Time.at( 100 )
@@ -174,6 +204,36 @@ describe 'bulk_data test' do
     expect( o.get_run_average ).to eq( 3 )
     expect( o.get_run_standard_deviation( false ) ).to be_within( 0.0001 ).of( 0.7071 )
     expect( o.get_run_cv( false ) ).to be_within( 0.0001 ).of( 0.2357 )
+
+  end
+
+  it 'should do run calculations on 1 run of 1' do
+
+    t = Time.at( 100 )
+    o = NicInfo::BulkIPObservation.new( t )
+    o.observed( t )
+
+    o.finish_calculations
+    expect( o.shortest_run ).to eq( 1 )
+    expect( o.longest_run ).to eq( 1 )
+    expect( o.run_sum ).to eq( 1 )
+    expect( o.run_count ).to eq( 1 )
+
+  end
+
+  it 'should do run calculations on 1 run of 2' do
+
+    t = Time.at( 100 )
+    o = NicInfo::BulkIPObservation.new( t )
+    o.observed( t )
+    t = t + 1
+    o.observed( t )
+
+    o.finish_calculations
+    expect( o.shortest_run ).to eq( 2 )
+    expect( o.longest_run ).to eq( 2 )
+    expect( o.run_sum ).to eq( 2 )
+    expect( o.run_count ).to eq( 1 )
 
   end
 
