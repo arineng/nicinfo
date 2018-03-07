@@ -36,6 +36,18 @@ module NicInfo
 
     attr_accessor :sum, :count, :sum_squared
 
+    def initialize
+      @sum = 0
+      @sum_squared = 0
+      @count = 0
+    end
+
+    def datum( value )
+      @sum = @sum + value
+      @sum_squared = @sum_squared + value**2
+      @count = @count + 1
+    end
+
     def get_average( sum = @sum, count = @count )
       retval = nil
       retval = sum.fdiv( count ) if count > 0
