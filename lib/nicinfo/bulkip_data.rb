@@ -43,9 +43,11 @@ module NicInfo
     end
 
     def datum( value )
-      @sum = @sum + value
-      @sum_squared = @sum_squared + value**2
-      @count = @count + 1
+      if value
+        @sum = @sum + value
+        @sum_squared = @sum_squared + value**2
+        @count = @count + 1
+      end
     end
 
     def get_average( sum = @sum, count = @count )
