@@ -873,17 +873,13 @@ HELP_SUMMARY
       end
       bulkip_data.note_times_in_data if fs.timing_provided
       bulkip_data.note_start_time
-      current_file = nil
-      current_lineno = nil
       lines_processed = 0
       begin
         bulkip_data.note_new_file
         fs.foreach_by_time do |ip,time,lineno,file_name|
           @appctx.logger.trace( "time: #{time} bulk ip: #{ip} line no: #{lineno} file: #{file_name}")
-          current_lineno = lineno
-          current_file = file_name
           if lines_processed % 1000 == 0
-            @appctx.logger.mesg( "Lines processed: #{lines_processed}. Network lookups: #{bulkip_data.network_lookups}. Currently on line #{lineno} of #{file_name}.")
+            @appctx.logger.mesg( "Lines processed: #{lines_processed}. Time: #{time}. Network lookups: #{bulkip_data.network_lookups}. Currently on line #{lineno} of #{file_name}.")
           end
           lines_processed = lines_processed + 1
           if ( time != nil && fs.timing_provided ) || !fs.timing_provided
@@ -920,7 +916,7 @@ HELP_SUMMARY
           end
         end
       rescue Interrupt
-        @appctx.logger.mesg( "Processing interrupted at #{current_lineno} in #{current_file}")
+        @appctx.logger.mesg( "Processing interrupted.")
       end
       bulkip_data.review_fetch_errors
       bulkip_data.note_end_time

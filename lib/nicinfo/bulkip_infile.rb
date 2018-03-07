@@ -323,14 +323,12 @@ module NicInfo
       end
 
       #iterate through until all done
-      num_eol = 0
-      while num_eol < @inlines.length do
+      loop do
         lowest_line = nil
         lowest_file = nil
-        num_eol = 0
         @inlines.each do |b,l|
           if b.eol || l == nil
-            num_eol = num_eol + 1
+            next
           else
             if l[:time] == nil
               lowest_line = l
@@ -344,10 +342,9 @@ module NicInfo
             end
           end
         end
-        if lowest_line
-          yield( lowest_line[ :ip ], lowest_line[ :time ], lowest_line[ :lineno ], lowest_file.file_name )
-          @inlines[ lowest_file ] = lowest_file.next_line
-        end
+        break if lowest_line == nil
+        yield( lowest_line[ :ip ], lowest_line[ :time ], lowest_line[ :lineno ], lowest_file.file_name )
+        @inlines[ lowest_file ] = lowest_file.next_line
       end
 
       @inlines.keys.each do |b|
