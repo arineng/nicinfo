@@ -88,7 +88,7 @@ module NicInfo
           elsif interval > 0 && interval < @shortest_interval
             @shortest_interval = interval
           end
-          if @longest_interval == nil || interval > @longest_interval
+          if interval > 0 && ( @longest_interval == nil || interval > @longest_interval )
             @longest_interval = interval
           end
           if interval > 0
@@ -783,11 +783,14 @@ module NicInfo
         # magnitude cv percentage
         columns << to_columnar_data( datum.get_magnitude_cv_percentage( @interval_seconds_to_increment != nil ) )
 
+        # longest interval
+        columns << to_columnar_data( datum.longest_interval )
+
         # shortest interval
         columns << to_columnar_data( datum.shortest_interval )
 
-        # longest interval
-        columns << to_columnar_data( datum.longest_interval )
+        # interval count
+        columns << to_columnar_data( datum.interval_count )
 
         # interval average
         columns << to_columnar_data( datum.get_interval_average )
@@ -798,11 +801,14 @@ module NicInfo
         # interval cv percentage
         columns << to_columnar_data( datum.get_interval_cv_percentage( @interval_seconds_to_increment != nil ) )
 
+        # longest run
+        columns << datum.longest_run
+
         # shortest run
         columns << datum.shortest_run
 
-        # longest run
-        columns << datum.longest_run
+        # run count
+        columns << datum.run_count
 
         # run average
         columns << datum.get_run_average
@@ -829,13 +835,15 @@ module NicInfo
         headers << "Magnitude Average"
         headers << "Magnitude Std Deviation"
         headers << "Magnitude CV %"
-        headers << "Shortest Interval"
         headers << "Longest Interval"
+        headers << "Shortest Interval"
+        headers << "Interval Count"
         headers << "Interval Average"
         headers << "Interval Std Deviation"
         headers << "Interval CV %"
-        headers << "Shortest Run"
         headers << "Longest Run"
+        headers << "Shortest Run"
+        headers << "Run Count"
         headers << "Run Average"
         headers << "Run Std Deviation"
         headers << "Run CV %"
