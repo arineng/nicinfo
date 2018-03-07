@@ -32,7 +32,49 @@ module NicInfo
   # TODO get rid of explicit exits
   # TODO make CSV/TSV output compliant with RFC4180
 
-  class BulkIPObservation
+  class Stat
+
+    attr_accessor :sum, :count, :sum_squared
+
+    def get_average( sum = @sum, count = @count )
+      retval = nil
+      retval = sum.fdiv( count ) if count > 0
+      return retval
+    end
+
+    def get_std_dev( sample, count = @count, sum = @sum, sum_squared = @sum_squared )
+      retval = nil
+      devisor = count
+      if sample
+        devisor = count - 1
+      end
+      variance = ( sum_squared - sum**2.0 / count )
+      if devisor > 0 && variance > 0
+        retval = Math.sqrt( variance / devisor )
+      end
+      return retval
+    end
+
+    def get_cv( sample, count = @count, sum = @sum, sum_squared = @sum_squared, average = get_average( @sum, @count ) )
+      retval = nil
+      std_dev = get_std_dev( sample, count, sum, sum_squared )
+      if std_dev && average
+        retval = std_dev.fdiv( average )
+      end
+      return retval
+    end
+
+    def get_percentage( value )
+      retval = nil
+      if value
+        retval = "#{value * 100}%"
+      end
+      return retval
+    end
+
+  end
+
+  class BulkIPObservation < Stat
 
     attr_accessor :observations, :first_observed_time, :last_observed_time
     attr_accessor :this_second
@@ -159,7 +201,7 @@ module NicInfo
     end
 
     def get_magnitude_average
-      @magnitude_sum.fdiv( @magnitude_count )
+      get_average( @magnitude_sum, @magnitude_count )
     end
 
     def get_magnitude_standard_deviation( sample )
@@ -171,15 +213,11 @@ module NicInfo
     end
 
     def get_magnitude_cv_percentage( sample )
-      get_cv_percentage( get_magnitude_cv( sample ) )
+      get_percentage( get_magnitude_cv( sample ) )
     end
 
     def get_interval_average
-      retval = nil
-      if @interval_count > 0
-        retval = @interval_sum.fdiv( @interval_count )
-      end
-      return retval
+      get_average( @interval_sum, @interval_count )
     end
 
     def get_interval_standard_deviation( sample )
@@ -191,11 +229,11 @@ module NicInfo
     end
 
     def get_interval_cv_percentage( sample )
-      get_cv_percentage( get_interval_cv( sample ) )
+      get_percentage( get_interval_cv( sample ) )
     end
 
     def get_run_average
-      @run_sum.fdiv( @run_count )
+      get_average( @run_sum, @run_count )
     end
 
     def get_run_standard_deviation( sample )
@@ -207,37 +245,7 @@ module NicInfo
     end
 
     def get_run_cv_percentage( sample )
-      get_cv_percentage( get_run_cv( sample ) )
-    end
-
-    def get_std_dev( sample, count, sum, sum_squared )
-      retval = nil
-      devisor = count
-      if sample
-        devisor = count - 1
-      end
-      variance = ( sum_squared - sum**2.0 / count )
-      if devisor > 0 && variance > 0
-        retval = Math.sqrt( variance / devisor )
-      end
-      return retval
-    end
-
-    def get_cv( sample, count, sum, sum_squared, average )
-      retval = nil
-      std_dev = get_std_dev( sample, count, sum, sum_squared )
-      if std_dev && average
-        retval = std_dev.fdiv( average )
-      end
-      return retval
-    end
-
-    def get_cv_percentage( cv )
-      retval = nil
-      if cv
-        retval = "#{cv * 100}%"
-      end
-      return retval
+      get_percentage( get_run_cv( sample ) )
     end
 
   end
