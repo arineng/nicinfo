@@ -883,7 +883,7 @@ HELP_SUMMARY
           current_lineno = lineno
           current_file = file_name
           if lines_processed % 1000 == 0
-            @appctx.logger.mesg( "Lines processed: #{lines_processed}. Querie sent: #{bulkip_data.network_lookups}. Currently on line #{lineno} of #{file_name}.")
+            @appctx.logger.mesg( "Lines processed: #{lines_processed}. Network lookups: #{bulkip_data.network_lookups}. Currently on line #{lineno} of #{file_name}.")
           end
           lines_processed = lines_processed + 1
           if ( time != nil && fs.timing_provided ) || !fs.timing_provided
