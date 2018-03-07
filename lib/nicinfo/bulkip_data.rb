@@ -37,7 +37,7 @@ module NicInfo
     attr_accessor :observations, :first_observed_time, :last_observed_time
     attr_accessor :this_second
     # magnitude is defined as observations per second
-    attr_accessor :magnitude, :greatest_magnitude, :least_magnitude
+    attr_accessor :magnitude, :magnitude_ceiling, :magnitude_floor
     attr_accessor :magnitude_sum, :magnitude_count, :magnitude_sum_squared
     # interval is defined as the time in seconds between seconds with an observation
     # by definition, must be greater than zero
@@ -72,14 +72,14 @@ module NicInfo
         if @this_second == nil
           @this_second = time.to_i
           @magnitude = 1
-          @greatest_magnitude = 1
+          @magnitude_ceiling = 1
           @magnitude_count = 1
           @run = 1
           @longest_run = 1
         elsif time.to_i == @this_second
           @magnitude = @magnitude + 1
-          if @magnitude > @greatest_magnitude
-            @greatest_magnitude = @magnitude
+          if @magnitude > @magnitude_ceiling
+            @magnitude_ceiling = @magnitude
           end
         elsif time.to_i != @this_second
           interval = time.to_i - @this_second - 1
@@ -107,10 +107,10 @@ module NicInfo
             @run_sum_squared = @run_sum_squared + @run**2
             @run = 1
           end
-          if @least_magnitude == nil
-            @least_magnitude = @magnitude
-          elsif @magnitude < @least_magnitude
-            @least_magnitude = @magnitude
+          if @magnitude_floor == nil
+            @magnitude_floor = @magnitude
+          elsif @magnitude < @magnitude_floor
+            @magnitude_floor = @magnitude
           end
           @magnitude_sum = @magnitude_sum + @magnitude
           @magnitude_sum_squared = @magnitude_sum_squared + @magnitude**2
@@ -122,10 +122,10 @@ module NicInfo
     end
 
     def finish_calculations
-      if @least_magnitude == nil
-        @least_magnitude = @greatest_magnitude
-      elsif @magnitude < @least_magnitude
-        @least_magnitude = @magnitude
+      if @magnitude_floor == nil
+        @magnitude_floor = @magnitude_ceiling
+      elsif @magnitude < @magnitude_floor
+        @magnitude_floor = @magnitude
       end
       @magnitude_sum = @magnitude_sum + @magnitude
       @magnitude_sum_squared = @magnitude_sum_squared + @magnitude**2
@@ -772,11 +772,11 @@ module NicInfo
         # last observation time
         columns << datum.last_observed_time.strftime('%d %b %Y %H:%M:%S')
 
-        # greatest magnitude
-        columns << datum.greatest_magnitude
+        # magnitude ceiling
+        columns << datum.magnitude_ceiling
 
-        # least magnitude
-        columns << datum.least_magnitude
+        # magnitude floor
+        columns << datum.magnitude_floor
 
         # magnitude average
         columns << datum.get_magnitude_average
@@ -834,8 +834,8 @@ module NicInfo
         headers << "Observed Period"
         headers << "First Observation Time"
         headers << "Last Observation Time"
-        headers << "Greatest Magnitude"
-        headers << "Least Magnitude"
+        headers << "Magnitude Ceiling"
+        headers << "Magnitude Floor"
         headers << "Magnitude Average"
         headers << "Magnitude Std Deviation"
         headers << "Magnitude CV %"
