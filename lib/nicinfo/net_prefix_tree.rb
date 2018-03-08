@@ -37,27 +37,23 @@ module NicInfo
         segments = ipaddr.to_string.split( ":" )
         tree = @v6_tree
       end
-      depth = 0
-      loop do
-        n = tree[ segments[ depth ] ]
-        if n
-          if n.is_a?( Hash )
-            tree = tree[ segments[ depth ] ]
-            depth = depth + 1
-          elsif n.is_a?( Array )
-            n.each do |i|
-              if i[:ipaddr].include?( ipaddr )
-                retval = i
+      3.times.each do |depth|
+        tree = tree[ segments[ depth ] ]
+        break unless tree
+      end
+      if tree
+        t = tree[ segments[ 4 ] ]
+        if t
+          if t.is_a?( Array )
+            t.each do |n|
+              if n[:ipaddr].include?( ipaddr )
+                retval = n[:data]
                 break
               end
             end
-            break
-          elsif n[:ipaddr].include?( ipaddr )
-            retval = n
-            break
+          else
+            retval = t[:data]
           end
-        else
-          break
         end
       end
       return retval
@@ -65,61 +61,43 @@ module NicInfo
 
     def insert( cidr_string, data )
       ipaddr = IPAddr.new( cidr_string )
-      if ipaddr.ipaddr.ipv4?
+      if ipaddr.ipv4?
         segments = ipaddr.to_string.split( "." )
         cidr = cidr_string.split( "/" )
-        segment_depth = cidr[1].to_i / 8
+        cidr_prefix = cidr[ 0 ]
+        cidr_length = cidr[ 1 ].to_i
         tree = @v4_tree
       else
         segments = ipaddr.to_string.split( ":" )
         cidr = cidr_string.split( "/" )
-        segment_depth = cidr[1].to_i / 16
+        cidr_prefix = cidr[ 0 ]
+        cidr_length = cidr[ 1 ].to_i
         tree = @v6_tree
       end
-      depth = 0
-      segment_depth = segment_depth - 1
-      loop do
-        n = tree[ segments[ depth ] ]
-        if n
-          if depth == segment_depth
-            if n.is_a?( Hash )
-              raise "hash found mistakenly. depth: #{depth} cidr: #{cidr_string}"
-            elsif n.is_a?( Array )
-              a = n.detect do |i|
-                i[ :cidr_length ] == cidr[ 1 ]
-              end
-              if a
-                raise "tree collision in array. cidr: #{cidr_string} node: #{a}"
-              else
-                n << Node.new( cidr[0], cidr[1], ipaddr, data )
-                n.sort! do |x,y|
-                  y[:cidr_length].to_i <=> x[:cidr_length].to_i
-                end
-              end
-            else
-              if n[:cidr_length] == cidr[ 1 ]
-                raise "tree collision in array. cidr: #{cidr_string} node: #{a}"
-              else
-                if n[:cidr_length].to_i > cidr[1].to_i
-                  a = [ Node.new( cidr[0], cidr[1], ipaddr, data), n ]
-                else
-                  a = [ n, Node.new( cidr[0], cidr[1], ipaddr, data) ]
-                end
-                tree[ segments[ depth ] ] = a
-              end
-            end
-          end
-          #else drop through and loop again
-        else
-          if depth != segment_depth
-            tree[ segments[ depth ] ] = {}
-          else
-            tree[ segments[ depth ] ] = Node.new( cidr[0], cidr[1], ipaddr, data )
-          end
+      3.times.each do |depth|
+        t = tree[ segments[ depth ] ]
+        unless t
+          t = {}
+          tree[ segments[ depth] ] = t
         end
-        break if depth == segment_depth
-        tree = tree[ segments[ depth ] ]
-        depth = depth + 1
+        tree = t
+      end
+      t = tree[ segments[ 4 ] ]
+      if t == nil
+        t = Node.new( cidr_prefix, cidr_length, ipaddr, data)
+        tree[ segments[ 4 ] ] = t
+      elsif t.is_a?( Array )
+        t << Node.new( cidr_prefix, cidr_length, ipaddr, data )
+        t.sort! do |x,y|
+          y[:cidr_length] <=> x[:cidr_length]
+        end
+      else
+        if t[:cidr_length] > cidr_length
+          a = [ Node.new( cidr_prefix, cidr_length, ipaddr, data), t ]
+        else
+          a = [ t, Node.new( cidr_prefix, cidr_length, ipaddr, data) ]
+        end
+        tree[ segments[ 4 ] ] = a
       end
     end
 
