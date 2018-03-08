@@ -17,5 +17,5 @@ Coveralls.wear!
 
 RSpec.configure do |c|
   # declare an exclusion filter
-  c.filter_run_excluding :live => true
+  c.filter_run_excluding :live => true, :performance => true
 end
