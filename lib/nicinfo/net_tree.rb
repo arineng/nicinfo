@@ -55,23 +55,31 @@ module NicInfo
     def insert( node )
       if include?( node )
         if @left == nil
+          #puts "new left"
           @left = node
         elsif @left != nil && @left.contained_by?( node )
+          #puts "replacing left"
           node.insert( @left )
           @left = node
         elsif @left != nil && @left.include?( node )
+          #puts "inserting left"
           @left.insert( node )
         elsif @right != nil && @right.contained_by?( node )
+          #puts "replacing right"
           node.insert( @right )
           @right = node
         elsif @right != nil && @right.include?( node )
+          #puts "inserting right"
           @right.insert( node )
         elsif @left != nil && @right == nil && @left.right_of?( node )
+          #puts "swapping left to right"
           @right = @left
           @left = node
         elsif @left != nil && @right == nil && @left.left_of?( node )
+          #puts "new right"
           @right = node
         elsif @left != nil && @right !=nil && @left.left_of?( node ) && @right.right_of?( node )
+          #puts "new middle"
           inter = NetNode.new
           inter.begin = @left.begin
           inter.end = @right.end
@@ -80,6 +88,7 @@ module NicInfo
           @left = inter
           @right = nil
         elsif @left != nil && @right != nil && @left.overlaps?( node ) && @right.overlaps?( node )
+          #puts "new center overlap"
           inter = NetNode.new
           inter.begin = @left.begin > node.begin ? node.begin : @left.begin
           inter.end = @right.end < node.end ? node.end : @right.end
@@ -88,6 +97,7 @@ module NicInfo
           @left = inter
           @right = nil
         elsif @left != nil && @left.overlaps?( node )
+          #puts "new left overlap"
           inter = NetNode.new
           inter.begin = @left.begin > node.begin ? node.begin : @left.begin
           inter.end = @left.end < node.end ? node.end : @left.end
@@ -95,6 +105,7 @@ module NicInfo
           inter.right = nil
           @left = inter
         elsif @right != nil && @right.overlaps?( node )
+          #puts "new right overlap"
           inter = NetNode.new
           inter.begin = @right.begin > node.begin ? node.begin : @right.begin
           inter.end = @right.end < node.end ? node.end : @right.end
@@ -127,14 +138,28 @@ module NicInfo
       @right.each if @right
     end
 
+    def print
+      puts self
+      puts "   left: #{@left}"
+      puts "  right: #{@right}"
+      puts "   data: #{@data}"
+      @left.print if @left
+      @right.print if @right
+    end
+
   end
 
   class NetTree
 
     attr_accessor :v4_root, :v6_root
 
+    def initialize
+      @v4_root = NicInfo::NetNode.new( IPAddr.new( "0.0.0.0/0" ) )
+      @v6_root = NicInfo::NetNode.new( IPAddr.new( "::0/0" ) )
+    end
+
     def find_by_ipaddr( ipaddr )
-      node = NetNode( ipaddr )
+      node = NicInfo::NetNode.new( ipaddr )
       retval = nil
       found = nil
       if ipaddr.ipv4? && @v4_root
@@ -149,29 +174,11 @@ module NicInfo
     end
 
     def insert( ipaddr, data )
-      node = NetNode( ipaddr, data )
+      node = NicInfo::NetNode.new( ipaddr, data )
       if ipaddr.ipv4?
-        if @v4_root
-          if @v4_root.include?( node )
-            @v4_root.insert( node )
-          else
-            node.insert( @v4_root )
-            @v4_root = node
-          end
-        else
-          @v4_root = node
-        end
+        @v4_root.insert( node )
       else
-        if @v6_root
-          if @v6_root.include?( node )
-            @v6_root.insert( node )
-          else
-            node.insert( @v6_root )
-            @v6_root = node
-          end
-        else
-          @v6_root = node
-        end
+        @v6_root.insert( node )
       end
     end
 

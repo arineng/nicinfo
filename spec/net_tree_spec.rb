@@ -51,4 +51,25 @@ describe 'bulk_infile test' do
 
   end
 
+  it 'should insert' do
+
+    t = NicInfo::NetTree.new
+    #puts "1"
+    t.insert( IPAddr.new( "10.0.0.0/24" ), 1 )
+    #puts "2"
+    t.insert( IPAddr.new( "10.0.0.0/16" ), 2 )
+    #puts "3"
+    t.insert( IPAddr.new( "10.0.0.0/25" ), 3 )
+    #puts "4"
+    t.insert( IPAddr.new( "9.0.0.0/24" ), 4 )
+    #puts "5"
+    t.insert( IPAddr.new( "11.0.0.0/24" ), 5 )
+    expect( t.find_by_ipaddr( IPAddr.new( "10.0.0.1" ) ) ).to eq( 3 )
+    expect( t.find_by_ipaddr( IPAddr.new( "10.0.1.1" ) ) ).to eq( 2 )
+    expect( t.find_by_ipaddr( IPAddr.new( "9.0.1.1" ) ) ).to be_nil
+    expect( t.find_by_ipaddr( IPAddr.new( "9.0.0.1" ) ) ).to eq( 4 )
+    #t.v4_root.print
+
+  end
+
 end
