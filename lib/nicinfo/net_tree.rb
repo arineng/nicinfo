@@ -18,13 +18,15 @@ module NicInfo
 
   class NetNode
 
-    attr_accessor :left, :right, :begin, :end, :data
+    attr_accessor :left, :right, :begin, :end, :data, :cidr_string, :ipaddr
 
-    def initialize( ipaddr = nil, data = nil )
+    def initialize( cidr_string = nil, data = nil )
       @data = data
-      if ipaddr
-        @begin = ipaddr.to_range.begin.to_i
-        @end = ipaddr.to_range.end.to_i
+      if cidr_string
+        @cidr_string = cidr_string
+        @ipaddr = IPAddr.new( cidr_string )
+        @begin = @ipaddr.to_range.begin.to_i
+        @end = @ipaddr.to_range.end.to_i
       end
     end
 
@@ -34,6 +36,10 @@ module NicInfo
 
     def contained_by?( node )
       node.begin <= @begin && node.end >= @end
+    end
+
+    def exactly_matches?( node )
+      node.begin == @begin && node.end == @end
     end
 
     def overlaps?( node )
@@ -49,74 +55,59 @@ module NicInfo
     end
 
     def to_s
-      "#{@begin}-#{@end}"
+      "#{@cidr_string}:#{@begin}-#{@end}"
     end
 
     def insert( node )
       if include?( node )
         if @left == nil
-          #puts "new left"
           @left = node
-        elsif @left != nil && @left.contained_by?( node )
-          #puts "replacing left"
-          node.insert( @left )
-          @left = node
-        elsif @left != nil && @left.include?( node )
-          #puts "inserting left"
-          @left.insert( node )
-        elsif @right != nil && @right.contained_by?( node )
-          #puts "replacing right"
-          node.insert( @right )
-          @right = node
-        elsif @right != nil && @right.include?( node )
-          #puts "inserting right"
-          @right.insert( node )
-        elsif @left != nil && @right == nil && @left.right_of?( node )
-          #puts "swapping left to right"
-          @right = @left
-          @left = node
-        elsif @left != nil && @right == nil && @left.left_of?( node )
-          #puts "new right"
-          @right = node
-        elsif @left != nil && @right !=nil && @left.left_of?( node ) && @right.right_of?( node )
-          #puts "new middle"
-          inter = NetNode.new
-          inter.begin = @left.begin
-          inter.end = @right.end
-          inter.left = @left
-          inter.right = @right
-          @left = inter
-          @right = nil
-        elsif @left != nil && @right != nil && @left.overlaps?( node ) && @right.overlaps?( node )
-          #puts "new center overlap"
-          inter = NetNode.new
-          inter.begin = @left.begin > node.begin ? node.begin : @left.begin
-          inter.end = @right.end < node.end ? node.end : @right.end
-          inter.left = @left
-          inter.right = @right
-          @left = inter
-          @right = nil
-        elsif @left != nil && @left.overlaps?( node )
-          #puts "new left overlap"
-          inter = NetNode.new
-          inter.begin = @left.begin > node.begin ? node.begin : @left.begin
-          inter.end = @left.end < node.end ? node.end : @left.end
-          inter.left = @left
-          inter.right = nil
-          @left = inter
-        elsif @right != nil && @right.overlaps?( node )
-          #puts "new right overlap"
-          inter = NetNode.new
-          inter.begin = @right.begin > node.begin ? node.begin : @right.begin
-          inter.end = @right.end < node.end ? node.end : @right.end
-          inter.left = @right
-          inter.right = nil
-          @right = inter
-        else
-          raise "insertion error. node: #{node} left: #{@left} right: #{@right}"
+        elsif @left != nil
+          if @left.exactly_matches?( node )
+            if @left.data == nil && node.data != nil
+              node.left = @left.left
+              node.right = @left.right
+              @left = node
+            else
+              raise "duplicate left node insertion. left: #{@left} node: #{node}"
+            end
+          elsif @left.contained_by?( node )
+            node.insert( @left )
+            @left = node
+          elsif @left.include?( node )
+            @left.insert( node )
+          else
+            if @right == nil
+              @right = node
+            elsif @right.exactly_matches?( node )
+              if @right.data == nil && node.data != nil
+                node.left = @right.left
+                node.right = @right.right
+                @right = node
+              else
+                raise "duplicate right node insertion. right: #{@right} node: #{node}"
+              end
+            elsif @right.contained_by?( node )
+              node.insert( @right )
+              @right = node
+            elsif @right.include?( node )
+              @right.insert( node )
+            else
+              inter = NetNode.new
+              inter.begin = @left.begin > node.begin ? node.begin : @left.begin
+              inter.end = @left.end < node.end ? node.end : @left.end
+              inter.insert( @left )
+              @left = inter
+              inter.insert( node )
+              if inter.include?( @right )
+                inter.insert( @right )
+                @right = nil
+              end
+            end
+          end
         end
       else
-        raise "inserting into node that cannot fit new node"
+        raise "insertion fit error. node: #{node} left: #{@left} right: #{@right}"
       end
     end
 
@@ -147,6 +138,24 @@ module NicInfo
       @right.print if @right
     end
 
+    def print_pre
+      puts self
+      puts "   left: #{@left}"
+      puts "  right: #{@right}"
+      puts "   data: #{@data}"
+      @left.print_pre if @left
+      @right.print_pre if @right
+    end
+
+    def print_post
+      puts self
+      puts "   left: #{@left}"
+      puts "  right: #{@right}"
+      puts "   data: #{@data}"
+      @left.print_post if @left
+      @right.print_post if @right
+    end
+
   end
 
   class NetTree
@@ -154,15 +163,15 @@ module NicInfo
     attr_accessor :v4_root, :v6_root
 
     def initialize
-      @v4_root = NicInfo::NetNode.new( IPAddr.new( "0.0.0.0/0" ) )
-      @v6_root = NicInfo::NetNode.new( IPAddr.new( "::0/0" ) )
+      @v4_root = NicInfo::NetNode.new(  "0.0.0.0/0" )
+      @v6_root = NicInfo::NetNode.new(  "::0/0" )
     end
 
-    def find_by_ipaddr( ipaddr )
-      node = NicInfo::NetNode.new( ipaddr )
+    def find_by_ipaddr( ip )
+      node = NicInfo::NetNode.new( ip )
       retval = nil
       found = nil
-      if ipaddr.ipv4? && @v4_root
+      if node.ipaddr.ipv4? && @v4_root
         found = @v4_root.find( node )
       else
         found = @v6_root.find( node )
@@ -173,9 +182,9 @@ module NicInfo
       return retval
     end
 
-    def insert( ipaddr, data )
-      node = NicInfo::NetNode.new( ipaddr, data )
-      if ipaddr.ipv4?
+    def insert( cidr_string, data )
+      node = NicInfo::NetNode.new( cidr_string, data )
+      if node.ipaddr.ipv4?
         @v4_root.insert( node )
       else
         @v6_root.insert( node )
