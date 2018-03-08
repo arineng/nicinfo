@@ -48,43 +48,175 @@ describe 'bulk_infile test', :performance => true do
     end
     @networks_100k.uniq!
 
-    @ips_1M = []
-    (1..1000000).each do |x|
-      @ips_1M << "#{rand(255)}.#{rand(255)}.#{rand(255)}.#{rand(255)}"
+    @ips_100 = []
+    (1..100).each do |x|
+      @ips_100 << "#{rand(255)}.#{rand(255)}.#{rand(255)}.#{rand(255)}"
     end
 
-    @ips_2M = []
-    (1..2000000).each do |x|
-      @ips_2M << "#{rand(255)}.#{rand(255)}.#{rand(255)}.#{rand(255)}"
+    @ips_200 = []
+    (1..200).each do |x|
+      @ips_200 << "#{rand(255)}.#{rand(255)}.#{rand(255)}.#{rand(255)}"
     end
 
-    @ips_4M = []
-    (1..4000000).each do |x|
-      @ips_4M << "#{rand(255)}.#{rand(255)}.#{rand(255)}.#{rand(255)}"
+    @ips_400 = []
+    (1..400).each do |x|
+      @ips_400 << "#{rand(255)}.#{rand(255)}.#{rand(255)}.#{rand(255)}"
     end
 
   end
 
-  it 'should insert into tree' do
+  it 'should insert into hash' do
 
+    puts "","","hash insertion benchmarks",""
 
     Benchmark.bmbm do |x|
       x.report("insert 20k") do
-        t = NicInfo::NetTree.new
-        @networks_20k.each do |n|
-          t.insert( n, true )
+        blocks = {}
+        @networks_20k.each do |x|
+          blocks[ IPAddr.new( x ) ] = true
         end
       end
       x.report("insert 50k") do
-        t = NicInfo::NetTree.new
-        @networks_50k.each do |n|
-          t.insert( n, true )
+        blocks = {}
+        @networks_50k.each do |x|
+          blocks[ IPAddr.new( x ) ] = true
         end
       end
       x.report("insert 100k") do
-        t = NicInfo::NetTree.new
-        @networks_100k.each do |n|
-          t.insert( n, true )
+        blocks = {}
+        @networks_100k.each do |x|
+          blocks[ IPAddr.new( x ) ] = true
+        end
+      end
+    end
+
+  end
+
+  it 'should do IPAddr include?' do
+
+    puts "","","ipaddr include? benchmarks",""
+
+    ipaddr = IPAddr.new( "192.168.0.0/16" )
+
+    Benchmark.bmbm do |x|
+      x.report("lookup 100 of 20k") do
+        @ips_100.each do |ip|
+          ipaddr.include?( IPAddr.new( ip ) )
+        end
+      end
+      x.report("lookup 200 of 20k") do
+        @ips_200.each do |ip|
+          ipaddr.include?( IPAddr.new( ip ) )
+        end
+      end
+      x.report("lookup 400 of 20k") do
+        @ips_400.each do |ip|
+          ipaddr.include?( IPAddr.new( ip ) )
+        end
+      end
+    end
+
+  end
+
+  it 'should iterate over 20k hash to find net' do
+
+    puts "","","iterate over 20k hash benchmarks",""
+
+    blocks = {}
+    @networks_20k.each do |x|
+      blocks[ IPAddr.new( x ) ] = true
+    end
+
+    Benchmark.bmbm do |x|
+      x.report("lookup 100 of 20k") do
+        @ips_100.each do |ip|
+          blocks.each do |ipaddr,v|
+            break if ipaddr.include?( IPAddr.new( ip ) )
+          end
+        end
+      end
+      x.report("lookup 200 of 20k") do
+        @ips_200.each do |ip|
+          blocks.each do |ipaddr,v|
+            break if ipaddr.include?( IPAddr.new( ip ) )
+          end
+        end
+      end
+      x.report("lookup 400 of 20k") do
+        @ips_400.each do |ip|
+          blocks.each do |ipaddr,v|
+            break if ipaddr.include?( IPAddr.new( ip ) )
+          end
+        end
+      end
+    end
+
+  end
+
+  it 'should iterate over 50k hash to find net' do
+
+    puts "","","iterate over 50k hash benchmarks",""
+
+    blocks = {}
+    @networks_50k.each do |x|
+      blocks[ IPAddr.new( x ) ] = true
+    end
+
+    Benchmark.bmbm do |x|
+      x.report("lookup 100 of 50k") do
+        @ips_100.each do |ip|
+          blocks.each do |ipaddr,v|
+            break if ipaddr.include?( IPAddr.new( ip ) )
+          end
+        end
+      end
+      x.report("lookup 200 of 50k") do
+        @ips_200.each do |ip|
+          blocks.each do |ipaddr,v|
+            break if ipaddr.include?( IPAddr.new( ip ) )
+          end
+        end
+      end
+      x.report("lookup 400 of 50k") do
+        @ips_400.each do |ip|
+          blocks.each do |ipaddr,v|
+            break if ipaddr.include?( IPAddr.new( ip ) )
+          end
+        end
+      end
+    end
+
+  end
+
+  it 'should iterate over 100k hash to find net' do
+
+    puts "","","iterate over 100k hash benchmarks",""
+
+    blocks = {}
+    @networks_100k.each do |x|
+      blocks[ IPAddr.new( x ) ] = true
+    end
+
+    Benchmark.bmbm do |x|
+      x.report("lookup 100 of 100k") do
+        @ips_100.each do |ip|
+          blocks.each do |ipaddr,v|
+            break if ipaddr.include?( IPAddr.new( ip ) )
+          end
+        end
+      end
+      x.report("lookup 200 of 100k") do
+        @ips_200.each do |ip|
+          blocks.each do |ipaddr,v|
+            break if ipaddr.include?( IPAddr.new( ip ) )
+          end
+        end
+      end
+      x.report("lookup 400 of 100k") do
+        @ips_400.each do |ip|
+          blocks.each do |ipaddr,v|
+            break if ipaddr.include?( IPAddr.new( ip ) )
+          end
         end
       end
     end
