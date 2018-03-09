@@ -75,7 +75,7 @@ describe 'net_tree test' do
 
   xit 'should insert' do
 
-    t = NicInfo::NetBTree.new
+    t = NicInfo::NetTree.new
     t.insert( "10.0.0.0/24", 1 )
     t.insert( "10.0.0.0/16", 2 )
     t.insert( "10.0.0.0/25", 3 )
