@@ -17,17 +17,23 @@ require 'rspec'
 require 'pp'
 require_relative '../lib/nicinfo/binary_search_tree'
 
-describe 'net_tree test' do
+describe 'binary search tree test' do
 
   it 'should btree basics' do
 
     t = NicInfo::BinarySearchTree.new
     root = t.insert( nil,  5, "a" )
+    expect( t.size( root ) ).to eq( 1 )
     t.insert( root, 3, "b" )
+    expect( t.size( root ) ).to eq( 2 )
     t.insert( root, 1, "c" )
+    expect( t.size( root ) ).to eq( 3 )
     t.insert( root, 4, "d" )
+    expect( t.size( root ) ).to eq( 4 )
     t.insert( root, 9, "e" )
+    expect( t.size( root ) ).to eq( 5 )
     t.insert( root, 6, "f" )
+    expect( t.size( root ) ).to eq( 6 )
     expect( t.lookup( root, 1 ).data ).to eq( "c" )
     expect( t.lookup( root, 3 ).data ).to eq( "b" )
     expect( t.lookup( root, 4 ).data ).to eq( "d" )
@@ -44,6 +50,13 @@ describe 'net_tree test' do
     expect( t.floor( root, 8 ).data ).to eq( "f" )
     expect( t.floor( root, 9 ).data ).to eq( "e" )
     expect( t.floor( root, 10 ).data ).to eq( "e" )
+    expect( t.size( root ) ).to eq( 6 )
+
+    a = []
+    t.each( root ) do |n|
+      a << n.data
+    end
+    expect( a ).to eq( [ "c", "b", "d", "a", "f", "e" ] )
 
   end
 

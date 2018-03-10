@@ -72,6 +72,27 @@ module NicInfo
       end
     end
 
+    def size( node )
+      if node == nil
+        return 0
+      else
+        size = 1
+        size = size + size( node.left )
+        size = size + size( node.right )
+        return size
+      end
+    end
+
+    def each( node, &block )
+      if node == nil
+        return
+      else
+        each( node.left, &block )
+        yield( node )
+        each( node.right, &block )
+      end
+    end
+
   end
 
 end
