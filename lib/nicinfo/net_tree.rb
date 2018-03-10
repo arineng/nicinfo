@@ -13,6 +13,7 @@
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 require 'ipaddr'
+require 'nicinfo/binary_search_tree'
 
 module NicInfo
 
@@ -44,14 +45,14 @@ module NicInfo
           if s.data.is_a?( Array )
             s.data.each do |i|
               if i.ipaddr.eql?( ipaddr )
-                raise "collision. s: #{i} n: #{ipaddr}"
+                raise "collision. s: #{i.data.ipaddr}/#{i.data.cidr_length} n: #{ipaddr}/#{cidr_length}"
               end
             end
             #else
             net_node = NetNode.new( cidr_length, ipaddr, data )
             s.data = append_to( s.data, net_node )
           elsif s.data.ipaddr.eql?( ipaddr )
-            raise "collision. s: #{s} n: #{ipaddr}"
+            raise "collision. s: #{s.data.ipaddr}/#{s.data.cidr_length} n: #{ipaddr}/#{cidr_length}"
           else
             net_node = NetNode.new( cidr_length, ipaddr, data )
             s.data = append_to( s.data, net_node )
@@ -100,8 +101,12 @@ module NicInfo
       return retval
     end
 
-    def find_by_ipaddr( ip )
+    def find_by_ip( ip )
       ipaddr = IPAddr.new( ip )
+      return find_by_ipaddr( ipaddr )
+    end
+
+    def find_by_ipaddr( ipaddr )
       if ipaddr.ipv4?
         return find_by_root( @v4_root, ipaddr )
       else
@@ -109,9 +114,56 @@ module NicInfo
       end
     end
 
+    def lookup_net_by_root( root, ipaddr )
+      retval = nil
+      n = @btree.lookup( root, ipaddr.to_range.begin.to_i )
+      if n
+        if n.data.is_a?( Array )
+          n.data.each do |i|
+            if i.ipaddr.eql?( ipaddr )
+              retval = i.data
+              break
+            end
+          end
+        else
+          retval = n.data.data if n.data.ipaddr.eql?( ipaddr )
+        end
+      end
+      return retval
+    end
+
+    def lookup_net( cidr )
+      ipaddr = IPAddr.new( cidr )
+      if ipaddr.ipv4?
+        return lookup_net_by_root( @v4_root, ipaddr )
+      else
+        return lookup_net_by_root( @v6_root, ipaddr )
+      end
+    end
+
     def each( &block )
-      @btree.each( @v4_root, &block )
-      @btree.each( @v6_root, &block )
+      @btree.each( @v6_root ) do |n|
+        if n.data.is_a?( Array )
+          n.data.each do |i|
+            yield( i.data )
+          end
+        else
+          yield( n.data.data )
+        end
+      end
+      @btree.each( @v4_root ) do |n|
+        if n.data.is_a?( Array )
+          n.data.each do |i|
+            yield( i.data )
+          end
+        else
+          yield( n.data.data )
+        end
+      end
+    end
+
+    def length
+      @btree.size( @v4_root ) + @btree.size( @v6_root )
     end
 
   end

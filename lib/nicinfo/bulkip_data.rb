@@ -17,6 +17,7 @@ require 'nicinfo/appctx'
 require 'nicinfo/ip'
 require 'nicinfo/utils'
 require 'nicinfo/common_summary'
+require 'nicinfo/net_tree'
 
 module NicInfo
 
@@ -334,7 +335,7 @@ module NicInfo
 
     def initialize( appctx )
       @appctx = appctx
-      @block_data = Hash.new
+      @block_data = NicInfo::NetTree.new
       @listed_data = Hash.new
       @net_data = Array.new
       @fetch_errors = Array.new
@@ -407,6 +408,11 @@ module NicInfo
       return retval
     end
 
+    #real	2m4.086s
+    #user	1m13.681s
+    #sys	0m2.437s
+
+
     def query_for_net?(ipaddr, time )
 
       if @interval_seconds_to_increment
@@ -428,13 +434,11 @@ module NicInfo
       end
 
       retval = NetNotFound
-      @block_data.each do |datum_net, datum|
-        if datum_net.include?( ipaddr )
-          datum.observed( time )
-          retval = NetAlreadyRetreived
-          @appctx.logger.trace( "observed network already retreived" )
-          break;
-        end
+      datum = @block_data.find_by_ipaddr( ipaddr )
+      if datum
+        datum.observed( time )
+        retval = NetAlreadyRetreived
+        @appctx.logger.trace( "observed network already retreived" )
       end
 
       @total_observations = @total_observations + 1 if retval
@@ -464,8 +468,13 @@ module NicInfo
 
       cidrs = ipnetwork.summary_data[ NicInfo::CommonSummary::CIDRS ]
       cidrs.each do |cidr|
-        b = BulkIPBlock.new( cidr, time, bulkipnetwork, bulkiplisted )
-        @block_data[IPAddr.new( cidr ) ] = b
+        b = @block_data.lookup_net( cidr )
+        if b
+          b.observed( time )
+        else
+          b = BulkIPBlock.new( cidr, time, bulkipnetwork, bulkiplisted )
+          @block_data.insert( cidr, b )
+        end
       end
 
       @total_observations = @total_observations + 1
@@ -496,7 +505,7 @@ module NicInfo
             cidr = "#{fetch_error.ipaddr.mask(24).to_s}/24"
           end
           b = BulkIPBlock.new( cidr, fetch_error.time, nil, nil )
-          @block_data[IPAddr.new( cidr ) ] = b
+          @block_data.insert( cidr, b )
           @total_observations = @total_observations + 1
         end
       end
@@ -543,7 +552,7 @@ module NicInfo
       top_ops = get_top_ops( @top_block_ops )
       f = File.open( n, "w" );
       f.puts( output_block_column_headers(seperator ) )
-      @block_data.values.each do |datum|
+      @block_data.each do |datum|
         f.puts( output_block_columns(datum, seperator, top_observations, top_ops ) )
         top_observations = sort_array_by_top( top_observations, @top_observations_number ) if top_observations
         top_ops = sort_array_by_top( top_ops, @top_ops_number ) if top_ops

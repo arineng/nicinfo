@@ -47,34 +47,43 @@ describe 'net_tree test' do
     t.insert( "10.0.0.0/25", 3 )
     t.insert( "9.0.0.0/24", 4 )
     t.insert( "11.0.0.0/24", 5 )
-    expect( t.find_by_ipaddr( "10.0.0.1" ) ).to eq( 3 )
-    expect( t.find_by_ipaddr( "10.0.1.1" ) ).to eq( 2 )
-    expect( t.find_by_ipaddr( "9.0.1.1" ) ).to be_nil
-    expect( t.find_by_ipaddr( "9.0.0.1" ) ).to eq( 4 )
-    expect( t.find_by_ipaddr( "11.0.0.1" ) ).to eq( 5 )
-    expect( t.find_by_ipaddr( "11.0.1.1" ) ).to be_nil
+    expect( t.find_by_ip( "10.0.0.1" ) ).to eq( 3 )
+    expect( t.find_by_ip( "10.0.1.1" ) ).to eq( 2 )
+    expect( t.find_by_ip( "9.0.1.1" ) ).to be_nil
+    expect( t.find_by_ip( "9.0.0.1" ) ).to eq( 4 )
+    expect( t.find_by_ip( "11.0.0.1" ) ).to eq( 5 )
+    expect( t.find_by_ip( "11.0.1.1" ) ).to be_nil
     t.insert( "11.0.0.0/16", 6 )
-    expect( t.find_by_ipaddr( "11.0.1.1" ) ).to eq( 6 )
-    expect( t.find_by_ipaddr( "11.0.0.1" ) ).to eq( 5 )
+    expect( t.find_by_ip( "11.0.1.1" ) ).to eq( 6 )
+    expect( t.find_by_ip( "11.0.0.1" ) ).to eq( 5 )
     t.insert( "13.0.0.0/8", 7 )
-    expect( t.find_by_ipaddr( "10.0.0.1" ) ).to eq( 3 )
-    expect( t.find_by_ipaddr( "10.0.1.1" ) ).to eq( 2 )
-    expect( t.find_by_ipaddr( "9.0.1.1" ) ).to be_nil
-    expect( t.find_by_ipaddr( "9.0.0.1" ) ).to eq( 4 )
-    expect( t.find_by_ipaddr( "11.0.1.1" ) ).to eq( 6 )
-    expect( t.find_by_ipaddr( "11.0.0.1" ) ).to eq( 5 )
-    expect( t.find_by_ipaddr( "13.0.0.1" ) ).to eq( 7 )
-    expect( t.find_by_ipaddr( "12.0.0.0" ) ).to be_nil
+    expect( t.find_by_ip( "10.0.0.1" ) ).to eq( 3 )
+    expect( t.find_by_ip( "10.0.1.1" ) ).to eq( 2 )
+    expect( t.find_by_ip( "9.0.1.1" ) ).to be_nil
+    expect( t.find_by_ip( "9.0.0.1" ) ).to eq( 4 )
+    expect( t.find_by_ip( "11.0.1.1" ) ).to eq( 6 )
+    expect( t.find_by_ip( "11.0.0.1" ) ).to eq( 5 )
+    expect( t.find_by_ip( "13.0.0.1" ) ).to eq( 7 )
+    expect( t.find_by_ip( "12.0.0.0" ) ).to be_nil
     t.insert( "11.1.0.0/16", 8 )
-    expect( t.find_by_ipaddr( "11.1.0.1" ) ).to eq( 8 )
-    expect( t.find_by_ipaddr( "11.2.0.1" ) ).to be_nil
-    expect( t.find_by_ipaddr( "10.0.0.1" ) ).to eq( 3 )
-    expect( t.find_by_ipaddr( "10.0.1.1" ) ).to eq( 2 )
-    expect( t.find_by_ipaddr( "9.0.1.1" ) ).to be_nil
-    expect( t.find_by_ipaddr( "9.0.0.1" ) ).to eq( 4 )
-    expect( t.find_by_ipaddr( "11.0.1.1" ) ).to eq( 6 )
-    expect( t.find_by_ipaddr( "11.0.0.1" ) ).to eq( 5 )
-    expect( t.find_by_ipaddr( "13.0.0.1" ) ).to eq( 7 )
+    expect( t.find_by_ip( "11.1.0.1" ) ).to eq( 8 )
+    expect( t.find_by_ip( "11.2.0.1" ) ).to be_nil
+    expect( t.find_by_ip( "10.0.0.1" ) ).to eq( 3 )
+    expect( t.find_by_ip( "10.0.1.1" ) ).to eq( 2 )
+    expect( t.find_by_ip( "9.0.1.1" ) ).to be_nil
+    expect( t.find_by_ip( "9.0.0.1" ) ).to eq( 4 )
+    expect( t.find_by_ip( "11.0.1.1" ) ).to eq( 6 )
+    expect( t.find_by_ip( "11.0.0.1" ) ).to eq( 5 )
+    expect( t.find_by_ip( "13.0.0.1" ) ).to eq( 7 )
+
+    expect( t.lookup_net( "11.1.0.0/16" ) ).to eq( 8 )
+    expect( t.lookup_net( "13.0.0.0/8" ) ).to eq( 7 )
+    expect( t.lookup_net( "11.0.0.0/16" ) ).to eq( 6 )
+    expect( t.lookup_net( "11.0.0.0/24" ) ).to eq( 5 )
+    expect( t.lookup_net( "9.0.0.0/24" ) ).to eq( 4 )
+    expect( t.lookup_net( "10.0.0.0/25" ) ).to eq( 3 )
+    expect( t.lookup_net( "10.0.0.0/16" ) ).to eq( 2 )
+    expect( t.lookup_net( "10.0.0.0/24" ) ).to eq( 1 )
 
   end
 
