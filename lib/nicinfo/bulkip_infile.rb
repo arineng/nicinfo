@@ -333,6 +333,7 @@ module NicInfo
             if l[:time] == nil
               lowest_line = l
               lowest_file = b
+              break
             elsif lowest_line == nil || lowest_line[:time] == nil
               lowest_line = l
               lowest_file = b
