@@ -345,7 +345,7 @@ module NicInfo
           end
         end
         if lowest_line != nil && lowest_line[:time] != nil
-          if last_time == nil || last_time <= lowest_line[ :time ]
+          if last_time == nil || last_time.to_i <= lowest_line[ :time ].to_i
             last_time = lowest_line[ :time ]
           else
             raise "descending time values detected. time: #{lowest_line[:time]} line: #{lowest_line[:lineno]} file: #{lowest_file.file_name}"
