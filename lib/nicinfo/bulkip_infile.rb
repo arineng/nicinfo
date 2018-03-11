@@ -323,6 +323,7 @@ module NicInfo
       end
 
       #iterate through until all done
+      last_time = nil
       loop do
         lowest_line = nil
         lowest_file = nil
@@ -341,6 +342,13 @@ module NicInfo
               lowest_line = l
               lowest_file = b
             end
+          end
+        end
+        if lowest_line != nil && lowest_line[:time] != nil
+          if last_time == nil || last_time <= lowest_line[ :time ]
+            last_time = lowest_line[ :time ]
+          else
+            raise "descending time values detected. time: #{lowest_line[:time]} line: #{lowest_line[:lineno]} file: #{lowest_file.file_name}"
           end
         end
         break if lowest_line == nil

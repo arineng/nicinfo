@@ -32,6 +32,7 @@ module NicInfo
   # TODO unique nets by fixed size
   # TODO get rid of explicit exits
   # TODO make CSV/TSV output compliant with RFC4180
+  # TODO when no files in bulk-in glob, throw error
 
   class Stat
 

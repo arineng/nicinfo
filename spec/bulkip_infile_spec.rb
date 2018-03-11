@@ -378,4 +378,22 @@ describe 'bulk_infile test' do
 
   end
 
+  it 'should iterato and error' do
+
+    dir = File.join( @work_dir, "foreach_by_time_bad" )
+    logger = NicInfo::Logger.new
+    logger.data_out = StringIO.new
+    logger.message_out = StringIO.new
+    logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
+    appctx = NicInfo::AppContext.new(dir )
+    appctx.logger=logger
+    appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
+
+    fs = NicInfo::BulkIPInFileSet.new( appctx )
+    fs.set_file_list( "spec/bulkip/bad*.log" )
+
+    expect{ fs.foreach_by_time {|ip,time,lineno,file_name| } }.to raise_error(/descending/)
+
+  end
+
 end
