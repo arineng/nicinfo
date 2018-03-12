@@ -335,6 +335,8 @@ module NicInfo
     NetNotFoundBetweenIntervals = 2
 
     TopScores = Struct.new( :observations, :obsvnspersecond, :magnitude )
+    Statistics = Struct.new( :observations, :observed_period, :magnitude_ceiling, :magnitude_floor,
+                             :shortest_interval, :longest_interval, :interval_count, :shortest_run, :longest_run, :run_count )
 
     def initialize( appctx )
       @appctx = appctx
@@ -350,6 +352,19 @@ module NicInfo
       @total_fetch_errors = 0
       @total_ip_errors = 0
       @total_time_errors = 0
+    end
+
+    def new_statistics
+      Statistics.new( NicInfo::Stat.new,
+                      NicInfo::Stat.new,
+                      NicInfo::Stat.new,
+                      NicInfo::Stat.new,
+                      NicInfo::Stat.new,
+                      NicInfo::Stat.new,
+                      NicInfo::Stat.new,
+                      NicInfo::Stat.new,
+                      NicInfo::Stat.new,
+                      NicInfo::Stat.new )
     end
 
     def sort_array_by_top( array, top_number )
@@ -528,10 +543,11 @@ module NicInfo
       n = file_name+"-blocks"+extension
       @appctx.logger.trace( "writing file #{n}")
       top_blocks = TopScores.new( Array.new, Array.new, Array.new )
+      block_stats = new_statistics
       f = File.open( n, "w" );
       f.puts( output_block_column_headers(seperator ) )
       @block_data.each do |datum|
-        f.puts( output_block_columns(datum, seperator, top_blocks ) )
+        f.puts( output_block_columns(datum, seperator, top_blocks, block_stats ) )
         sort_tops( top_blocks )
       end
       puts_signature( f )
@@ -540,10 +556,11 @@ module NicInfo
       n = file_name+"-networks"+extension
       @appctx.logger.trace( "writing file #{n}")
       top_networks = TopScores.new( Array.new, Array.new, Array.new )
+      network_stats = new_statistics
       f = File.open( n, "w" );
       f.puts( output_network_column_headers( seperator ) )
       @net_data.each do |datum|
-        f.puts( output_network_columns( datum, seperator, top_networks ) )
+        f.puts( output_network_columns( datum, seperator, top_networks, network_stats ) )
         sort_tops( top_networks )
       end
       puts_signature( f )
@@ -552,22 +569,23 @@ module NicInfo
       n = file_name+"-listednames"+extension
       @appctx.logger.trace( "writing file #{n}")
       top_listednames = TopScores.new( Array.new, Array.new, Array.new )
+      listedname_stats = new_statistics
       f = File.open( n, "w" );
       f.puts( output_listed_column_headers( seperator ) )
       @listed_data.values.each do |datum |
-        f.puts( output_listed_columns( datum, seperator, top_listednames ) )
+        f.puts( output_listed_columns( datum, seperator, top_listednames, listedname_stats ) )
         sort_tops( top_listednames )
       end
       puts_signature( f )
       f.close
 
-      #top observations
+      # top observations
       n = "#{file_name}-blocks-top#{@top_scores}-observations#{extension}"
       @appctx.logger.trace( "writing file #{n}")
       f = File.open( n, "w" );
       f.puts( output_block_column_headers(seperator ) )
       top_blocks.observations.each do |item|
-        f.puts( output_block_columns(item[1], seperator, nil ) )
+        f.puts( output_block_columns(item[1], seperator, nil, nil ) )
       end
       puts_signature( f )
       f.close
@@ -577,7 +595,7 @@ module NicInfo
       f = File.open( n, "w" );
       f.puts( output_network_column_headers( seperator ) )
       top_networks.observations.each do |item|
-        f.puts( output_network_columns( item[1], seperator, nil ) )
+        f.puts( output_network_columns( item[1], seperator, nil, nil ) )
       end
       puts_signature( f )
       f.close
@@ -587,19 +605,19 @@ module NicInfo
       f = File.open( n, "w" );
       f.puts( output_listed_column_headers( seperator ) )
       top_listednames.observations.each do |item |
-        f.puts( output_listed_columns( item[1], seperator, nil ) )
+        f.puts( output_listed_columns( item[1], seperator, nil, nil ) )
       end
       puts_signature( f )
       f.close
 
 
-      #observations per second
+      # top observations per second
       n = "#{file_name}-blocks-top#{@top_scores}-obsvnspersecond#{extension}"
       @appctx.logger.trace( "writing file #{n}")
       f = File.open( n, "w" );
       f.puts( output_block_column_headers(seperator ) )
       top_blocks.obsvnspersecond.each do |item|
-        f.puts( output_block_columns(item[1], seperator, nil ) )
+        f.puts( output_block_columns(item[1], seperator, nil, nil ) )
       end
       puts_signature( f )
       f.close
@@ -609,7 +627,7 @@ module NicInfo
       f = File.open( n, "w" );
       f.puts( output_network_column_headers( seperator ) )
       top_networks.obsvnspersecond.each do |item|
-        f.puts( output_network_columns( item[1], seperator, nil ) )
+        f.puts( output_network_columns( item[1], seperator, nil, nil ) )
       end
       puts_signature( f )
       f.close
@@ -619,18 +637,18 @@ module NicInfo
       f = File.open( n, "w" );
       f.puts( output_listed_column_headers( seperator ) )
       top_listednames.obsvnspersecond.each do |item |
-        f.puts( output_listed_columns( item[1], seperator, nil ) )
+        f.puts( output_listed_columns( item[1], seperator, nil, nil ) )
       end
       puts_signature( f )
       f.close
 
-      #magnitude
+      # top magnitude
       n = "#{file_name}-blocks-top#{@top_scores}-magnitude#{extension}"
       @appctx.logger.trace( "writing file #{n}")
       f = File.open( n, "w" );
       f.puts( output_block_column_headers(seperator ) )
       top_blocks.magnitude.each do |item|
-        f.puts( output_block_columns(item[1], seperator, nil ) )
+        f.puts( output_block_columns(item[1], seperator, nil, nil ) )
       end
       puts_signature( f )
       f.close
@@ -640,7 +658,7 @@ module NicInfo
       f = File.open( n, "w" );
       f.puts( output_network_column_headers( seperator ) )
       top_networks.magnitude.each do |item|
-        f.puts( output_network_columns( item[1], seperator, nil ) )
+        f.puts( output_network_columns( item[1], seperator, nil, nil ) )
       end
       puts_signature( f )
       f.close
@@ -650,11 +668,36 @@ module NicInfo
       f = File.open( n, "w" );
       f.puts( output_listed_column_headers( seperator ) )
       top_listednames.magnitude.each do |item |
-        f.puts( output_listed_columns( item[1], seperator, nil ) )
+        f.puts( output_listed_columns( item[1], seperator, nil, nil ) )
       end
       puts_signature( f )
       f.close
 
+      # block statistics
+      n = "#{file_name}-blocks-statistics#{extension}"
+      @appctx.logger.trace( "writing file #{n}")
+      f = File.open( n, "w" );
+      output_statistics( f, block_stats, seperator )
+      puts_signature( f )
+      f.close
+
+      # network statistics
+      n = "#{file_name}-networks-statistics#{extension}"
+      @appctx.logger.trace( "writing file #{n}")
+      f = File.open( n, "w" );
+      output_statistics( f, network_stats, seperator )
+      puts_signature( f )
+      f.close
+
+      # listedname statistics
+      n = "#{file_name}-listednames-statistics#{extension}"
+      @appctx.logger.trace( "writing file #{n}")
+      f = File.open( n, "w" );
+      output_statistics( f,listedname_stats , seperator )
+      puts_signature( f )
+      f.close
+
+      # meta
       n = file_name+"-meta"+extension
       @appctx.logger.trace( "writing file #{n}")
       f = File.open( n, "w" );
@@ -726,10 +769,10 @@ module NicInfo
       file.puts( "https://github.com/arineng/nicinfo" )
     end
 
-    def output_block_columns(datum, seperator, tops )
+    def output_block_columns(datum, seperator, tops, stats )
       columns = Array.new
       columns << datum.cidrstring
-      gather_query_and_timing_values( columns, datum, tops )
+      gather_query_and_timing_values( columns, datum, tops, stats )
       if datum.bulkipnetwork
         summary_data = datum.bulkipnetwork.summary_data
         columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ], seperator )
@@ -745,10 +788,10 @@ module NicInfo
       return columns.join( seperator )
     end
 
-    def output_network_columns( datum, seperator, tops )
+    def output_network_columns( datum, seperator, tops, stats )
       columns = Array.new
       columns << datum.cn
-      gather_query_and_timing_values( columns, datum, tops )
+      gather_query_and_timing_values( columns, datum, tops, stats )
       summary_data = datum.summary_data
       columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ], seperator )
       columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::LISTED_NAME ], seperator )
@@ -757,23 +800,24 @@ module NicInfo
       return columns.join( seperator )
     end
 
-    def output_listed_columns( datum, seperator, tops )
+    def output_listed_columns( datum, seperator, tops, stats )
       columns = Array.new
       summary_data = datum.summary_data
       columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::LISTED_NAME ], seperator )
-      gather_query_and_timing_values( columns, datum, tops )
+      gather_query_and_timing_values( columns, datum, tops, stats )
       columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ], seperator )
       columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::LISTED_COUNTRY ], seperator )
       columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::ABUSE_EMAIL ], seperator )
       return columns.join( seperator )
     end
 
-    def gather_query_and_timing_values( columns, datum, tops = nil )
+    def gather_query_and_timing_values( columns, datum, tops = nil, stats = nil )
       datum.finish_calculations
 
       # observations
       columns << datum.observations.to_s
       tops.observations << [ datum.observations, datum ] if tops
+      stats.observations.datum( datum.observations ) if stats
 
       # percentage of total observations
       columns << datum.get_percentage_of_total_observations( @total_observations )
@@ -789,6 +833,7 @@ module NicInfo
 
         # observed period
         columns << datum.get_observed_period
+        stats.observed_period.datum( datum.get_observed_period ) if stats
 
         # first observation time
         columns << datum.first_observed_time.strftime('%d %b %Y %H:%M:%S')
@@ -799,9 +844,11 @@ module NicInfo
         # magnitude ceiling
         columns << datum.magnitude_ceiling
         tops.magnitude << [ datum.magnitude_ceiling, datum ] if tops
+        stats.magnitude_ceiling.datum( datum.magnitude_ceiling ) if stats
 
         # magnitude floor
         columns << datum.magnitude_floor
+        stats.magnitude_floor.datum( datum.magnitude_floor ) if stats
 
         # magnitude average
         columns << datum.get_magnitude_average
@@ -814,12 +861,15 @@ module NicInfo
 
         # longest interval
         columns << to_columnar_data( datum.longest_interval )
+        stats.longest_interval.datum( datum.longest_interval ) if stats && datum.longest_interval
 
         # shortest interval
         columns << to_columnar_data( datum.shortest_interval )
+        stats.shortest_interval.datum( datum.shortest_interval ) if stats && datum.shortest_interval
 
         # interval count
         columns << to_columnar_data( datum.interval_count )
+        stats.interval_count.datum( datum.interval_count ) if stats && datum.interval_count
 
         # interval average
         columns << to_columnar_data( datum.get_interval_average )
@@ -832,12 +882,15 @@ module NicInfo
 
         # longest run
         columns << datum.longest_run
+        stats.longest_run.datum( datum.longest_run ) if stats
 
         # shortest run
         columns << datum.shortest_run
+        stats.shortest_run.datum( datum.shortest_run ) if stats
 
         # run count
         columns << datum.run_count
+        stats.run_count.datum( datum.run_count ) if stats
 
         # run average
         columns << datum.get_run_average
@@ -877,6 +930,40 @@ module NicInfo
         headers << "Run Std Deviation"
         headers << "Run CV %"
       end
+    end
+
+    def output_statistics( file, statistics, seperator )
+      file.puts( output_statistics_headers( seperator ))
+      file.puts( output_stat_obj( "Observations", statistics.observations, seperator ) )
+      if @do_time_statistics
+        file.puts( output_stat_obj( "Observed Period", statistics.observed_period, seperator ) )
+        file.puts( output_stat_obj( "Magnitude Ceiling", statistics.magnitude_ceiling, seperator ) )
+        file.puts( output_stat_obj( "Magnitude Floor", statistics.magnitude_floor, seperator ) )
+        file.puts( output_stat_obj( "Shortest Interval", statistics.shortest_interval, seperator ) )
+        file.puts( output_stat_obj( "Longest Interval", statistics.longest_interval, seperator ) )
+        file.puts( output_stat_obj( "Interval Count", statistics.interval_count, seperator ) )
+        file.puts( output_stat_obj( "Shortest Run", statistics.shortest_run, seperator ) )
+        file.puts( output_stat_obj( "Longest Run", statistics.longest_run, seperator ) )
+        file.puts( output_stat_obj( "Run Count", statistics.run_count, seperator ) )
+      end
+    end
+
+    def output_stat_obj( data_type, stat, seperator )
+      columns = Array.new
+      columns << data_type
+      columns << stat.get_average
+      columns << stat.get_std_dev( @do_sampling )
+      columns << stat.get_percentage( stat.get_cv( @do_sampling ) )
+      return columns.join( seperator )
+    end
+
+    def output_statistics_headers( seperator )
+      headers = Array.new
+      headers << "Data Type"
+      headers << "Average"
+      headers << "Std. Deviation"
+      headers << "CV Percentage"
+      return headers.join( seperator )
     end
 
     def output_tracked_urls( tracker, qps, seperator )

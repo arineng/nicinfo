@@ -383,6 +383,9 @@ describe 'web mocks' do
     expect( File.file?( "#{file_out}-blocks-top2-magnitude.tsv" ) ).to be_truthy
     expect( File.file?( "#{file_out}-networks-top2-magnitude.tsv" ) ).to be_truthy
     expect( File.file?( "#{file_out}-listednames-top2-magnitude.tsv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-blocks-statistics.tsv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-networks-statistics.tsv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-listednames-statistics.tsv" ) ).to be_truthy
     expect( File.file?( "#{file_out}-meta.tsv" ) ).to be_truthy
 
     expect( File.file?( "#{file_out}-blocks.csv" ) ).to be_truthy
@@ -397,6 +400,9 @@ describe 'web mocks' do
     expect( File.file?( "#{file_out}-blocks-top2-magnitude.csv" ) ).to be_truthy
     expect( File.file?( "#{file_out}-networks-top2-magnitude.csv" ) ).to be_truthy
     expect( File.file?( "#{file_out}-listednames-top2-magnitude.csv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-blocks-statistics.csv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-networks-statistics.csv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-listednames-statistics.csv" ) ).to be_truthy
     expect( File.file?( "#{file_out}-meta.csv" ) ).to be_truthy
   end
 
