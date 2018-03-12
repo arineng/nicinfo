@@ -861,7 +861,7 @@ HELP_SUMMARY
       fs.set_file_list( file_list )
       rdap_query = NicInfo::RDAPQuery.new( @appctx )
       bulkip_data = NicInfo::BulkIPData.new( @appctx )
-      bulkip_data.set_top_scores( @appctx.options.bulkip_top_scores ) if @appctx.options.bulkip_top_scores
+      bulkip_data.top_scores = @appctx.options.bulkip_top_scores if @appctx.options.bulkip_top_scores
       if @appctx.options.bulkip_interval_seconds
         bulkip_data.set_interval_seconds_to_increment( @appctx.options.bulkip_interval_seconds )
       end

@@ -32,7 +32,6 @@ module NicInfo
   # TODO make CSV/TSV output compliant with RFC4180
   # TODO when no files in bulk-in glob, throw error
   # TODO add feature to set sorted line buffer size
-  # TODO see about just keeping sumamry data to save on memory
 
   class Stat
 
@@ -268,10 +267,11 @@ module NicInfo
 
   class BulkIPNetwork < BulkIPObservation
 
-    attr_accessor :ipnetwork
+    attr_accessor :cn, :summary_data
 
     def initialize( ipnetwork, time )
-      @ipnetwork = ipnetwork
+      @cn = ipnetwork.get_cn
+      @summary_data = ipnetwork.summary_data
       super( time )
     end
 
@@ -298,10 +298,10 @@ module NicInfo
 
   class BulkIPListed < BulkIPObservation
 
-    attr_accessor :ipnetwork
+    attr_accessor :summary_data
 
     def initialize( ipnetwork, time )
-      @ipnetwork = ipnetwork
+      @summary_data = ipnetwork.summary_data
       super( time )
     end
 
@@ -731,7 +731,7 @@ module NicInfo
       columns << datum.cidrstring
       gather_query_and_timing_values( columns, datum, tops )
       if datum.bulkipnetwork
-        summary_data = datum.bulkipnetwork.ipnetwork.summary_data
+        summary_data = datum.bulkipnetwork.summary_data
         columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ], seperator )
         columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::LISTED_NAME ], seperator )
         columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::LISTED_COUNTRY ], seperator )
@@ -747,9 +747,9 @@ module NicInfo
 
     def output_network_columns( datum, seperator, tops )
       columns = Array.new
-      columns << datum.ipnetwork.get_cn
+      columns << datum.cn
       gather_query_and_timing_values( columns, datum, tops )
-      summary_data = datum.ipnetwork.summary_data
+      summary_data = datum.summary_data
       columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ], seperator )
       columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::LISTED_NAME ], seperator )
       columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::LISTED_COUNTRY ], seperator )
@@ -759,7 +759,7 @@ module NicInfo
 
     def output_listed_columns( datum, seperator, tops )
       columns = Array.new
-      summary_data = datum.ipnetwork.summary_data
+      summary_data = datum.summary_data
       columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::LISTED_NAME ], seperator )
       gather_query_and_timing_values( columns, datum, tops )
       columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ], seperator )
@@ -798,7 +798,7 @@ module NicInfo
 
         # magnitude ceiling
         columns << datum.magnitude_ceiling
-        tops.magnitude << [ datum.magnitude_ceiling, datum ]
+        tops.magnitude << [ datum.magnitude_ceiling, datum ] if tops
 
         # magnitude floor
         columns << datum.magnitude_floor

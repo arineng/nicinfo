@@ -49,10 +49,12 @@ describe 'bulk_data test' do
     appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
     ip192 = NicInfo::Ip.new( appctx )
+    ip192.objectclass = { "handle" => "ip192"}
     ip192.summary_data = Hash.new
     ip192.summary_data[ NicInfo::CommonSummary::CIDRS ] = [ "192.168.0.0/16" ]
 
     ip10 = NicInfo::Ip.new( appctx )
+    ip10.objectclass = { "handle" => "ip10"}
     ip10.summary_data = Hash.new
     ip10.summary_data[ NicInfo::CommonSummary::CIDRS ] = [ "10.0.0.0/8" ]
 
@@ -83,6 +85,7 @@ describe 'bulk_data test' do
     appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
     ip192 = NicInfo::Ip.new( appctx )
+    ip192.objectclass = { "handle" => "ip192"}
     ip192.summary_data = Hash.new
     ip192.summary_data[ NicInfo::CommonSummary::CIDRS ] = [ "192.168.0.0/16" ]
 

@@ -360,8 +360,7 @@ describe 'web mocks' do
     args << "--bulkip-in" << "spec/bulkip/ex5.log"
     args << "--bulkip-out-tsv" << file_out
     args << "--bulkip-out-csv" << file_out
-    args << "--bulkip-top-observations" << "2"
-    args << "--bulkip-top-ops" << "2"
+    args << "--bulkip-top-scores" << "2"
 
     expect{ NicInfo::Main.new( args, config ).run }.to_not output.to_stdout
 
@@ -378,9 +377,12 @@ describe 'web mocks' do
     expect( File.file?( "#{file_out}-blocks-top2-observations.tsv" ) ).to be_truthy
     expect( File.file?( "#{file_out}-networks-top2-observations.tsv" ) ).to be_truthy
     expect( File.file?( "#{file_out}-listednames-top2-observations.tsv" ) ).to be_truthy
-    expect( File.file?( "#{file_out}-blocks-top2-ops.tsv" ) ).to be_truthy
-    expect( File.file?( "#{file_out}-networks-top2-ops.tsv" ) ).to be_truthy
-    expect( File.file?( "#{file_out}-listednames-top2-ops.tsv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-blocks-top2-obsvnspersecond.tsv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-networks-top2-obsvnspersecond.tsv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-listednames-top2-obsvnspersecond.tsv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-blocks-top2-magnitude.tsv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-networks-top2-magnitude.tsv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-listednames-top2-magnitude.tsv" ) ).to be_truthy
     expect( File.file?( "#{file_out}-meta.tsv" ) ).to be_truthy
 
     expect( File.file?( "#{file_out}-blocks.csv" ) ).to be_truthy
@@ -389,9 +391,12 @@ describe 'web mocks' do
     expect( File.file?( "#{file_out}-blocks-top2-observations.csv" ) ).to be_truthy
     expect( File.file?( "#{file_out}-networks-top2-observations.csv" ) ).to be_truthy
     expect( File.file?( "#{file_out}-listednames-top2-observations.csv" ) ).to be_truthy
-    expect( File.file?( "#{file_out}-blocks-top2-ops.csv" ) ).to be_truthy
-    expect( File.file?( "#{file_out}-networks-top2-ops.csv" ) ).to be_truthy
-    expect( File.file?( "#{file_out}-listednames-top2-ops.csv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-blocks-top2-obsvnspersecond.csv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-networks-top2-obsvnspersecond.csv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-listednames-top2-obsvnspersecond.csv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-blocks-top2-magnitude.csv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-networks-top2-magnitude.csv" ) ).to be_truthy
+    expect( File.file?( "#{file_out}-listednames-top2-magnitude.csv" ) ).to be_truthy
     expect( File.file?( "#{file_out}-meta.csv" ) ).to be_truthy
   end
 
