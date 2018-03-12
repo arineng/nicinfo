@@ -312,14 +312,9 @@ module NicInfo
           @appctx.options.bulkip_out_tsv = file
         end
 
-        opts.on( "--bulkip-top-observations NUMBER",
-                "Output top NUMBER of observations" ) do |n|
-          @appctx.options.bulkip_top_observations = n.to_i
-        end
-
-        opts.on( "--bulkip-top-ops NUMBER",
-                "Output top NUMBER of observations-per-second" ) do |n|
-          @appctx.options.bulkip_top_ops = n.to_i
+        opts.on( "--bulkip-top-scores NUMBER",
+                "Set top NUMBER of data" ) do |n|
+          @appctx.options.bulkip_top_scores = n.to_i
         end
 
         opts.on( "--bulkip-interval SECONDS",
@@ -866,8 +861,7 @@ HELP_SUMMARY
       fs.set_file_list( file_list )
       rdap_query = NicInfo::RDAPQuery.new( @appctx )
       bulkip_data = NicInfo::BulkIPData.new( @appctx )
-      bulkip_data.set_top_observations_number( @appctx.options.bulkip_top_observations )
-      bulkip_data.set_top_ops_number( @appctx.options.bulkip_top_ops )
+      bulkip_data.set_top_scores( @appctx.options.bulkip_top_scores ) if @appctx.options.bulkip_top_scores
       if @appctx.options.bulkip_interval_seconds
         bulkip_data.set_interval_seconds_to_increment( @appctx.options.bulkip_interval_seconds )
       end

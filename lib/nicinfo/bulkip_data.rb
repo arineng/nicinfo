@@ -22,9 +22,7 @@ require 'nicinfo/net_tree'
 module NicInfo
 
   # things to think about
-  # TODO second pass feature that does not query network
   # TODO percentage of total observations by registry
-  # TODO mean, std dev, and cv of both period and frequency
   # TODO track redirect URLs too
   # TODO track error count per URL
   # TODO track avg response time per URL
@@ -34,6 +32,7 @@ module NicInfo
   # TODO make CSV/TSV output compliant with RFC4180
   # TODO when no files in bulk-in glob, throw error
   # TODO add feature to set sorted line buffer size
+  # TODO see about just keeping sumamry data to save on memory
 
   class Stat
 
@@ -325,6 +324,7 @@ module NicInfo
 
     attr_accessor :net_data, :listed_data, :block_data, :fetch_errors, :appctx, :network_lookups
     attr_accessor :interval_seconds_to_increment, :second_to_sample, :total_intervals, :do_sampling
+    attr_accessor :top_scores
 
     UrlColumnHeaders = [ "Total Queries", "Averaged QPS", "URL" ]
     NotApplicable = "N/A"
@@ -334,10 +334,12 @@ module NicInfo
     NetAlreadyRetreived = 1
     NetNotFoundBetweenIntervals = 2
 
+    TopScores = Struct.new( :observations, :obsvnspersecond, :magnitude )
 
     def initialize( appctx )
       @appctx = appctx
       @do_sampling = false
+      @top_scores = 100
       @block_data = NicInfo::NetTree.new
       @listed_data = Hash.new
       @net_data = Array.new
@@ -350,29 +352,17 @@ module NicInfo
       @total_time_errors = 0
     end
 
-    def set_top_observations_number( top_observations_number )
-      if top_observations_number
-        @top_observations_number = top_observations_number
-        @top_block_observations = Array.new
-        @top_network_observations = Array.new
-        @top_listedname_observations = Array.new
-      end
-    end
-
-    def set_top_ops_number( top_ops_number )
-      if top_ops_number
-        @top_ops_number = top_ops_number
-        @top_block_ops = Array.new
-        @top_network_ops = Array.new
-        @top_listedname_ops = Array.new
-      end
-    end
-
     def sort_array_by_top( array, top_number )
       retval = array.sort_by do |i|
         i[0] * -1
       end
       return retval.first( top_number )
+    end
+
+    def sort_tops( tops )
+      tops.observations = sort_array_by_top( tops.observations, @top_scores )
+      tops.obsvnspersecond = sort_array_by_top( tops.obsvnspersecond, @top_scores )
+      tops.magnitude = sort_array_by_top( tops.magnitude, @top_scores )
     end
 
     def note_times_in_data
@@ -411,11 +401,6 @@ module NicInfo
       @non_global_unicast = @non_global_unicast + 1 unless retval
       return retval
     end
-
-    #real	2m4.086s
-    #user	1m13.681s
-    #sys	0m2.437s
-
 
     def query_for_net?(ipaddr, time )
 
@@ -531,16 +516,6 @@ module NicInfo
       output_column_sv( file_name, ".csv", "," )
     end
 
-    def get_top_observations( top_observations )
-      return top_observations if @top_observations_number
-      return nil
-    end
-
-    def get_top_ops( top_ops )
-      return top_ops if @top_ops_number
-      return nil
-    end
-
     def output_column_sv( file_name, extension, seperator )
 
       # prelim values
@@ -552,119 +527,133 @@ module NicInfo
 
       n = file_name+"-blocks"+extension
       @appctx.logger.trace( "writing file #{n}")
-      top_observations = get_top_observations( @top_block_observations )
-      top_ops = get_top_ops( @top_block_ops )
+      top_blocks = TopScores.new( Array.new, Array.new, Array.new )
       f = File.open( n, "w" );
       f.puts( output_block_column_headers(seperator ) )
       @block_data.each do |datum|
-        f.puts( output_block_columns(datum, seperator, top_observations, top_ops ) )
-        top_observations = sort_array_by_top( top_observations, @top_observations_number ) if top_observations
-        top_ops = sort_array_by_top( top_ops, @top_ops_number ) if top_ops
+        f.puts( output_block_columns(datum, seperator, top_blocks ) )
+        sort_tops( top_blocks )
       end
-      @top_block_observations = top_observations if top_observations
-      @top_block_ops = top_ops if top_ops
       puts_signature( f )
       f.close
 
       n = file_name+"-networks"+extension
       @appctx.logger.trace( "writing file #{n}")
-      top_observations = get_top_observations( @top_network_observations )
-      top_ops = get_top_ops( @top_network_ops )
+      top_networks = TopScores.new( Array.new, Array.new, Array.new )
       f = File.open( n, "w" );
       f.puts( output_network_column_headers( seperator ) )
       @net_data.each do |datum|
-        f.puts( output_network_columns( datum, seperator, top_observations, top_ops ) )
-        top_observations = sort_array_by_top( top_observations, @top_observations_number ) if top_observations
-        top_ops = sort_array_by_top( top_ops, @top_ops_number ) if top_ops
+        f.puts( output_network_columns( datum, seperator, top_networks ) )
+        sort_tops( top_networks )
       end
-      @top_network_observations = top_observations if top_observations
-      @top_network_ops = top_ops if top_ops
       puts_signature( f )
       f.close
 
       n = file_name+"-listednames"+extension
       @appctx.logger.trace( "writing file #{n}")
-      top_observations = get_top_observations( @top_listedname_observations )
-      top_ops = get_top_ops( @top_listedname_ops )
+      top_listednames = TopScores.new( Array.new, Array.new, Array.new )
       f = File.open( n, "w" );
       f.puts( output_listed_column_headers( seperator ) )
       @listed_data.values.each do |datum |
-        f.puts( output_listed_columns( datum, seperator, top_observations, top_ops ) )
-        top_observations = sort_array_by_top( top_observations, @top_observations_number ) if top_observations
-        top_ops = sort_array_by_top( top_ops, @top_ops_number ) if top_ops
+        f.puts( output_listed_columns( datum, seperator, top_listednames ) )
+        sort_tops( top_listednames )
       end
-      @top_listedname_observations = top_observations if top_observations
-      @top_listedname_ops = top_ops if top_ops
       puts_signature( f )
       f.close
 
-      if @top_observations_number
-
-        n = "#{file_name}-blocks-top#{@top_observations_number}-observations#{extension}"
-        @appctx.logger.trace( "writing file #{n}")
-        f = File.open( n, "w" );
-        f.puts( output_block_column_headers(seperator ) )
-        @top_block_observations.each do |item|
-          f.puts( output_block_columns(item[1], seperator, nil, nil ) )
-        end
-        puts_signature( f )
-        f.close
-
-        n = "#{file_name}-networks-top#{@top_observations_number}-observations#{extension}"
-        @appctx.logger.trace( "writing file #{n}")
-        f = File.open( n, "w" );
-        f.puts( output_network_column_headers( seperator ) )
-        @top_network_observations.each do |item|
-          f.puts( output_network_columns( item[1], seperator, nil, nil ) )
-        end
-        puts_signature( f )
-        f.close
-
-        n = "#{file_name}-listednames-top#{@top_observations_number}-observations#{extension}"
-        @appctx.logger.trace( "writing file #{n}")
-        f = File.open( n, "w" );
-        f.puts( output_listed_column_headers( seperator ) )
-        @top_listedname_observations.each do |item |
-          f.puts( output_listed_columns( item[1], seperator, nil, nil ) )
-        end
-        puts_signature( f )
-        f.close
-
+      #top observations
+      n = "#{file_name}-blocks-top#{@top_scores}-observations#{extension}"
+      @appctx.logger.trace( "writing file #{n}")
+      f = File.open( n, "w" );
+      f.puts( output_block_column_headers(seperator ) )
+      top_blocks.observations.each do |item|
+        f.puts( output_block_columns(item[1], seperator, nil ) )
       end
+      puts_signature( f )
+      f.close
 
-      if @top_ops_number
-
-        n = "#{file_name}-blocks-top#{@top_ops_number}-ops#{extension}"
-        @appctx.logger.trace( "writing file #{n}")
-        f = File.open( n, "w" );
-        f.puts( output_block_column_headers(seperator ) )
-        @top_block_ops.each do |item|
-          f.puts( output_block_columns(item[1], seperator, nil, nil ) )
-        end
-        puts_signature( f )
-        f.close
-
-        n = "#{file_name}-networks-top#{@top_ops_number}-ops#{extension}"
-        @appctx.logger.trace( "writing file #{n}")
-        f = File.open( n, "w" );
-        f.puts( output_network_column_headers( seperator ) )
-        @top_network_ops.each do |item|
-          f.puts( output_network_columns( item[1], seperator, nil, nil ) )
-        end
-        puts_signature( f )
-        f.close
-
-        n = "#{file_name}-listednames-top#{@top_ops_number}-ops#{extension}"
-        @appctx.logger.trace( "writing file #{n}")
-        f = File.open( n, "w" );
-        f.puts( output_listed_column_headers( seperator ) )
-        @top_listedname_ops.each do |item |
-          f.puts( output_listed_columns( item[1], seperator, nil, nil ) )
-        end
-        puts_signature( f )
-        f.close
-
+      n = "#{file_name}-networks-top#{@top_scores}-observations#{extension}"
+      @appctx.logger.trace( "writing file #{n}")
+      f = File.open( n, "w" );
+      f.puts( output_network_column_headers( seperator ) )
+      top_networks.observations.each do |item|
+        f.puts( output_network_columns( item[1], seperator, nil ) )
       end
+      puts_signature( f )
+      f.close
+
+      n = "#{file_name}-listednames-top#{@top_scores}-observations#{extension}"
+      @appctx.logger.trace( "writing file #{n}")
+      f = File.open( n, "w" );
+      f.puts( output_listed_column_headers( seperator ) )
+      top_listednames.observations.each do |item |
+        f.puts( output_listed_columns( item[1], seperator, nil ) )
+      end
+      puts_signature( f )
+      f.close
+
+
+      #observations per second
+      n = "#{file_name}-blocks-top#{@top_scores}-obsvnspersecond#{extension}"
+      @appctx.logger.trace( "writing file #{n}")
+      f = File.open( n, "w" );
+      f.puts( output_block_column_headers(seperator ) )
+      top_blocks.obsvnspersecond.each do |item|
+        f.puts( output_block_columns(item[1], seperator, nil ) )
+      end
+      puts_signature( f )
+      f.close
+
+      n = "#{file_name}-networks-top#{@top_scores}-obsvnspersecond#{extension}"
+      @appctx.logger.trace( "writing file #{n}")
+      f = File.open( n, "w" );
+      f.puts( output_network_column_headers( seperator ) )
+      top_networks.obsvnspersecond.each do |item|
+        f.puts( output_network_columns( item[1], seperator, nil ) )
+      end
+      puts_signature( f )
+      f.close
+
+      n = "#{file_name}-listednames-top#{@top_scores}-obsvnspersecond#{extension}"
+      @appctx.logger.trace( "writing file #{n}")
+      f = File.open( n, "w" );
+      f.puts( output_listed_column_headers( seperator ) )
+      top_listednames.obsvnspersecond.each do |item |
+        f.puts( output_listed_columns( item[1], seperator, nil ) )
+      end
+      puts_signature( f )
+      f.close
+
+      #magnitude
+      n = "#{file_name}-blocks-top#{@top_scores}-magnitude#{extension}"
+      @appctx.logger.trace( "writing file #{n}")
+      f = File.open( n, "w" );
+      f.puts( output_block_column_headers(seperator ) )
+      top_blocks.magnitude.each do |item|
+        f.puts( output_block_columns(item[1], seperator, nil ) )
+      end
+      puts_signature( f )
+      f.close
+
+      n = "#{file_name}-networks-top#{@top_scores}-magnitude#{extension}"
+      @appctx.logger.trace( "writing file #{n}")
+      f = File.open( n, "w" );
+      f.puts( output_network_column_headers( seperator ) )
+      top_networks.magnitude.each do |item|
+        f.puts( output_network_columns( item[1], seperator, nil ) )
+      end
+      puts_signature( f )
+      f.close
+
+      n = "#{file_name}-listednames-top#{@top_scores}-magnitude#{extension}"
+      @appctx.logger.trace( "writing file #{n}")
+      f = File.open( n, "w" );
+      f.puts( output_listed_column_headers( seperator ) )
+      top_listednames.magnitude.each do |item |
+        f.puts( output_listed_columns( item[1], seperator, nil ) )
+      end
+      puts_signature( f )
+      f.close
 
       n = file_name+"-meta"+extension
       @appctx.logger.trace( "writing file #{n}")
@@ -737,10 +726,10 @@ module NicInfo
       file.puts( "https://github.com/arineng/nicinfo" )
     end
 
-    def output_block_columns(datum, seperator, top_observations, top_ops )
+    def output_block_columns(datum, seperator, tops )
       columns = Array.new
       columns << datum.cidrstring
-      gather_query_and_timing_values( columns, datum, top_observations, top_ops )
+      gather_query_and_timing_values( columns, datum, tops )
       if datum.bulkipnetwork
         summary_data = datum.bulkipnetwork.ipnetwork.summary_data
         columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ], seperator )
@@ -756,10 +745,10 @@ module NicInfo
       return columns.join( seperator )
     end
 
-    def output_network_columns( datum, seperator, top_observations, top_ops )
+    def output_network_columns( datum, seperator, tops )
       columns = Array.new
       columns << datum.ipnetwork.get_cn
-      gather_query_and_timing_values( columns, datum, top_observations, top_ops )
+      gather_query_and_timing_values( columns, datum, tops )
       summary_data = datum.ipnetwork.summary_data
       columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ], seperator )
       columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::LISTED_NAME ], seperator )
@@ -768,23 +757,23 @@ module NicInfo
       return columns.join( seperator )
     end
 
-    def output_listed_columns( datum, seperator, top_observations, top_ops )
+    def output_listed_columns( datum, seperator, tops )
       columns = Array.new
       summary_data = datum.ipnetwork.summary_data
       columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::LISTED_NAME ], seperator )
-      gather_query_and_timing_values( columns, datum, top_observations, top_ops )
+      gather_query_and_timing_values( columns, datum, tops )
       columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ], seperator )
       columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::LISTED_COUNTRY ], seperator )
       columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::ABUSE_EMAIL ], seperator )
       return columns.join( seperator )
     end
 
-    def gather_query_and_timing_values( columns, datum, top_observations = nil, top_ops = nil )
+    def gather_query_and_timing_values( columns, datum, tops = nil )
       datum.finish_calculations
 
       # observations
       columns << datum.observations.to_s
-      top_observations << [ datum.observations, datum ] if top_observations
+      tops.observations << [ datum.observations, datum ] if tops
 
       # percentage of total observations
       columns << datum.get_percentage_of_total_observations( @total_observations )
@@ -796,7 +785,7 @@ module NicInfo
         # averaged obsvns / observed period
         ops = datum.get_observations_per_observed_period
         columns << ops
-        top_ops << [ ops, datum ] if top_ops
+        tops.obsvnspersecond << [ ops, datum ] if tops
 
         # observed period
         columns << datum.get_observed_period
@@ -809,6 +798,7 @@ module NicInfo
 
         # magnitude ceiling
         columns << datum.magnitude_ceiling
+        tops.magnitude << [ datum.magnitude_ceiling, datum ]
 
         # magnitude floor
         columns << datum.magnitude_floor
