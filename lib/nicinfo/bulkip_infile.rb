@@ -37,10 +37,11 @@ module NicInfo
 
     InLine = Struct.new( :ip, :time, :lineno )
 
-    attr_accessor :file_name, :strategy, :lineno, :eol
+    attr_accessor :file_name, :strategy, :lineno, :eol, :line_buffer_size
 
     def initialize file_name
       @file_name = file_name
+      @line_buffer_size = 5
     end
 
     def has_strategy
@@ -238,23 +239,51 @@ module NicInfo
       end
     end
 
+    def get_line
+      line = @file.gets
+      if line
+        fields = line.split ( /\s/ )
+        ip = get_ip( fields )
+        time = get_time( fields )
+        @lineno = @lineno + 1
+        InLine.new( ip, time, @lineno )
+      end
+    end
+
+    def sort_line_buffer
+      @line_buffer.sort! do |x,y|
+        if x[:time] == nil || y[:time] == nil
+          0
+        else
+          x[:time] <=> y[:time]
+        end
+      end
+    end
+
     def next_line
       if @file == nil
         @file = File.open( file_name, "r" )
         @lineno = 0
+        @line_buffer = Array.new
+        @line_buffer_size.times do |i|
+          l = get_line
+          @line_buffer << l if l
+        end
+        sort_line_buffer
       end
       retval = nil
       if !@eol
-        line = @file.gets
+        line = get_line
         if line
-          fields = line.split ( /\s/ )
-          ip = get_ip( fields )
-          time = get_time( fields )
-          @lineno = @lineno + 1
-          retval = InLine.new( ip, time, @lineno )
-        else
-          @eol = true
+          @line_buffer << line
+          sort_line_buffer
         end
+      end
+      if @line_buffer.empty?
+        @eol = true
+      else
+        retval = @line_buffer[ 0 ]
+        @line_buffer = @line_buffer.drop( 1 )
       end
       return retval
     end
