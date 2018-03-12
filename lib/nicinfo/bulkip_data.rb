@@ -324,7 +324,7 @@ module NicInfo
   class BulkIPData
 
     attr_accessor :net_data, :listed_data, :block_data, :fetch_errors, :appctx, :network_lookups
-    attr_accessor :interval_seconds_to_increment, :second_to_sample, :total_intervals
+    attr_accessor :interval_seconds_to_increment, :second_to_sample, :total_intervals, :do_sampling
 
     UrlColumnHeaders = [ "Total Queries", "Averaged QPS", "URL" ]
     NotApplicable = "N/A"
@@ -337,6 +337,7 @@ module NicInfo
 
     def initialize( appctx )
       @appctx = appctx
+      @do_sampling = false
       @block_data = NicInfo::NetTree.new
       @listed_data = Hash.new
       @net_data = Array.new
@@ -393,6 +394,7 @@ module NicInfo
     def set_interval_seconds_to_increment( seconds )
       @interval_seconds_to_increment = seconds
       @total_intervals = 0
+      @do_sampling = true
     end
 
     def observed_time( time )
@@ -447,7 +449,7 @@ module NicInfo
       observed_time( time )
 
       # if doing sampling, note that
-      if retval == NetNotFound && @interval_seconds_to_increment && time.to_i != @second_to_sample.to_i
+      if retval == NetNotFound && @do_sampling && time.to_i != @second_to_sample.to_i
         @appctx.logger.trace( "retreival unnecessary outside of sampling time" )
         retval = NetNotFoundBetweenIntervals
       end
@@ -699,7 +701,7 @@ module NicInfo
       f.puts( output_total_row( "Total Time Parse Errors", @total_time_errors, seperator ) )
       f.puts( output_total_row( "Analysis Start Time", @start_time.strftime('%d %b %Y %H:%M:%S'), seperator ) )
       f.puts( output_total_row( "Analysis End Time", @end_time.strftime('%d %b %Y %H:%M:%S'), seperator ) )
-      f.puts( output_total_row( "Total Sampling Intervals", @total_intervals, seperator ) ) if @interval_seconds_to_increment
+      f.puts( output_total_row( "Total Sampling Intervals", @total_intervals, seperator ) ) if @do_sampling
 
       puts_signature( f )
       f.close
@@ -815,10 +817,10 @@ module NicInfo
         columns << datum.get_magnitude_average
 
         # magnitude standard deviation
-        columns << to_columnar_data( datum.get_magnitude_standard_deviation( @interval_seconds_to_increment != nil ) )
+        columns << to_columnar_data( datum.get_magnitude_standard_deviation( @do_sampling ) )
 
         # magnitude cv percentage
-        columns << to_columnar_data( datum.get_magnitude_cv_percentage( @interval_seconds_to_increment != nil ) )
+        columns << to_columnar_data( datum.get_magnitude_cv_percentage( @do_sampling ) )
 
         # longest interval
         columns << to_columnar_data( datum.longest_interval )
@@ -833,10 +835,10 @@ module NicInfo
         columns << to_columnar_data( datum.get_interval_average )
 
         # interval standard deviation
-        columns << to_columnar_data( datum.get_interval_standard_deviation( @interval_seconds_to_increment != nil ) )
+        columns << to_columnar_data( datum.get_interval_standard_deviation( @do_sampling ) )
 
         # interval cv percentage
-        columns << to_columnar_data( datum.get_interval_cv_percentage( @interval_seconds_to_increment != nil ) )
+        columns << to_columnar_data( datum.get_interval_cv_percentage( @do_sampling ) )
 
         # longest run
         columns << datum.longest_run
@@ -851,10 +853,10 @@ module NicInfo
         columns << datum.get_run_average
 
         # run standard deviation
-        columns << to_columnar_data( datum.get_run_standard_deviation( @interval_seconds_to_increment != nil ) )
+        columns << to_columnar_data( datum.get_run_standard_deviation( @do_sampling ) )
 
         # run cv percentage
-        columns << to_columnar_data( datum.get_run_cv_percentage( @interval_seconds_to_increment != nil ) )
+        columns << to_columnar_data( datum.get_run_cv_percentage( @do_sampling ) )
       end
     end
 
