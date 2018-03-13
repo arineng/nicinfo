@@ -891,12 +891,12 @@ HELP_SUMMARY
                     rtype = get_query_type_from_result( rdap_response.json_data )
                     if rtype == QueryType::BY_IP
                       ipnetwork = NicInfo::process_ip( rdap_response.json_data, @appctx )
-                      bulkip_data.observe_network( ipnetwork, time )
+                      bulkip_data.observe_network( ipnetwork, time, rdap_response.requested_url )
                     else
-                      bulkip_data.fetch_error( ipaddr, time, rdap_response.code, "RDAP IP network type not returned" )
+                      bulkip_data.observe_unknown_network( ipaddr, time )
                     end
                   else
-                    bulkip_data.fetch_error( ipaddr, time, rdap_response.code, rdap_response.exception.message )
+                    bulkip_data.observe_unknown_network( ipaddr, time )
                   end
                 end
               end
@@ -912,7 +912,6 @@ HELP_SUMMARY
       rescue Interrupt
         @appctx.logger.mesg( "Processing interrupted.")
       end
-      bulkip_data.review_fetch_errors
       bulkip_data.note_end_time
       if @appctx.options.bulkip_out_csv
         bulkip_data.output_csv( @appctx.options.bulkip_out_csv )

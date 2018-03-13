@@ -16,7 +16,7 @@ module NicInfo
 
   class RDAPResponse
 
-    attr_accessor :data, :json_data, :exception, :error_state, :code
+    attr_accessor :data, :json_data, :exception, :error_state, :code, :requested_url
 
   end
 
@@ -97,6 +97,7 @@ module NicInfo
         else
           rdap_url = query[0]
         end
+        retval.requested_url = rdap_url
         retval.data = get(rdap_url, 0, true, bootstrap_url )
         retval.json_data = JSON.load(retval.data)
         if (ec = retval.json_data[ NicInfo::NICINFO_DEMO_ERROR ]) != nil

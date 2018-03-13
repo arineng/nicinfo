@@ -369,7 +369,7 @@ describe 'web mocks' do
     expect(a_request(:get, "https://rdap.db.ripe.net/ip/194.85.61.205")).to have_been_made.once
     expect(a_request(:get, "https://rdap.arin.net/registry/ip/108.45.128.208")).to have_been_made.once
     expect(a_request(:get, "https://rdap.afrinic.net/rdap/ip/196.216.2.21")).to have_been_made.once
-    expect(a_request(:get, "https://rdap.afrinic.net/rdap/ip/196.216.2.20")).to have_been_made.once
+    expect(a_request(:get, "https://rdap.afrinic.net/rdap/ip/196.216.2.20")).to_not have_been_made
 
     expect( File.file?( "#{file_out}-blocks.tsv" ) ).to be_truthy
     expect( File.file?( "#{file_out}-networks.tsv" ) ).to be_truthy

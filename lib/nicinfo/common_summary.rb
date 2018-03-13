@@ -14,6 +14,11 @@
 
 module NicInfo
 
+  def NicInfo.service_operator_from_link( link )
+    m =  /(http|https):\/\/.*\.([^.]+\.[^\/]+)\/[^\/]*\/.*/.match( link )
+    m[2].downcase if m
+  end
+
   class CommonSummary
 
     SUMMARY_DATA_NAME = "nicinfo_summary_data"
@@ -42,8 +47,7 @@ module NicInfo
 
       self_link = NicInfo.get_self_link( NicInfo.get_links( object_class, appctx ) )
       if self_link
-        m =  /(http|https):\/\/.*\.([^.]+\.[^\/]+)\/[^\/]*\/.*/.match( self_link )
-        @summary_data[SERVICE_OPERATOR ] = m[2].downcase if m
+        set_service_operator_from_link( self_link )
       end
 
       registrant = find_entity_by_role( entities, "registrant" )
@@ -77,6 +81,11 @@ module NicInfo
       last_changed_date = find_event_date_by_action( object_class, "last changed" )
       @summary_data[LAST_CHANGED_DATE ] = last_changed_date if last_changed_date
 
+    end
+
+    def set_service_operator_from_link( link )
+      l = NicInfo.service_operator_from_link( link )
+      @summary_data[SERVICE_OPERATOR ] = l if l
     end
 
     def set_listed_country( country )

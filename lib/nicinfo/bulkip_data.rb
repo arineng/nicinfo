@@ -324,22 +324,9 @@ module NicInfo
 
   end
 
-  class BulkIPFetchError
-
-    attr_accessor :ipaddr, :time, :code, :reason
-
-    def initialize( ipaddr, time, code, reason )
-      @ipaddr = ipaddr
-      @time = time
-      @code = code
-      @reason = reason
-    end
-
-  end
-
   class BulkIPData
 
-    attr_accessor :net_data, :listed_data, :block_data, :fetch_errors, :appctx, :network_lookups
+    attr_accessor :net_data, :listed_data, :block_data, :appctx, :network_lookups
     attr_accessor :interval_seconds_to_increment, :second_to_sample, :total_intervals, :do_sampling
     attr_accessor :top_scores, :overall_block_stats, :overall_network_stats, :overall_listedname_stats
 
@@ -365,7 +352,6 @@ module NicInfo
       @block_data = NicInfo::NetTree.new
       @listed_data = Hash.new
       @net_data = Array.new
-      @fetch_errors = Array.new
       @non_global_unicast = 0
       @network_lookups = 0
       @total_observations = 0
@@ -477,7 +463,12 @@ module NicInfo
 
     end
 
-    def observe_network( ipnetwork, time )
+    def observe_network( ipnetwork, time, requested_url = nil )
+
+      if requested_url && !ipnetwork.summary_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ]
+        l = NicInfo.service_operator_from_link( requested_url )
+        ipnetwork.summary_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ] = l if l
+      end
 
       bulkipnetwork = BulkIPNetwork.new( ipnetwork, time, @overall_network_stats )
       @net_data << bulkipnetwork
@@ -507,32 +498,16 @@ module NicInfo
 
     end
 
-    def fetch_error( ipaddr, time, code, reason )
-      @fetch_errors << BulkIPFetchError.new( ipaddr, time, code, reason )
+    def observe_unknown_network( ipaddr, time )
+      if ipaddr.ipv6?
+        cidr = "#{ipaddr.mask(56).to_s}/56"
+      else
+        cidr = "#{ipaddr.mask(24).to_s}/24"
+      end
+      b = BulkIPBlock.new( cidr, time, nil, nil, @overall_block_stats )
+      @block_data.insert( cidr, b )
+      @total_observations = @total_observations + 1
       @total_fetch_errors = @total_fetch_errors + 1
-    end
-
-    def review_fetch_errors
-      # run back through and figure out which can be processed again
-      # and delete them
-      @fetch_errors.delete_if do |fetch_error|
-        query_for_net?(fetch_error.ipaddr, fetch_error.time )
-      end
-
-      # now lets put these into blocks as unknown
-      @fetch_errors.each do |fetch_error|
-        block_found = query_for_net?(fetch_error.ipaddr, fetch_error.time )
-        unless block_found
-          if fetch_error.ipaddr.ipv6?
-            cidr = "#{fetch_error.ipaddr.mask(56).to_s}/56"
-          else
-            cidr = "#{fetch_error.ipaddr.mask(24).to_s}/24"
-          end
-          b = BulkIPBlock.new( cidr, fetch_error.time, nil, nil, @overall_stats )
-          @block_data.insert( cidr, b )
-          @total_observations = @total_observations + 1
-        end
-      end
     end
 
     def ip_error( ip )
@@ -724,13 +699,6 @@ module NicInfo
       n = file_name+"-meta"+extension
       @appctx.logger.mesg( "writing file #{n}")
       f = File.open( n, "w" );
-      unless @fetch_errors.empty?
-        f.puts
-        f.puts( "Unresolved Fetch Errors" )
-        @fetch_errors.each do |fetch_error|
-          f.puts( "#{fetch_error.ipaddr.to_s}#{seperator}#{fetch_error.code}#{seperator}#{fetch_error.reason}" )
-        end
-      end
 
       unless @appctx.tracked_urls.empty?
         f.puts

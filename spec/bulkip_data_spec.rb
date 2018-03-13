@@ -295,4 +295,28 @@ describe 'bulk_data test' do
 
   end
 
+  it 'should set serivce operator from request url' do
+
+    dir = File.join( @work_dir, "set_service_operator_from_request_url" )
+    logger = NicInfo::Logger.new
+    logger.data_out = StringIO.new
+    logger.message_out = StringIO.new
+    logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
+    appctx = NicInfo::AppContext.new(dir )
+    appctx.logger=logger
+    appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
+
+    ip192 = NicInfo::Ip.new( appctx )
+    ip192.objectclass = { "handle" => "ip192"}
+    ip192.summary_data = Hash.new
+    ip192.summary_data[ NicInfo::CommonSummary::CIDRS ] = [ "192.168.0.0/16" ]
+
+    b = NicInfo::BulkIPData.new( appctx )
+    b.note_new_file
+    t = Time.new
+    b.observe_network( ip192, t, "http://rdap.arin.net/registry/ip/192.168.0.0" )
+    expect(b.net_data[0].summary_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ] ).to eq( "arin.net" )
+
+  end
+
 end
