@@ -501,8 +501,13 @@ module NicInfo
       else
         cidr = "#{ipaddr.mask(24).to_s}/24"
       end
-      b = BulkIPBlock.new( cidr, time, nil, nil, @overall_block_stats )
-      @block_data.insert( cidr, b )
+      b = @block_data.lookup_net( cidr )
+      if b
+        b.observed( time )
+      else
+        b = BulkIPBlock.new( cidr, time, nil, nil, @overall_block_stats )
+        @block_data.insert( cidr, b )
+      end
       @total_observations = @total_observations + 1
       @total_fetch_errors = @total_fetch_errors + 1
     end
