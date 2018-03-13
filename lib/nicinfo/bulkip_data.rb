@@ -32,6 +32,10 @@ module NicInfo
   # TODO make CSV/TSV output compliant with RFC4180
   # TODO when no files in bulk-in glob, throw error
   # TODO add feature to set sorted line buffer size
+  # TODO change review fetch errors to simply observing as unknown
+  # TODO get service operator for summary data from request URL if not given or no response
+  # TODO get magnitude, interval, and run overall stats
+  # TODO rank statistics
 
   class Stat
 
