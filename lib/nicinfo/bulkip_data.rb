@@ -37,7 +37,6 @@ module NicInfo
   # TODO get magnitude, interval, and run overall stats
   # TODO rank statistics
   # TODO block statistics by /24 and /56
-  # TODO total IP addresses
 
   class Stat
 
