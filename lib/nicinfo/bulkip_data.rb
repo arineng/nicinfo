@@ -36,6 +36,8 @@ module NicInfo
   # TODO get service operator for summary data from request URL if not given or no response
   # TODO get magnitude, interval, and run overall stats
   # TODO rank statistics
+  # TODO block statistics by /24 and /56
+  # TODO total IP addresses
 
   class Stat
 
