@@ -34,7 +34,6 @@ module NicInfo
   # TODO add feature to set sorted line buffer size
   # TODO change review fetch errors to simply observing as unknown
   # TODO get service operator for summary data from request URL if not given or no response
-  # TODO get magnitude, interval, and run overall stats
   # TODO rank statistics
   # TODO block statistics by /24 and /56
 
@@ -96,6 +95,8 @@ module NicInfo
 
   class BulkIPObservation < Stat
 
+    OverallStats = Struct.new( :magnitude, :interval, :run )
+
     attr_accessor :observations, :first_observed_time, :last_observed_time
     attr_accessor :this_second
     # magnitude is defined as observations per second
@@ -109,8 +110,13 @@ module NicInfo
     # by definition, must be greater than zero
     attr_accessor :run, :shortest_run, :longest_run
     attr_accessor :run_count, :run_sum, :run_sum_squared
+    # overall stat objects
+    attr_accessor :overall_interval_stats, :overall_run_stats, :overall_magnitude_stats
 
-    def initialize( time )
+    def initialize( time, overall_stats )
+      @overall_magnitude_stats = overall_stats.magnitude
+      @overall_interval_stats = overall_stats.interval
+      @overall_run_stats = overall_stats.run
       @observations = 0
       @interval_sum = 0
       @interval_sum_squared = 0
@@ -157,6 +163,7 @@ module NicInfo
             @interval_sum = @interval_sum + interval
             @interval_sum_squared = @interval_sum_squared + interval**2
             @interval_count = @interval_count + 1
+            @overall_interval_stats.datum( interval )
           end
           if interval == 0
             @run = @run + 1
@@ -167,6 +174,7 @@ module NicInfo
             @run_count = @run_count + 1
             @run_sum = @run_sum + @run
             @run_sum_squared = @run_sum_squared + @run**2
+            @overall_run_stats.datum( @run )
             @run = 1
           end
           if @magnitude_floor == nil
@@ -177,6 +185,7 @@ module NicInfo
           @magnitude_sum = @magnitude_sum + @magnitude
           @magnitude_sum_squared = @magnitude_sum_squared + @magnitude**2
           @magnitude_count = @magnitude_count + 1
+          @overall_magnitude_stats.datum( @magnitude )
           @this_second = time.to_i
           @magnitude = 1
         end
@@ -191,15 +200,18 @@ module NicInfo
       end
       @magnitude_sum = @magnitude_sum + @magnitude
       @magnitude_sum_squared = @magnitude_sum_squared + @magnitude**2
+      @overall_magnitude_stats.datum( @magnitude )
       if @run > 1
         @longest_run = @run if @longest_run < @run
         @run_count = @run_count + 1
         @run_sum = @run_sum + @run
         @run_sum_squared = @run_sum_squared + @run**2
+        @overall_run_stats.datum( @run )
       elsif @run_count == 0
         @run_count = 1
         @run_sum = 1
         @run_sum_squared = 1
+        @overall_run_stats.datum( 1 )
       end
       @shortest_run = @run unless @shortest_run
     end
@@ -274,10 +286,10 @@ module NicInfo
 
     attr_accessor :cn, :summary_data
 
-    def initialize( ipnetwork, time )
+    def initialize( ipnetwork, time, overall_stats )
       @cn = ipnetwork.get_cn
       @summary_data = ipnetwork.summary_data
-      super( time )
+      super( time, overall_stats )
     end
 
   end
@@ -286,11 +298,11 @@ module NicInfo
 
     attr_accessor :cidrstring, :bulkipnetwork, :bulkiplisted
 
-    def initialize( cidrstring, time, bulkipnetwork, bulkiplisted )
+    def initialize( cidrstring, time, bulkipnetwork, bulkiplisted, overall_stats )
       @bulkiplisted = bulkiplisted
       @bulkipnetwork = bulkipnetwork
       @cidrstring = cidrstring
-      super( time )
+      super( time, overall_stats )
     end
 
     def observed( time )
@@ -305,9 +317,9 @@ module NicInfo
 
     attr_accessor :summary_data
 
-    def initialize( ipnetwork, time )
+    def initialize( ipnetwork, time, overall_stats )
       @summary_data = ipnetwork.summary_data
-      super( time )
+      super( time, overall_stats )
     end
 
   end
@@ -329,7 +341,7 @@ module NicInfo
 
     attr_accessor :net_data, :listed_data, :block_data, :fetch_errors, :appctx, :network_lookups
     attr_accessor :interval_seconds_to_increment, :second_to_sample, :total_intervals, :do_sampling
-    attr_accessor :top_scores
+    attr_accessor :top_scores, :overall_block_stats, :overall_network_stats, :overall_listedname_stats
 
     UrlColumnHeaders = [ "Total Queries", "Averaged QPS", "URL" ]
     NotApplicable = "N/A"
@@ -347,6 +359,9 @@ module NicInfo
       @appctx = appctx
       @do_sampling = false
       @top_scores = 100
+      @overall_block_stats = NicInfo::BulkIPObservation::OverallStats.new( NicInfo::Stat.new, NicInfo::Stat.new, NicInfo::Stat.new )
+      @overall_network_stats = NicInfo::BulkIPObservation::OverallStats.new( NicInfo::Stat.new, NicInfo::Stat.new, NicInfo::Stat.new )
+      @overall_listedname_stats = NicInfo::BulkIPObservation::OverallStats.new( NicInfo::Stat.new, NicInfo::Stat.new, NicInfo::Stat.new )
       @block_data = NicInfo::NetTree.new
       @listed_data = Hash.new
       @net_data = Array.new
@@ -464,14 +479,14 @@ module NicInfo
 
     def observe_network( ipnetwork, time )
 
-      bulkipnetwork = BulkIPNetwork.new( ipnetwork, time )
+      bulkipnetwork = BulkIPNetwork.new( ipnetwork, time, @overall_network_stats )
       @net_data << bulkipnetwork
 
       listed_name = ipnetwork.summary_data[ NicInfo::CommonSummary::LISTED_NAME ]
       listed_name = NotApplicable unless listed_name
       bulkiplisted = @listed_data[ listed_name ]
       unless bulkiplisted
-        bulkiplisted = BulkIPListed.new( ipnetwork, time )
+        bulkiplisted = BulkIPListed.new( ipnetwork, time, @overall_listedname_stats )
         @listed_data[ listed_name ] = bulkiplisted
       end
 
@@ -481,7 +496,7 @@ module NicInfo
         if b
           b.observed( time )
         else
-          b = BulkIPBlock.new( cidr, time, bulkipnetwork, bulkiplisted )
+          b = BulkIPBlock.new( cidr, time, bulkipnetwork, bulkiplisted, @overall_block_stats )
           @block_data.insert( cidr, b )
         end
       end
@@ -513,7 +528,7 @@ module NicInfo
           else
             cidr = "#{fetch_error.ipaddr.mask(24).to_s}/24"
           end
-          b = BulkIPBlock.new( cidr, fetch_error.time, nil, nil )
+          b = BulkIPBlock.new( cidr, fetch_error.time, nil, nil, @overall_stats )
           @block_data.insert( cidr, b )
           @total_observations = @total_observations + 1
         end
@@ -546,7 +561,7 @@ module NicInfo
       end
 
       n = file_name+"-blocks"+extension
-      @appctx.logger.trace( "writing file #{n}")
+      @appctx.logger.mesg( "writing file #{n}")
       top_blocks = TopScores.new( Array.new, Array.new, Array.new )
       block_stats = new_statistics
       f = File.open( n, "w" );
@@ -559,7 +574,7 @@ module NicInfo
       f.close
 
       n = file_name+"-networks"+extension
-      @appctx.logger.trace( "writing file #{n}")
+      @appctx.logger.mesg( "writing file #{n}")
       top_networks = TopScores.new( Array.new, Array.new, Array.new )
       network_stats = new_statistics
       f = File.open( n, "w" );
@@ -572,7 +587,7 @@ module NicInfo
       f.close
 
       n = file_name+"-listednames"+extension
-      @appctx.logger.trace( "writing file #{n}")
+      @appctx.logger.mesg( "writing file #{n}")
       top_listednames = TopScores.new( Array.new, Array.new, Array.new )
       listedname_stats = new_statistics
       f = File.open( n, "w" );
@@ -586,7 +601,7 @@ module NicInfo
 
       # top observations
       n = "#{file_name}-blocks-top#{@top_scores}-observations#{extension}"
-      @appctx.logger.trace( "writing file #{n}")
+      @appctx.logger.mesg( "writing file #{n}")
       f = File.open( n, "w" );
       f.puts( output_block_column_headers(seperator ) )
       top_blocks.observations.each do |item|
@@ -596,7 +611,7 @@ module NicInfo
       f.close
 
       n = "#{file_name}-networks-top#{@top_scores}-observations#{extension}"
-      @appctx.logger.trace( "writing file #{n}")
+      @appctx.logger.mesg( "writing file #{n}")
       f = File.open( n, "w" );
       f.puts( output_network_column_headers( seperator ) )
       top_networks.observations.each do |item|
@@ -606,7 +621,7 @@ module NicInfo
       f.close
 
       n = "#{file_name}-listednames-top#{@top_scores}-observations#{extension}"
-      @appctx.logger.trace( "writing file #{n}")
+      @appctx.logger.mesg( "writing file #{n}")
       f = File.open( n, "w" );
       f.puts( output_listed_column_headers( seperator ) )
       top_listednames.observations.each do |item |
@@ -618,7 +633,7 @@ module NicInfo
 
       # top observations per second
       n = "#{file_name}-blocks-top#{@top_scores}-obsvnspersecond#{extension}"
-      @appctx.logger.trace( "writing file #{n}")
+      @appctx.logger.mesg( "writing file #{n}")
       f = File.open( n, "w" );
       f.puts( output_block_column_headers(seperator ) )
       top_blocks.obsvnspersecond.each do |item|
@@ -628,7 +643,7 @@ module NicInfo
       f.close
 
       n = "#{file_name}-networks-top#{@top_scores}-obsvnspersecond#{extension}"
-      @appctx.logger.trace( "writing file #{n}")
+      @appctx.logger.mesg( "writing file #{n}")
       f = File.open( n, "w" );
       f.puts( output_network_column_headers( seperator ) )
       top_networks.obsvnspersecond.each do |item|
@@ -638,7 +653,7 @@ module NicInfo
       f.close
 
       n = "#{file_name}-listednames-top#{@top_scores}-obsvnspersecond#{extension}"
-      @appctx.logger.trace( "writing file #{n}")
+      @appctx.logger.mesg( "writing file #{n}")
       f = File.open( n, "w" );
       f.puts( output_listed_column_headers( seperator ) )
       top_listednames.obsvnspersecond.each do |item |
@@ -649,7 +664,7 @@ module NicInfo
 
       # top magnitude
       n = "#{file_name}-blocks-top#{@top_scores}-magnitude#{extension}"
-      @appctx.logger.trace( "writing file #{n}")
+      @appctx.logger.mesg( "writing file #{n}")
       f = File.open( n, "w" );
       f.puts( output_block_column_headers(seperator ) )
       top_blocks.magnitude.each do |item|
@@ -659,7 +674,7 @@ module NicInfo
       f.close
 
       n = "#{file_name}-networks-top#{@top_scores}-magnitude#{extension}"
-      @appctx.logger.trace( "writing file #{n}")
+      @appctx.logger.mesg( "writing file #{n}")
       f = File.open( n, "w" );
       f.puts( output_network_column_headers( seperator ) )
       top_networks.magnitude.each do |item|
@@ -669,7 +684,7 @@ module NicInfo
       f.close
 
       n = "#{file_name}-listednames-top#{@top_scores}-magnitude#{extension}"
-      @appctx.logger.trace( "writing file #{n}")
+      @appctx.logger.mesg( "writing file #{n}")
       f = File.open( n, "w" );
       f.puts( output_listed_column_headers( seperator ) )
       top_listednames.magnitude.each do |item |
@@ -680,31 +695,34 @@ module NicInfo
 
       # block statistics
       n = "#{file_name}-blocks-statistics#{extension}"
-      @appctx.logger.trace( "writing file #{n}")
+      @appctx.logger.mesg( "writing file #{n}")
       f = File.open( n, "w" );
       output_statistics( f, block_stats, seperator )
+      output_overall_stats( f, @overall_block_stats, seperator )
       puts_signature( f )
       f.close
 
       # network statistics
       n = "#{file_name}-networks-statistics#{extension}"
-      @appctx.logger.trace( "writing file #{n}")
+      @appctx.logger.mesg( "writing file #{n}")
       f = File.open( n, "w" );
       output_statistics( f, network_stats, seperator )
+      output_overall_stats( f, @overall_network_stats, seperator )
       puts_signature( f )
       f.close
 
       # listedname statistics
       n = "#{file_name}-listednames-statistics#{extension}"
-      @appctx.logger.trace( "writing file #{n}")
+      @appctx.logger.mesg( "writing file #{n}")
       f = File.open( n, "w" );
       output_statistics( f,listedname_stats , seperator )
+      output_overall_stats( f, @overall_listedname_stats, seperator )
       puts_signature( f )
       f.close
 
       # meta
       n = file_name+"-meta"+extension
-      @appctx.logger.trace( "writing file #{n}")
+      @appctx.logger.mesg( "writing file #{n}")
       f = File.open( n, "w" );
       unless @fetch_errors.empty?
         f.puts
@@ -950,6 +968,14 @@ module NicInfo
         file.puts( output_stat_obj( "Shortest Run", statistics.shortest_run, seperator ) )
         file.puts( output_stat_obj( "Longest Run", statistics.longest_run, seperator ) )
         file.puts( output_stat_obj( "Run Count", statistics.run_count, seperator ) )
+      end
+    end
+
+    def output_overall_stats( file, overall_stats, seperator )
+      if @do_time_statistics
+        file.puts( output_stat_obj( "Magnitude", overall_stats.magnitude, seperator ) )
+        file.puts( output_stat_obj( "Interval", overall_stats.interval, seperator ) )
+        file.puts( output_stat_obj( "Run", overall_stats.run, seperator ) )
       end
     end
 

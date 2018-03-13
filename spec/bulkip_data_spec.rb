@@ -111,8 +111,9 @@ describe 'bulk_data test' do
 
   it 'should do interval calculations' do
 
+    os = NicInfo::BulkIPObservation::OverallStats.new( NicInfo::Stat.new, NicInfo::Stat.new, NicInfo::Stat.new )
     t = Time.at( 100 )
-    o = NicInfo::BulkIPObservation.new( t )
+    o = NicInfo::BulkIPObservation.new( t, os )
     expect( o.shortest_interval ).to be_nil
     o.observed( t )
     expect( o.shortest_interval ).to be_nil
@@ -135,13 +136,17 @@ describe 'bulk_data test' do
     expect( o.get_interval_average ).to eq( 4 )
     expect( o.get_interval_standard_deviation( false ) ).to be_within( 0.0001 ).of( 3.5590 )
     expect( o.get_interval_cv( false ) ).to be_within( 0.0001 ).of( 0.8897 )
+    expect( os.interval.get_average ).to eq( 4 )
+    expect( os.interval.get_std_dev( false ) ).to be_within( 0.0001 ).of( 3.5590 )
+    expect( os.interval.get_cv( false ) ).to be_within( 0.0001 ).of( 0.8897 )
 
   end
 
   it 'should do interval calculations on no intervals 1 run of 1' do
 
+    os = NicInfo::BulkIPObservation::OverallStats.new( NicInfo::Stat.new, NicInfo::Stat.new, NicInfo::Stat.new )
     t = Time.at( 100 )
-    o = NicInfo::BulkIPObservation.new( t )
+    o = NicInfo::BulkIPObservation.new( t, os )
     o.observed( t )
 
     o.finish_calculations
@@ -154,8 +159,9 @@ describe 'bulk_data test' do
 
   it 'should do interval calculations on no intervals 1 run of 2' do
 
+    os = NicInfo::BulkIPObservation::OverallStats.new( NicInfo::Stat.new, NicInfo::Stat.new, NicInfo::Stat.new )
     t = Time.at( 100 )
-    o = NicInfo::BulkIPObservation.new( t )
+    o = NicInfo::BulkIPObservation.new( t, os )
     o.observed( t )
     t = t + 1
     o.observed( t )
@@ -170,8 +176,9 @@ describe 'bulk_data test' do
 
   it 'should do run calculations' do
 
+    os = NicInfo::BulkIPObservation::OverallStats.new( NicInfo::Stat.new, NicInfo::Stat.new, NicInfo::Stat.new )
     t = Time.at( 100 )
-    o = NicInfo::BulkIPObservation.new( t )
+    o = NicInfo::BulkIPObservation.new( t, os )
     o.observed( t )
     t = t + 1
     o.observed( t )
@@ -207,13 +214,17 @@ describe 'bulk_data test' do
     expect( o.get_run_average ).to eq( 3 )
     expect( o.get_run_standard_deviation( false ) ).to be_within( 0.0001 ).of( 0.7071 )
     expect( o.get_run_cv( false ) ).to be_within( 0.0001 ).of( 0.2357 )
+    expect( os.run.get_average ).to eq( 3 )
+    expect( os.run.get_std_dev( false ) ).to be_within( 0.0001 ).of( 0.7071 )
+    expect( os.run.get_cv( false ) ).to be_within( 0.0001 ).of( 0.2357 )
 
   end
 
   it 'should do run calculations on 1 run of 1' do
 
+    os = NicInfo::BulkIPObservation::OverallStats.new( NicInfo::Stat.new, NicInfo::Stat.new, NicInfo::Stat.new )
     t = Time.at( 100 )
-    o = NicInfo::BulkIPObservation.new( t )
+    o = NicInfo::BulkIPObservation.new( t, os )
     o.observed( t )
 
     o.finish_calculations
@@ -226,8 +237,9 @@ describe 'bulk_data test' do
 
   it 'should do run calculations on 1 run of 2' do
 
+    os = NicInfo::BulkIPObservation::OverallStats.new( NicInfo::Stat.new, NicInfo::Stat.new, NicInfo::Stat.new )
     t = Time.at( 100 )
-    o = NicInfo::BulkIPObservation.new( t )
+    o = NicInfo::BulkIPObservation.new( t, os )
     o.observed( t )
     t = t + 1
     o.observed( t )
@@ -242,8 +254,9 @@ describe 'bulk_data test' do
 
   it 'should do magnitude calculations' do
 
+    os = NicInfo::BulkIPObservation::OverallStats.new( NicInfo::Stat.new, NicInfo::Stat.new, NicInfo::Stat.new )
     t = Time.at( 100 )
-    o = NicInfo::BulkIPObservation.new( t )
+    o = NicInfo::BulkIPObservation.new( t, os )
     expect( o.magnitude_ceiling ).to eq(1 )
     o.observed( t )
     expect( o.magnitude_ceiling ).to eq(2 )
@@ -276,6 +289,9 @@ describe 'bulk_data test' do
     expect( o.get_magnitude_average ).to eq( 4 )
     expect( o.get_magnitude_standard_deviation( false ) ).to be_within(0.0001).of( 0.8164 )
     expect( o.get_magnitude_cv( false ) ).to be_within( 0.0001 ).of( 0.2041 )
+    expect( os.magnitude.get_average ).to eq( 4 )
+    expect( os.magnitude.get_std_dev( false ) ).to be_within(0.0001).of( 0.8164 )
+    expect( os.magnitude.get_cv( false ) ).to be_within( 0.0001 ).of( 0.2041 )
 
   end
 
