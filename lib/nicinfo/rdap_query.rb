@@ -16,7 +16,7 @@ module NicInfo
 
   class RDAPResponse
 
-    attr_accessor :data, :json_data, :exception, :error_state, :response, :code
+    attr_accessor :data, :json_data, :exception, :error_state, :code
 
   end
 
