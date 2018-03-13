@@ -22,12 +22,10 @@ require 'nicinfo/net_tree'
 module NicInfo
 
   # things to think about
-  # TODO percentage of total observations by registry
   # TODO track redirect URLs too
   # TODO track error count per URL
   # TODO track avg response time per URL
   # TODO feature to turn off deep object caching
-  # TODO unique nets by fixed size
   # TODO get rid of explicit exits
   # TODO make CSV/TSV output compliant with RFC4180
   # TODO when no files in bulk-in glob, throw error
@@ -516,6 +514,12 @@ module NicInfo
       @total_time_errors = @total_time_errors + 1
     end
 
+    def gather_service_operator( hash, summary_data )
+      if summary_data
+        hash[ summary_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ] ] += 1
+      end
+    end
+
     def output_tsv( file_name )
       output_column_sv( file_name, ".tsv", "\t" )
     end
@@ -532,6 +536,9 @@ module NicInfo
       else
         @observation_period_seconds = nil
       end
+      block_so_count = Hash.new( 0 )
+      network_so_count = Hash.new( 0 )
+      listedname_so_count = Hash.new( 0 )
 
       n = file_name+"-blocks"+extension
       @appctx.logger.mesg( "writing file #{n}")
@@ -542,6 +549,7 @@ module NicInfo
       @block_data.each do |datum|
         f.puts( output_block_columns(datum, seperator, top_blocks, block_stats ) )
         sort_tops( top_blocks )
+        gather_service_operator( block_so_count, datum.bulkipnetwork.summary_data ) if datum.bulkipnetwork
       end
       puts_signature( f )
       f.close
@@ -555,6 +563,7 @@ module NicInfo
       @net_data.each do |datum|
         f.puts( output_network_columns( datum, seperator, top_networks, network_stats ) )
         sort_tops( top_networks )
+        gather_service_operator( network_so_count, datum.summary_data )
       end
       puts_signature( f )
       f.close
@@ -568,6 +577,7 @@ module NicInfo
       @listed_data.values.each do |datum |
         f.puts( output_listed_columns( datum, seperator, top_listednames, listedname_stats ) )
         sort_tops( top_listednames )
+        gather_service_operator( listedname_so_count, datum.summary_data )
       end
       puts_signature( f )
       f.close
@@ -697,6 +707,25 @@ module NicInfo
       n = file_name+"-meta"+extension
       @appctx.logger.mesg( "writing file #{n}")
       f = File.open( n, "w" );
+      service_operators = block_so_count.keys | network_so_count.keys | listedname_so_count.keys
+      so_headers = [ "Service Operator" ] + service_operators
+      f.puts( so_headers.join( seperator ))
+      so_columns = [ "Blocks" ]
+      service_operators.each do |so|
+        so_columns << block_so_count[ so ]
+      end
+      f.puts( so_columns.join( seperator ) )
+      so_columns = [ "Networks" ]
+      service_operators.each do |so|
+        so_columns << network_so_count[ so ]
+      end
+      f.puts( so_columns.join( seperator ) )
+      so_columns = [ "Listed Names" ]
+      service_operators.each do |so|
+        so_columns << listedname_so_count[ so ]
+      end
+      f.puts( so_columns.join( seperator ) )
+
 
       unless @appctx.tracked_urls.empty?
         f.puts
