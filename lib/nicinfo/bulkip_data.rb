@@ -33,7 +33,6 @@ module NicInfo
   # TODO when no files in bulk-in glob, throw error
   # TODO add feature to set sorted line buffer size
   # TODO change review fetch errors to simply observing as unknown
-  # TODO get service operator for summary data from request URL if not given or no response
   # TODO rank statistics
   # TODO block statistics by /24 and /56
 
