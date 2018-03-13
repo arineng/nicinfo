@@ -30,7 +30,6 @@ module NicInfo
   # TODO make CSV/TSV output compliant with RFC4180
   # TODO when no files in bulk-in glob, throw error
   # TODO add feature to set sorted line buffer size
-  # TODO rank statistics
   # TODO block statistics by /24 and /56
 
   class Stat
@@ -337,6 +336,8 @@ module NicInfo
     TopScores = Struct.new( :observations, :obsvnspersecond, :magnitude )
     Statistics = Struct.new( :observations, :observed_period, :magnitude_ceiling, :magnitude_floor,
                              :shortest_interval, :longest_interval, :interval_count, :shortest_run, :longest_run, :run_count )
+    Percentiles = Struct.new( :magnitudes, :intervals, :runs )
+    Rank = Struct.new( :low, :high, :percentile )
 
     def initialize( appctx )
       @appctx = appctx
@@ -520,6 +521,44 @@ module NicInfo
       end
     end
 
+    def gather_percentiles( collection )
+      interval_averages = Array.new
+      magnitude_averages = Array.new
+      run_averages = Array.new
+      collection.each do |datum|
+        datum.finish_calculations
+        a = datum.get_interval_average
+        interval_averages << a if a
+        magnitude_averages << datum.get_magnitude_average
+        run_averages << datum.get_run_average
+      end
+      interval_averages.sort!
+      magnitude_averages.sort!
+      run_averages.sort!
+      interval_ranks = gather_ranks( interval_averages )
+      magnitude_ranks = gather_ranks( magnitude_averages )
+      run_ranks = gather_ranks( run_averages )
+      return Percentiles.new( magnitude_ranks, interval_ranks, run_ranks )
+    end
+
+    def gather_ranks( array )
+      ranks = Array.new
+      tenth = array.length / 10
+      counter = 0
+      10.times do |i|
+        low = array[ counter ]
+        counter += tenth
+        if i == 9
+          high = array[ array.length - 1 ]
+        else
+          high = array[ counter - 1 ]
+        end
+        rank = ( i ) * 10
+        ranks << Rank.new( low, high, rank )
+      end
+      return ranks
+    end
+
     def output_tsv( file_name )
       output_column_sv( file_name, ".tsv", "\t" )
     end
@@ -531,6 +570,7 @@ module NicInfo
     def output_column_sv( file_name, extension, seperator )
 
       # prelim values
+      @appctx.logger.mesg( "Preparing Data")
       if @first_observed_time != nil && @last_observed_time != nil
         @observation_period_seconds = @last_observed_time.to_i - @first_observed_time.to_i + 1
       else
@@ -539,6 +579,14 @@ module NicInfo
       block_so_count = Hash.new( 0 )
       network_so_count = Hash.new( 0 )
       listedname_so_count = Hash.new( 0 )
+      # NOTE -----------------------
+      # NOTE: gather statistics also calls datum.finish_calculations
+      # NOTE -----------------------
+      if @do_time_statistics
+        block_percentiles = gather_percentiles( @block_data )
+        network_percentiles = gather_percentiles( @net_data )
+        listedname_percentiles = gather_percentiles( @listed_data.values )
+      end
 
       n = file_name+"-blocks"+extension
       @appctx.logger.mesg( "writing file #{n}")
@@ -547,7 +595,7 @@ module NicInfo
       f = File.open( n, "w" );
       f.puts( output_block_column_headers(seperator ) )
       @block_data.each do |datum|
-        f.puts( output_block_columns(datum, seperator, top_blocks, block_stats ) )
+        f.puts( output_block_columns(datum, seperator, block_percentiles, top_blocks, block_stats ) )
         sort_tops( top_blocks )
         gather_service_operator( block_so_count, datum.bulkipnetwork.summary_data ) if datum.bulkipnetwork
       end
@@ -561,7 +609,7 @@ module NicInfo
       f = File.open( n, "w" );
       f.puts( output_network_column_headers( seperator ) )
       @net_data.each do |datum|
-        f.puts( output_network_columns( datum, seperator, top_networks, network_stats ) )
+        f.puts( output_network_columns( datum, seperator, network_percentiles, top_networks, network_stats ) )
         sort_tops( top_networks )
         gather_service_operator( network_so_count, datum.summary_data )
       end
@@ -575,7 +623,7 @@ module NicInfo
       f = File.open( n, "w" );
       f.puts( output_listed_column_headers( seperator ) )
       @listed_data.values.each do |datum |
-        f.puts( output_listed_columns( datum, seperator, top_listednames, listedname_stats ) )
+        f.puts( output_listed_columns( datum, seperator, listedname_percentiles, top_listednames, listedname_stats ) )
         sort_tops( top_listednames )
         gather_service_operator( listedname_so_count, datum.summary_data )
       end
@@ -588,7 +636,7 @@ module NicInfo
       f = File.open( n, "w" );
       f.puts( output_block_column_headers(seperator ) )
       top_blocks.observations.each do |item|
-        f.puts( output_block_columns(item[1], seperator, nil, nil ) )
+        f.puts( output_block_columns(item[1], seperator, block_percentiles, nil, nil ) )
       end
       puts_signature( f )
       f.close
@@ -598,7 +646,7 @@ module NicInfo
       f = File.open( n, "w" );
       f.puts( output_network_column_headers( seperator ) )
       top_networks.observations.each do |item|
-        f.puts( output_network_columns( item[1], seperator, nil, nil ) )
+        f.puts( output_network_columns( item[1], seperator, network_percentiles, nil, nil ) )
       end
       puts_signature( f )
       f.close
@@ -608,7 +656,7 @@ module NicInfo
       f = File.open( n, "w" );
       f.puts( output_listed_column_headers( seperator ) )
       top_listednames.observations.each do |item |
-        f.puts( output_listed_columns( item[1], seperator, nil, nil ) )
+        f.puts( output_listed_columns( item[1], seperator, listedname_percentiles,nil, nil ) )
       end
       puts_signature( f )
       f.close
@@ -620,7 +668,7 @@ module NicInfo
       f = File.open( n, "w" );
       f.puts( output_block_column_headers(seperator ) )
       top_blocks.obsvnspersecond.each do |item|
-        f.puts( output_block_columns(item[1], seperator, nil, nil ) )
+        f.puts( output_block_columns(item[1], seperator, block_percentiles,  nil, nil ) )
       end
       puts_signature( f )
       f.close
@@ -630,7 +678,7 @@ module NicInfo
       f = File.open( n, "w" );
       f.puts( output_network_column_headers( seperator ) )
       top_networks.obsvnspersecond.each do |item|
-        f.puts( output_network_columns( item[1], seperator, nil, nil ) )
+        f.puts( output_network_columns( item[1], seperator, network_percentiles, nil, nil ) )
       end
       puts_signature( f )
       f.close
@@ -640,7 +688,7 @@ module NicInfo
       f = File.open( n, "w" );
       f.puts( output_listed_column_headers( seperator ) )
       top_listednames.obsvnspersecond.each do |item |
-        f.puts( output_listed_columns( item[1], seperator, nil, nil ) )
+        f.puts( output_listed_columns( item[1], seperator, listedname_percentiles, nil, nil ) )
       end
       puts_signature( f )
       f.close
@@ -651,7 +699,7 @@ module NicInfo
       f = File.open( n, "w" );
       f.puts( output_block_column_headers(seperator ) )
       top_blocks.magnitude.each do |item|
-        f.puts( output_block_columns(item[1], seperator, nil, nil ) )
+        f.puts( output_block_columns(item[1], seperator, block_percentiles, nil, nil ) )
       end
       puts_signature( f )
       f.close
@@ -661,7 +709,7 @@ module NicInfo
       f = File.open( n, "w" );
       f.puts( output_network_column_headers( seperator ) )
       top_networks.magnitude.each do |item|
-        f.puts( output_network_columns( item[1], seperator, nil, nil ) )
+        f.puts( output_network_columns( item[1], seperator, network_percentiles, nil, nil ) )
       end
       puts_signature( f )
       f.close
@@ -671,7 +719,7 @@ module NicInfo
       f = File.open( n, "w" );
       f.puts( output_listed_column_headers( seperator ) )
       top_listednames.magnitude.each do |item |
-        f.puts( output_listed_columns( item[1], seperator, nil, nil ) )
+        f.puts( output_listed_columns( item[1], seperator, listedname_percentiles, nil, nil ) )
       end
       puts_signature( f )
       f.close
@@ -682,6 +730,8 @@ module NicInfo
       f = File.open( n, "w" );
       output_statistics( f, block_stats, seperator )
       output_overall_stats( f, @overall_block_stats, seperator )
+      f.puts
+      output_percentiles( f, block_percentiles, seperator )
       puts_signature( f )
       f.close
 
@@ -691,6 +741,8 @@ module NicInfo
       f = File.open( n, "w" );
       output_statistics( f, network_stats, seperator )
       output_overall_stats( f, @overall_network_stats, seperator )
+      f.puts
+      output_percentiles( f, network_percentiles, seperator )
       puts_signature( f )
       f.close
 
@@ -700,6 +752,8 @@ module NicInfo
       f = File.open( n, "w" );
       output_statistics( f,listedname_stats , seperator )
       output_overall_stats( f, @overall_listedname_stats, seperator )
+      f.puts
+      output_percentiles( f, listedname_percentiles, seperator )
       puts_signature( f )
       f.close
 
@@ -787,10 +841,10 @@ module NicInfo
       file.puts( "https://github.com/arineng/nicinfo" )
     end
 
-    def output_block_columns(datum, seperator, tops, stats )
+    def output_block_columns(datum, seperator, percentiles, tops, stats )
       columns = Array.new
       columns << datum.cidrstring
-      gather_query_and_timing_values( columns, datum, tops, stats )
+      gather_query_and_timing_values( columns, datum, percentiles, tops, stats )
       if datum.bulkipnetwork
         summary_data = datum.bulkipnetwork.summary_data
         columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ], seperator )
@@ -806,10 +860,10 @@ module NicInfo
       return columns.join( seperator )
     end
 
-    def output_network_columns( datum, seperator, tops, stats )
+    def output_network_columns( datum, seperator, percentiles, tops, stats )
       columns = Array.new
       columns << datum.cn
-      gather_query_and_timing_values( columns, datum, tops, stats )
+      gather_query_and_timing_values( columns, datum, percentiles,  tops, stats )
       summary_data = datum.summary_data
       columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ], seperator )
       columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::LISTED_NAME ], seperator )
@@ -818,19 +872,44 @@ module NicInfo
       return columns.join( seperator )
     end
 
-    def output_listed_columns( datum, seperator, tops, stats )
+    def output_listed_columns( datum, seperator, percentiles, tops, stats )
       columns = Array.new
       summary_data = datum.summary_data
       columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::LISTED_NAME ], seperator )
-      gather_query_and_timing_values( columns, datum, tops, stats )
+      gather_query_and_timing_values( columns, datum, percentiles, tops, stats )
       columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ], seperator )
       columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::LISTED_COUNTRY ], seperator )
       columns << to_columnar_string( summary_data[ NicInfo::CommonSummary::ABUSE_EMAIL ], seperator )
       return columns.join( seperator )
     end
 
-    def gather_query_and_timing_values( columns, datum, tops = nil, stats = nil )
-      datum.finish_calculations
+    def output_percentiles( file, percentiles, seperator )
+      headers = [ "Percentile" ]
+      headers << "Magnitude Avg Low" << "Magnitude Avg High"
+      headers << "Interval Avg Low" << "Interval Avg High"
+      headers << "Run Avg Low" << "Run Avg High"
+      file.puts( headers.join( seperator ))
+      10.times do |i|
+        columns = [ i ]
+        columns << percentiles.magnitudes[ i ].low << percentiles.magnitudes[ i ].high
+        columns << percentiles.intervals[ i ].low << percentiles.intervals[ i ].high
+        columns << percentiles.runs[ i ].low << percentiles.runs[ i ].high
+        file.puts( columns.join( seperator ) )
+      end
+    end
+
+    def get_rank( ranks, value )
+      retval = NotApplicable
+      ranks.each do |rank|
+        if value >= rank.low && value <= rank.high
+          retval = rank.percentile
+          break
+        end
+      end if value != nil
+      return retval
+    end
+
+    def gather_query_and_timing_values( columns, datum, percentiles, tops = nil, stats = nil )
 
       # observations
       columns << datum.observations.to_s
@@ -869,7 +948,11 @@ module NicInfo
         stats.magnitude_floor.datum( datum.magnitude_floor ) if stats
 
         # magnitude average
-        columns << datum.get_magnitude_average
+        magnitude_average = datum.get_magnitude_average
+        columns << magnitude_average
+
+        # magnitude average rank
+        columns << get_rank( percentiles.magnitudes, magnitude_average)
 
         # magnitude standard deviation
         columns << to_columnar_data( datum.get_magnitude_standard_deviation( @do_sampling ) )
@@ -890,7 +973,11 @@ module NicInfo
         stats.interval_count.datum( datum.interval_count ) if stats && datum.interval_count
 
         # interval average
-        columns << to_columnar_data( datum.get_interval_average )
+        interval_average = datum.get_interval_average
+        columns << to_columnar_data( interval_average )
+
+        # inteval average rank
+        columns << get_rank( percentiles.intervals, interval_average )
 
         # interval standard deviation
         columns << to_columnar_data( datum.get_interval_standard_deviation( @do_sampling ) )
@@ -911,7 +998,11 @@ module NicInfo
         stats.run_count.datum( datum.run_count ) if stats
 
         # run average
-        columns << datum.get_run_average
+        run_average = datum.get_run_average
+        columns << run_average
+        columns << get_rank( percentiles.runs, run_average )
+
+        # run average rank
 
         # run standard deviation
         columns << to_columnar_data( datum.get_run_standard_deviation( @do_sampling ) )
@@ -933,18 +1024,21 @@ module NicInfo
         headers << "Magnitude Ceiling"
         headers << "Magnitude Floor"
         headers << "Magnitude Average"
+        headers << "Magnitude Avg Percentile"
         headers << "Magnitude Std Deviation"
         headers << "Magnitude CV %"
         headers << "Longest Interval"
         headers << "Shortest Interval"
         headers << "Interval Count"
         headers << "Interval Average"
+        headers << "Interval Avg Percentile"
         headers << "Interval Std Deviation"
         headers << "Interval CV %"
         headers << "Longest Run"
         headers << "Shortest Run"
         headers << "Run Count"
         headers << "Run Average"
+        headers << "Run Avg Percentile"
         headers << "Run Std Deviation"
         headers << "Run CV %"
       end
