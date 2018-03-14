@@ -124,6 +124,10 @@ module NicInfo
         @appctx.logger.mesg( e.message, NicInfo::AttentionType::ERROR )
         retval.error_state = true
         retval.exception = e
+      rescue Net::OpenTimeout => e
+        @appctx.logger.mesg( "DNS resolution issue: #{e.message}", NicInfo::AttentionType::ERROR )
+        retval.error_state = true
+        retval.exception = e
       rescue ArgumentError => a
         @appctx.logger.mesg(a.message, NicInfo::AttentionType::ERROR )
         retval.error_state = true
