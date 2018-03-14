@@ -29,6 +29,7 @@ module NicInfo
   # TODO get rid of explicit exits
   # TODO make CSV/TSV output compliant with RFC4180
   # TODO when no files in bulk-in glob, throw error
+  # TODO if no bulkip out given, thrown an error
   # TODO add feature to set sorted line buffer size
   # TODO block statistics by /24 and /56
 
