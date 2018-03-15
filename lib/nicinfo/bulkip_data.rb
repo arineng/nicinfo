@@ -446,7 +446,6 @@ module NicInfo
       if datum
         datum.observed( time )
         retval = NetAlreadyRetreived
-        @appctx.logger.trace( "observed network already retreived" )
       end
 
       @total_observations = @total_observations + 1 if retval
@@ -487,6 +486,7 @@ module NicInfo
         else
           b = BulkIPBlock.new( cidr, time, bulkipnetwork, bulkiplisted, @overall_block_stats )
           @block_data.insert( cidr, b )
+          @appctx.logger.trace( "inserting #{cidr} block")
         end
       end
 
@@ -508,6 +508,7 @@ module NicInfo
       else
         b = BulkIPBlock.new( cidr, time, nil, nil, @overall_block_stats )
         @block_data.insert( cidr, b )
+        @appctx.logger.trace( "inserting unknown #{cidr} block")
       end
       @total_observations = @total_observations + 1
       @total_fetch_errors = @total_fetch_errors + 1

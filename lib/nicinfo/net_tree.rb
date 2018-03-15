@@ -22,7 +22,7 @@ module NicInfo
 
     NetNode = Struct.new( :cidr_length, :ipaddr, :data )
 
-    attr_accessor :v4_root, :v6_root
+    attr_accessor :v4_root, :v6_root, :btree
 
     def initialize
       @btree = NicInfo::BinarySearchTree.new
@@ -83,20 +83,29 @@ module NicInfo
 
     end
 
-    def find_by_root( root, ipaddr )
+    def find_by_root( root, ipaddr, number )
       retval = nil
-      n = @btree.floor( root, ipaddr.to_i )
+      n = @btree.floor( root, number )
       if n
         if n.data.is_a?( Array )
           n.data.each do |i|
+            start_num = i.ipaddr.to_range.begin.to_i
+            end_num = i.ipaddr.to_range.end.to_i
             if i.ipaddr.include?( ipaddr )
               retval = i.data
               break
             end
           end
         else
-          retval = n.data.data if n.data.ipaddr.include?( ipaddr )
+          start_num = n.data.ipaddr.to_range.begin.to_i
+          end_num = n.data.ipaddr.to_range.end.to_i
+          if n.data.ipaddr.include?( ipaddr )
+            retval = n.data.data
+          end
         end
+      end
+      if retval == nil && end_num != nil && end_num < number
+        retval = find_by_root( root, ipaddr, start_num - 1 )
       end
       return retval
     end
@@ -108,9 +117,9 @@ module NicInfo
 
     def find_by_ipaddr( ipaddr )
       if ipaddr.ipv4?
-        return find_by_root( @v4_root, ipaddr )
+        return find_by_root( @v4_root, ipaddr, ipaddr.to_i )
       else
-        return find_by_root( @v6_root, ipaddr )
+        return find_by_root( @v6_root, ipaddr, ipaddr.to_i )
       end
     end
 

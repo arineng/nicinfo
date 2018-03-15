@@ -60,4 +60,31 @@ describe 'binary search tree test' do
 
   end
 
+  it 'should do btree floor' do
+    t = NicInfo::BinarySearchTree.new
+    a = []
+    (1..9).each do |x|
+      a << x * 10
+      a << x * 100
+      a << x * 1000
+    end
+    a.each do |x|
+      root = t.insert( nil, x, x )
+      a.each do |y|
+        if y != x
+          t.insert( root, y, y )
+        end
+      end
+      a.each_with_index do |x,i|
+        expect( t.floor( root, x ).data ).to eq( x )
+        expect( t.floor( root, x + 1 ).data ).to eq( x )
+        if i == 0
+          expect( t.floor( root, x - 1 ) ).to_not be
+        else
+          expect( t.floor( root, x - 1 ).data ).to_not eq( x )
+        end
+      end
+    end
+  end
+
 end

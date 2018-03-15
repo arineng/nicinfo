@@ -87,4 +87,12 @@ describe 'net_tree test' do
 
   end
 
+  it 'should find' do
+    t = NicInfo::NetTree.new
+    t.insert( "10.0.0.0/8", 1 )
+    t.insert( "10.0.1.0/24", 2 )
+    expect( t.find_by_ip( "10.1.0.0" ) ).to eq( 1 )
+
+  end
+
 end
