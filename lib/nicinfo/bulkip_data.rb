@@ -462,36 +462,48 @@ module NicInfo
 
     def observe_network( ipnetwork, time, requested_url = nil )
 
-      if requested_url && !ipnetwork.summary_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ]
-        l = NicInfo.service_operator_from_link( requested_url )
-        ipnetwork.summary_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ] = l if l
-      end
 
-      bulkipnetwork = BulkIPNetwork.new( ipnetwork, time, @overall_network_stats )
-      @net_data << bulkipnetwork
-
-      listed_name = ipnetwork.summary_data[ NicInfo::CommonSummary::LISTED_NAME ]
-      listed_name = NotApplicable unless listed_name
-      bulkiplisted = @listed_data[ listed_name ]
-      unless bulkiplisted
-        bulkiplisted = BulkIPListed.new( ipnetwork, time, @overall_listedname_stats )
-        @listed_data[ listed_name ] = bulkiplisted
-      end
-
+      found = false
       cidrs = ipnetwork.summary_data[ NicInfo::CommonSummary::CIDRS ]
       cidrs.each do |cidr|
         b = @block_data.lookup_net( cidr )
         if b
           b.observed( time )
-        else
+          @appctx.logger.trace( "double observation with #{cidr} block")
+          found = true
+        end
+      end
+
+      unless found
+        if requested_url && !ipnetwork.summary_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ]
+          l = NicInfo.service_operator_from_link( requested_url )
+          ipnetwork.summary_data[ NicInfo::CommonSummary::SERVICE_OPERATOR ] = l if l
+        end
+
+        bulkipnetwork = BulkIPNetwork.new( ipnetwork, time, @overall_network_stats )
+        @net_data << bulkipnetwork
+
+        listed_name = ipnetwork.summary_data[ NicInfo::CommonSummary::LISTED_NAME ]
+        listed_name = NotApplicable unless listed_name
+        bulkiplisted = @listed_data[ listed_name ]
+        unless bulkiplisted
+          bulkiplisted = BulkIPListed.new( ipnetwork, time, @overall_listedname_stats )
+          @listed_data[ listed_name ] = bulkiplisted
+        end
+
+        cidrs = ipnetwork.summary_data[ NicInfo::CommonSummary::CIDRS ]
+        cidrs.each do |cidr|
+          b = @block_data.lookup_net( cidr )
           b = BulkIPBlock.new( cidr, time, bulkipnetwork, bulkiplisted, @overall_block_stats )
           @block_data.insert( cidr, b )
           @appctx.logger.trace( "inserting #{cidr} block")
         end
+
+        @network_lookups = @network_lookups + 1
+
       end
 
       @total_observations = @total_observations + 1
-      @network_lookups = @network_lookups + 1
       observed_time( time )
 
     end
@@ -505,6 +517,7 @@ module NicInfo
       b = @block_data.lookup_net( cidr )
       if b
         b.observed( time )
+        @appctx.logger.trace( "double observation with unknown #{cidr} block")
       else
         b = BulkIPBlock.new( cidr, time, nil, nil, @overall_block_stats )
         @block_data.insert( cidr, b )
