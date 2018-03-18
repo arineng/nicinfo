@@ -32,6 +32,7 @@ module NicInfo
   # TODO if no bulkip out given, thrown an error
   # TODO add feature to set sorted line buffer size
   # TODO block statistics by /24 and /56
+  # TODO change configuration of bulkip to its own YAML file
 
   class Stat
 
