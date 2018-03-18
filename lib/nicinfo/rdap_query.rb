@@ -341,6 +341,7 @@ module NicInfo
 
     def cache_self_references json_data
       # TODO look at a way to report objects that don't have self links
+      return unless @appctx.config[ NicInfo::CACHE ][ NicInfo::DEEP_OBJECT_CACHING ]
       links = NicInfo::get_links json_data, @appctx
       if links
         self_link = NicInfo.get_self_link links

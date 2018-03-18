@@ -154,6 +154,13 @@ module NicInfo
           raise OptionParser::InvalidArgument, cc.to_s unless cc =~ /yes|no|true|false/i
         end
 
+        opts.on("--deep-object-caching YES|NO|TRUE|FALSE",
+                "Caching of objects in embedded in other objects.") do |dc|
+          @appctx.config[ NicInfo::CACHE ][ NicInfo::DEEP_OBJECT_CACHING ] = false if dc =~ /no|false/i
+          @appctx.config[ NicInfo::CACHE ][ NicInfo::DEEP_OBJECT_CACHING ] = true if dc =~ /yes|true/i
+          raise OptionParser::InvalidArgument, dc.to_s unless dc =~ /yes|no|true|false/i
+        end
+
         opts.on("--empty-cache",
                 "Empties the cache of all files regardless of eviction policy.") do |cc|
           @appctx.options.empty_cache = true

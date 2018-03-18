@@ -84,6 +84,7 @@ module NicInfo
   CACHE_EVICTION = "cache_eviction"
   USE_CACHE = "use_cache"
   CLEAN_CACHE = "clean_cache"
+  DEEP_OBJECT_CACHING = "deep_object_caching"
   BOOTSTRAP = "bootstrap"
   BOOTSTRAP_URL = "bootstrap_url"
   HELP_ROOT_URL = "help_root_url"

@@ -319,6 +319,9 @@ cache:
   # Automatically clean the cache.
   clean_cache: true
 
+  # Controls the caching of objects inside of other objects.
+  deep_object_caching: true
+
 bootstrap:
 
   # The base or bootstrap URL. Specifying this will bypass all built-in bootstrapping.
@@ -363,7 +366,7 @@ security:
 
 config:
   # This should not be altered.
-  version: 4
+  version: 5
 
 YAML_CONFIG
 

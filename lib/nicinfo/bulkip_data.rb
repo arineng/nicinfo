@@ -25,7 +25,6 @@ module NicInfo
   # TODO track redirect URLs too
   # TODO track error count per URL
   # TODO track avg response time per URL
-  # TODO feature to turn off deep object caching
   # TODO get rid of explicit exits
   # TODO make CSV/TSV output compliant with RFC4180
   # TODO when no files in bulk-in glob, throw error
