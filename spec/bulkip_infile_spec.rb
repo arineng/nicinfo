@@ -352,7 +352,7 @@ describe 'bulk_infile test' do
     appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
     fs = NicInfo::BulkIPInFileSet.new( appctx )
-    fs.set_file_list( "spec/bulkip/fs*.log" )
+    fs.add_to_file_list( "spec/bulkip/fs*.log" )
 
     values = [
       [ "61.181.2.38", "2018-02-04 10:00:00,005", 1, "fs1.log" ],
@@ -390,7 +390,7 @@ describe 'bulk_infile test' do
     appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
     fs = NicInfo::BulkIPInFileSet.new( appctx )
-    fs.set_file_list( "spec/bulkip/bad*.log" )
+    fs.add_to_file_list( "spec/bulkip/bad*.log" )
 
     expect{ fs.foreach_by_time {|ip,time,lineno,file_name| } }.to raise_error(/descending/)
 
@@ -408,7 +408,7 @@ describe 'bulk_infile test' do
     appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
     fs = NicInfo::BulkIPInFileSet.new( appctx )
-    fs.set_file_list( "spec/bulkip/almost_bad*.log" )
+    fs.add_to_file_list( "spec/bulkip/almost_bad*.log" )
 
     expect{ fs.foreach_by_time {|ip,time,lineno,file_name| } }.to_not raise_error
 

@@ -306,14 +306,18 @@ module NicInfo
       @appctx = appctx
     end
 
-    def set_file_list( file_list )
+    def add_to_file_list( file_list )
+      unless @file_list
+        @file_list = []
+        @timing_provided = false
+      end
 
       # if we have been given a directory, turn it into a glob pattern
       if File.directory?( file_list )
         file_list = file_list + File::SEPARATOR unless file_list.end_with?( File::SEPARATOR )
         file_list = file_list + "*"
       end
-      @file_list = file_list
+      @file_list << file_list
 
       # make sure all files have a strategy
       # and make sure that all files either have timing information or don't, no mixtures
@@ -334,9 +338,7 @@ module NicInfo
       if files_with_time != 0 && files_without_time != 0
         raise ArgumentError.new( "Some files have times and some do not. All files must either have time values or no time values.")
       end
-      @timing_provided = false
       @timing_provided = true if files_with_time != 0
-
     end
 
     def foreach_by_time

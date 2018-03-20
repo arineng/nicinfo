@@ -27,7 +27,7 @@ module NicInfo
       @appctx = appctx
     end
 
-    def setup( file_name )
+    def configure( file_name )
       retval = false
       if File.exists?( file_name )
         @appctx.load_config( file_name, false )

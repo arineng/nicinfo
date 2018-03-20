@@ -865,7 +865,7 @@ HELP_SUMMARY
     def do_bulkip
       file_list = @appctx.options.bulkip_in
       fs = NicInfo::BulkIPInFileSet.new( @appctx )
-      fs.set_file_list( file_list )
+      fs.add_to_file_list( file_list )
       rdap_query = NicInfo::RDAPQuery.new( @appctx )
       bulkip_data = NicInfo::BulkIPData.new( @appctx )
       bulkip_data.top_scores = @appctx.options.bulkip_top_scores if @appctx.options.bulkip_top_scores

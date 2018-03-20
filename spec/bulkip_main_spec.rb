@@ -49,7 +49,7 @@ describe 'bulk_main test' do
     appctx.setup_workspace
     bm = NicInfo::BulkIPMain.new( appctx )
     fn = File.join( dir, "new_bulkip_config.yaml" )
-    bm.setup( fn )
+    bm.configure( fn )
     expect( File.exists?( fn ) ).to be_truthy
 
   end
