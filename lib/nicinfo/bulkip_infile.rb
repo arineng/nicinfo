@@ -299,7 +299,7 @@ module NicInfo
 
   class BulkIPInFileSet
 
-    attr_accessor :appctx, :timing_provided, :file_list
+    attr_accessor :appctx, :timing_provided, :file_list, :line_buffer_size
 
 
     def initialize( appctx )
@@ -346,6 +346,7 @@ module NicInfo
       @inlines = {}
       Dir.glob( @file_list ).each do |file|
         b = BulkIPInFile.new( file )
+        b.line_buffer_size = @line_buffer_size if @line_buffer_size
         if b.strategy == nil
           raise RuntimeError unless b.has_strategy
         end
