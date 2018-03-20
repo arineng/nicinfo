@@ -90,6 +90,9 @@ output:
   # otherwise, leave it commented out to go to stderr
   #messages_file: /tmp/NicInfo.messages
 
+  # Page output with system pager when appropriate.
+  pager: true
+
 cache:
 
   # The maximum age an item from the cache will be used.
