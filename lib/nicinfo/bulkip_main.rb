@@ -91,7 +91,7 @@ output:
   #messages_file: /tmp/NicInfo.messages
 
   # Page output with system pager when appropriate.
-  pager: true
+  pager: false
 
 cache:
 
