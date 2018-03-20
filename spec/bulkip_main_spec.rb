@@ -35,9 +35,9 @@ describe 'bulk_main test' do
 
   end
 
-  it 'should create template file' do
+  it 'should create template file and injest' do
 
-    dir = File.join( @work_dir, "create_template" )
+    dir = File.join( @work_dir, "create_injest_template" )
     logger = NicInfo::Logger.new
     logger.data_out = StringIO.new
     logger.message_out = StringIO.new
@@ -51,6 +51,11 @@ describe 'bulk_main test' do
     fn = File.join( dir, "new_bulkip_config.yaml" )
     bm.configure( fn )
     expect( File.exists?( fn ) ).to be_truthy
+    expect( appctx.config[ NicInfo::OUTPUT ][NicInfo::PAGER ] ).to be_truthy
+
+    # now this should actually injest it
+    bm.configure( fn )
+    expect( appctx.config[ NicInfo::OUTPUT ][NicInfo::PAGER ] ).to be_falsey
 
   end
 
