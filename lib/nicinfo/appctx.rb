@@ -108,9 +108,11 @@ module NicInfo
       end
     end
 
-    def load_config config_file_name
-      @config = YAML.load( @@yaml_config )
-      @config[NicInfo::CONFIG].delete(NicInfo::VERSION_CONFIG)
+    def load_config( config_file_name, merge_defaults = true )
+      if merge_defaults
+        @config = YAML.load( @@yaml_config )
+        @config[NicInfo::CONFIG].delete(NicInfo::VERSION_CONFIG)
+      end
       merger = proc do |key, v1, v2|
         Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) :
                 Array === v1 && Array === v2 ? v1 | v2 :

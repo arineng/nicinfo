@@ -102,6 +102,15 @@ module NicInfo
   SECURITY = "security"
   TRY_INSECURE = "try_insecure"
 
+  # BulkIP Configuration Values
+  BULKIP = "bulkip"
+  INPUT_FILES = "input_files"
+  SORTED_LINE_BUFFER_SIZE = "sorted_line_buffer_size"
+  TSV_OUTPUT = "tsv_output"
+  CSV_OUTPUT = "csv_output"
+  TOP_SCORES = "top_scores"
+  SAMPLING_INTERVAL = "sampling_interval"
+
   # NicInfo values
   NICINFO_DEMO_URL = "nicInfo_demoUrl"
   NICINFO_DEMO_HINT = "nicInfo_demoHint"
