@@ -22,16 +22,16 @@ require 'nicinfo/net_tree'
 module NicInfo
 
   # things to think about
-  # TODO track redirect URLs too
-  # TODO track error count per URL
-  # TODO track avg response time per URL
   # TODO get rid of explicit exits
   # TODO make CSV/TSV output compliant with RFC4180
-  # TODO when no files in bulk-in glob, throw error
-  # TODO if no bulkip out given, thrown an error
-  # TODO add feature to set sorted line buffer size
   # TODO block statistics by /24 and /56
-  # TODO change configuration of bulkip to its own YAML file
+  # TODO check track redirect URLs too
+  # TODO check track error count per URL
+  # TODO check track avg response time per URL
+  # TODO check when no files in bulk-in glob, throw error
+  # TODO check if no bulkip out given, thrown an error
+  # TODO check add feature to set sorted line buffer size
+  # TODO check change configuration of bulkip to its own YAML file
 
   class Stat
 
@@ -326,7 +326,7 @@ module NicInfo
     attr_accessor :interval_seconds_to_increment, :second_to_sample, :total_intervals, :do_sampling
     attr_accessor :top_scores, :overall_block_stats, :overall_network_stats, :overall_listedname_stats
 
-    UrlColumnHeaders = [ "Total Queries", "Averaged QPS", "URL" ]
+    HostColumnHeaders = [ "Host", "Total Queries", "Avg QPS", "Avg Response Time" ]
     NotApplicable = "N/A"
 
     # result codes from query_for_net?
@@ -801,12 +801,16 @@ module NicInfo
       f.puts( so_columns.join( seperator ) )
 
 
-      unless @appctx.tracked_urls.empty?
+      unless @appctx.tracked_hosts.empty?
         f.puts
-        f.puts( UrlColumnHeaders.join( seperator ) )
+        response_type_keys = []
+        @appctx.tracked_hosts.each_value do |tracker|
+          response_type_keys = response_type_keys | tracker.response_types.keys
+        end
+        host_headers = HostColumnHeaders + response_type_keys
+        f.puts( host_headers.join( seperator ) )
         @appctx.tracked_urls.each_value do |tracker|
-          qps = tracker.total_queries.fdiv( tracker.last_query_time.to_i - tracker.first_query_time.to_i )
-          f.puts( output_tracked_urls( tracker, qps, seperator ) )
+          f.puts( output_tracked_hosts( tracker, response_type_keys, seperator ) )
         end
       end
 
@@ -1106,11 +1110,15 @@ module NicInfo
       return headers.join( seperator )
     end
 
-    def output_tracked_urls( tracker, qps, seperator )
+    def output_tracked_hosts( tracker, response_type_keys, seperator )
       columns = Array.new
-      columns << tracker.total_queries.to_s
-      columns << qps.to_s
-      columns << tracker.url
+      columns << tracker.host
+      columns << tracker.total_queries
+      columns << tracker.get_average_query_rate
+      columns << tracker.get_average_response_time
+      response_type_keys.each do |key|
+        columns << tracker.response_types[ key ]
+      end
       return columns.join( seperator )
     end
 

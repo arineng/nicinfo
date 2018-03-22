@@ -23,11 +23,45 @@ require 'nicinfo/constants'
 
 module NicInfo
 
+  # tracks response stats from hosts
+  class TrackedHost
+    attr_accessor :host, :total_queries, :first_query_time, :last_query_time, :response_time
+    attr_accessor :response_types
+
+    def initialize( host )
+      @host = host
+      @total_queries = 1
+      @first_query_time = Time.now
+      @last_query_time = Time.now
+      @response_types = Hash.new( 1 )
+      @response_time = 0
+    end
+
+    def queried( start_time, end_time )
+      @total_queries = @total_queries + 1
+      @last_query_time = Time.now
+      @response_time = @response_time + ( end_time.to_i - start_time.to_i )
+      @response_types[ "200" ] += 1
+    end
+
+    def get_average_query_rate
+      @total_queries.fdiv( @last_query_time.to_i - @first_query_time.to_i )
+    end
+
+    def get_average_response_time
+      @response_time.fdiv( @total_queries )
+    end
+
+    def register_response( response_type )
+      @response_types[ response_type ] += 1
+    end
+  end
+
   # Handles configuration of the application
   class AppContext
 
     attr_accessor :logger, :config, :rdap_cache_dir, :options, :conf_msgs, :rdap_bootstrap_dir, :factory
-    attr_accessor :cache, :tracked_urls
+    attr_accessor :cache, :tracked_hosts
 
     # Intializes the configuration with a place to look for the config file
     # If the file doesn't exist, a default is used.
@@ -38,7 +72,7 @@ module NicInfo
       @app_data = app_data
       @logger = NicInfo::Logger.new
       @conf_msgs = Array.new
-      @tracked_urls = Hash.new
+      @tracked_hosts = Hash.new
       @factory = NicInfo::Factory.new( self )
 
       config_file_name = AppContext.formulate_config_file_name(@app_data )
@@ -263,6 +297,29 @@ module NicInfo
 
     def self.formulate_config_file_name data_dir
       File.join( data_dir, "config.yaml" )
+    end
+
+    def queried( uri, start_time, end_time )
+      t = get_tracked_host( uri )
+      t.queried( start_time, end_time )
+    end
+
+    def register_response( uri, response_type )
+      t = get_tracked_host( uri )
+      t.register_response( response_type )
+    end
+
+    def get_tracked_host( uri )
+      unless uri.is_a?( URI )
+        uri = URI.parse( uri )
+      end
+      host = uri.host
+      t = @tracked_hosts[ host ]
+      if t == nil
+        t = NicInfo::TrackedHost.new( host )
+        @tracked_hosts[ host ] = t
+      end
+      return t
     end
 
     @@yaml_config = <<YAML_CONFIG

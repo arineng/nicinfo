@@ -597,7 +597,7 @@ module NicInfo
           @appctx.save_as_yaml( NicInfo::LASTTREE_YAML, data_tree ) if !data_tree.empty?
           show_search_results_truncated json_data
           show_conformance_messages
-          show_tracked_urls
+          show_tracked_hosts
           show_helpful_messages json_data, data_tree if show_help
         end
       end
@@ -796,10 +796,10 @@ HELP_SUMMARY
       end
     end
 
-    def show_tracked_urls
-      @appctx.tracked_urls.each_value do |tracker|
-        qps = tracker.total_queries.fdiv( tracker.last_query_time.to_i - tracker.first_query_time.to_i )
-        @appctx.logger.trace( "#{tracker.total_queries} queries to #{tracker.url} rated at #{qps} queries per second")
+    def show_tracked_hosts
+      @appctx.tracked_hosts.each_value do |tracker|
+        qps = tracker.get_average_query_rate
+        @appctx.logger.trace( "#{tracker.total_queries} queries to #{tracker.host} rated at #{qps} queries per second")
       end
     end
 
@@ -844,7 +844,7 @@ HELP_SUMMARY
     def do_bulkip
       @bulkip.setup
       @bulkip.execute
-      show_tracked_urls
+      show_tracked_hosts
     end
 
   end

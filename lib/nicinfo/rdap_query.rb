@@ -22,24 +22,6 @@ module NicInfo
 
   end
 
-  class TrackedUrl
-
-    attr_accessor :url, :total_queries, :first_query_time, :last_query_time
-
-    def initialize( url )
-      @url = url
-      @total_queries = 1
-      @first_query_time = Time.now
-      @last_query_time = Time.now
-    end
-
-    def queried
-      @total_queries = @total_queries + 1
-      @last_query_time = Time.now
-    end
-
-  end
-
   class RDAPQuery
 
     MaxRedirects = 5
@@ -100,7 +82,7 @@ module NicInfo
           rdap_url = query[0]
         end
         retval.requested_url = rdap_url
-        retval.data = get(rdap_url, 0, true, bootstrap_url )
+        retval.data = get(rdap_url, 0, true )
         retval.json_data = JSON.load(retval.data)
         if (ec = retval.json_data[ NicInfo::NICINFO_DEMO_ERROR ]) != nil
           res = MyHTTPResponse.new( "1.1", ec, "Demo Exception" )
@@ -116,22 +98,27 @@ module NicInfo
         @appctx.logger.mesg( "Server returned invalid JSON!", NicInfo::AttentionType::ERROR )
         retval.error_state = true
         retval.exception = a
+        @appctx.register_response( rdap_url, "JSON Err" )
       rescue SocketError => a
         @appctx.logger.mesg(a.message, NicInfo::AttentionType::ERROR )
         retval.error_state = true
         retval.exception = a
+        @appctx.register_response( rdap_url, "Connection Err" )
       rescue SystemCallError => e
         @appctx.logger.mesg( e.message, NicInfo::AttentionType::ERROR )
         retval.error_state = true
         retval.exception = e
+        @appctx.register_response( rdap_url, "Network Err" )
       rescue Net::OpenTimeout => e
         @appctx.logger.mesg( "DNS resolution issue: #{e.message}", NicInfo::AttentionType::ERROR )
         retval.error_state = true
         retval.exception = e
+        @appctx.register_response( rdap_url, "DNS Err" )
       rescue ArgumentError => a
         @appctx.logger.mesg(a.message, NicInfo::AttentionType::ERROR )
         retval.error_state = true
         retval.exception = a
+        @appctx.register_response( rdap_url, "Unknown Err" )
       rescue Net::HTTPServerException => e
         case e.response.code
           when "200"
@@ -140,15 +127,19 @@ module NicInfo
           when "401"
             @appctx.logger.mesg("Authorization is required.", NicInfo::AttentionType::ERROR )
             handle_error_response(e,retval)
+            @appctx.register_response( rdap_url, e.response.code )
           when "404"
             @appctx.logger.mesg("Query yielded no results.", NicInfo::AttentionType::INFO )
             handle_error_response( e, retval )
+            @appctx.register_response( rdap_url, e.response.code )
           else
             @appctx.logger.mesg("Error #{e.response.code}.", NicInfo::AttentionType::ERROR )
             handle_error_response( e, retval )
+            @appctx.register_response( rdap_url, e.response.code )
         end
         @appctx.logger.trace("Server response code was " + e.response.code)
       rescue Net::HTTPFatalError => e
+        @appctx.register_response( rdap_url, e.response.code )
         case e.response.code
           when "500"
             @appctx.logger.mesg("RDAP server is reporting an internal error.", NicInfo::AttentionType::ERROR )
@@ -169,6 +160,7 @@ module NicInfo
         retval.exception = e
         retval.code = 302
         @appctx.logger.mesg("Too many redirections, retries, or a redirect loop has been detected." )
+        @appctx.register_response( rdap_url, "Loop Err" )
       end
 
       return retval
@@ -237,20 +229,12 @@ module NicInfo
     end
 
     # Do an HTTP GET with the path.
-    def get url, try, expect_rdap = true, tracking_url = nil
+    def get url, try, expect_rdap = true
 
       data = @appctx.cache.get(url)
       if data == nil
 
         @appctx.logger.trace("Issuing GET for " + url)
-        tracking_url = url if tracking_url == nil
-        tracker = @appctx.tracked_urls[ tracking_url ]
-        if tracker
-          tracker.queried
-        else
-          tracker = TrackedUrl.new( tracking_url )
-          @appctx.tracked_urls[ tracking_url ] = tracker
-        end
         uri = URI.parse( URI::encode( url ) )
         req = Net::HTTP::Get.new(uri.request_uri)
         req["User-Agent"] = NicInfo::VERSION_LABEL
@@ -263,10 +247,14 @@ module NicInfo
         end
 
         begin
+          start_time = Time.now
           res = http.start do |http_req|
             http_req.request(req)
           end
+          end_time = Time.now
+          @appctx.queried( uri, start_time, end_time )
         rescue OpenSSL::SSL::SSLError => e
+          @appctx.register_reponse( uri, "SSL Err" )
           if @appctx.config[ NicInfo::SECURITY ][ NicInfo::TRY_INSECURE ]
             @appctx.logger.mesg( "Secure connection failed. Trying insecure connection." )
             uri.scheme = "http"
