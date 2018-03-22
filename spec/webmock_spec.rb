@@ -18,6 +18,7 @@ require 'pp'
 require 'spec_helper'
 require 'rspec'
 require 'webmock/rspec'
+require 'erb'
 require_relative '../lib/nicinfo/appctx'
 require_relative '../lib/nicinfo/nicinfo_main'
 require_relative '../lib/nicinfo/nicinfo_logger'
@@ -355,12 +356,16 @@ describe 'web mocks' do
     config.logger=logger
     config.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
 
-    file_out = File.join( dir, "bulkip_out" )
+    @file_out = File.join( dir, "bulkip_out" )
+    render = ERB.new( "spec/bulkip/webmock_spec.yaml" )
+    FileUtils.mkdir_p( dir )
+    cf_name = File.join( dir, "webmock_spec.yaml" )
+    bulkip_config = File.open( cf_name, "w" )
+    bulkip_config.puts( render.result )
+    bulkip_config.close
+
     args = []
-    args << "--bulkip-in" << "spec/bulkip/ex5.log"
-    args << "--bulkip-out-tsv" << file_out
-    args << "--bulkip-out-csv" << file_out
-    args << "--bulkip-top-scores" << "2"
+    args << "--bulkip-config" << cf_name
 
     expect{ NicInfo::Main.new( args, config ).run }.to_not output.to_stdout
 

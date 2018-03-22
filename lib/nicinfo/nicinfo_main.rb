@@ -35,8 +35,7 @@ require 'ipaddr'
 require 'nicinfo/data_tree'
 require 'nicinfo/traceroute'
 require 'nicinfo/rdap_query'
-require 'nicinfo/bulkip_infile'
-require 'nicinfo/bulkip_data'
+require 'nicinfo/bulkip_main'
 begin
   require 'json'
 rescue LoadError
@@ -81,7 +80,7 @@ module NicInfo
   # The main class for the nicinfo command.
   class Main
 
-    attr_accessor :appctx, :jcr_context, :jcr_strict_context
+    attr_accessor :appctx, :jcr_context, :jcr_strict_context, :bulkip
 
     def initialize args, appctx = nil
 
@@ -302,31 +301,11 @@ module NicInfo
         opts.separator ""
         opts.separator "Bulk IP Options:"
 
-        opts.on( "--bulkip-in FILES",
-                 "Bulk IP input files" ) do |files|
-          @appctx.options.bulkip_in = files
-          @appctx.options.do_bulkip = true
+        opts.on( "--bulkip-config FILE",
+                 "Bulk IP configuration file" ) do |file|
+          @bulkip = NicInfo::BulkIPMain.new( @appctx )
+          @appctx.options.do_bulkip = @bulkip.configure( file )
           @appctx.options.require_query = false
-        end
-
-        opts.on( "--bulkip-out-csv NAME",
-                 "Bulk IP CSV output file base name" ) do |file|
-          @appctx.options.bulkip_out_csv = file
-        end
-
-        opts.on( "--bulkip-out-tsv NAME",
-                 "Bulk IP TSV output file base name" ) do |file|
-          @appctx.options.bulkip_out_tsv = file
-        end
-
-        opts.on( "--bulkip-top-scores NUMBER",
-                "Set top NUMBER of data" ) do |n|
-          @appctx.options.bulkip_top_scores = n.to_i
-        end
-
-        opts.on( "--bulkip-interval SECONDS",
-                 "Sampling interval in seconds" ) do |n|
-          @appctx.options.bulkip_interval_seconds = n.to_i
         end
 
       end
@@ -863,71 +842,8 @@ HELP_SUMMARY
     end
 
     def do_bulkip
-      file_list = @appctx.options.bulkip_in
-      fs = NicInfo::BulkIPInFileSet.new( @appctx )
-      fs.add_to_file_list( file_list )
-      rdap_query = NicInfo::RDAPQuery.new( @appctx )
-      bulkip_data = NicInfo::BulkIPData.new( @appctx )
-      bulkip_data.top_scores = @appctx.options.bulkip_top_scores if @appctx.options.bulkip_top_scores
-      if @appctx.options.bulkip_interval_seconds
-        bulkip_data.set_interval_seconds_to_increment( @appctx.options.bulkip_interval_seconds )
-      end
-      bulkip_data.note_times_in_data if fs.timing_provided
-      bulkip_data.note_start_time
-      lines_processed = 0
-      begin
-        bulkip_data.note_new_file
-        fs.foreach_by_time do |ip,time,lineno,file_name|
-          @appctx.logger.trace( "time: #{time} bulk ip: #{ip} line no: #{lineno} file: #{file_name}")
-          if lines_processed % 1000 == 0
-            @appctx.logger.mesg( "Lines processed: #{lines_processed}. Time: #{time}. Network lookups: #{bulkip_data.network_lookups}. Currently on line #{lineno} of #{file_name}.")
-          end
-          lines_processed = lines_processed + 1
-          if ( time != nil && fs.timing_provided ) || !fs.timing_provided
-            begin
-              ipaddr = IPAddr.new( ip )
-              if !bulkip_data.valid_to_query?( ipaddr )
-                @appctx.logger.trace( "skipping non-global-unicast address #{ip}")
-              else
-                if bulkip_data.query_for_net?(ipaddr, time ) == NicInfo::BulkIPData::NetNotFound
-                  query_value = [ ip ]
-                  qtype = QueryType::BY_IP4_ADDR
-                  qtype = QueryType::BY_IP6_ADDR if ipaddr.ipv6?
-                  rdap_response = rdap_query.do_rdap_query( query_value, qtype, nil )
-                  if ! rdap_response.error_state
-                    rtype = get_query_type_from_result( rdap_response.json_data )
-                    if rtype == QueryType::BY_IP
-                      ipnetwork = NicInfo::process_ip( rdap_response.json_data, @appctx )
-                      bulkip_data.observe_network( ipnetwork, time, rdap_response.requested_url )
-                    else
-                      bulkip_data.observe_unknown_network( ipaddr, time )
-                    end
-                  else
-                    bulkip_data.observe_unknown_network( ipaddr, time )
-                  end
-                end
-              end
-            rescue IPAddr::Error
-              bulkip_data.ip_error( ip )
-              @appctx.logger.mesg( "Invalid IP address '#{ip}'", NicInfo::AttentionType::ERROR )
-            end
-          else
-            bulkip_data.time_error( time )
-            @appctx.logger.mesg( "Invalid time value", NicInfo::AttentionType::ERROR )
-          end
-        end
-      rescue Interrupt
-        @appctx.logger.mesg( "Processing interrupted.")
-      end
-      bulkip_data.note_end_time
-      if @appctx.options.bulkip_out_csv
-        bulkip_data.output_csv( @appctx.options.bulkip_out_csv )
-      end
-      if @appctx.options.bulkip_out_tsv
-        bulkip_data.output_tsv( @appctx.options.bulkip_out_tsv )
-      end
-      fs.done
-      @appctx.logger.mesg( "Bulk IP Lookups Finished.")
+      @bulkip.setup
+      @bulkip.execute
       show_tracked_urls
     end
 

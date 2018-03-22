@@ -1,0 +1,69 @@
+bulkip:
+
+  # Specifies the input files containing IP addresses and
+  # optional timing information. Each item can be an explicit
+  # file, a file glob pattern (as in shell globs), or a directory.
+  # All files are opened and read together, collated by the time
+  # value in the lines of the file, if present.
+  input_files:
+    - spec/bulkip/ex5.log
+
+  # If time values are present, all input files are collated together
+  # by ascending time value. Each file must have time values given in
+  # ascending order. In cases where this cannot be completely assured,
+  # each file is buffered and sorted as it is read. This value controls
+  # the size of this line buffer. The default is 5 lines.
+  #sorted_line_buffer_size: 5
+
+  # The basename of the TSV files that will be generated. Each file
+  # will have the .tsv extension added to it.
+  # Both TSV and CSV may be specified, but atleast one is required.
+  tsv_output: <%= @file_out %>
+
+  # The basename of the CSV files that will be generated. Each file
+  # will have the .csv extension added to it.
+  # Both TSV and CSV may be specified, but atleast one is required.
+  csv_output: <%= @file_out %>
+
+  # Separate files are generated sorted by the top number of observatons,
+  # observations per observed period, and magnitude. By default, the file
+  # is limited to the top 100. This value can change the limitation value.
+  top_scores: 2
+
+  # If looking up each line of the input files is not feasible, then
+  # sampling can be done. This value specifies the number of seconds
+  # to randomly skip according to the time values on the lines in the
+  # input files.
+  #sampling_interval: 60
+
+output:
+
+  # possible values are NONE, SOME, ALL
+  messages: NONE
+
+  # If specified, messages goes to this file
+  # otherwise, leave it commented out to go to stderr
+  #messages_file: /tmp/NicInfo.messages
+
+  # Page output with system pager when appropriate.
+  pager: false
+
+cache:
+
+  # The maximum age an item from the cache will be used.
+  # This value is in seconds
+  cache_expiry: 604800
+
+  # The maximum age an item will be in the cache before it is evicted
+  # when the cache is cleaned.
+  # This value is in seconds
+  cache_eviction: 604800
+
+  # Controls the caching of objects inside of other objects.
+  deep_object_caching: false
+
+security:
+
+  # if HTTPS cannot be established, try HTTP
+  try_insecure: true
+
