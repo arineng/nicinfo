@@ -279,7 +279,10 @@ module NicInfo
         opts.on( "--bulkip-config FILE",
                  "Bulk IP configuration file" ) do |file|
           @bulkip = NicInfo::BulkIPMain.new( @appctx )
-          @appctx.options.do_bulkip = @bulkip.configure( file )
+          if @bulkip.configure( file )
+            @appctx.options.do_bulkip = true
+            @appctx.configure_logger
+          end
           @appctx.options.require_query = false
         end
 
