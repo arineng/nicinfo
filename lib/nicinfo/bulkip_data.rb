@@ -809,7 +809,7 @@ module NicInfo
         end
         host_headers = HostColumnHeaders + response_type_keys
         f.puts( host_headers.join( seperator ) )
-        @appctx.tracked_urls.each_value do |tracker|
+        @appctx.tracked_hosts.each_value do |tracker|
           f.puts( output_tracked_hosts( tracker, response_type_keys, seperator ) )
         end
       end
