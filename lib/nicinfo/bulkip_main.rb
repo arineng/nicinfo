@@ -18,6 +18,7 @@ require 'nicinfo/ip'
 require 'nicinfo/utils'
 require 'nicinfo/bulkip_infile'
 require 'nicinfo/bulkip_data'
+require 'nicinfo/query_type'
 
 module NicInfo
 
@@ -100,7 +101,7 @@ module NicInfo
                   qtype = QueryType::BY_IP6_ADDR if ipaddr.ipv6?
                   rdap_response = rdap_query.do_rdap_query( query_value, qtype, nil )
                   if ! rdap_response.error_state
-                    rtype = get_query_type_from_result( rdap_response.json_data )
+                    rtype = NicInfo.get_query_type_from_result( rdap_response.json_data )
                     if rtype == QueryType::BY_IP
                       ipnetwork = NicInfo::process_ip( rdap_response.json_data, @appctx )
                       bulkip_data.observe_network( ipnetwork, time, rdap_response.requested_url )

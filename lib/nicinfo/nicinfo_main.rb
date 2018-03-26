@@ -1,4 +1,4 @@
-# Copyright (C) 2011-2017 American Registry for Internet Numbers
+# Copyright (C) 2011-2018 American Registry for Internet Numbers
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -36,6 +36,7 @@ require 'nicinfo/data_tree'
 require 'nicinfo/traceroute'
 require 'nicinfo/rdap_query'
 require 'nicinfo/bulkip_main'
+require 'nicinfo/query_type'
 begin
   require 'json'
 rescue LoadError
@@ -44,32 +45,6 @@ rescue LoadError
 end
 
 module NicInfo
-
-  class QueryType < NicInfo::Enum
-
-    QueryType.add_item :BY_IP4_ADDR, "IP4ADDR"
-    QueryType.add_item :BY_IP6_ADDR, "IP6ADDR"
-    QueryType.add_item :BY_IP4_CIDR, "IP4CIDR"
-    QueryType.add_item :BY_IP6_CIDR, "IP6CIDR"
-    QueryType.add_item :BY_IP, "IP"
-    QueryType.add_item :BY_AS_NUMBER, "ASNUMBER"
-    QueryType.add_item :BY_DOMAIN, "DOMAIN"
-    QueryType.add_item :BY_RESULT, "RESULT"
-    QueryType.add_item :BY_ENTITY_HANDLE, "ENTITYHANDLE"
-    QueryType.add_item :BY_NAMESERVER, "NAMESERVER"
-    QueryType.add_item :SRCH_ENTITY_BY_NAME, "ESBYNAME"
-    QueryType.add_item :SRCH_DOMAINS, "DOMAINS"
-    QueryType.add_item :SRCH_DOMAIN_BY_NAME, "DSBYNAME"
-    QueryType.add_item :SRCH_DOMAIN_BY_NSNAME, "DSBYNSNAME"
-    QueryType.add_item :SRCH_DOMAIN_BY_NSIP, "DSBYNSIP"
-    QueryType.add_item :SRCH_NS, "NAMESERVERS"
-    QueryType.add_item :SRCH_NS_BY_NAME, "NSBYNAME"
-    QueryType.add_item :SRCH_NS_BY_IP, "NSBYIP"
-    QueryType.add_item :TRACE, "TRACE"
-    QueryType.add_item :BY_SERVER_HELP, "HELP"
-    QueryType.add_item :BY_URL, "URL"
-
-  end
 
   class JcrMode < NicInfo::Enum
     JcrMode.add_item :NO_VALIDATION, "NONE"
@@ -525,7 +500,7 @@ module NicInfo
       unless do_json_output( json_data )
         @appctx.factory.new_notices.display_notices json_data, @appctx.options.query_type == QueryType::BY_SERVER_HELP
         if @appctx.options.query_type != QueryType::BY_SERVER_HELP
-          result_type = get_query_type_from_result( json_data )
+          result_type = NicInfo.get_query_type_from_result( json_data )
           if result_type != nil
             if result_type != @appctx.options.query_type
               @appctx.logger.mesg( "Query type is " + @appctx.options.query_type + ". Result type is " + result_type + "." )
@@ -715,7 +690,7 @@ HELP_SUMMARY
 
     def process_result( json_data )
       success = false
-      type = get_query_type_from_result( json_data )
+      type = NicInfo.get_query_type_from_result( json_data )
       case type
         when QueryType::BY_IP
           NicInfo::process_ip(json_data, @appctx )
@@ -740,34 +715,6 @@ HELP_SUMMARY
       return success
     end
 
-    # Looks at the returned JSON and attempts to match that
-    # to a query type.
-    def get_query_type_from_result( json_data )
-      retval = nil
-      object_class_name = json_data[ "objectClassName" ]
-      if object_class_name != nil
-        case object_class_name
-          when "domain"
-            retval = QueryType::BY_DOMAIN
-          when "ip network"
-            retval = QueryType::BY_IP
-          when "entity"
-            retval = QueryType::BY_ENTITY_HANDLE
-          when "autnum"
-            retval = QueryType::BY_AS_NUMBER
-          when "nameserver"
-            retval = QueryType::BY_NAMESERVER
-        end
-      end
-      if json_data[ "domainSearchResults" ]
-        retval = QueryType::SRCH_DOMAINS
-      elsif json_data[ "nameserverSearchResults" ]
-        retval = QueryType::SRCH_NS
-      elsif json_data[ "entitySearchResults" ]
-        retval = QueryType::SRCH_ENTITY_BY_NAME
-      end
-      return retval
-    end
 
     def eval_json_value json_value, json_data
       appended_code = String.new
