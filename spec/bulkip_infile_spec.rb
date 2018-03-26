@@ -88,95 +88,95 @@ describe 'bulk_infile test' do
     b = NicInfo::BulkIPInFile.new( nil )
 
     s = "2018-02-03 00:00:00,336 DEBUG rws[0:0:0:0:0:0:0:1] => [http://localhost:8080/whoisrws/seam/resource/rest/nets;q=153.92.0.2?showDetails=true&showARIN=false&showNonArinTopLevelNet=false&ext=netref2]"
-    strategy = b.guess_time( s )
+    strategy = b.guess_time( s, 3 )
     expect( strategy[NicInfo::BulkIPInFile::DateTimeType]  ).to eq( NicInfo::BulkIPInFile::DateTimeRubyType )
     expect( strategy[NicInfo::BulkIPInFile::StripDateTime] ).to be_falsey
     expect( strategy[NicInfo::BulkIPInFile::DateTimeColumn] ).to eq( 0 )
 
     s = "2018-02-03-00:00:00,529 DEBUG whois 101.127.230.241 => [n = + 66.249.95.255]"
-    strategy = b.guess_time( s )
+    strategy = b.guess_time( s, 4 )
     expect( strategy[NicInfo::BulkIPInFile::DateTimeType]  ).to eq( NicInfo::BulkIPInFile::DateTimeRubyType )
     expect( strategy[NicInfo::BulkIPInFile::StripDateTime] ).to be_falsey
     expect( strategy[NicInfo::BulkIPInFile::DateTimeColumn] ).to eq( 0 )
 
     s = "DEBUG whois 101.127.230.241 => [n = + 66.249.95.255] 2018-02-03-00:00:00,529"
-    strategy = b.guess_time( s )
+    strategy = b.guess_time( s, 3 )
     expect( strategy[NicInfo::BulkIPInFile::DateTimeType]  ).to eq( NicInfo::BulkIPInFile::DateTimeRubyType )
     expect( strategy[NicInfo::BulkIPInFile::DateTimeColumn] ).to eq( 7 )
 
     s = "DEBUG whois 101.127.230.241 => [n = + 66.249.95.255] [2018-02-03-00:00:00,529]"
-    strategy = b.guess_time( s )
+    strategy = b.guess_time( s, 3 )
     expect( strategy[NicInfo::BulkIPInFile::DateTimeType]  ).to eq( NicInfo::BulkIPInFile::DateTimeRubyType )
     expect( strategy[NicInfo::BulkIPInFile::DateTimeColumn] ).to eq( 7 )
 
     s = "[2018-02-03 00:00:00,336] DEBUG rws[0:0:0:0:0:0:0:1] => [http://localhost:8080/whoisrws/seam/resource/rest/nets;q=153.92.0.2?showDetails=true&showARIN=false&showNonArinTopLevelNet=false&ext=netref2]"
-    strategy = b.guess_time( s )
+    strategy = b.guess_time( s, 3 )
     expect( strategy[NicInfo::BulkIPInFile::DateTimeType]  ).to eq( NicInfo::BulkIPInFile::DateTimeRubyType )
     expect( strategy[NicInfo::BulkIPInFile::DateTimeColumn] ).to eq( 0 )
 
     s = "[2018-02-03-00:00:00,529] DEBUG whois 101.127.230.241 => [n = + 66.249.95.255]"
-    strategy = b.guess_time( s )
+    strategy = b.guess_time( s, 4 )
     expect( strategy[NicInfo::BulkIPInFile::DateTimeType]  ).to eq( NicInfo::BulkIPInFile::DateTimeRubyType )
     expect( strategy[NicInfo::BulkIPInFile::DateTimeColumn] ).to eq( 0 )
 
     s = '108.45.120.114 - - [03/Feb/2018:05:31:26 -0500] "GET /registry/ip/172.217.8.3 HTTP/1.1" 200 5383 "-" "Python-urllib/3.5"'
-    strategy = b.guess_time( s )
+    strategy = b.guess_time( s, 1 )
     expect( strategy[NicInfo::BulkIPInFile::DateTimeType]  ).to eq( NicInfo::BulkIPInFile::DateTimeApacheType )
     expect( strategy[NicInfo::BulkIPInFile::StripDateTime] ).to be_truthy
     expect( strategy[NicInfo::BulkIPInFile::DateTimeColumn] ).to eq( 3 )
 
     s = '2001:500:31::7 - - [03/Feb/2018:05:31:26 -0500] "GET /registry/entity/ARIN HTTP/1.1" 200 4261 "-" "-"'
-    strategy = b.guess_time( s )
+    strategy = b.guess_time( s, 1 )
     expect( strategy[NicInfo::BulkIPInFile::DateTimeType]  ).to eq( NicInfo::BulkIPInFile::DateTimeApacheType )
     expect( strategy[NicInfo::BulkIPInFile::StripDateTime] ).to be_truthy
     expect( strategy[NicInfo::BulkIPInFile::DateTimeColumn] ).to eq( 3 )
 
     s = '108.45.120.114 - - 03/Feb/2018:05:31:26 -0500 "GET /registry/ip/172.217.8.3 HTTP/1.1" 200 5383 "-" "Python-urllib/3.5"'
-    strategy = b.guess_time( s )
+    strategy = b.guess_time( s, 1 )
     expect( strategy[NicInfo::BulkIPInFile::DateTimeType]  ).to eq( NicInfo::BulkIPInFile::DateTimeApacheType )
     expect( strategy[NicInfo::BulkIPInFile::StripDateTime] ).to be_falsey
     expect( strategy[NicInfo::BulkIPInFile::DateTimeColumn] ).to eq( 3 )
 
     s = '2001:500:31::7 - - 03/Feb/2018:05:31:26 -0500 "GET /registry/entity/ARIN HTTP/1.1" 200 4261 "-" "-"'
-    strategy = b.guess_time( s )
+    strategy = b.guess_time( s, 1 )
     expect( strategy[NicInfo::BulkIPInFile::DateTimeType]  ).to eq( NicInfo::BulkIPInFile::DateTimeApacheType )
     expect( strategy[NicInfo::BulkIPInFile::StripDateTime] ).to be_falsey
     expect( strategy[NicInfo::BulkIPInFile::DateTimeColumn] ).to eq( 3 )
 
     s = '108.45.120.114 - - [03/Feb/2018:05:31:26] "GET /registry/ip/172.217.8.3 HTTP/1.1" 200 5383 "-" "Python-urllib/3.5"'
-    strategy = b.guess_time( s )
+    strategy = b.guess_time( s, 1 )
     expect( strategy[NicInfo::BulkIPInFile::DateTimeType]  ).to eq( NicInfo::BulkIPInFile::DateTimeApacheNoTZType )
     expect( strategy[NicInfo::BulkIPInFile::StripDateTime] ).to be_truthy
     expect( strategy[NicInfo::BulkIPInFile::DateTimeColumn] ).to eq( 3 )
 
     s = '2001:500:31::7 - - [03/Feb/2018:05:31:26] "GET /registry/entity/ARIN HTTP/1.1" 200 4261 "-" "-"'
-    strategy = b.guess_time( s )
+    strategy = b.guess_time( s, 1 )
     expect( strategy[NicInfo::BulkIPInFile::DateTimeType]  ).to eq( NicInfo::BulkIPInFile::DateTimeApacheNoTZType )
     expect( strategy[NicInfo::BulkIPInFile::StripDateTime] ).to be_truthy
     expect( strategy[NicInfo::BulkIPInFile::DateTimeColumn] ).to eq( 3 )
 
     s = '108.45.120.114 - - 03/Feb/2018:05:31:26 "GET /registry/ip/172.217.8.3 HTTP/1.1" 200 5383 "-" "Python-urllib/3.5"'
-    strategy = b.guess_time( s )
+    strategy = b.guess_time( s, 1 )
     expect( strategy[NicInfo::BulkIPInFile::DateTimeType]  ).to eq( NicInfo::BulkIPInFile::DateTimeApacheNoTZType )
     expect( strategy[NicInfo::BulkIPInFile::StripDateTime] ).to be_falsey
     expect( strategy[NicInfo::BulkIPInFile::DateTimeColumn] ).to eq( 3 )
 
     s = '2001:500:31::7 - - 03/Feb/2018:05:31:26 "GET /registry/entity/ARIN HTTP/1.1" 200 4261 "-" "-"'
-    strategy = b.guess_time( s )
+    strategy = b.guess_time( s, 1 )
     expect( strategy[NicInfo::BulkIPInFile::DateTimeType]  ).to eq( NicInfo::BulkIPInFile::DateTimeApacheNoTZType )
     expect( strategy[NicInfo::BulkIPInFile::StripDateTime] ).to be_falsey
     expect( strategy[NicInfo::BulkIPInFile::DateTimeColumn] ).to eq( 3 )
 
     s = "DEBUG rws[0:0:0:0:0:0:0:1] => [http://localhost:8080/whoisrws/seam/resource/rest/nets;q=153.92.0.2?showDetails=true&showARIN=false&showNonArinTopLevelNet=false&ext=netref2]"
-    strategy = b.guess_time( s )
+    strategy = b.guess_time( s, 2 )
     expect( strategy[NicInfo::BulkIPInFile::DateTimeType]  ).to eq( NicInfo::BulkIPInFile::DateTimeNoneType )
 
     s = "DEBUG whois 101.127.230.241 => [n = + 66.249.95.255]"
-    strategy = b.guess_time( s )
+    strategy = b.guess_time( s, 3 )
     expect( strategy[NicInfo::BulkIPInFile::DateTimeType]  ).to eq( NicInfo::BulkIPInFile::DateTimeNoneType )
 
     s = '108.45.120.114 - - "GET /registry/ip/172.217.8.3 HTTP/1.1" 200 5383 "-" "Python-urllib/3.5"'
-    strategy = b.guess_time( s )
+    strategy = b.guess_time( s, 1 )
     expect( strategy[NicInfo::BulkIPInFile::DateTimeType]  ).to eq( NicInfo::BulkIPInFile::DateTimeNoneType )
   end
 
@@ -216,6 +216,22 @@ describe 'bulk_infile test' do
     expect( strategy[NicInfo::BulkIPInFile::DateTimeColumn] ).to eq( 3 )
 
     s = '2001:500:31::7 - - [03/Feb/2018:05:31:26 -0500] "GET /registry/entity/ARIN HTTP/1.1" 200 4261 "-" "-"'
+    strategy = b.guess_line( s )
+    expect( strategy[NicInfo::BulkIPInFile::IpColumn] ).to eq( 0 )
+    expect( strategy[NicInfo::BulkIPInFile::StripIp] ).to be_falsey
+    expect( strategy[NicInfo::BulkIPInFile::DateTimeType]  ).to eq( NicInfo::BulkIPInFile::DateTimeApacheType )
+    expect( strategy[NicInfo::BulkIPInFile::StripDateTime] ).to be_truthy
+    expect( strategy[NicInfo::BulkIPInFile::DateTimeColumn] ).to eq( 3 )
+
+    s = '2001:500:a9::6 - - [11/Mar/2018:03:56:27 -0400] "GET /registry/entity/ARIN HTTP/1.1" 200 4261 "-" "-"'
+    strategy = b.guess_line( s )
+    expect( strategy[NicInfo::BulkIPInFile::IpColumn] ).to eq( 0 )
+    expect( strategy[NicInfo::BulkIPInFile::StripIp] ).to be_falsey
+    expect( strategy[NicInfo::BulkIPInFile::DateTimeType]  ).to eq( NicInfo::BulkIPInFile::DateTimeApacheType )
+    expect( strategy[NicInfo::BulkIPInFile::StripDateTime] ).to be_truthy
+    expect( strategy[NicInfo::BulkIPInFile::DateTimeColumn] ).to eq( 3 )
+
+    s = '199.5.26.7 - - [11/Mar/2018:03:56:26 -0400] "GET /registry/entity/ARIN HTTP/1.1" 200 4261 "-" "-"'
     strategy = b.guess_line( s )
     expect( strategy[NicInfo::BulkIPInFile::IpColumn] ).to eq( 0 )
     expect( strategy[NicInfo::BulkIPInFile::StripIp] ).to be_falsey
@@ -297,6 +313,25 @@ describe 'bulk_infile test' do
         when 24
           expect( ip ).to eq( "2001:500:13::7" )
           expect( time ).to eq( Time.strptime( "04/Feb/2018:06:02:06 -0500", NicInfo::BulkIPInFile::ApacheTimeFormat ) )
+      end
+      i=i+1
+    end
+  end
+
+  it 'should iterate ex6.log' do
+    b = NicInfo::BulkIPInFile.new( "spec/bulkip/ex6.log" )
+    i=0
+    b.foreach do |ip,time|
+      case i
+        when 0
+          expect( ip ).to eq( "199.5.26.6" )
+          expect( time ).to eq( Time.strptime( "11/Mar/2018:03:56:25 -0400", NicInfo::BulkIPInFile::ApacheTimeFormat ) )
+        when 1
+          expect( ip ).to eq( "199.5.26.7" )
+          expect( time ).to eq( Time.strptime( "11/Mar/2018:03:56:26 -0400", NicInfo::BulkIPInFile::ApacheTimeFormat ) )
+        when 2
+          expect( ip ).to eq( "2001:500:a9::6" )
+          expect( time ).to eq( Time.strptime( "11/Mar/2018:03:56:27 -0400", NicInfo::BulkIPInFile::ApacheTimeFormat ) )
       end
       i=i+1
     end

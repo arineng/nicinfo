@@ -68,7 +68,7 @@ module NicInfo
 
     def guess_line line
       strategy = guess_ip( line )
-      strategy.merge!( guess_time( line ) )
+      strategy.merge!( guess_time( line, strategy[ IpColumn ] ) )
       return strategy
     end
 
@@ -104,12 +104,15 @@ module NicInfo
       return retval
     end
 
-    def guess_time line
+    def guess_time( line, ignore_column )
       column = -1
       strip = false
       type = DateTimeNoneType
       fields = line.split(/\s/)
       for i in 0..fields.length do
+        if i == ignore_column
+          next
+        end
         if i+1 < fields.length && is_time( fields[i] + " " + fields[i+1] )
           column = i
           strip = false

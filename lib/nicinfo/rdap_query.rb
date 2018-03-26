@@ -258,7 +258,7 @@ module NicInfo
           if @appctx.config[ NicInfo::SECURITY ][ NicInfo::TRY_INSECURE ]
             @appctx.logger.mesg( "Secure connection failed. Trying insecure connection." )
             uri.scheme = "http"
-            return get( uri.to_s, try, expect_rdap, tracking_url )
+            return get( uri.to_s, try, expect_rdap )
           else
             raise e
           end
@@ -288,7 +288,7 @@ module NicInfo
               res.error! if try >= MaxRedirects
               location = res["location"]
               @appctx.cache.create_or_update( url, NicInfo::REDIRECT_TO + location )
-              return get( location, try + 1, expect_rdap, tracking_url )
+              return get( location, try + 1, expect_rdap )
             end
             res.error!
         end #end case
@@ -296,7 +296,7 @@ module NicInfo
       elsif data.start_with?( NicInfo::REDIRECT_TO )
         raise Net::HTTPRetriableError.new( "Too many redirects", nil ) if try >= MaxRedirects
         location = data.sub( NicInfo::REDIRECT_TO, "" ).strip
-        return get( location, try + 1, expect_rdap, tracking_url)
+        return get( location, try + 1, expect_rdap )
       end #end if
 
       return data
