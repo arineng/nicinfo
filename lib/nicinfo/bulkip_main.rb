@@ -72,11 +72,22 @@ module NicInfo
       @sorted_line_buffer_size = @appctx.config[ NicInfo::BULKIP ][ NicInfo::SORTED_LINE_BUFFER_SIZE ]
       @file_in_set.line_buffer_size = @sorted_line_buffer_size if @sorted_line_buffer_size
 
-      @excluded_blocks = @appctx.config[ NicInfo::BULKIP ][ NicInfo::EXCLUDED_BLOCKS ]
+      @excluded_blocks = @appctx.config[ NicInfo::BULKIP ][ NicInfo::EXCLUDE_BLOCKS ]
       if @excluded_blocks == nil
         @excluded_blocks = Array.new
       elsif !@excluded_blocks.is_a?( Array )
         @excluded_blocks = [ @excluded_blocks ]
+      end
+
+      matches = @appctx.config[ NicInfo::BULKIP ][ NicInfo::INCLUDE_LINES ]
+      if matches != nil
+        if matches.is_a?( Array )
+          matches.each do |match|
+            @file_in_set.add_include_regex( match )
+          end
+        else
+          @file_in_set.add_include_regex( matches )
+        end
       end
     end
 
@@ -185,13 +196,21 @@ bulkip:
   # Specifies ranges of IP addresses by network block to exclude from
   # the analisys. Non-global unicast addresses are excluded automatically,
   # so there is not need to list them.
-  #excluded_blocks:
+  #exclude_blocks:
   # - 2001:500:a9::/48
   # - 199.5.26.0/24
   # - 199.71.0.0/24
   # - 2001:500:31::/48
   # - 2001:500:13::/48
   # - 199.212.0.0/24
+
+  # Specifies a set of regular expressions to be matched. Only lines matching
+  # a regular expression will be analyzed. The regular expressions do not need
+  # to be delimited with '/' characters.
+  # If no list is given, all lines are matched.
+  #include_lines:
+  # - INFO
+  # - QUERY
 
 output:
 

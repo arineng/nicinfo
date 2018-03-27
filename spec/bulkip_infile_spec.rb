@@ -449,4 +449,27 @@ describe 'bulk_infile test' do
 
   end
 
+  it 'should iterate and include' do
+
+    dir = File.join( @work_dir, "foreach_by_time_include" )
+    logger = NicInfo::Logger.new
+    logger.data_out = StringIO.new
+    logger.message_out = StringIO.new
+    logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
+    appctx = NicInfo::AppContext.new(dir )
+    appctx.logger=logger
+    appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
+
+    fs = NicInfo::BulkIPInFileSet.new( appctx )
+    fs.add_to_file_list( "spec/bulkip/include*.log" )
+    fs.add_include_regex( "DEBUG" )
+
+    i = 0
+    fs.foreach_by_time do |ip,time,lineno,file_name|
+      i = i + 1
+    end
+    expect( i ).to eq( 7 )
+
+  end
+
 end

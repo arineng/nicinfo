@@ -37,7 +37,7 @@ module NicInfo
 
     InLine = Struct.new( :ip, :time, :lineno )
 
-    attr_accessor :file_name, :strategy, :lineno, :eol, :line_buffer_size
+    attr_accessor :file_name, :strategy, :lineno, :eol, :line_buffer_size, :include_regexes
 
     def initialize file_name
       @file_name = file_name
@@ -234,6 +234,7 @@ module NicInfo
       end
       i = 0
       File.foreach( @file_name ) do |line|
+        next unless include?( line )
         fields = line.split( /\s/ )
         ip = get_ip( fields )
         time = get_time( fields )
@@ -244,13 +245,28 @@ module NicInfo
 
     def get_line
       line = @file.gets
-      if line
+      if line && include?( line )
         fields = line.split ( /\s/ )
         ip = get_ip( fields )
         time = get_time( fields )
         @lineno = @lineno + 1
         InLine.new( ip, time, @lineno )
       end
+    end
+
+    def include?( line )
+      retval = false
+      if @include_regexes
+        @include_regexes.each do |regex|
+          if regex.match( line )
+            retval = true
+            break
+          end
+        end
+      else
+        retval = true
+      end
+      return retval
     end
 
     def sort_line_buffer
@@ -302,11 +318,18 @@ module NicInfo
 
   class BulkIPInFileSet
 
-    attr_accessor :appctx, :timing_provided, :file_list, :line_buffer_size
+    attr_accessor :appctx, :timing_provided, :file_list, :line_buffer_size, :include_regexes
 
 
     def initialize( appctx )
       @appctx = appctx
+    end
+
+    def add_include_regex( regex_string )
+      unless @include_regexes
+        @include_regexes = Array.new
+      end
+      @include_regexes << Regexp.new( regex_string )
     end
 
     def add_to_file_list( file_list )
@@ -349,6 +372,7 @@ module NicInfo
       @inlines = {}
       Dir.glob( @file_list ).each do |file|
         b = BulkIPInFile.new( file )
+        b.include_regexes = @include_regexes
         b.line_buffer_size = @line_buffer_size if @line_buffer_size
         if b.strategy == nil
           raise RuntimeError unless b.has_strategy
