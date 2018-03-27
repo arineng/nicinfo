@@ -325,6 +325,7 @@ module NicInfo
     attr_accessor :net_data, :listed_data, :block_data, :appctx, :network_lookups
     attr_accessor :interval_seconds_to_increment, :second_to_sample, :total_intervals, :do_sampling
     attr_accessor :top_scores, :overall_block_stats, :overall_network_stats, :overall_listedname_stats
+    attr_accessor :exclude_blocks
 
     HostColumnHeaders = [ "Host", "Total Queries", "Avg QPS", "Avg Response Time" ]
     NotApplicable = "N/A"
@@ -361,6 +362,7 @@ module NicInfo
       @block_data = NicInfo::NetTree.new
       @listed_data = Hash.new
       @net_data = Array.new
+      @exclude_blocks = Array.new
       @v4_1918 = 0
       @v4_link_local = 0
       @v4_loopback = 0
@@ -422,6 +424,11 @@ module NicInfo
       @do_sampling = true
     end
 
+    def add_exclude_block cidr
+      ipaddr = IPAddr.new( cidr )
+      @exclude_blocks << ipaddr
+    end
+
     def observed_time( time )
       if time
         @first_observed_time = time unless @first_observed_time
@@ -450,6 +457,9 @@ module NicInfo
         retval = false
       end
       @non_global_unicast = @non_global_unicast + 1 unless retval
+      @exclude_blocks.each do |block|
+        retval = false if block.include?( ipaddr )
+      end
       return retval
     end
 

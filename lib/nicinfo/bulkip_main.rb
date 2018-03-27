@@ -25,7 +25,7 @@ module NicInfo
   class BulkIPMain
 
     attr_accessor :appctx, :file_in_set, :tsv_output, :csv_output, :top_scores, :sampling_interval
-    attr_accessor :sorted_line_buffer_size
+    attr_accessor :sorted_line_buffer_size, :excluded_blocks
 
     def initialize( appctx )
       @appctx = appctx
@@ -71,11 +71,21 @@ module NicInfo
       @sampling_interval = @appctx.config[ NicInfo::BULKIP ][ NicInfo::SAMPLING_INTERVAL ]
       @sorted_line_buffer_size = @appctx.config[ NicInfo::BULKIP ][ NicInfo::SORTED_LINE_BUFFER_SIZE ]
       @file_in_set.line_buffer_size = @sorted_line_buffer_size if @sorted_line_buffer_size
+
+      @excluded_blocks = @appctx.config[ NicInfo::BULKIP ][ NicInfo::EXCLUDED_BLOCKS ]
+      if @excluded_blocks == nil
+        @excluded_blocks = Array.new
+      elsif !@excluded_blocks.is_a?( Array )
+        @excluded_blocks = [ @excluded_blocks ]
+      end
     end
 
     def execute
       rdap_query = NicInfo::RDAPQuery.new( @appctx )
       bulkip_data = NicInfo::BulkIPData.new( @appctx )
+      @excluded_blocks.each do |block|
+        bulkip_data.add_exclude_block( block )
+      end
       bulkip_data.top_scores = @top_scores if @top_scores
       bulkip_data.set_interval_seconds_to_increment( @sampling_interval ) if @sampling_interval
       bulkip_data.note_times_in_data if @file_in_set.timing_provided
@@ -171,6 +181,17 @@ bulkip:
   # to randomly skip according to the time values on the lines in the
   # input files.
   #sampling_interval: 60
+
+  # Specifies ranges of IP addresses by network block to exclude from
+  # the analisys. Non-global unicast addresses are excluded automatically,
+  # so there is not need to list them.
+  #excluded_blocks:
+  # - 2001:500:a9::/48
+  # - 199.5.26.0/24
+  # - 199.71.0.0/24
+  # - 2001:500:31::/48
+  # - 2001:500:13::/48
+  # - 199.212.0.0/24
 
 output:
 

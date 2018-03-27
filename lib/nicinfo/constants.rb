@@ -110,6 +110,7 @@ module NicInfo
   CSV_OUTPUT = "csv_output"
   TOP_SCORES = "top_scores"
   SAMPLING_INTERVAL = "sampling_interval"
+  EXCLUDED_BLOCKS = "excluded_blocks"
 
   # NicInfo values
   NICINFO_DEMO_URL = "nicInfo_demoUrl"
