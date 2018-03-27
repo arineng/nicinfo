@@ -61,7 +61,7 @@ module NicInfo
   class AppContext
 
     attr_accessor :logger, :config, :rdap_cache_dir, :options, :conf_msgs, :rdap_bootstrap_dir, :factory
-    attr_accessor :cache, :tracked_hosts
+    attr_accessor :cache, :tracked_hosts, :errored_uris
 
     # Intializes the configuration with a place to look for the config file
     # If the file doesn't exist, a default is used.
@@ -73,6 +73,7 @@ module NicInfo
       @logger = NicInfo::Logger.new
       @conf_msgs = Array.new
       @tracked_hosts = Hash.new
+      @errored_uris = Array.new
       @factory = NicInfo::Factory.new( self )
 
       config_file_name = AppContext.formulate_config_file_name(@app_data )
@@ -307,6 +308,9 @@ module NicInfo
     def register_response( uri, response_type )
       t = get_tracked_host( uri )
       t.register_response( response_type )
+      if response_type != "200" and response_type != 200
+        @errored_uris << [response_type, uri ]
+      end
     end
 
     def get_tracked_host( uri )

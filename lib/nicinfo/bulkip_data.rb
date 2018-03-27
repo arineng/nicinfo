@@ -831,6 +831,14 @@ module NicInfo
       f.puts( output_total_row( "Analysis End Time", @end_time.strftime('%d %b %Y %H:%M:%S'), seperator ) )
       f.puts( output_total_row( "Total Sampling Intervals", @total_intervals, seperator ) ) if @do_sampling
 
+      unless @appctx.errored_uris.empty?
+        f.puts
+        f.puts( ["Error", "URI" ].join( seperator ))
+        @appctx.errored_uris.each do |item|
+          f.puts( item.join( seperator ) )
+        end
+      end
+
       puts_signature( f )
       f.close
     end
