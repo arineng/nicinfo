@@ -245,11 +245,16 @@ module NicInfo
 
     def get_line
       line = @file.gets
-      if line && include?( line )
+      loop do
+        break unless line
+        @lineno = @lineno + 1
+        break if include?( line )
+        line = @file.gets
+      end
+      if line
         fields = line.split ( /\s/ )
         ip = get_ip( fields )
         time = get_time( fields )
-        @lineno = @lineno + 1
         InLine.new( ip, time, @lineno )
       end
     end
@@ -330,6 +335,7 @@ module NicInfo
         @include_regexes = Array.new
       end
       @include_regexes << Regexp.new( regex_string )
+      @appctx.logger.trace( "Include regular expressions: #{@include_regexes}")
     end
 
     def add_to_file_list( file_list )
