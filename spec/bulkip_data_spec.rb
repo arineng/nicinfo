@@ -319,4 +319,33 @@ describe 'bulk_data test' do
 
   end
 
+  it 'should know about non-global unicast address' do
+    dir = File.join( @work_dir, "should_know_about_non_global_unicast" )
+    logger = NicInfo::Logger.new
+    logger.data_out = StringIO.new
+    logger.message_out = StringIO.new
+    logger.message_level = NicInfo::MessageLevel::NO_MESSAGES
+    appctx = NicInfo::AppContext.new(dir )
+    appctx.logger=logger
+    appctx.config[ NicInfo::BOOTSTRAP ][ NicInfo::UPDATE_BSFILES ]=false
+
+    b = NicInfo::BulkIPData.new( appctx )
+    expect( b.valid_to_query?( IPAddr.new( "::1" ) ) ).to be_falsey
+    expect( b.valid_to_query?( IPAddr.new( "0:0:0:0:0:0:0:1" ) ) ).to be_falsey
+    expect( b.valid_to_query?( IPAddr.new( "224.0.0.1" ) ) ).to be_falsey
+    expect( b.valid_to_query?( IPAddr.new( "255.0.0.1" ) ) ).to be_falsey
+    expect( b.valid_to_query?( IPAddr.new( "10.0.0.1" ) ) ).to be_falsey
+    expect( b.valid_to_query?( IPAddr.new( "192.168.0.1" ) ) ).to be_falsey
+    expect( b.valid_to_query?( IPAddr.new( "172.16.0.1" ) ) ).to be_falsey
+    expect( b.valid_to_query?( IPAddr.new( "127.16.0.1" ) ) ).to be_falsey
+    expect( b.valid_to_query?( IPAddr.new( "127.0.0.1" ) ) ).to be_falsey
+    expect( b.valid_to_query?( IPAddr.new( "169.254.0.1" ) ) ).to be_falsey
+    expect( b.valid_to_query?( IPAddr.new( "fe80::67c9:f0ec:bac4:8e55" ) ) ).to be_falsey
+
+    expect( b.valid_to_query?( IPAddr.new( "139.226.146.173" ) ) ).to be_truthy
+    expect( b.valid_to_query?( IPAddr.new( "2a02:d8:0:0:250:56ff:fe95:ca7e" ) ) ).to be_truthy
+    expect( b.valid_to_query?( IPAddr.new( "2001:41d0:2:193d:0:0:0:5" ) ) ).to be_truthy
+    expect( b.valid_to_query?( IPAddr.new( "194.85.61.205" ) ) ).to be_truthy
+  end
+
 end

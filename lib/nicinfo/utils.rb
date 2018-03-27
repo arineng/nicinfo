@@ -193,30 +193,5 @@ module NicInfo
     return words.join( " " )
   end
 
-  #v4 non global unicast space
-  V4_MULTICAST_RESERVED = IPAddr.new( "224.0.0.0/3" )
-  V4_PRIVATE_10 = IPAddr.new( "10.0.0.0/8" )
-  V4_PRIVATE_192 = IPAddr.new( "192.168.0.0/16" )
-  V4_LOOPBACK = IPAddr.new( "127.0.0.0/8" )
-  V4_PRIVATE_172 = IPAddr.new( "172.16.0.0/12" )
-  V4_LINK_LOCAL = IPAddr.new( "169.254.0.0/16" )
-
-  #v6 global unicast space
-  V6_GLOBAL_UNICAST = IPAddr.new( "2000::/3" )
-
-  def NicInfo.is_global_unicast?( ipaddr )
-    retval = true
-    if NicInfo::V4_MULTICAST_RESERVED.include?( ipaddr ) ||
-       NicInfo::V4_PRIVATE_10.include?( ipaddr ) ||
-       NicInfo::V4_PRIVATE_172.include?( ipaddr ) ||
-       NicInfo::V4_PRIVATE_192.include?( ipaddr ) ||
-       NicInfo::V4_LOOPBACK.include?( ipaddr ) ||
-       NicInfo::V4_LINK_LOCAL.include?( ipaddr )
-      retval = false
-    elsif ipaddr.ipv6? && !NicInfo::V6_GLOBAL_UNICAST.include?( ipaddr )
-      retval = false
-    end
-    return retval
-  end
 
 end

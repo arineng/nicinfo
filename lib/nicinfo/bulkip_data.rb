@@ -334,6 +334,17 @@ module NicInfo
     NetAlreadyRetreived = 1
     NetNotFoundBetweenIntervals = 2
 
+    #v4 non global unicast space
+    V4_MULTICAST_RESERVED = IPAddr.new( "224.0.0.0/3" )
+    V4_PRIVATE_10 = IPAddr.new( "10.0.0.0/8" )
+    V4_PRIVATE_192 = IPAddr.new( "192.168.0.0/16" )
+    V4_LOOPBACK = IPAddr.new( "127.0.0.0/8" )
+    V4_PRIVATE_172 = IPAddr.new( "172.16.0.0/12" )
+    V4_LINK_LOCAL = IPAddr.new( "169.254.0.0/16" )
+
+    #v6 global unicast space
+    V6_GLOBAL_UNICAST = IPAddr.new( "2000::/3" )
+
     TopScores = Struct.new( :observations, :obsvnspersecond, :magnitude )
     Statistics = Struct.new( :observations, :observed_period, :magnitude_ceiling, :magnitude_floor,
                              :shortest_interval, :longest_interval, :interval_count, :shortest_run, :longest_run, :run_count )
@@ -350,6 +361,11 @@ module NicInfo
       @block_data = NicInfo::NetTree.new
       @listed_data = Hash.new
       @net_data = Array.new
+      @v4_1918 = 0
+      @v4_link_local = 0
+      @v4_loopback = 0
+      @v4_multicast = 0
+      @v6_unallocated = 0
       @non_global_unicast = 0
       @network_lookups = 0
       @total_observations = 0
@@ -416,10 +432,27 @@ module NicInfo
     end
 
     def valid_to_query?( ipaddr )
-      retval = NicInfo.is_global_unicast?( ipaddr )
+      retval = true
+      if V4_MULTICAST_RESERVED.include?( ipaddr )
+        @v4_multicast += 1
+        retval = false
+      elsif V4_PRIVATE_10.include?( ipaddr ) || V4_PRIVATE_172.include?( ipaddr ) || V4_PRIVATE_192.include?( ipaddr )
+        @v4_1918 += 1
+        retval = false
+      elsif V4_LOOPBACK.include?( ipaddr )
+        @v4_loopback +=1
+        retval = false
+      elsif V4_LINK_LOCAL.include?( ipaddr )
+        @v4_link_local += 1
+        retval = false
+      elsif ipaddr.ipv6? && !( V6_GLOBAL_UNICAST.include?( ipaddr ) )
+        @v6_unallocated += 1
+        retval = false
+      end
       @non_global_unicast = @non_global_unicast + 1 unless retval
       return retval
     end
+
 
     def query_for_net?(ipaddr, time )
 
@@ -823,6 +856,11 @@ module NicInfo
       f.puts( output_total_row( "Total Network Blocks", @block_data.length, seperator ) )
       f.puts( output_total_row( "Total Listed Names", @listed_data.length, seperator ) )
       f.puts( output_total_row( "Non-Global Unicast IPs", @non_global_unicast, seperator ) )
+      f.puts( output_total_row( "IPv4 Link Local IPs", @v4_link_local, seperator ) )
+      f.puts( output_total_row( "IPv4 Loopback IPs", @v4_loopback, seperator ) )
+      f.puts( output_total_row( "IPv4 Multicast IPs", @v4_multicast, seperator ) )
+      f.puts( output_total_row( "IPv4 RFC 1918 IPs", @v4_1918, seperator ) )
+      f.puts( output_total_row( "IPv6 Unallocated IPs", @v6_unallocated, seperator ) )
       f.puts( output_total_row( "Network Lookups", @network_lookups, seperator ) )
       f.puts( output_total_row( "Total Fetch Errors", @total_fetch_errors, seperator ) )
       f.puts( output_total_row( "Total IP Address Parse Errors", @total_ip_errors, seperator ) )
