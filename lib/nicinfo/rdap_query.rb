@@ -254,7 +254,7 @@ module NicInfo
           end_time = Time.now
           @appctx.queried( uri, start_time, end_time )
         rescue OpenSSL::SSL::SSLError => e
-          @appctx.register_reponse( uri, "SSL Err" )
+          @appctx.register_response( uri, "SSL Err" )
           if @appctx.config[ NicInfo::SECURITY ][ NicInfo::TRY_INSECURE ]
             @appctx.logger.mesg( "Secure connection failed. Trying insecure connection." )
             uri.scheme = "http"
