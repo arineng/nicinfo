@@ -248,7 +248,9 @@ module NicInfo
 
       messages_file = output[ NicInfo::MESSAGES_FILE ]
       if messages_file != nil
-        @logger.message_out = File.open( messages_file, "w+" )
+        f = File.open( messages_file, "w+" )
+        f.sync = true
+        @logger.message_out = f
       end
 
       @logger.data_amount = output[ NicInfo::DATA ]
@@ -256,7 +258,9 @@ module NicInfo
 
       data_file = output[ NicInfo::DATA_FILE ]
       if data_file != nil
-        @logger.data_out= File.open( data_file, "w+" )
+        f = File.open( data_file, "w+" )
+        f.sync = true
+        @logger.data_out = f
       end
 
       @logger.pager=output[ NicInfo::PAGER ]
