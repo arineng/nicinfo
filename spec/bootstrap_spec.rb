@@ -16,7 +16,7 @@ require 'spec_helper'
 require 'rspec'
 require 'pp'
 require_relative '../lib/nicinfo/bootstrap'
-require_relative '../lib/nicinfo/appctx'
+require_relative '../lib/../lib/nicinfo/config'
 
 describe 'bootstrap rspec tests' do
 
@@ -40,7 +40,7 @@ describe 'bootstrap rspec tests' do
 
   it 'should test find urls by ipv4' do
     dir = File.join( @work_dir, "test_find_url_by_v4" )
-    c = NicInfo::AppContext.new(dir )
+    c = NicInfo::Config.new( dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
     bootstrap = NicInfo::Bootstrap.new c
@@ -59,7 +59,7 @@ describe 'bootstrap rspec tests' do
 
   it 'should find urls by ipv6' do
     dir = File.join( @work_dir, "test_find_url_by_v6" )
-    c = NicInfo::AppContext.new(dir )
+    c = NicInfo::Config.new( dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
     bootstrap = NicInfo::Bootstrap.new c
@@ -73,7 +73,7 @@ describe 'bootstrap rspec tests' do
 
   it 'should find url by as' do
     dir = File.join( @work_dir, "test_find_url_by_as" )
-    c = NicInfo::AppContext.new(dir )
+    c = NicInfo::Config.new( dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
     bootstrap = NicInfo::Bootstrap.new c
@@ -91,7 +91,7 @@ describe 'bootstrap rspec tests' do
 
   it 'should get ipv4 from inaddr' do
     dir = File.join( @work_dir, "test_find_ip4_from_inaddr" )
-    c = NicInfo::AppContext.new(dir )
+    c = NicInfo::Config.new( dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
     bootstrap = NicInfo::Bootstrap.new c
@@ -104,7 +104,7 @@ describe 'bootstrap rspec tests' do
 
   it 'should get ip6 from inaddr' do
     dir = File.join( @work_dir, "test_find_ip6_from_inaddr" )
-    c = NicInfo::AppContext.new(dir )
+    c = NicInfo::Config.new( dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
     bootstrap = NicInfo::Bootstrap.new c
@@ -114,7 +114,7 @@ describe 'bootstrap rspec tests' do
 
   it 'should find url by domain' do
     dir = File.join( @work_dir, "test_find_url_by_domain" )
-    c = NicInfo::AppContext.new(dir )
+    c = NicInfo::Config.new( dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
     bootstrap = NicInfo::Bootstrap.new c
@@ -126,7 +126,7 @@ describe 'bootstrap rspec tests' do
 
   it 'should find url by forward domain' do
     dir = File.join( @work_dir, "test_find_url_by_forward_domain" )
-    c = NicInfo::AppContext.new(dir )
+    c = NicInfo::Config.new( dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
     bootstrap = NicInfo::Bootstrap.new c
@@ -136,7 +136,7 @@ describe 'bootstrap rspec tests' do
 
   it 'should find url by entity' do
     dir = File.join( @work_dir, "test_find_url_by_entity" )
-    c = NicInfo::AppContext.new(dir )
+    c = NicInfo::Config.new( dir )
     c.logger.message_level = "NONE"
     c.setup_workspace
     bootstrap = NicInfo::Bootstrap.new c
