@@ -12,7 +12,7 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 # IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-require 'nicinfo/appctx'
+require 'nicinfo/config'
 require 'nicinfo/nicinfo_logger'
 require 'nicinfo/utils'
 require 'time'
@@ -79,7 +79,7 @@ module NicInfo
       if remarks
         excessive_notice = @config.factory.new_notices.is_excessive_notice(remarks)
         if (excessive_notice && (@config.logger.data_amount != NicInfo::DataAmount::EXTRA_DATA))
-          @appctx.logger.datum "Excessive Remarks", "Use \"-V\" or \"--data extra\" to see them."
+          @config.logger.datum "Excessive Remarks", "Use \"-V\" or \"--data extra\" to see them."
         else
           if remarks.instance_of?(Array)
             remarks.each do |remark|
@@ -109,7 +109,7 @@ module NicInfo
               end
             end
           else
-            @appctx.conf_msgs << "'remarks' is not an array."
+            @config.conf_msgs << "'remarks' is not an array."
           end
         end
       end
@@ -218,7 +218,7 @@ module NicInfo
           license = NicInfo.get_license_link links
           @config.logger.prose NicInfo::DataAmount::NORMAL_DATA, "License", license, NicInfo::AttentionType::SECONDARY if license
         else
-          @appctx.conf_msgs << "'links' is not an array."
+          @config.conf_msgs << "'links' is not an array."
         end
       end
     end
