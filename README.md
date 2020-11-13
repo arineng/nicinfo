@@ -1,7 +1,6 @@
 # Overview
 [![Gem Version](https://badge.fury.io/rb/nicinfo.svg)](https://badge.fury.io/rb/nicinfo)
 [![Build Status](https://travis-ci.org/arineng/nicinfo.svg?branch=master)](https://travis-ci.org/arineng/nicinfo)
-[![Build status](https://ci.appveyor.com/api/projects/status/8rr7uqn7gscq9dm2?svg=true)](https://ci.appveyor.com/project/anewton1998/nicinfo)
 [![Coverage Status](https://coveralls.io/repos/github/arineng/nicinfo/badge.svg?branch=master)](https://coveralls.io/github/arineng/nicinfo?branch=master)
 
 NicInfo is a general purpose, command line Registry Data Access Protocol (RDAP) client released under 
