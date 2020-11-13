@@ -131,12 +131,12 @@ module NicInfo
     def process entity
       if ( vcard = get_vcard( entity ) ) != nil
         vcardElements = vcard[ 1 ]
-        if vcardElements.size == 0
+        if vcardElements.nil? || vcardElements.size == 0
           @config.conf_msgs << "jCard (vCard) is empty."
         elsif vcardElements[ 0 ][ 0 ] != "version"
           @config.conf_msgs << "jCard (vCard) does not have required version first element."
         end
-        vcardElements.each do |element|
+        vcardElements&.each do |element|
           if element[ 0 ] == "fn"
             @fns << element[ 3 ]
           end
