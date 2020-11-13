@@ -7,7 +7,7 @@ NicInfo is a general purpose, command line Registry Data Access Protocol (RDAP) 
 an open source, ISC derivative BSD style license. RDAP is an HTTP-based RESTful protocol defined by 
 the IETF as a replacement for Whois. 
 
-The general usage of this software from the command line is "nicinfo QUERY_VALE" where the 
+The general usage of this software from the command line is "nicinfo QUERY_VALUE" where the 
 QUERY_VALUE is an IP address, domain name, autonomous system number, name server host name, 
 or entity identifier. NicInfo will attempt to determine the most appropriate RDAP server to query 
 and follow redirects to other RDAP servers as needed.
