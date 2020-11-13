@@ -349,7 +349,7 @@ module NicInfo
             content_type = res[ "content-type" ].downcase
             if expect_rdap
               unless content_type.include?(NicInfo::RDAP_CONTENT_TYPE) or content_type.include?(NicInfo::JSON_CONTENT_TYPE)
-                raise Net::HTTPServerException.new("Bad Content Type", res)
+                raise Net::HTTPClientException.new("Bad Content Type", res)
               end
               if content_type.include? NicInfo::JSON_CONTENT_TYPE
                 @config.conf_msgs << "Server responded with non-RDAP content type but it is JSON"
@@ -603,7 +603,7 @@ module NicInfo
           res = MyHTTPResponse.new( "1.1", ec, "Demo Exception" )
           res["content-type"] = NicInfo::RDAP_CONTENT_TYPE
           res.body=data
-          raise Net::HTTPServerException.new( "Demo Exception", res )
+          raise Net::HTTPClientException.new( "Demo Exception", res )
         end
         inspect_rdap_compliance json_data
         cache_self_references json_data
@@ -614,7 +614,7 @@ module NicInfo
         @config.logger.mesg(a.message, NicInfo::AttentionType::ERROR )
       rescue ArgumentError => a
         @config.logger.mesg(a.message, NicInfo::AttentionType::ERROR )
-      rescue Net::HTTPServerException => e
+      rescue Net::HTTPClientException => e
         case e.response.code
           when "200"
             @config.logger.mesg( e.message, NicInfo::AttentionType::SUCCESS )
