@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.homepage    = 'https://github.com/arinlabs/nicinfo'
   s.license      = 'ISC'
   s.executables << 'nicinfo'
-  s.add_dependency 'netaddr', '~> 1.5' , '>= 1.5.1'
+  s.add_dependency 'netaddr', '~> 2.0.4'
   s.add_dependency 'rainbow', '~> 3.0'
   s.add_dependency 'jcrvalidator', '= 0.8.3'
 end
