@@ -5,6 +5,11 @@
 [![Dependency Status](https://gemnasium.com/badges/github.com/arineng/nicinfo.svg)](https://gemnasium.com/github.com/arineng/nicinfo)
 [![Coverage Status](https://coveralls.io/repos/github/arineng/nicinfo/badge.svg?branch=master)](https://coveralls.io/github/arineng/nicinfo?branch=master)
 
+> This branch is being kept for historical purposes.  We will be reverting an incomplete feature
+> that is currently in master.  If anyone has forked the repository after this feature, you may
+> use this branch as a basis.  At some point, we may return to this branch as a starting point
+> to complete this feature.
+
 NicInfo is a general purpose, command line Registry Data Access Protocol (RDAP) client released under 
 an open source, ISC derivative BSD style license. RDAP is an HTTP-based RESTful protocol defined by 
 the IETF as a replacement for Whois. 
