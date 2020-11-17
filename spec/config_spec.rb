@@ -60,7 +60,7 @@ output:
   data: TERSE
   #data_file: /tmp/NicInfo.data
 bootstrap:
-  ip_root_url: https://rdap.arin.net/bootstrap
+  ip_root_url: https://rdap-bootstrap.arin.net/bootstrap
 NOT_DEFAULT_CONFIG
     f = File.open( File.join( dir, "config.yaml" ), "w" )
     f.puts( not_default_config )
@@ -72,7 +72,7 @@ NOT_DEFAULT_CONFIG
     expect( c.config[ NicInfo::SECURITY ][ NicInfo::TRY_INSECURE ] ).to be_truthy
     expect( c.config[ NicInfo::OUTPUT ][ NicInfo::MESSAGES_FILE ] ).to be_nil
     expect( c.config[ NicInfo::OUTPUT ][ NicInfo::DATA_FILE ] ).to be_nil
-    expect( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::IP_ROOT_URL ] ).to eq( "https://rdap.arin.net/bootstrap" )
+    expect( c.config[ NicInfo::BOOTSTRAP ][ NicInfo::IP_ROOT_URL ] ).to eq( "https://rdap-bootstrap.arin.net/bootstrap" )
 
     expect( c.logger.data_amount ).to eq( "TERSE" )
     expect( c.logger.message_level ).to eq( "NONE" )

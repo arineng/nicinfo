@@ -132,9 +132,9 @@
     ],
     "links":[
         {
-            "value":"https://rdap.arin.net/bootstrap/entity/foo1",
+            "value":"https://rdap-bootstrap.arin.net/bootstrap/entity/foo1",
             "rel":"self",
-            "href":"https://rdap.arin.net/bootstrap/entity/foo1"
+            "href":"https://rdap-bootstrap.arin.net/bootstrap/entity/foo1"
         }
     ],
     "events":[

@@ -14,7 +14,7 @@
             ],
             "links":[
                 {
-                    "value":"https://rdap.arin.net/bootstrap/entity/restricted",
+                    "value":"https://rdap-bootstrap.arin.net/bootstrap/entity/restricted",
                     "rel":"terms-of-service",
                     "type":"text/html",
                     "href":"http://www.example.com/tos.html"
@@ -28,7 +28,7 @@
             ],
             "links":[
                 {
-                    "value":"https://rdap.arin.net/bootstrap/entity/restricted",
+                    "value":"https://rdap-bootstrap.arin.net/bootstrap/entity/restricted",
                     "rel":"copyright",
                     "type":"text/html",
                     "href":"http://www.example.com/copyright.html"
@@ -43,7 +43,7 @@
             ],
             "links":[
                 {
-                    "value":"https://rdap.arin.net/bootstrap/entity/restricted",
+                    "value":"https://rdap-bootstrap.arin.net/bootstrap/entity/restricted",
                     "rel":"about",
                     "type":"text/html",
                     "href":"https://lists.arin.net/mailman/listinfo/arin-tech-discuss"

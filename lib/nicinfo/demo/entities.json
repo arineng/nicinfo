@@ -147,9 +147,9 @@
       ],
       "links": [
         {
-          "value": "https://rdap.arin.net/bootstrap/entity/entity-dnr",
+          "value": "https://rdap-bootstrap.arin.net/bootstrap/entity/entity-dnr",
           "rel": "self",
-          "href": "https://rdap.arin.net/bootstrap/entity/entity-dnr"
+          "href": "https://rdap-bootstrap.arin.net/bootstrap/entity/entity-dnr"
         }
       ],
       "port43": "whois.example.net",
@@ -286,9 +286,9 @@
       ],
       "links": [
         {
-          "value": "https://rdap.arin.net/bootstrap/entity/foo1",
+          "value": "https://rdap-bootstrap.arin.net/bootstrap/entity/foo1",
           "rel": "self",
-          "href": "https://rdap.arin.net/bootstrap/entity/foo1"
+          "href": "https://rdap-bootstrap.arin.net/bootstrap/entity/foo1"
         }
       ],
       "events": [

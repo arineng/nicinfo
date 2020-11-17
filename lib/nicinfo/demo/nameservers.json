@@ -45,9 +45,9 @@
         ],
         "links":[
           {
-            "value":"https://rdap.arin.net/bootstrap/nameserver/ns1.xn--fo-5ja.example",
+            "value":"https://rdap-bootstrap.arin.net/bootstrap/nameserver/ns1.xn--fo-5ja.example",
             "rel":"self",
-            "href":"https://rdap.arin.net/bootstrap/nameserver/ns1.xn--fo-5ja.example"
+            "href":"https://rdap-bootstrap.arin.net/bootstrap/nameserver/ns1.xn--fo-5ja.example"
           }
         ],
         "port43":"whois.example.net",
@@ -248,9 +248,9 @@
         ],
         "links":[
           {
-            "value":"https://rdap.arin.net/bootstrap/nameserver/ns1.xn--fo-5ja.example",
+            "value":"https://rdap-bootstrap.arin.net/bootstrap/nameserver/ns1.xn--fo-5ja.example",
             "rel":"self",
-            "href":"https://rdap.arin.net/bootstrap/nameserver/ns1.xn--fo-5ja.example"
+            "href":"https://rdap-bootstrap.arin.net/bootstrap/nameserver/ns1.xn--fo-5ja.example"
           }
         ],
         "port43":"whois.example.net",
