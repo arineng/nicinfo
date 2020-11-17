@@ -136,91 +136,93 @@ module NicInfo
         elsif vcardElements[ 0 ][ 0 ] != "version"
           @config.conf_msgs << "jCard (vCard) does not have required version first element."
         end
-        vcardElements&.each do |element|
-          if element[ 0 ] == "fn"
-            @fns << element[ 3 ]
-          end
-          if element[ 0 ] == "n"
-            name = ""
-            if element[ 3 ][ -1 ].instance_of? Array
-              name << element[ 3 ][ -1 ].join( ' ' )
+        if !vcardElements.nil?
+          vcardElements.each do |element|
+            if element[ 0 ] == "fn"
+              @fns << element[ 3 ]
             end
-            name << ' ' if name[-1] != ' '
-            name << element[ 3 ][ 1 ]
-            if element[ 3 ][ 2 ] && !element[ 3 ][ 2 ].empty?
-              name << " " << element[ 3 ][ 2 ]
+            if element[ 0 ] == "n"
+              name = ""
+              if element[ 3 ][ -1 ].instance_of? Array
+                name << element[ 3 ][ -1 ].join( ' ' )
+              end
+              name << ' ' if name[-1] != ' '
+              name << element[ 3 ][ 1 ]
+              if element[ 3 ][ 2 ] && !element[ 3 ][ 2 ].empty?
+                name << " " << element[ 3 ][ 2 ]
+              end
+              if element[ 3 ][ 3 ] && !element[ 3 ][ 3 ].empty?
+                name << " " << element[ 3 ][ 3 ]
+              end
+              name << " " << element[ 3 ][ 0 ]
+              if element[ 3 ][ -2 ].instance_of? Array
+                name << " " << element[ 3 ][ -2 ].join( ' ' )
+              end
+              @names << name.strip
             end
-            if element[ 3 ][ 3 ] && !element[ 3 ][ 3 ].empty?
-              name << " " << element[ 3 ][ 3 ]
+            if element[ 0 ] == "tel"
+              tel = Tel.new
+              if (type = element[ 1 ][ "type" ]) != nil
+                tel.type << type if type.instance_of? String
+                tel.type = type if type.instance_of? Array
+              end
+              if (str = element[ 3 ] ).start_with?( "tel:" )
+                tel.number=str[ /^tel\:([^;]*)/,1 ]
+                tel.ext=str[ /[^;]*ext=(.*)/,1 ]
+              else
+                tel.number=str
+              end
+              @phones << tel
             end
-            name << " " << element[ 3 ][ 0 ]
-            if element[ 3 ][ -2 ].instance_of? Array
-              name << " " << element[ 3 ][ -2 ].join( ' ' )
+            if element[ 0 ] == "email"
+              email = Email.new
+              if (type = element[ 1 ][ "type" ]) != nil
+                email.type << type if type.instance_of? String
+                email.type = type if type.instance_of? Array
+              end
+              email.addr=element[ 3 ]
+              @emails << email
             end
-            @names << name.strip
-          end
-          if element[ 0 ] == "tel"
-            tel = Tel.new
-            if (type = element[ 1 ][ "type" ]) != nil
-              tel.type << type if type.instance_of? String
-              tel.type = type if type.instance_of? Array
+            if element[ 0 ] == "adr"
+              adr = Adr.new
+              if (type = element[ 1 ][ "type" ]) != nil
+                adr.type << type if type.instance_of? String
+                adr.type = type if type.instance_of? Array
+              end
+              if (label = element[ 1 ][ "label" ]) != nil
+                adr.label = label.split( "\n" )
+              else
+                adr.pobox=element[ 3 ][ 0 ]
+                adr.extended=element[ 3 ][ 1 ]
+                adr.street=element[ 3 ][ 2 ]
+                adr.locality=element[ 3 ][ 3 ]
+                adr.region=element[ 3 ][ 4 ]
+                adr.postal=element[ 3 ][ 5 ]
+                adr.country=element[ 3 ][ 6 ]
+                adr.structured=true
+              end
+              @adrs << adr
             end
-            if (str = element[ 3 ] ).start_with?( "tel:" )
-              tel.number=str[ /^tel\:([^;]*)/,1 ]
-              tel.ext=str[ /[^;]*ext=(.*)/,1 ]
-            else
-              tel.number=str
+            if element[ 0 ] == "kind"
+              @kind = element[ 3 ]
             end
-            @phones << tel
-          end
-          if element[ 0 ] == "email"
-            email = Email.new
-            if (type = element[ 1 ][ "type" ]) != nil
-              email.type << type if type.instance_of? String
-              email.type = type if type.instance_of? Array
+            if element[ 0 ] == "title"
+              @titles << element[ 3 ]
             end
-            email.addr=element[ 3 ]
-            @emails << email
-          end
-          if element[ 0 ] == "adr"
-            adr = Adr.new
-            if (type = element[ 1 ][ "type" ]) != nil
-              adr.type << type if type.instance_of? String
-              adr.type = type if type.instance_of? Array
+            if element[ 0 ] == "role"
+              @roles << element[ 3 ]
             end
-            if (label = element[ 1 ][ "label" ]) != nil
-              adr.label = label.split( "\n" )
-            else
-              adr.pobox=element[ 3 ][ 0 ]
-              adr.extended=element[ 3 ][ 1 ]
-              adr.street=element[ 3 ][ 2 ]
-              adr.locality=element[ 3 ][ 3 ]
-              adr.region=element[ 3 ][ 4 ]
-              adr.postal=element[ 3 ][ 5 ]
-              adr.country=element[ 3 ][ 6 ]
-              adr.structured=true
+            if element[ 0 ] == "org"
+              org = Org.new
+              if (type = element[ 1 ][ "type" ]) != nil
+                org.type << type if type.instance_of? String
+                org.type = type if type.instance_of? Array
+              end
+              names = element[ 3 ]
+              org.names << names if names.instance_of? String
+              org.names = org.names + names if names.instance_of? Array
+              @orgs << org
             end
-            @adrs << adr
-          end
-          if element[ 0 ] == "kind"
-            @kind = element[ 3 ]
-          end
-          if element[ 0 ] == "title"
-            @titles << element[ 3 ]
-          end
-          if element[ 0 ] == "role"
-            @roles << element[ 3 ]
-          end
-          if element[ 0 ] == "org"
-            org = Org.new
-            if (type = element[ 1 ][ "type" ]) != nil
-              org.type << type if type.instance_of? String
-              org.type = type if type.instance_of? Array
-            end
-            names = element[ 3 ]
-            org.names << names if names.instance_of? String
-            org.names = org.names + names if names.instance_of? Array
-            @orgs << org
           end
         end
         if @fns.empty?
