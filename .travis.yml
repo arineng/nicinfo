@@ -1,7 +1,6 @@
 language: ruby
 os:
   - linux
-  - osx
 rvm:
   - 2.1.3
   - 2.3.4
