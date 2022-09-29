@@ -319,7 +319,8 @@ module NicInfo
       if data == nil
 
         @config.logger.trace("Issuing GET for " + url)
-        uri = URI.parse( URI::encode( url ) )
+        p = URI::Parser.new
+        uri = URI.parse( p.escape( url ) )
         req = Net::HTTP::Get.new(uri.request_uri)
         req["User-Agent"] = NicInfo::VERSION_LABEL
         req["Accept"] = NicInfo::RDAP_CONTENT_TYPE + ", " + NicInfo::JSON_CONTENT_TYPE
@@ -376,7 +377,8 @@ module NicInfo
     def get_file_via_http url, file_name, try
 
       @config.logger.trace("Downloading " + url + " to " + file_name )
-      uri = URI.parse( URI::encode( url ) )
+      p = URI::Parser.new
+      uri = URI.parse( p.escape( url ) )
       req = Net::HTTP::Get.new(uri.request_uri)
       req["User-Agent"] = NicInfo::VERSION_LABEL
       req["Accept"] = NicInfo::JSON_CONTENT_TYPE
@@ -937,7 +939,7 @@ HELP_SUMMARY
 
     # Creates a query type
     def create_resource_url(args, queryType)
-
+      p = URI::Parser.new
       path = ""
       case queryType
         when QueryType::BY_IP4_ADDR
@@ -959,15 +961,15 @@ HELP_SUMMARY
           path = tree.find_rest_ref(args[0])
           raise ArgumentError.new("Unable to find result for " + args[0]) unless path
         when QueryType::BY_ENTITY_HANDLE
-          path << "entity/" << URI.escape( args[ 0 ] )
+          path << "entity/" << p.escape( args[ 0 ] )
         when QueryType::SRCH_ENTITY_BY_NAME
           case args.length
             when 1
-              path << "entities?fn=" << URI.escape( args[ 0 ] )
+              path << "entities?fn=" << p.escape( args[ 0 ] )
             when 2
-              path << "entities?fn=" << URI.escape( args[ 0 ] + " " + args[ 1 ] )
+              path << "entities?fn=" << p.escape( args[ 0 ] + " " + args[ 1 ] )
             when 3
-              path << "entities?fn=" << URI.escape( args[ 0 ] + " " + args[ 1 ] + " " + args[ 2 ] )
+              path << "entities?fn=" << p.escape( args[ 0 ] + " " + args[ 1 ] + " " + args[ 2 ] )
           end
         when QueryType::SRCH_DOMAIN_BY_NAME
           path << "domains?name=" << args[ 0 ]

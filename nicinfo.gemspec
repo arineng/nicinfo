@@ -9,8 +9,8 @@ Gem::Specification.new do |s|
   s.date        = Time.now.strftime( "%Y-%m-%d" )
   s.summary     = "RDAP Client"
   s.description = "A command-line RDAP client."
-  s.authors     = ["Andrew Newton"]
-  s.email       = 'andy@arin.net'
+  s.authors     = ["Andrew Newton","Garth Dubin"]
+  s.email       = 'gdubin@arin.net'
   s.files       = Dir["lib/**/*"].entries
   s.homepage    = 'https://github.com/arinlabs/nicinfo'
   s.license      = 'ISC'

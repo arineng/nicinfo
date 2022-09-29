@@ -20,8 +20,9 @@ require 'nicinfo/config'
 module NicInfo
 
   def NicInfo.make_safe( url )
-    safe = URI.escape( url )
-    safe = URI.escape( safe, "!*'();:@&=+$,/?#[]" )
+    p = URI::Parser.new
+    safe = p.escape( url )
+    safe = p.escape( safe, "!*'();:@&=+$,/?#[]" )
     return safe
   end
 
