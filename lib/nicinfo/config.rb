@@ -131,7 +131,7 @@ module NicInfo
     def get_bsfiles_last_update_time
       retval = nil
       fname = bsfiles_last_update_filename
-      if File.exists?( fname )
+      if File.exist?( fname )
         f = File.open( fname, "r" )
         data = f.read
         f.close
@@ -185,7 +185,7 @@ module NicInfo
     def load_as_yaml name, default = nil
       file_name = make_file_name( name )
       retval = default
-      if File.exists?( file_name )
+      if File.exist?( file_name )
         data_file = File.open( File.join( @app_data, name ), "r" )
         retval = YAML::load( data_file )
         data_file.close

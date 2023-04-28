@@ -18,7 +18,7 @@
 
 module NicInfo
 
-  VERSION = "1.5.1"
+  VERSION = "1.5.2"
   VERSION_LABEL = "NicInfo v." + VERSION
   COPYRIGHT = "Copyright (c) 2011-2017 American Registry for Internet Numbers (ARIN)"
   CONFIG_VERSION = 4

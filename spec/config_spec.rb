@@ -114,7 +114,7 @@ NOT_DEFAULT_CONFIG
     c.logger.message_level = "NONE"
     c.setup_workspace
 
-    expect( File.exists?( c.bsfiles_last_update_filename ) ).to be_falsey
+    expect( File.exist?( c.bsfiles_last_update_filename ) ).to be_falsey
     t2 = c.get_bsfiles_last_update_time
     expect( t2 ).to be_nil
 
