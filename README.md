@@ -1,3 +1,9 @@
+# Deprecated
+
+This repository is no longer maintained.
+
+Please consider using [ICANN RDAP](https://github.com/icann/icann-rdap) as an alternative.
+
 # Overview
 [![Gem Version](https://badge.fury.io/rb/nicinfo.svg)](https://badge.fury.io/rb/nicinfo)
 [![Build Status](https://travis-ci.org/arineng/nicinfo.svg?branch=master)](https://travis-ci.org/arineng/nicinfo)
